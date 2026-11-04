@@ -1,0 +1,68 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master, cesaruribe]
+  pull_request:
+    branches: [main, master, cesaruribe]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  pruebas:
+    name: Compilar y probar
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      - name: Configurar JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Dar permisos al wrapper
+        run: chmod +x mvnw
+
+      - name: Ejecutar la suite
+        run: ./mvnw -B -ntp verify
+
+      - name: Publicar reportes de pruebas
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reportes-surefire
+          path: target/surefire-reports/
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Resumen de resultados
+        if: always()
+        run: |
+          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import glob
+          import xml.etree.ElementTree as ET
+
+          total = fallos = errores = omitidas = 0
+          for ruta in glob.glob("target/surefire-reports/*.xml"):
+              raiz = ET.parse(ruta).getroot()
+              total += int(raiz.get("tests", 0))
+              fallos += int(raiz.get("failures", 0))
+              errores += int(raiz.get("errors", 0))
+              omitidas += int(raiz.get("skipped", 0))
+
+          print("### Resultados de la suite\n")
+          print("| Pruebas | Fallidas | Errores | Omitidas |")
+          print("|---|---|---|---|")
+          print(f"| {total} | {fallos} | {errores} | {omitidas} |")
+          PY

@@ -279,7 +279,15 @@ La aplicación queda disponible en <http://localhost:8080>.
 ./mvnw test
 ```
 
-Las pruebas usan el perfil `test` con **H2 en memoria** y Flyway deshabilitado. Cubren:
+Las pruebas usan el perfil `test` con **H2 en memoria** y Flyway deshabilitado. La estrategia,
+el calendario, los criterios de aceptación y la matriz de trazabilidad están en
+[`docs/PLAN_DE_PRUEBAS.md`](docs/PLAN_DE_PRUEBAS.md); la verificación manual, en
+[`docs/CHECKLIST_PRUEBAS_MANUALES.md`](docs/CHECKLIST_PRUEBAS_MANUALES.md).
+
+La suite se ejecuta automáticamente en cada push y pull request mediante
+[`.github/workflows/ci.yml`](.github/workflows/ci.yml).
+
+Cubren:
 
 - Login público, credenciales válidas e inválidas.
 - Redirección de usuarios anónimos.

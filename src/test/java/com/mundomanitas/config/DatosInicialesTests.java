@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -24,9 +25,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Verifica que las semillas creen los datos mínimos sobre una base vacía
  * (H2 arranca sin tablas ni registros) y que ejecutarlas de nuevo no
  * duplique información.
+ *
+ * <p>Se fuerza un contexto limpio antes de la clase porque otras pruebas
+ * pueden dejar usuarios o postulaciones en la misma base H2 compartida,
+ * haciendo que los conteos exactos dependan del orden de ejecución.</p>
  */
 @SpringBootTest
 @ActiveProfiles("test")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 class DatosInicialesTests {
 
     @Autowired

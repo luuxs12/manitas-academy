@@ -6,6 +6,19 @@ on:
   pull_request:
     branches: [main, master, cesaruribe]
   workflow_dispatch:
+    inputs:
+      usuarios:
+        description: "Hilos del escenario de landing"
+        required: false
+        default: "300"
+      usuariosApi:
+        description: "Hilos del escenario de login + catálogo"
+        required: false
+        default: "100"
+      duracion:
+        description: "Duración de la prueba en segundos"
+        required: false
+        default: "180"
 
 permissions:
   contents: read
@@ -241,17 +254,17 @@ jobs:
           curl -fsSL -o jmeter.tgz https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-5.6.3.tgz
           tar -xzf jmeter.tgz
 
-      - name: Ejecutar prueba de carga
+      - name: Ejecutar prueba de carga (300 usuarios por defecto)
         run: |
           ./apache-jmeter-5.6.3/bin/jmeter -n \
             -t perf/mundomanitas.jmx \
             -l perf/resultados.jtl \
             -e -o perf/reporte \
             -JbaseUrl=http://localhost:8080 \
-            -Jusuarios=20 \
-            -JusuariosApi=10 \
-            -JrampUp=15 \
-            -Jduracion=120
+            -Jusuarios=${{ inputs.usuarios || '300' }} \
+            -JusuariosApi=${{ inputs.usuariosApi || '100' }} \
+            -JrampUp=60 \
+            -Jduracion=${{ inputs.duracion || '180' }}
 
       - name: Publicar reporte de JMeter
         if: always()

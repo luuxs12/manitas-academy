@@ -39,7 +39,61 @@ jmeter -n -t perf/mundomanitas.jmx \
   -Jduracion=300
 ```
 
-El reporte HTML queda en `perf/reporte/index.html`.
+## Prueba de 300 usuarios (requisito de la entrega)
+
+300 usuarios concurrentes en la landing y 100 en el flujo de login + catálogo.
+También está disponible como job manual de CI (`.github/workflows/ci.yml`).
+
+En Windows, con la aplicación arrancada:
+
+```powershell
+powershell -ExecutionPolicy Bypass -File perf/ejecutar-300.ps1
+```
+
+En Linux/macOS o CI:
+
+```bash
+jmeter -n -t perf/mundomanitas.jmx \
+  -l perf/resultados-300.jtl \
+  -e -o perf/reporte-300 \
+  -JbaseUrl=http://localhost:8080 \
+  -Jusuarios=300 \
+  -JusuariosApi=100 \
+  -JrampUp=60 \
+  -Jduracion=180
+```
+
+El script `perf/ejecutar-300.ps1` valida `/actuator/health`, ejecuta el plan,
+calcula la media, el p95 y el máximo por petición, y **devuelve error si la tasa
+de error supera el 1 %**. Resultados en `perf/resultados-300.jtl` y
+`perf/reporte-300/index.html`.
+
+| Escenario | Hilos | Criterio de aceptación |
+|---|---|---|
+| Landing (`/` y `/inicio`) | 300 | error < 1 % |
+| Login + catálogo API | 100 | error < 1 % |
+
+El p95 se registra como métrica informativa. Los objetivos de latencia del
+plan (p95 < 800 ms en landing, < 1500 ms en login y < 500 ms en catálogo) se
+evalúan en un entorno de staging dedicado; en un portátil de desarrollo con la
+aplicación, PostgreSQL y JMeter compitiendo por la misma CPU, la latencia es
+necesariamente mayor.
+
+### Resultado de la última ejecución local
+
+Ejecución del 2026-11-04 en `localhost:8080` con PostgreSQL 18 local:
+
+| Petición | Muestras | Media | p95 | Máximo |
+|---|---:|---:|---:|---:|
+| `GET /` | 7 737 | 2 139 ms | 4 233 ms | 6 685 ms |
+| `GET /inicio` | 7 590 | 2 147 ms | 4 222 ms | 8 235 ms |
+| `POST /api/auth/login` | 3 367 | 1 806 ms | 3 094 ms | 5 060 ms |
+| `GET /api/cursos` | 3 291 | 692 ms | 1 329 ms | 2 242 ms |
+
+**21 985 muestras, 0 errores (0,00 %)**. El criterio de aceptación duro
+(tasa de error < 1 %) se cumple.
+
+El reporte HTML queda en `perf/reporte-300/index.html`.
 
 ## Parámetros
 

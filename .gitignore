@@ -37,6 +37,14 @@ logs/
 .env
 *.log
 
+### E2E y rendimiento ###
+node_modules/
+e2e/node_modules/
+e2e/playwright-report/
+e2e/test-results/
+perf/reporte/
+perf/*.jtl
+
 # Configuración local con credenciales reales.
 # Usa application-dev.example.properties como plantilla.
 src/main/resources/application-dev.properties

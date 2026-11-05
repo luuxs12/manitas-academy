@@ -313,6 +313,44 @@ El script arranca la aplicación con el perfil `dev`, espera a que responda y co
 formulario de login, `/actuator/health`, redirección de anónimos, login JWT, catálogo por API,
 403 por rol, sesión web con catálogo, reporte Excel del docente y certificado Word del estudiante.
 
+### Pruebas E2E y accesibilidad
+
+La suite de Playwright cubre landing, sesión, roles y WCAG 2.1 AA. Requiere Node 20+ y la
+aplicación corriendo:
+
+```bash
+cd e2e
+npm install
+npx playwright install chromium
+npm test
+```
+
+Detalles en [`e2e/README.md`](e2e/README.md). En CI se ejecuta en el job `e2e` con PostgreSQL 18.
+
+### Pruebas de rendimiento
+
+El plan de JMeter tiene dos escenarios (landing y login + catálogo API) con umbrales de
+p95 y tasa de error:
+
+```bash
+jmeter -n -t perf/mundomanitas.jmx -l perf/resultados.jtl -e -o perf/reporte \
+  -JbaseUrl=http://localhost:8080 -Jusuarios=50 -JusuariosApi=30 -JrampUp=30 -Jduracion=300
+```
+
+Detalles y criterios en [`perf/README.md`](perf/README.md). En CI se ejecuta manualmente
+(`workflow_dispatch`) con una carga reducida.
+
+### Cobertura de código
+
+JaCoCo se ejecuta en cada build y deja el reporte en `target/site/jacoco/index.html`:
+
+```bash
+./mvnw test
+```
+
+La cobertura actual es 75.3 % de líneas (78.6 % en el paquete `service`). En CI el reporte
+se publica junto a los resultados de la suite.
+
 ---
 
 ## 8. Despliegue con Docker

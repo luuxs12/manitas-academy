@@ -66,10 +66,14 @@ Cada criterio es medible y verificable en la entrega.
 | AC-06 | Regresiones en la matriz de roles | 0 | `AplicacionWebTests` + smoke manual |
 | AC-07 | Accesibilidad básica en landing, login y dashboard | Sin bloqueos de teclado; contraste AA en texto principal | Checklist manual + axe DevTools |
 | AC-08 | Cobertura funcional de servicios críticos | Cada método público de `service/` con al menos un caso feliz y uno de error | Revisión de matriz |
+| AC-09 | Cobertura de líneas del proyecto | ≥ 70 % (línea base actual: 75.3 %) | `./mvnw test` → `target/site/jacoco/index.html` |
+| AC-10 | Cobertura de líneas del paquete `service` | ≥ 75 % (actual: 78.6 %) | Reporte JaCoCo por paquete |
 
-> La cobertura de líneas (JaCoCo) es deseable, pero **no se impone como umbral** todavía:
-> un porcentaje alto con pruebas triviales da falsa seguridad. Primero se exige
-> trazabilidad requisito → prueba.
+> La cobertura se mide con JaCoCo en cada build, pero **no se impone todavía como
+> umbral que rompa el build**: un porcentaje alto con pruebas triviales da falsa
+> seguridad. Primero se exige trazabilidad requisito → prueba y luego se aprieta
+> el umbral de forma gradual. El número se revisa en cada PR contra la línea base
+> de AC-09/AC-10.
 
 ---
 
@@ -84,9 +88,9 @@ Se usa una pirámide con base amplia de pruebas rápidas y una cima pequeña de 
 | Web MVC | Controladores, modelo, plantillas, seguridad de sesión | `MockMvc` + `spring-security-test` | `web/AplicacionWebTests` | Cada push | Desarrollo |
 | API REST | Contratos JSON, JWT, códigos HTTP | `MockMvc` + JWT real | `api/ApiRestTests`, `web/PostulacionApiTests` | Cada push | Desarrollo |
 | Semillas y datos | Idempotencia, roles, módulos de navegación | `@SpringBootTest` | `config/DatosInicialesTests` | Cada push | Desarrollo |
-| Humo E2E | Flujo real en navegador | Manual hoy → Playwright (fase 2) | `docs/CHECKLIST_PRUEBAS_MANUALES.md` | Antes de entrega | QA / todo el equipo |
-| Rendimiento | Latencia y errores bajo carga | JMeter (fase 3) | `docs/` (plan adjunto) | Antes de release | QA |
-| Accesibilidad | Uso sin ratón, contraste, lector de pantalla | axe DevTools + revisión manual | Checklist manual | Antes de release | Diseño + QA |
+| Humo E2E | Flujo real en navegador | Playwright + axe-core | `e2e/tests` | Cada push | Desarrollo |
+| Rendimiento | Latencia y errores bajo carga | JMeter 5.6 | `perf/mundomanitas.jmx` | Antes de release / manual | QA |
+| Accesibilidad | Uso sin ratón, contraste, lector de pantalla | axe-core + revisión manual | `e2e/tests/accesibilidad.spec.ts` + checklist | Cada push y antes de release | Diseño + QA |
 | Seguridad | Configuración, cabeceras, exposición | Revisión + OWASP ZAP baseline (fase 3) | CI / manual | Antes de release | Desarrollo |
 
 ### 4.1 Qué se automatiza y qué no
@@ -163,12 +167,12 @@ Cada área funcional apunta a las pruebas que hoy la cubren. Total actual: **81 
 
 ### 6.1 Huecos conocidos
 
-| Hueco | Riesgo | Plan |
+| Hueco | Riesgo | Estado |
 |---|---|---|
-| Sin E2E de navegador | Regresiones visuales o de JS pasan desapercibidas | Playwright en semana 3 |
-| Sin prueba de carga | Degradación bajo concurrencia | JMeter en semana 4 |
-| Sin JaCoCo | Cobertura no medida | Evaluar en semana 2 |
-| Sin prueba de accesibilidad automatizada | Barreras para usuarios sordos | axe DevTools + revisión manual |
+| Sin E2E de navegador | Regresiones visuales o de JS pasan desapercibidas | **Cubierto**: `e2e/` y job `e2e` en CI |
+| Sin prueba de carga | Degradación bajo concurrencia | **Cubierto**: `perf/mundomanitas.jmx` y job manual |
+| Sin JaCoCo | Cobertura no medida | **Cubierto**: JaCoCo en `pom.xml` y reporte como artefacto de CI |
+| Sin prueba de accesibilidad automatizada | Barreras para usuarios sordos | **Cubierto**: axe-core en `e2e/tests/accesibilidad.spec.ts` |
 
 ---
 
@@ -241,17 +245,28 @@ Se ejecuta en:
 - `pull_request` hacia esas ramas.
 - Ejecución manual (`workflow_dispatch`).
 
-Pasos:
+Tres jobs:
+
+| Job | Qué hace | Cuándo |
+|---|---|---|
+| `pruebas` | `./mvnw -B -ntp verify` + reporte Surefire + resumen | Cada push y PR |
+| `e2e` | PostgreSQL 18, empaqueta, arranca la app, instala Chromium y ejecuta Playwright + axe | Cada push y PR, después de `pruebas` |
+| `rendimiento` | JMeter con carga reducida y reporte HTML | Solo `workflow_dispatch` |
+
+Pasos del job `pruebas`:
 
 1. Checkout del código.
 2. JDK 21 Temurin con caché de Maven.
 3. `./mvnw -B -ntp verify`.
-4. Publicación de `target/surefire-reports/` como artefacto.
+4. Publicación de `target/surefire-reports/` y `target/site/jacoco/` como artefacto.
 5. Resumen de resultados en la página del workflow.
+
+El job `e2e` publica `playwright-report/`, `test-results/` y, si falla, el log de
+la aplicación. El job `rendimiento` publica `perf/reporte/` y el `.jtl`.
 
 Recomendaciones de protección de rama:
 
-- Requerir el check **CI / Compilar y probar** antes de fusionar.
+- Requerir los checks **CI / Compilar y probar** y **CI / E2E y accesibilidad** antes de fusionar.
 - Prohibir el merge con la suite en rojo.
 - Requerir al menos una revisión aprobada.
 
@@ -271,18 +286,22 @@ Frecuencia: antes de cada entrega y al cerrar cada iteración.
 
 ---
 
-## 12. Pruebas de rendimiento (fase 3)
+## 12. Pruebas de rendimiento
 
-Herramienta: **Apache JMeter 5.x** (gratuita, estándar, sin dependencias de SaaS).
+Herramienta: **Apache JMeter 5.6** (gratuita, estándar, sin dependencias de SaaS).
+Plan versionado: `perf/mundomanitas.jmx` · Instrucciones: `perf/README.md`.
 
 | Escenario | Peticiones | Carga | Criterio |
 |---|---|---|---|
-| Landing pública | `GET /` | 50 usuarios, ramp-up 30 s, 5 min | p95 < 800 ms, error < 1 % |
-| Login + dashboard | `POST /login` + `GET /dashboard` | 30 usuarios | p95 < 1.5 s, error < 1 % |
-| API catálogo | `GET /api/cursos?page=0&size=9` con JWT | 50 usuarios | p95 < 500 ms, error < 1 % |
+| Landing pública | `GET /` y `GET /inicio` | 50 usuarios, ramp-up 30 s, 5 min | p95 < 800 ms, error < 1 % |
+| Login API + catálogo | `POST /api/auth/login` + `GET /api/cursos?page=0&size=9` con JWT | 30 usuarios | p95 < 1.5 s login y < 500 ms catálogo, error < 1 % |
 
 Se ejecuta contra el entorno de staging (Docker Compose + PostgreSQL), nunca contra producción.
 Entregable: `.jtl` + reporte HTML de JMeter + conclusión con cuello de botella identificado.
+
+**Última ejecución de humo** (3 usuarios de landing y 2 de API, 20 s, entorno local H2):
+96 muestras, 0 errores; p95 de 29 ms en landing, 78 ms en catálogo y 430 ms en login.
+Los umbrales completos se validan en la ejecución de 5 minutos contra staging.
 
 ---
 
@@ -293,11 +312,12 @@ Entregable: `.jtl` + reporte HTML de JMeter + conclusión con cuello de botella 
 | Unitarias e integración Java | JUnit 5 + Spring Boot Test | Ya integradas, cero fricción, el equipo las conoce | TestNG (menos ecosistema Spring) |
 | Web MVC y API | MockMvc | Rápido, sin servidor real, valida seguridad | RestAssured (útil, pero añade capa) |
 | Base de datos de prueba | H2 modo PostgreSQL | Instantánea, aislada, sin servicios externos | Testcontainers (más fiel, más lento; evaluar si aparecen diferencias) |
-| E2E de navegador | Playwright (fase 2) | Multi-navegador, trazas, buena API, CI amigable | Selenium (más mantenimiento), Cypress (solo Chromium en gratis) |
+| E2E de navegador | Playwright | Multi-navegador, trazas, buena API, CI amigable | Selenium (más mantenimiento), Cypress (solo Chromium en gratis) |
 | Rendimiento | JMeter | Estándar, gratuito, reportes claros | k6 (excelente, pero requiere Node/Go) |
 | CI/CD | GitHub Actions | El repositorio ya está en GitHub, sin costo adicional | Azure DevOps (potente, pero fuera del flujo actual) |
 | Gestión de pruebas y defectos | GitHub Issues + Projects | Trazabilidad junto al código, sin licencias | Azure DevOps Boards, Jira |
-| Accesibilidad | axe DevTools + revisión manual | Detecta lo automático; lo humano se revisa a mano | Solo automatizado (insuficiente) |
+| Accesibilidad | axe-core + revisión manual | Detecta automáticamente lo objetivo; lo humano se revisa a mano | Solo automatizado (insuficiente) |
+| Cobertura | JaCoCo | Estándar en Maven, reporte HTML y CSV | Sin medición (ciego a huecos) |
 
 > **Regla de oro**: no se adopta una herramienta que el equipo no pueda mantener.
 > Playwright y JMeter entran cuando la base automatizada ya es estable.
@@ -314,6 +334,9 @@ Entregable: `.jtl` + reporte HTML de JMeter + conclusión con cuello de botella 
 | Defectos escapados | Defectos hallados post-entrega / total | ≤ 5 % |
 | Tiempo de suite | Duración del job CI | ≤ 5 min |
 | Cobertura por requisito | Áreas con prueba / áreas totales | 100 % |
+| Cobertura de líneas (JaCoCo) | Líneas cubiertas / líneas instrumentadas | ≥ 70 % (hoy 75.3 %) |
+| Cobertura del paquete `service` | Líneas cubiertas / líneas de `service/` | ≥ 75 % (hoy 78.6 %) |
+| Cobertura de ramas (JaCoCo) | Ramas cubiertas / ramas instrumentadas | Informativa (hoy 54.0 %) |
 
 Se revisan al cierre de cada iteración y se registran en el informe de la semana 4,
 usando la plantilla `docs/INFORME_DE_PRUEBAS.md`.

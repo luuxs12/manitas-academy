@@ -37,12 +37,14 @@ jobs:
       - name: Ejecutar la suite
         run: ./mvnw -B -ntp verify
 
-      - name: Publicar reportes de pruebas
+      - name: Publicar reportes de pruebas y cobertura
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: reportes-surefire
-          path: target/surefire-reports/
+          path: |
+            target/surefire-reports/
+            target/site/jacoco/
           if-no-files-found: ignore
           retention-days: 7
 
@@ -66,3 +68,198 @@ jobs:
           print("|---|---|---|---|")
           print(f"| {total} | {fallos} | {errores} | {omitidas} |")
           PY
+
+  e2e:
+    name: E2E y accesibilidad
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    needs: pruebas
+
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_DB: mundomanitas
+          POSTGRES_USER: mundomanitas
+          POSTGRES_PASSWORD: mundomanitas
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U mundomanitas -d mundomanitas"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 12
+
+    env:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/mundomanitas
+      SPRING_DATASOURCE_USERNAME: mundomanitas
+      SPRING_DATASOURCE_PASSWORD: mundomanitas
+      JWT_SECRET: ci-jwt-secret-key-with-at-least-32-characters
+      REMEMBER_ME_KEY: ci-remember-me-key
+      SERVER_PORT: "8080"
+
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      - name: Configurar JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Dar permisos al wrapper
+        run: chmod +x mvnw
+
+      - name: Empaquetar la aplicación
+        run: ./mvnw -B -ntp -DskipTests package
+
+      - name: Arrancar la aplicación
+        run: |
+          nohup java -jar target/mundomanitas-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
+          echo $! > app.pid
+
+      - name: Esperar a que responda
+        run: |
+          for intento in $(seq 1 60); do
+            if curl -fsS http://localhost:8080/actuator/health > /dev/null; then
+              echo "Aplicación lista tras $intento intentos"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "La aplicación no arrancó"
+          tail -n 120 app.log
+          exit 1
+
+      - name: Configurar Node 22
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: e2e/package-lock.json
+
+      - name: Instalar dependencias E2E
+        working-directory: e2e
+        run: npm ci
+
+      - name: Instalar Chromium
+        working-directory: e2e
+        run: npx playwright install --with-deps chromium
+
+      - name: Ejecutar E2E y accesibilidad
+        working-directory: e2e
+        run: npx playwright test
+
+      - name: Publicar reporte de Playwright
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reporte-playwright
+          path: |
+            e2e/playwright-report/
+            e2e/test-results/
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Publicar log de la aplicación
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: log-aplicacion
+          path: app.log
+          if-no-files-found: ignore
+          retention-days: 7
+
+  rendimiento:
+    name: Prueba de carga (manual)
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    services:
+      postgres:
+        image: postgres:18-alpine
+        env:
+          POSTGRES_DB: mundomanitas
+          POSTGRES_USER: mundomanitas
+          POSTGRES_PASSWORD: mundomanitas
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U mundomanitas -d mundomanitas"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 12
+
+    env:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/mundomanitas
+      SPRING_DATASOURCE_USERNAME: mundomanitas
+      SPRING_DATASOURCE_PASSWORD: mundomanitas
+      JWT_SECRET: ci-jwt-secret-key-with-at-least-32-characters
+      REMEMBER_ME_KEY: ci-remember-me-key
+      SERVER_PORT: "8080"
+
+    steps:
+      - name: Descargar el código
+        uses: actions/checkout@v4
+
+      - name: Configurar JDK 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "21"
+          cache: maven
+
+      - name: Dar permisos al wrapper
+        run: chmod +x mvnw
+
+      - name: Empaquetar la aplicación
+        run: ./mvnw -B -ntp -DskipTests package
+
+      - name: Arrancar la aplicación
+        run: |
+          nohup java -jar target/mundomanitas-0.0.1-SNAPSHOT.jar > app.log 2>&1 &
+          echo $! > app.pid
+
+      - name: Esperar a que responda
+        run: |
+          for intento in $(seq 1 60); do
+            if curl -fsS http://localhost:8080/actuator/health > /dev/null; then
+              echo "Aplicación lista tras $intento intentos"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "La aplicación no arrancó"
+          tail -n 120 app.log
+          exit 1
+
+      - name: Descargar JMeter
+        run: |
+          curl -fsSL -o jmeter.tgz https://archive.apache.org/dist/jmeter/binaries/apache-jmeter-5.6.3.tgz
+          tar -xzf jmeter.tgz
+
+      - name: Ejecutar prueba de carga
+        run: |
+          ./apache-jmeter-5.6.3/bin/jmeter -n \
+            -t perf/mundomanitas.jmx \
+            -l perf/resultados.jtl \
+            -e -o perf/reporte \
+            -JbaseUrl=http://localhost:8080 \
+            -Jusuarios=20 \
+            -JusuariosApi=10 \
+            -JrampUp=15 \
+            -Jduracion=120
+
+      - name: Publicar reporte de JMeter
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: reporte-jmeter
+          path: |
+            perf/reporte/
+            perf/resultados.jtl
+          if-no-files-found: ignore
+          retention-days: 7

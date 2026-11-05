@@ -1,0 +1,17 @@
+{
+  "name": "mundomanitas-e2e",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Pruebas de extremo a extremo y accesibilidad de Mundo Manitas",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:ui": "playwright test --ui",
+    "report": "playwright show-report"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "4.10.0",
+    "@playwright/test": "1.49.1",
+    "@types/node": "22.10.2"
+  }
+}

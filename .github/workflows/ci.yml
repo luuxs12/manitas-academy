@@ -48,7 +48,30 @@ jobs:
         run: chmod +x mvnw
 
       - name: Ejecutar la suite
-        run: ./mvnw -B -ntp verify
+        id: suite
+        continue-on-error: true
+        run: |
+          set -o pipefail
+          ./mvnw -B -ntp verify 2>&1 | tee suite.log
+
+      - name: Mostrar causa de los fallos
+        if: steps.suite.outcome == 'failure'
+        run: |
+          echo "::error::La suite falló. Detalle a continuación."
+          encontrado=0
+          for f in target/surefire-reports/*.txt; do
+            [ -f "$f" ] || continue
+            if grep -qE 'Failures: [1-9]|Errors: [1-9]' "$f"; then
+              encontrado=1
+              detalle=$(tr '\n' ' ' < "$f" | sed 's/%/%25/g; s/\r//g' | cut -c1-1400)
+              echo "::error file=$f::$detalle"
+            fi
+          done
+          if [ "$encontrado" = "0" ]; then
+            detalle=$(tail -n 120 suite.log | tr '\n' ' ' | sed 's/%/%25/g; s/\r//g' | cut -c1-1400)
+            echo "::error::Sin reportes surefire. Últimas líneas del build: $detalle"
+          fi
+          exit 1
 
       - name: Publicar reportes de pruebas y cobertura
         if: always()

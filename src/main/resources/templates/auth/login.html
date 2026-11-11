@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('Iniciar sesión')}"></head>
+
+<body>
+<header th:replace="~{fragments/layout :: header}"></header>
+
+<main id="contenido" class="page page-center">
+    <div class="auth-card">
+        <p class="eyebrow">Cuentas</p>
+        <h1>Iniciar sesión</h1>
+        <p class="lead">
+            Estamos terminando esta pantalla. Muy pronto vas a poder entrar con tu
+            correo y continuar tus cursos.
+        </p>
+
+        <div class="auth-actions">
+            <a class="btn btn-primary" th:href="@{/registro}">Crear cuenta</a>
+            <a class="btn btn-ghost" th:href="@{/}">Volver al inicio</a>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/layout :: footer}"></footer>
+</body>
+</html>

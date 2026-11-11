@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:fragment="head(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description"
+          content="Cursos online accesibles con Lengua de Señas Peruana. Aprendé a tu ritmo, con intérprete y subtítulos en cada clase.">
+    <title th:text="${title} + ' · Mundo Manitas'">Mundo Manitas</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+
+<body>
+
+<header th:fragment="header">
+    <a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+    <nav class="nav" aria-label="Navegación principal">
+        <a class="brand" th:href="@{/}">
+            <span class="brand-mark" aria-hidden="true">MM</span>
+            <span>Mundo Manitas</span>
+        </a>
+
+        <ul class="nav-links">
+            <li><a th:href="@{/} + '#como-funciona'">Cómo funciona</a></li>
+            <li><a th:href="@{/} + '#accesibilidad'">Accesibilidad</a></li>
+            <li><a th:href="@{/} + '#membresia'">Membresía</a></li>
+        </ul>
+
+        <div class="nav-actions">
+            <a class="btn btn-ghost" th:href="@{/login}">Iniciar sesión</a>
+            <a class="btn btn-primary" th:href="@{/registro}">Crear cuenta</a>
+        </div>
+    </nav>
+</header>
+
+<footer th:fragment="footer">
+    <div class="footer-inner">
+        <div class="footer-brand">
+            <a class="brand" th:href="@{/}">
+                <span class="brand-mark" aria-hidden="true">MM</span>
+                <span>Mundo Manitas</span>
+            </a>
+            <p class="muted">Cursos online con Lengua de Señas Peruana.</p>
+        </div>
+
+        <nav aria-label="Enlaces del pie de página">
+            <ul class="footer-links">
+                <li><a th:href="@{/}">Inicio</a></li>
+                <li><a th:href="@{/} + '#accesibilidad'">Accesibilidad</a></li>
+                <li><a th:href="@{/login}">Iniciar sesión</a></li>
+                <li><a th:href="@{/registro}">Crear cuenta</a></li>
+            </ul>
+        </nav>
+
+        <p class="muted footer-copy">© 2026 Mundo Manitas · Hecho en Perú</p>
+    </div>
+</footer>
+
+</body>
+</html>

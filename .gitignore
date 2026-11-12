@@ -43,6 +43,7 @@ application-prod.yml
 ### Logs ###
 logs/
 *.log
+*.err
 
 ### Sistema operativo ###
 Thumbs.db

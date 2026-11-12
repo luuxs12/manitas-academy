@@ -1,138 +1,151 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="~{fragments/layout :: head('Cursos accesibles con Lengua de Señas')}"></head>
+<head th:replace="~{fragments/layout :: head('Cursos online con Lengua de Señas')}"></head>
 
-<body>
-<header th:replace="~{fragments/layout :: header}"></header>
+<body class="home">
 
-<main id="contenido">
+<div class="shell">
 
-    <!-- ---------------------------------------------------------
-         Portada
-         --------------------------------------------------------- -->
-    <section class="hero">
-        <div class="hero-copy">
-            <p class="eyebrow">Cursos online accesibles</p>
-            <h1>Aprendé a tu ritmo, <span class="accent">en tu lengua</span>.</h1>
-            <p class="lead">
-                Clases con video principal, intérprete en Lengua de Señas Peruana y
-                subtítulos. Para personas sordas, oyentes y para quien quiera
-                aprender distinto.
-            </p>
+    <header th:replace="~{fragments/layout :: header}"></header>
 
-            <div class="hero-actions">
-                <a class="btn btn-primary btn-lg" th:href="@{/registro}">Crear cuenta gratis</a>
-                <a class="btn btn-ghost btn-lg" th:href="@{/login}">Ya tengo cuenta</a>
+    <main id="contenido">
+
+        <!-- =========================================================
+             Portada
+             ========================================================= -->
+        <section class="hero" aria-labelledby="titulo-portada">
+
+            <div class="hero-bg" aria-hidden="true">
+                <video class="hero-video"
+                       autoplay muted loop playsinline preload="auto"
+                       poster="/img/hero-poster.jpg">
+                    <source th:src="@{/video/hero.mp4}" type="video/mp4">
+                </video>
+                <span class="hero-scrim"></span>
+                <span class="hero-grain"></span>
             </div>
 
-            <p class="hero-note">Cursos gratis y membresía premium · Sin tarjeta para empezar</p>
-        </div>
+            <div class="hero-inner">
 
-        <div class="hero-visual" aria-hidden="true">
-            <div class="mock-player">
-                <div class="mock-main">
-                    <span class="mock-tag">Clase de ejemplo</span>
-                    <span class="mock-caption">Hoy vamos a aprender el alfabeto en LSP.</span>
-                </div>
-                <div class="mock-sign">
-                    <span class="mock-sign-label">LSP</span>
-                    <span class="mock-sign-text">Intérprete</span>
-                </div>
-            </div>
-            <div class="mock-float">Subtítulos activados</div>
-        </div>
-    </section>
+                <p class="hero-kicker">Accesible por diseño</p>
 
-    <!-- ---------------------------------------------------------
-         Cómo funciona
-         --------------------------------------------------------- -->
-    <section class="section" id="como-funciona" aria-labelledby="titulo-como">
-        <p class="section-kicker">Cómo funciona</p>
-        <h2 id="titulo-como">Tres pasos y empezás</h2>
+                <h1 class="hero-title" id="titulo-portada">
+                    Aprendé a tu ritmo,<br>
+                    en tu lengua.
+                </h1>
 
-        <div class="steps">
-            <article class="step">
-                <span class="step-num">01</span>
-                <h3>Creá tu cuenta</h3>
-                <p>Elegí si querés ver las clases con intérprete en LSP y subtítulos.
-                    Podés cambiarlo cuando quieras desde tu perfil.</p>
-            </article>
-
-            <article class="step">
-                <span class="step-num">02</span>
-                <h3>Elegí tu curso</h3>
-                <p>Hay cursos gratis para empezar y una membresía premium con
-                    acceso a todo el catálogo.</p>
-            </article>
-
-            <article class="step">
-                <span class="step-num">03</span>
-                <h3>Aprendé y medí tu avance</h3>
-                <p>Mirá las lecciones a tu ritmo. Tu progreso queda guardado y
-                    podés retomar donde dejaste.</p>
-            </article>
-        </div>
-    </section>
-
-    <!-- ---------------------------------------------------------
-         Accesibilidad
-         --------------------------------------------------------- -->
-    <section class="section section-alt" id="accesibilidad" aria-labelledby="titulo-accesibilidad">
-        <p class="section-kicker">Accesibilidad</p>
-        <h2 id="titulo-accesibilidad">Pensada para no dejar a nadie afuera</h2>
-
-        <div class="features">
-            <article class="feature">
-                <h3>Lengua de Señas Peruana</h3>
-                <p>Cada lección tiene un video con intérprete, sincronizado con la clase.</p>
-            </article>
-
-            <article class="feature">
-                <h3>Subtítulos</h3>
-                <p>Texto sincronizado y revisado. Podés cambiar el tamaño desde tu perfil.</p>
-            </article>
-
-            <article class="feature">
-                <h3>Navegación con teclado</h3>
-                <p>Todo el sitio se recorre con Tab y Enter, con el foco siempre visible.</p>
-            </article>
-
-            <article class="feature">
-                <h3>A tu ritmo</h3>
-                <p>Velocidad de reproducción ajustable y progreso guardado en cada lección.</p>
-            </article>
-        </div>
-    </section>
-
-    <!-- ---------------------------------------------------------
-         Membresía
-         --------------------------------------------------------- -->
-    <section class="section" id="membresia" aria-labelledby="titulo-membresia">
-        <div class="cta-band">
-            <div>
-                <p class="section-kicker">Membresía</p>
-                <h2 id="titulo-membresia">Empezá gratis. Pasate a premium cuando quieras.</h2>
-                <p class="lead">
-                    Los cursos gratuitos quedan para siempre. La membresía mensual
-                    desbloquea todo el catálogo y los certificados.
+                <p class="hero-sub">
+                    Cursos online con intérprete en Lengua de Señas Peruana
+                    y subtítulos revisados.
                 </p>
+
+                <div class="hero-actions">
+                    <a class="btn btn-light btn-lg" th:href="@{/registro}">Crear cuenta gratis</a>
+                    <a class="link-action" th:href="@{/} + '#como-funciona'">Ver cómo funciona</a>
+                </div>
+
             </div>
-            <a class="btn btn-primary btn-lg" th:href="@{/registro}">Crear mi cuenta</a>
-        </div>
-    </section>
 
-    <!-- ---------------------------------------------------------
-         Llamado final
-         --------------------------------------------------------- -->
-    <section class="section final-cta" aria-labelledby="titulo-final">
-        <h2 id="titulo-final">Tu próximo curso empieza hoy</h2>
-        <p class="lead">Creá tu cuenta en menos de un minuto.</p>
-        <a class="btn btn-primary btn-lg" th:href="@{/registro}">Crear cuenta gratis</a>
-    </section>
+        </section>
 
-</main>
+        <!-- =========================================================
+             Cómo funciona
+             ========================================================= -->
+        <section class="section" id="como-funciona" aria-labelledby="titulo-como">
+            <div class="section-head">
+                <p class="section-kicker">Cómo funciona</p>
+                <h2 id="titulo-como">Tres pasos y empezás</h2>
+            </div>
 
-<footer th:replace="~{fragments/layout :: footer}"></footer>
+            <div class="steps">
+                <article class="step">
+                    <span class="step-num">01</span>
+                    <h3>Creá tu cuenta</h3>
+                    <p>Elegí si querés ver las clases con intérprete en LSP y subtítulos.
+                        Podés cambiarlo cuando quieras desde tu perfil.</p>
+                </article>
+
+                <article class="step">
+                    <span class="step-num">02</span>
+                    <h3>Elegí tu curso</h3>
+                    <p>Hay cursos gratis para empezar y una membresía premium con
+                        acceso a todo el catálogo.</p>
+                </article>
+
+                <article class="step">
+                    <span class="step-num">03</span>
+                    <h3>Aprendé y medí tu avance</h3>
+                    <p>Mirá las lecciones a tu ritmo. Tu progreso queda guardado y
+                        podés retomar donde dejaste.</p>
+                </article>
+            </div>
+        </section>
+
+        <!-- =========================================================
+             Accesibilidad
+             ========================================================= -->
+        <section class="section section-alt" id="accesibilidad" aria-labelledby="titulo-accesibilidad">
+            <div class="section-head">
+                <p class="section-kicker">Accesibilidad</p>
+                <h2 id="titulo-accesibilidad">Pensada para no dejar a nadie afuera</h2>
+            </div>
+
+            <div class="features">
+                <article class="feature">
+                    <h3>Lengua de Señas Peruana</h3>
+                    <p>Cada lección tiene un video con intérprete, sincronizado con la clase.</p>
+                </article>
+
+                <article class="feature">
+                    <h3>Subtítulos</h3>
+                    <p>Texto sincronizado y revisado. Podés cambiar el tamaño desde tu perfil.</p>
+                </article>
+
+                <article class="feature">
+                    <h3>Navegación con teclado</h3>
+                    <p>Todo el sitio se recorre con Tab y Enter, con el foco siempre visible.</p>
+                </article>
+
+                <article class="feature">
+                    <h3>A tu ritmo</h3>
+                    <p>Velocidad de reproducción ajustable y progreso guardado en cada lección.</p>
+                </article>
+            </div>
+        </section>
+
+        <!-- =========================================================
+             Membresía
+             ========================================================= -->
+        <section class="section" id="membresia" aria-labelledby="titulo-membresia">
+            <div class="cta-band">
+                <div class="cta-copy">
+                    <p class="section-kicker">Membresía</p>
+                    <h2 id="titulo-membresia">Empezá gratis.<br>Pasate a premium cuando quieras.</h2>
+                    <p class="lead">
+                        Los cursos gratuitos quedan para siempre. La membresía mensual
+                        desbloquea todo el catálogo y los certificados.
+                    </p>
+                </div>
+                <a class="btn btn-solid btn-lg" th:href="@{/registro}">Crear mi cuenta</a>
+            </div>
+        </section>
+
+        <!-- =========================================================
+             Llamado final
+             ========================================================= -->
+        <section class="section final-cta" aria-labelledby="titulo-final">
+            <p class="section-kicker">Empezá hoy</p>
+            <h2 id="titulo-final">Tu próximo curso<br>empieza hoy</h2>
+            <p class="lead">Creá tu cuenta en menos de un minuto.</p>
+            <a class="btn btn-solid btn-lg" th:href="@{/registro}">Crear cuenta gratis</a>
+        </section>
+
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+
+</div>
+
 </body>
 </html>

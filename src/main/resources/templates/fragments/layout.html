@@ -4,6 +4,8 @@
 <head th:fragment="head(title)">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="dark">
+    <meta name="theme-color" content="#FFFFFF">
     <meta name="description"
           content="Cursos online accesibles con Lengua de Señas Peruana. Aprendé a tu ritmo, con intérprete y subtítulos en cada clase.">
     <title th:text="${title} + ' · Mundo Manitas'">Mundo Manitas</title>
@@ -12,13 +14,14 @@
 
 <body>
 
-<header th:fragment="header">
+<header th:fragment="header" class="site-header">
     <a class="skip-link" href="#contenido">Saltar al contenido</a>
 
     <nav class="nav" aria-label="Navegación principal">
+
         <a class="brand" th:href="@{/}">
             <span class="brand-mark" aria-hidden="true">MM</span>
-            <span>Mundo Manitas</span>
+            <span class="brand-name">Mundo Manitas</span>
         </a>
 
         <ul class="nav-links">
@@ -28,18 +31,19 @@
         </ul>
 
         <div class="nav-actions">
-            <a class="btn btn-ghost" th:href="@{/login}">Iniciar sesión</a>
-            <a class="btn btn-primary" th:href="@{/registro}">Crear cuenta</a>
+            <a class="nav-login" th:href="@{/login}">Iniciar sesión</a>
+            <a class="btn btn-nav" th:href="@{/registro}">Crear cuenta</a>
         </div>
+
     </nav>
 </header>
 
-<footer th:fragment="footer">
+<footer th:fragment="footer" class="site-footer">
     <div class="footer-inner">
         <div class="footer-brand">
             <a class="brand" th:href="@{/}">
                 <span class="brand-mark" aria-hidden="true">MM</span>
-                <span>Mundo Manitas</span>
+                <span class="brand-name">Mundo Manitas</span>
             </a>
             <p class="muted">Cursos online con Lengua de Señas Peruana.</p>
         </div>

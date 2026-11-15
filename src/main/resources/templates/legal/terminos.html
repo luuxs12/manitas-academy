@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('Términos de uso')}"></head>
+
+<body>
+<div class="shell">
+    <header th:replace="~{fragments/layout :: header}"></header>
+
+    <main id="contenido" class="page">
+        <article class="legal">
+
+            <p class="section-kicker">Legal</p>
+            <h1>Términos de uso</h1>
+            <p class="lead">
+                Estas reglas valen para todo el que use Mundo Manitas. Están escritas
+                en lenguaje claro a propósito: si algo no se entiende, escribinos.
+            </p>
+            <p class="legal-date">Última actualización: noviembre de 2026.</p>
+
+            <section>
+                <h2>Tu cuenta</h2>
+                <p>
+                    Para guardar tu progreso necesitás una cuenta. Los datos que pongas
+                    tienen que ser tuyos y la contraseña es personal: no la compartas.
+                    Podés cerrar la cuenta cuando quieras desde tu perfil.
+                </p>
+            </section>
+
+            <section>
+                <h2>Cursos y acceso</h2>
+                <p>
+                    Los cursos marcados como gratuitos quedan disponibles mientras
+                    mantengas tu cuenta activa. La membresía premium habilita el
+                    catálogo completo y los certificados mientras esté vigente.
+                </p>
+                <ul>
+                    <li>El acceso es personal y no se transfiere.</li>
+                    <li>No se permite descargar ni redistribuir las clases.</li>
+                    <li>Los certificados se emiten al completar el curso.</li>
+                </ul>
+            </section>
+
+            <section>
+                <h2>Pagos y cancelación</h2>
+                <p>
+                    La membresía se cobra por mes y no tiene permanencia. Podés
+                    cancelarla cuando quieras: el acceso sigue hasta el final del
+                    período ya pagado y después volvés al plan gratuito.
+                </p>
+            </section>
+
+            <section>
+                <h2>Contenido y respeto</h2>
+                <p>
+                    Las clases, los subtítulos y los materiales son de Mundo Manitas
+                    o se usan con permiso. La Lengua de Señas Peruana es una lengua:
+                    en los espacios de la comunidad no se toleran burlas ni imitaciones
+                    despectivas.
+                </p>
+            </section>
+
+            <section>
+                <h2>Contacto</h2>
+                <p>
+                    Cualquier duda sobre estos términos:
+                    <a href="mailto:hola@mundomanitas.pe">hola@mundomanitas.pe</a>.
+                </p>
+            </section>
+
+        </article>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+</div>
+</body>
+</html>

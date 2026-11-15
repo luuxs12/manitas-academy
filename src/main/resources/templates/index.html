@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="~{fragments/layout :: head('Cursos de tecnología accesibles')}"></head>
+<head th:replace="~{fragments/layout :: head('Aprendé tecnología en tu lengua')}"></head>
 
 <body>
 
@@ -78,8 +78,7 @@
                 </a>
             </div>
 
-            <div class="rail" tabindex="0" role="region"
-                 aria-label="Cursos destacados. Deslizá para ver más.">
+            <div class="courses">
 
                 <a class="course" th:each="course : ${courses}"
                    th:href="@{/cursos/{slug}(slug=${course.slug})}">
@@ -88,26 +87,31 @@
                         <img th:src="${course.image}" alt="" width="960" height="600"
                              loading="lazy" decoding="async">
                         <span class="course-badge" th:text="${course.category}">Programación</span>
-                        <span class="course-level" th:text="${course.level}">Nivel inicial</span>
+                        <span class="course-price-tag"
+                              th:classappend="${course.free} ? ' course-price-tag--free' : ''"
+                              th:text="${course.priceLabel()}">Gratis</span>
                     </figure>
 
                     <div class="course-body">
-                        <span class="course-meta">
-                            <span th:text="${course.lessons}">32</span> lecciones
-                        </span>
                         <h3 class="course-title" th:text="${course.title}">Python desde cero</h3>
                         <p class="course-text" th:text="${course.summary}">Descripción del curso.</p>
                         <div class="course-foot">
-                            <span class="course-price" th:text="${course.priceLabel()}">Gratis</span>
-                            <span class="course-go">Ver curso <span aria-hidden="true">→</span></span>
+                            <span class="course-tags">
+                                <span th:text="${course.level}">Nivel inicial</span>
+                                <span th:text="${course.lessons} + ' lecciones'">32 lecciones</span>
+                            </span>
+                            <span class="course-arrow" aria-hidden="true">
+                                <svg class="ico" viewBox="0 0 24 24" focusable="false">
+                                    <path d="M5 12h13"/>
+                                    <path d="m12 5 7 7-7 7"/>
+                                </svg>
+                            </span>
                         </div>
                     </div>
 
                 </a>
 
             </div>
-
-            <p class="rail-hint">Deslizá la fila o usá las flechas del teclado.</p>
 
         </section>
 
@@ -214,6 +218,85 @@
                 </ul>
 
             </div>
+
+        </section>
+
+        <section class="section stories" id="historias" aria-labelledby="titulo-historias">
+
+            <div class="stories-head">
+                <div class="stories-title">
+                    <p class="section-kicker">Historias</p>
+                    <h2 id="titulo-historias">Cuando la clase se entiende, se nota</h2>
+                </div>
+
+                <ul class="stats" aria-label="Mundo Manitas en números">
+                    <li>
+                        <span class="stat-value" th:text="${#lists.size(courses)}">6</span>
+                        <span class="stat-label">cursos</span>
+                    </li>
+                    <li>
+                        <span class="stat-value"
+                              th:text="${#lists.size(courses.?[free])}">2</span>
+                        <span class="stat-label">gratis</span>
+                    </li>
+                    <li>
+                        <span class="stat-value">100%</span>
+                        <span class="stat-label">con intérprete</span>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="testimonials">
+
+                <figure class="testimonial">
+                    <blockquote>
+                        <p>“Nunca había terminado un curso online. Acá el intérprete
+                            va al mismo ritmo que la explicación, así que no me
+                            pierdo a la mitad.”</p>
+                    </blockquote>
+                    <figcaption>
+                        <span class="avatar" aria-hidden="true">RQ</span>
+                        <span class="who">
+                            <strong>Rosa Quispe</strong>
+                            <span>Python desde cero</span>
+                        </span>
+                    </figcaption>
+                </figure>
+
+                <figure class="testimonial">
+                    <blockquote>
+                        <p>“Los subtítulos de otros videos siempre iban atrasados.
+                            Acá están revisados y puedo seguir la clase sin
+                            adivinar lo que se dijo.”</p>
+                    </blockquote>
+                    <figcaption>
+                        <span class="avatar" aria-hidden="true">LM</span>
+                        <span class="who">
+                            <strong>Luis Mamani</strong>
+                            <span>Desarrollo web con HTML y CSS</span>
+                        </span>
+                    </figcaption>
+                </figure>
+
+                <figure class="testimonial">
+                    <blockquote>
+                        <p>“Estudio después del trabajo. Retomo donde dejé y no
+                            tengo que volver a buscar la parte que me faltaba.”</p>
+                    </blockquote>
+                    <figcaption>
+                        <span class="avatar" aria-hidden="true">KS</span>
+                        <span class="who">
+                            <strong>Katherine Salazar</strong>
+                            <span>Bases de datos con SQL</span>
+                        </span>
+                    </figcaption>
+                </figure>
+
+            </div>
+
+            <p class="stories-note">
+                ¿Ya hiciste un curso? <a href="mailto:hola@mundomanitas.pe">Contanos cómo te fue</a>.
+            </p>
 
         </section>
 

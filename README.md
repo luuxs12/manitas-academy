@@ -3,6 +3,9 @@
 Backend y sitio web de la plataforma de cursos con Lengua de Señas Peruana (LSP).
 Aplicación **monolítica** con Spring Boot y páginas HTML generadas en el servidor.
 
+> Antes de escribir código, leé [`REGLAS-EQUIPO.txt`](REGLAS-EQUIPO.txt): ramas,
+> commits, capas, base de datos, diseño y accesibilidad.
+
 | Pieza | Tecnología |
 |---|---|
 | Lenguaje | Java 25 |
@@ -118,6 +121,7 @@ api/
     │           ├── fragments/           pedazos reutilizables (header, footer)
     │           ├── auth/                login y registro
     │           ├── cursos/              catálogo y detalle de curso
+    │           ├── legal/                términos y privacidad
     │           ├── student/             mis cursos, reproductor, perfil, progreso
     │           ├── checkout/            pago de curso y membresía
     │           ├── admin/               panel de administración
@@ -125,7 +129,8 @@ api/
     └── test/java/com/mundomanitas/api/  pruebas
 ```
 
-Las carpetas vacías llevan un `.gitkeep` para que Git las conserve.
+Las carpetas sin archivos se crean cuando llegue su primer contenido; no se
+versionan carpetas vacías.
 
 ### Qué va en cada capa
 
@@ -249,19 +254,29 @@ También podés instalar **DBeaver** (gratis) y conectarte con los mismos datos.
 - Métodos y variables en inglés; textos visibles en español.
 - Un archivo por clase.
 - Fechas en UTC.
-- **Los videos no van en `static/`**: se guardan en un servicio externo y en la base solo queda la URL.
+- **Los videos de las lecciones no van en `static/`**: se guardan en un servicio
+  externo y en la base queda solo la URL. La única excepción es el video corto de
+  la portada (`static/video/hero.mp4`).
 
 ---
 
 ## Estado del proyecto
 
-Esqueleto limpio. Todavía no hay entidades, controladores ni migraciones: se agregan por fases.
+La base está en pie y funciona:
 
-Orden previsto:
+- Portada rediseñada con video, carrusel CSS y pie completo.
+- Catálogo de seis cursos de tecnología con foto propia, búsqueda por texto y
+  ficha de curso.
+- Páginas de términos, privacidad y nosotros.
+- Pantallas base de login y registro, con seguridad abierta en desarrollo.
+- Esquema `V1` de cuentas y preferencias de accesibilidad aplicado por Flyway.
 
-1. Cuentas: registro, login, roles, perfil y preferencias de accesibilidad.
-2. Catálogo e inscripción a cursos gratis.
-3. Lecciones y reproductor con video principal + video en LSP.
+Falta:
+
+1. Cuentas reales: registro, login, roles, perfil y preferencias.
+2. Inscripción a cursos gratis y lecciones.
+3. Reproductor con video principal + video en LSP y subtítulos.
 4. Progreso del estudiante.
 5. Membresía y pagos.
-6. Panel de administración y estadísticas.
+6. Panel de administración y estadísticas. Las tareas del equipo se reparten
+   según `REGLAS-EQUIPO.txt`.

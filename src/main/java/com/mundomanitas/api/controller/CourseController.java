@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 
 /**
- * Catálogo público y búsqueda con {@code GET}, sin JavaScript.
+ * Catálogo público y búsqueda con {@code GET}.
  */
 @Controller
 public class CourseController {

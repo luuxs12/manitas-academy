@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('Nosotros')}"></head>
+
+<body>
+<div class="shell">
+    <header th:replace="~{fragments/layout :: header}"></header>
+
+    <main id="contenido" class="page">
+
+        <div class="about-head">
+            <p class="section-kicker">Nosotros</p>
+            <h1>Una lengua,<br>mil manos.</h1>
+            <p class="lead">
+                Mundo Manitas es una plataforma peruana de cursos de tecnología
+                dictados en Lengua de Señas Peruana. Nació de una idea simple:
+                aprender no debería depender de escuchar.
+            </p>
+        </div>
+
+        <div class="values">
+            <article class="value">
+                <h2>Respeto</h2>
+                <p>La LSP es una lengua con su propia gramática. No la tratamos
+                    como una traducción del español ni como un recurso de
+                    accesibilidad: es el idioma en el que se enseña.</p>
+            </article>
+
+            <article class="value">
+                <h2>Claridad</h2>
+                <p>Cada lección tiene intérprete, subtítulos revisados y un
+                    ritmo que podés manejar. Si algo no se entiende, se puede
+                    volver atrás sin perder el hilo.</p>
+            </article>
+
+            <article class="value">
+                <h2>Comunidad</h2>
+                <p>Construimos con personas sordas, no para ellas. Docentes,
+                    intérpretes y estudiantes revisan el material antes de
+                    publicarlo.</p>
+            </article>
+        </div>
+
+        <section class="about-note" aria-labelledby="titulo-lengua">
+            <h2 id="titulo-lengua">La LSP es una lengua, no una traducción</h2>
+            <p>
+                Tiene su propio vocabulario, su gramática y su cultura. Por eso
+                los cursos se graban en Lengua de Señas Peruana, con subtítulos
+                en español como apoyo, y no al revés.
+            </p>
+            <p class="about-note-quote">
+                «Aprender una lengua también es aprender a escuchar de otra
+                manera.»
+            </p>
+        </section>
+
+        <div class="about-cta">
+            <h2>Empezá por el primer curso</h2>
+            <p class="lead">Es gratis y no necesitás tarjeta.</p>
+            <a class="btn btn-solid btn-lg" th:href="@{/cursos}">Ver cursos</a>
+        </div>
+
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+</div>
+</body>
+</html>

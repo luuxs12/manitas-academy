@@ -4,11 +4,12 @@
 <head th:fragment="head(title)">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="color-scheme" content="dark">
+    <meta name="color-scheme" content="light">
     <meta name="theme-color" content="#FFFFFF">
     <meta name="description"
           content="Cursos online accesibles con Lengua de Señas Peruana. Aprendé a tu ritmo, con intérprete y subtítulos en cada clase.">
     <title th:text="${title} + ' · Mundo Manitas'">Mundo Manitas</title>
+    <link rel="icon" type="image/png" th:href="@{/img/brand/favicon.png}">
     <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 
@@ -20,15 +21,39 @@
     <nav class="nav" aria-label="Navegación principal">
 
         <a class="brand" th:href="@{/}">
-            <span class="brand-mark" aria-hidden="true">MM</span>
-            <span class="brand-name">Mundo Manitas</span>
+            <picture>
+                <source th:srcset="@{/img/brand/logo-claro.webp}" type="image/webp">
+                <img class="brand-logo" th:src="@{/img/brand/logo-claro.png}"
+                     alt="Mundo Manitas" width="143" height="48">
+            </picture>
         </a>
 
         <ul class="nav-links">
-            <li><a th:href="@{/} + '#como-funciona'">Cómo funciona</a></li>
+            <li><a th:href="@{/}">Inicio</a></li>
+            <li><a th:href="@{/cursos}">Cursos</a></li>
+            <li><a th:href="@{/nosotros}">Nosotros</a></li>
             <li><a th:href="@{/} + '#accesibilidad'">Accesibilidad</a></li>
-            <li><a th:href="@{/} + '#membresia'">Membresía</a></li>
         </ul>
+
+        <form class="nav-search" role="search" th:action="@{/buscar}" method="get"
+              th:classappend="${!#strings.isEmpty(query)} ? 'nav-search--open' : ''">
+            <label class="nav-search-toggle" for="buscador">
+                <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <circle cx="11" cy="11" r="6.5"></circle>
+                    <path d="m16 16 4.5 4.5"></path>
+                </svg>
+                <span class="sr-only">Buscar cursos</span>
+            </label>
+            <input class="nav-search-input" id="buscador" name="q" type="search"
+                   placeholder="¿Qué deseas aprender?" th:value="${query}"
+                   autocomplete="off">
+            <button class="nav-search-btn" type="submit" aria-label="Buscar cursos">
+                <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M5 12h13"></path>
+                    <path d="m12 5 7 7-7 7"></path>
+                </svg>
+            </button>
+        </form>
 
         <div class="nav-actions">
             <a class="nav-login" th:href="@{/login}">Iniciar sesión</a>
@@ -39,25 +64,68 @@
 </header>
 
 <footer th:fragment="footer" class="site-footer">
-    <div class="footer-inner">
+    <div class="footer-main">
+
         <div class="footer-brand">
             <a class="brand" th:href="@{/}">
-                <span class="brand-mark" aria-hidden="true">MM</span>
-                <span class="brand-name">Mundo Manitas</span>
+                <picture>
+                    <source th:srcset="@{/img/brand/logo-claro.webp}" type="image/webp">
+                    <img class="brand-logo" th:src="@{/img/brand/logo-claro.png}"
+                         alt="Mundo Manitas" width="113" height="38">
+                </picture>
             </a>
-            <p class="muted">Cursos online con Lengua de Señas Peruana.</p>
+            <p>
+                Cursos de tecnología con intérprete en Lengua de Señas Peruana
+                y subtítulos revisados. Aprender sin depender de escuchar.
+            </p>
+            <p class="footer-badge">Hecho en Perú</p>
         </div>
 
-        <nav aria-label="Enlaces del pie de página">
-            <ul class="footer-links">
-                <li><a th:href="@{/}">Inicio</a></li>
-                <li><a th:href="@{/} + '#accesibilidad'">Accesibilidad</a></li>
-                <li><a th:href="@{/login}">Iniciar sesión</a></li>
-                <li><a th:href="@{/registro}">Crear cuenta</a></li>
+        <nav class="footer-col" aria-labelledby="pie-cursos">
+            <h2 id="pie-cursos">Cursos</h2>
+            <ul>
+                <li><a th:href="@{/cursos/python-desde-cero}">Python desde cero</a></li>
+                <li><a th:href="@{/cursos/desarrollo-web-html-css}">Desarrollo web</a></li>
+                <li><a th:href="@{/cursos/redes-y-soporte-tecnico}">Redes y soporte</a></li>
+                <li><a th:href="@{/cursos/bases-de-datos-sql}">Bases de datos</a></li>
+                <li><a th:href="@{/cursos}">Catálogo completo</a></li>
             </ul>
         </nav>
 
-        <p class="muted footer-copy">© 2026 Mundo Manitas · Hecho en Perú</p>
+        <nav class="footer-col" aria-labelledby="pie-plataforma">
+            <h2 id="pie-plataforma">Plataforma</h2>
+            <ul>
+                <li><a th:href="@{/} + '#como-funciona'">Cómo funciona</a></li>
+                <li><a th:href="@{/} + '#accesibilidad'">Accesibilidad</a></li>
+                <li><a th:href="@{/} + '#membresia'">Membresía</a></li>
+                <li><a th:href="@{/registro}">Empezar gratis</a></li>
+            </ul>
+        </nav>
+
+        <nav class="footer-col" aria-labelledby="pie-mundo">
+            <h2 id="pie-mundo">Mundo Manitas</h2>
+            <ul>
+                <li><a th:href="@{/nosotros}">Nosotros</a></li>
+                <li><a href="mailto:hola@mundomanitas.pe">Escríbenos</a></li>
+                <li><a th:href="@{/registro}">Crear cuenta</a></li>
+                <li><a th:href="@{/login}">Iniciar sesión</a></li>
+            </ul>
+        </nav>
+
+    </div>
+
+    <p class="footer-wordmark" aria-hidden="true">Mundo Manitas</p>
+
+    <div class="footer-bottom">
+        <div class="footer-bottom-inner">
+            <p>© 2026 Mundo Manitas. Todos los derechos reservados.</p>
+            <nav class="footer-legal" aria-label="Enlaces legales">
+                <a th:href="@{/terminos}">Términos</a>
+                <a th:href="@{/privacidad}">Privacidad</a>
+                <a th:href="@{/} + '#accesibilidad'">Accesibilidad</a>
+            </nav>
+            <a class="footer-top" href="#contenido">Volver arriba ↑</a>
+        </div>
     </div>
 </footer>
 

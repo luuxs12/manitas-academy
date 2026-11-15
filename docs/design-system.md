@@ -101,7 +101,8 @@ es la más legible en tamaños chicos y no suma descarga.
 
 ### Movimiento
 
-Todo el movimiento es CSS, sin JavaScript, y comparte la curva `--ease`
+Todo el movimiento es CSS por defecto, con JavaScript solo cuando no hay otra
+forma, y comparte la curva `--ease`
 (`cubic-bezier(.22, 1, .36, 1)`).
 
 - **Entrada de la portada**: escalonada, de 400 a 650 ms, con retrasos de
@@ -125,7 +126,7 @@ perfil, cursos y panel de administración:
 |---|---|
 | `.shell` | contenedor de la página (blanco, a todo el ancho) |
 | `.nav-search` | buscador de la cabecera: cerrado es el ícono, se abre al enfocar (formulario GET a `/buscar`) |
-| `.nav-search-toggle` | ícono-etiqueta que abre el buscador, sin JavaScript |
+| `.nav-search-toggle` | ícono-etiqueta que abre el buscador solo con CSS |
 | `.search-big` | buscador grande de la página de cursos |
 | `.ico` | íconos de trazo en SVG, sin librerías |
 | `.sr-only` | texto solo para lectores de pantalla |
@@ -145,7 +146,7 @@ perfil, cursos y panel de administración:
 | `.section-head--row` / `.section-link` | encabezado con enlace "Ver todos" a la derecha |
 | `.courses` / `.course` | grilla de cursos: foto 16:10, etiqueta de categoría, nivel, metadatos y precio |
 | `.course-badge` / `.course-level` | etiquetas sobre la foto (categoría en verde, nivel sobre el velo) |
-| `.rail` | carrusel horizontal con `scroll-snap`, sin JavaScript; se mueve con trackpad, rueda o teclado |
+| `.rail` | carrusel horizontal con `scroll-snap`; se mueve con trackpad, rueda o teclado sin necesidad de JS |
 | `.steps` / `.step` | tarjetas numeradas; al pasar el mouse se rellenan de verde |
 | `.split` / `.split-head` | sección a dos columnas con el encabezado fijo al hacer scroll |
 | `.feature-list` / `.feature` / `.feature-icon` | lista de accesibilidad con ícono y filas separadas |

@@ -10,7 +10,7 @@ Aplicación **monolítica** con Spring Boot y páginas HTML generadas en el serv
 |---|---|
 | Lenguaje | Java 25 |
 | Framework | Spring Boot 4.1.2 |
-| Vistas | Thymeleaf + HTML + CSS + JavaScript propio (vanilla) |
+| Vistas | Thymeleaf + HTML + CSS + JavaScript |
 | Base de datos | PostgreSQL 18 **local** |
 | Migraciones | Flyway |
 | Build | Maven (wrapper incluido) |
@@ -116,7 +116,7 @@ api/
     │       │   ├── css/                 hojas de estilo
     │       │   ├── fonts/               Tanker y Open Sans (autoalojadas)
     │       │   ├── img/                 imágenes del sitio
-    │       │   ├── js/                  JavaScript propio (vanilla)
+    │       │   ├── js/                  JavaScript del sitio
     │       │   └── video/               video de la portada
     │       └── templates/
     │           ├── fragments/           pedazos reutilizables (header, footer)

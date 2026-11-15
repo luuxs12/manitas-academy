@@ -24,13 +24,13 @@ Plataforma de cursos de tecnología accesibles para personas sordas, con
 intérprete en Lengua de Señas Peruana (LSP) y subtítulos revisados.
 
 Es un monolito Spring Boot que genera las páginas en el servidor con Thymeleaf.
-No es una API REST con frontend separado y no hay React, Vue ni Angular.
+No es una SPA ni una API REST con frontend separado.
 
 | Pieza          | Tecnología                                        |
 |----------------|---------------------------------------------------|
 | Lenguaje       | Java 25                                           |
 | Framework      | Spring Boot 4.1.2                                 |
-| Vistas         | Thymeleaf + HTML + CSS + JavaScript propio        |
+| Vistas         | Thymeleaf + HTML + CSS + JavaScript               |
 | Base de datos  | PostgreSQL 18 (local)                             |
 | Migraciones    | Flyway                                            |
 | Build          | Maven con wrapper (.\mvnw.cmd)                    |
@@ -38,9 +38,8 @@ No es una API REST con frontend separado y no hay React, Vue ni Angular.
 | Librerías      | Guava, Apache POI, Commons Lang3, Commons IO      |
 | Logs           | Logback (incluido en Spring Boot)                 |
 
-Regla de oro: el backend es 100 % Java. El frontend es HTML + CSS + Thymeleaf,
-con JavaScript propio (vanilla) cuando aporte. Sin frameworks ni librerías de
-frontend: ni React, ni Vue, ni jQuery, ni Bootstrap.
+Regla de oro: el backend es 100 % Java y el frontend usa HTML, CSS y
+JavaScript de forma normal, sobre las plantillas Thymeleaf.
 
 --------------------------------------------------------------------------------
 2. ENTORNO DE TRABAJO
@@ -115,7 +114,7 @@ src/main/resources/
   static/css/             styles.css (una sola hoja)
   static/fonts/           Tanker y Open Sans, autoalojadas
   static/img/             imágenes del sitio y de los cursos
-  static/js/              JavaScript propio (vanilla), un archivo por comportamiento
+  static/js/              JavaScript del sitio
   static/video/           video de la portada
   templates/fragments/    header, footer y head reutilizables
   templates/auth/         login y registro
@@ -238,51 +237,38 @@ Cada capa tiene un trabajo y solo ese:
     velocidad). Es opcional y modificable.
 
 --------------------------------------------------------------------------------
-6. FRONTEND: HTML + CSS + THYMELEAF + JAVASCRIPT PROPIO
+6. FRONTEND: HTML + CSS + JAVASCRIPT
 --------------------------------------------------------------------------------
 
-6.1 Base que funciona sin JavaScript
+6.1 Reglas generales
 
-  - El HTML y el CSS resuelven lo principal: enlaces reales, formularios
-    GET/POST, :focus, :hover, :target, scroll-snap, details/summary.
-  - La página debe seguir siendo usable con JavaScript desactivado. JavaScript
-    es una mejora, nunca un requisito para navegar o completar un formulario.
-  - Un formulario de búsqueda siempre con method="get" para que el resultado se
+  - HTML, CSS y JavaScript se usan de forma normal, como en cualquier proyecto
+    web. No hace falta evitar el JavaScript ni dar rodeos con CSS.
+  - La página tiene que quedar legible y navegable aunque un script falle: un
+    error de JavaScript no puede dejar la pantalla en blanco.
+  - Un formulario de búsqueda sigue con method="get" para que el resultado se
     pueda compartir.
-  - Cero frameworks y cero librerías de JS, CSS o íconos: ni React, ni Vue, ni
-    jQuery, ni Bootstrap. Los íconos son SVG de trazo escritos a mano con la
-    clase .ico.
+  - Los íconos son SVG de trazo con la clase .ico.
   - Nada de imágenes generadas por IA ni de fotos de stock genéricas: las
     portadas de los cursos son fotos reales propias y sus créditos van en
     src/main/resources/static/img/cursos/CREDITOS.md.
 
-6.2 JavaScript: cuándo y cómo
+6.2 JavaScript
 
-  Se permite JavaScript propio (vanilla, ES2020 o superior) cuando HTML y CSS
-  no alcanzan: confirmaciones, filtros en vivo, un reproductor, un contador.
-  Si se puede con CSS, se hace con CSS.
-
-  - Sin transpiladores, sin bundlers y sin dependencias externas.
-  - Un archivo por comportamiento en static/js/, con nombre en inglés y
-    kebab-case: nav-search.js, lesson-player.js.
-  - Se carga con <script th:src="@{/js/nav-search.js}" defer></script>.
-    Prohibido onclick, onload ni cualquier on* escrito en el HTML, y prohibido
-    el código embebido en la plantilla.
-  - Los datos del servidor llegan por atributos data-* o por un bloque
-    <script type="application/json">. Nunca se arma HTML concatenando texto.
-  - Prohibido innerHTML con contenido del usuario: se usa textContent o se
-    crean nodos con createElement. La validación real está en el servidor con
-    Bean Validation; la del navegador es solo comodidad.
-  - Si el elemento que busca el script no existe en la página, termina sin
-    lanzar errores: const el = document.querySelector(...); if (!el) return;
-  - Cuando el DOM cambia, se actualizan los aria-* y el foco.
-  - El script respeta prefers-reduced-motion y no bloquea el render.
-  - Nada de console.log en el código final; los errores se manejan y, si hace
-    falta, se informan en la interfaz.
+  - Los archivos van en static/js/, uno por comportamiento, con nombre en
+    inglés y kebab-case: nav-search.js, lesson-player.js.
+  - Se enlazan desde la plantilla con
+    <script th:src="@{/js/nav-search.js}" defer></script>.
+  - La validación del servidor con Bean Validation es obligatoria; la del
+    navegador es solo una ayuda.
+  - No se arma HTML con datos del usuario usando innerHTML: se usa textContent
+    o se crean nodos con createElement.
+  - Si se agrega una librería de JavaScript, se acuerda con el equipo y se
+    documenta en el README.
 
 6.3 Plantillas
 
-  - El head, la cabecera y el pie salen de fragments/layout.html:
+  - El head, la cabecera y el pie salen de templates/fragments/layout.html:
     th:replace="~{fragments/layout :: head('Título')}"
     th:replace="~{fragments/layout :: header}"
   - Una plantilla no repite el head ni el menú.
@@ -519,11 +505,8 @@ No se sube ni se hace:
   - target/, logs/, *.log, .env, application-local.yml, .idea/, .vscode/
     (ya están en .gitignore; no se fuerza su entrada).
   - Contraseñas, tokens, claves o datos personales de usuarios reales.
-  - Frameworks y librerías de JavaScript o de CSS (React, Vue, jQuery,
-    Bootstrap), librerías de íconos y CDN de fuentes.
-  - JavaScript dentro del HTML: onclick, onload, on* o bloques <script> con
-    código. Solo archivos propios en static/js/.
   - innerHTML con datos del usuario; se usa textContent o createElement.
+  - Librerías de JavaScript o CSS nuevas sin acordarlas con el equipo.
   - Cambios directos a main, push forzado a main, historia reescrita.
   - Comentarios de veinte líneas, código comentado, código muerto.
   - Imágenes generadas por IA en el sitio.
@@ -555,8 +538,8 @@ Base de datos
   [ ] La entidad coincide con la tabla (la app arranca con ddl-auto: validate).
 
 Interfaz
-  [ ] La página funciona con JavaScript desactivado.
-  [ ] Si hay JavaScript, está en static/js/, se carga con defer y no usa on*.
+  [ ] Si un script falla, la página se sigue leyendo y se puede navegar.
+  [ ] El JavaScript está en static/js/ y se enlaza desde la plantilla.
   [ ] No se arma HTML con innerHTML a partir de datos del usuario.
   [ ] Colores y tamaños salen de :root.
   [ ] Se ve bien en 360, 390, 412, 768 y 1440 px, sin desborde horizontal.
@@ -639,7 +622,7 @@ Una tarea está terminada cuando:
   2. Pasa las pruebas y compila.
   3. Se ve bien en móvil, tablet y escritorio.
   4. Se navega con teclado y respeta prefers-reduced-motion.
-  5. Sigue funcionando con JavaScript desactivado.
+  5. Sigue legible y navegable si un script falla.
   6. No deja código muerto, comentarios largos ni archivos sueltos.
   7. Está documentada si cambió el diseño, el esquema o las reglas.
   8. Está en su rama, con commits claros y subida al remoto.

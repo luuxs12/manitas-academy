@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head(${course.title})}"></head>
+
+<body>
+<div class="shell">
+    <header th:replace="~{fragments/layout :: header}"></header>
+
+    <main id="contenido" class="page">
+
+        <a class="back-link" th:href="@{/cursos}">← Volver al catálogo</a>
+
+        <div class="detail">
+
+            <div class="detail-media">
+                <img th:src="${course.image}"
+                     th:alt="'Portada del curso ' + ${course.title}"
+                     width="960" height="600" decoding="async">
+                <span class="course-badge" th:text="${course.category}">Programación</span>
+                <span class="course-level" th:text="${course.level}">Nivel inicial</span>
+            </div>
+
+            <div class="detail-body">
+                <p class="section-kicker" th:text="${course.category}">Programación</p>
+                <h1 th:text="${course.title}">Nombre del curso</h1>
+                <p class="lead" th:text="${course.summary}">Descripción del curso.</p>
+
+                <dl class="detail-facts">
+                    <div>
+                        <dt>Lecciones</dt>
+                        <dd th:text="${course.lessons}">24</dd>
+                    </div>
+                    <div>
+                        <dt>Acceso</dt>
+                        <dd th:text="${course.priceLabel()}">Gratis</dd>
+                    </div>
+                    <div>
+                        <dt>Intérprete</dt>
+                        <dd>Incluido</dd>
+                    </div>
+                </dl>
+
+                <a class="btn btn-solid btn-lg" th:href="@{/registro}">
+                    Crear cuenta para empezar
+                </a>
+            </div>
+
+        </div>
+
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+</div>
+</body>
+</html>

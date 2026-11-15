@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('Privacidad')}"></head>
+
+<body>
+<div class="shell">
+    <header th:replace="~{fragments/layout :: header}"></header>
+
+    <main id="contenido" class="page">
+        <article class="legal">
+
+            <p class="section-kicker">Legal</p>
+            <h1>Privacidad</h1>
+            <p class="lead">
+                Guardamos lo mínimo para que puedas aprender: tu cuenta, tu progreso
+                y tus preferencias de accesibilidad. Nada más.
+            </p>
+            <p class="legal-date">Última actualización: noviembre de 2026.</p>
+
+            <section>
+                <h2>Qué datos pedimos</h2>
+                <ul>
+                    <li>Nombre, correo y contraseña para crear la cuenta.</li>
+                    <li>El avance en cada curso y las lecciones completadas.</li>
+                    <li>Tus preferencias de subtítulos, contraste y velocidad.</li>
+                </ul>
+                <p>No pedimos datos de salud ni información sensible.</p>
+            </section>
+
+            <section>
+                <h2>Para qué los usamos</h2>
+                <p>
+                    Solo para que la plataforma funcione: mostrarte tu progreso,
+                    retomar donde dejaste y emitir certificados. No vendemos datos
+                    ni los compartimos con anunciantes.
+                </p>
+            </section>
+
+            <section>
+                <h2>Cookies</h2>
+                <p>
+                    Usamos una cookie técnica para mantener tu sesión iniciada.
+                    No hay cookies de publicidad ni seguimiento entre sitios.
+                </p>
+            </section>
+
+            <section>
+                <h2>Tus derechos</h2>
+                <p>
+                    Podés pedir acceso, corrección o eliminación de tus datos
+                    escribiendo a <a href="mailto:hola@mundomanitas.pe">hola@mundomanitas.pe</a>.
+                    Respondemos dentro de los plazos que fija la Ley 29733 de
+                    Protección de Datos Personales.
+                </p>
+            </section>
+
+            <section>
+                <h2>Dónde se guardan</h2>
+                <p>
+                    La información se aloja en servidores con acceso restringido.
+                    Las contraseñas se guardan cifradas y nunca se muestran.
+                </p>
+            </section>
+
+        </article>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+</div>
+</body>
+</html>

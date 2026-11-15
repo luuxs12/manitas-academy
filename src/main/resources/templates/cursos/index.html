@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/layout :: head('Cursos')}"></head>
+
+<body>
+<div class="shell">
+    <header th:replace="~{fragments/layout :: header}"></header>
+
+    <main id="contenido" class="page">
+
+        <div class="catalog-head">
+            <p class="section-kicker">Catálogo</p>
+            <h1>¿Qué querés aprender hoy?</h1>
+            <p class="lead">
+                Cursos de tecnología con intérprete en Lengua de Señas Peruana
+                y subtítulos revisados. Hay cursos gratis para empezar.
+            </p>
+
+            <form class="search-big" role="search" th:action="@{/buscar}" method="get">
+                <label class="sr-only" for="buscar-catalogo">Buscar cursos</label>
+                <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <circle cx="11" cy="11" r="6.5"></circle>
+                    <path d="m16 16 4.5 4.5"></path>
+                </svg>
+                <input id="buscar-catalogo" name="q" type="search"
+                       placeholder="¿Qué deseas aprender?" th:value="${query}"
+                       autocomplete="off">
+                <button class="btn btn-solid" type="submit">Buscar</button>
+            </form>
+
+            <p class="catalog-count" th:if="${!#strings.isEmpty(query)}">
+                <span th:text="${#lists.size(courses)}">0</span> resultados para
+                «<span th:text="${query}">…</span>»
+            </p>
+        </div>
+
+        <div class="courses" th:if="${!#lists.isEmpty(courses)}">
+            <a class="course" th:each="course : ${courses}"
+               th:href="@{/cursos/{slug}(slug=${course.slug})}">
+
+                <figure class="course-media">
+                    <img th:src="${course.image}" alt="" width="960" height="600"
+                         loading="lazy" decoding="async">
+                    <span class="course-badge" th:text="${course.category}">Programación</span>
+                    <span class="course-level" th:text="${course.level}">Nivel inicial</span>
+                </figure>
+
+                <div class="course-body">
+                    <span class="course-meta">
+                        <span th:text="${course.lessons}">32</span> lecciones
+                    </span>
+                    <h3 class="course-title" th:text="${course.title}">Nombre del curso</h3>
+                    <p class="course-text" th:text="${course.summary}">Descripción del curso.</p>
+                    <div class="course-foot">
+                        <span class="course-price" th:text="${course.priceLabel()}">Gratis</span>
+                        <span class="course-go">Ver curso <span aria-hidden="true">→</span></span>
+                    </div>
+                </div>
+
+            </a>
+        </div>
+
+        <div class="empty" th:if="${#lists.isEmpty(courses)}">
+            <p class="empty-title">No encontramos cursos para
+                «<span th:text="${query}">…</span>»</p>
+            <p class="muted">Probá con otra palabra o mirá el catálogo completo.</p>
+            <a class="btn btn-solid" th:href="@{/cursos}">Ver todos los cursos</a>
+        </div>
+
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
+</div>
+</body>
+</html>

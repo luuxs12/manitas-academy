@@ -13,38 +13,108 @@ Así, cambiar la identidad visual es editar un solo bloque.
 
 ## 2. Variables actuales
 
+Paleta oficial: **verde `#00FF00`, blanco `#FFFFFF` y negro `#000000`**.
+
 ```css
 :root {
-    /* Superficies */
-    --bg: #f6f7f4;              /* fondo de la página */
-    --surface: #ffffff;          /* tarjetas, header, footer */
-    --surface-alt: #edf2ec;      /* secciones alternas */
+    /* Tipografía */
+    --body: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    --display: "Tanker", "Segoe UI", system-ui, sans-serif;
 
-    /* Texto */
-    --ink: #14201d;              /* texto principal */
-    --muted: #4a5652;            /* texto secundario */
+    /* Papel */
+    --paper: #ffffff;            /* fondo de la página y de las tarjetas */
+
+    /* Tinta */
+    --ink: #000000;              /* texto, bordes y líneas */
+    --muted: rgba(0, 0, 0, .6);  /* negro al 60 %: se lee gris, sin hex nuevo */
+    --soft: rgba(0, 0, 0, .045); /* superficie neutra suave */
 
     /* Marca */
-    --accent: #0b6b5f;           /* color principal */
-    --accent-dark: #084f46;      /* hover / enlaces */
-    --accent-soft: #e2efe9;      /* fondos suaves */
+    --accent: #00ff00;           /* verde: superficie de marca */
+    --accent-soft: rgba(0, 255, 0, .14);   /* verde muy claro para paneles */
+    --accent-line: rgba(0, 255, 0, .55);   /* subrayado de enlaces */
+    --on-accent: #000000;        /* texto sobre verde, siempre negro */
 
     /* Bordes y foco */
-    --border: #d7dcd8;
-    --focus: #b45309;            /* anillo de foco (no debe desaparecer) */
+    --line: rgba(0, 0, 0, .08);        /* borde de tarjeta */
+    --line-strong: rgba(0, 0, 0, .18); /* borde al pasar el mouse */
+    --focus: #000000;                  /* anillo sobre blanco; verde sobre el video */
+
+    /* Sombras suaves */
+    --shadow-sm: 0 1px 2px rgba(0, 0, 0, .05), 0 8px 24px rgba(0, 0, 0, .06);
+    --shadow-md: 0 2px 6px rgba(0, 0, 0, .06), 0 20px 44px rgba(0, 0, 0, .11);
 
     /* Formas */
-    --radius: 16px;
-    --radius-sm: 10px;
-    --shadow: 0 18px 40px rgba(20, 32, 29, .10);
+    --radius: 20px;
+    --radius-lg: 28px;
+    --radius-sm: 14px;
+    --radius-pill: 999px;
 
     /* Layout */
-    --max: 1120px;               /* ancho máximo del contenido */
+    --max: 1200px;
 }
 ```
 
+Reglas de uso de la paleta:
+
+- **Verde `#00FF00`** = superficie de marca: botones, chip del número de paso, banda de
+  membresía, portada de curso, foco sobre el video. **Nunca como texto sobre blanco**:
+  su contraste es 1.4:1 y no se lee.
+- **Negro `#000000`** = todo el texto, los bordes y las líneas. Es el color de lectura.
+- **Blanco `#FFFFFF`** = fondo de página y de tarjetas.
+- **Texto sobre verde** siempre negro, nunca blanco.
+- **Grises** solo con negro y transparencia (`rgba(0, 0, 0, .6)`). Nunca un gris con hex
+  propio: así no aparece un cuarto color en la paleta.
+- **Verde sobre el video** sí se usa como acento (punto del kicker, anillo de foco),
+  porque el fondo ya es oscuro y el contraste es alto.
+- Las tarjetas llevan borde negro al 8 % y sombra suave. Nada de marcos gruesos,
+  sombras duras ni desplazamientos tipo bloque: la página respira.
+
+
 Podés renombrar o agregar variables **siempre que actualices este archivo**.
 Si agregás una nueva (por ejemplo `--accent-2`), avisame y la uso en las pantallas nuevas.
+
+### Tipografía
+
+Una familia de titulares: **Tanker** (Fontshare, licencia ITF Free Font License
+en `static/fonts/FFL-Fontshare.txt`). Se autoaloja en `static/fonts/`; no se
+pide nada por CDN.
+
+- Tanker se aplica a `h1`, `h2` y a las cifras grandes (`.hero-card-mark`,
+  `.step-num`, `.band-amount`).
+- Tiene **un solo peso (400)**. Siempre se declara `font-weight: 400`: pedir
+  650 o 700 genera una negrita sintética que deforma la letra.
+- Ya viene apretada: su `letter-spacing` va entre `-.015em` y `-.02em`.
+
+**Open Sans** (`--nav`) acompaña a Tanker en la navegación y en ningún otro
+lado. Se autoaloja como fuente variable (un solo archivo para todos los pesos,
+licencia OFL en `static/fonts/OFL-OpenSans.txt`):
+
+- Menú del encabezado e "Iniciar sesión", en **500** a `.9rem`.
+- Botón "Crear cuenta", en **600** a `.82rem`.
+- Títulos de las columnas del pie, en **700**, mayúsculas y `.1em` de tracking.
+- Es una humanista de trazo parejo: descansa la vista y deja que Tanker sea la
+  única voz con carácter.
+
+El cuerpo, las etiquetas y los párrafos quedan en la tipografía del sistema:
+es la más legible en tamaños chicos y no suma descarga.
+
+### Movimiento
+
+Todo el movimiento es CSS, sin JavaScript, y comparte la curva `--ease`
+(`cubic-bezier(.22, 1, .36, 1)`).
+
+- **Entrada de la portada**: escalonada, de 400 a 650 ms, con retrasos de
+  50 a 320 ms. El encabezado baja, el texto sube y la tarjeta aparece con un
+  leve `scale(.985)` que se asienta.
+- **Microinteracciones**: 180 a 240 ms. Los botones suben 2 px, la flecha se
+  desplaza 3 px, el subrayado de la navegación crece desde la izquierda y el
+  ícono de cada tarjeta se pinta de verde al pasar el mouse.
+- **Scroll**: `animation-timeline: view()` con rangos cortos (`entry 0%` a
+  `cover 18–30 %`), así la sección ya está visible cuando terminás de llegar.
+  Si el navegador no lo soporta, nada queda oculto.
+- **Movimiento reducido**: `prefers-reduced-motion: reduce` apaga animaciones y
+  transiciones; la página sigue completa.
 
 ## 3. Componentes que ya existen
 
@@ -53,17 +123,49 @@ perfil, cursos y panel de administración:
 
 | Clase | Uso |
 |---|---|
+| `.shell` | contenedor de la página (blanco, a todo el ancho) |
+| `.nav-search` | buscador de la cabecera: cerrado es el ícono, se abre al enfocar (formulario GET a `/buscar`) |
+| `.nav-search-toggle` | ícono-etiqueta que abre el buscador, sin JavaScript |
+| `.search-big` | buscador grande de la página de cursos |
+| `.ico` | íconos de trazo en SVG, sin librerías |
+| `.sr-only` | texto solo para lectores de pantalla |
+| `.hero` | portada con video de fondo y texto encima |
+| `.hero-inner` | bloque de texto sobre el video |
+| `.hero-card` | tarjeta de curso flotante sobre el video (se apila en pantallas chicas) |
 | `.btn` | base de todos los botones |
-| `.btn-primary` | acción principal (crear cuenta, guardar) |
+| `.btn-primary` / `.btn-solid` | acción principal: verde con texto negro |
+| `.btn-light` | acción sobre el video: blanca con texto negro |
 | `.btn-ghost` | acción secundaria (volver, cancelar) |
 | `.btn-lg` | botón grande de portada |
 | `.eyebrow` | texto pequeño en mayúsculas sobre un título |
 | `.lead` | párrafo introductorio |
 | `.muted` | texto secundario |
 | `.section` / `.section-kicker` | secciones de la landing |
+| `.section-alt` | panel verde claro |
+| `.section-head--row` / `.section-link` | encabezado con enlace "Ver todos" a la derecha |
+| `.courses` / `.course` | grilla de cursos: foto 16:10, etiqueta de categoría, nivel, metadatos y precio |
+| `.course-badge` / `.course-level` | etiquetas sobre la foto (categoría en verde, nivel sobre el velo) |
+| `.rail` | carrusel horizontal con `scroll-snap`, sin JavaScript; se mueve con trackpad, rueda o teclado |
+| `.steps` / `.step` | tarjetas numeradas; al pasar el mouse se rellenan de verde |
+| `.split` / `.split-head` | sección a dos columnas con el encabezado fijo al hacer scroll |
+| `.feature-list` / `.feature` / `.feature-icon` | lista de accesibilidad con ícono y filas separadas |
+| `.band-points` | lista de beneficios dentro de la banda verde |
+| `.cta-band` | banda verde de membresía |
+| `.cta-action` / `.band-price` / `.band-note` | precio y botón dentro de la banda |
+| `.final-note` | aclaración bajo el llamado final |
+| `.catalog-head` | encabezado de la página de cursos |
+| `.detail` / `.detail-media` / `.detail-facts` | ficha de un curso, con portada 4:3 |
+| `.about-head` / `.values` / `.about-note` | página Nosotros |
+| `.legal` / `.legal-date` | páginas de términos y privacidad |
+| `.empty` | estado vacío de la búsqueda |
 | `.page` / `.page-center` | contenedores de páginas internas |
 | `.auth-card` | tarjeta de login/registro |
 | `.auth-actions` | fila de botones dentro de la tarjeta |
+| `.footer-main` | rejilla del pie: marca + tres columnas de enlaces |
+| `.footer-col` | columna de enlaces del pie, con el título en Open Sans 700 |
+| `.footer-badge` | distintivo "Hecho en Perú" |
+| `.footer-wordmark` | firma grande en Tanker que cierra la página |
+| `.footer-bottom` / `.footer-legal` | barra inferior: copyright, enlaces legales y "Volver arriba" |
 
 Si cambiás el nombre de alguna, decime y actualizo las plantillas nuevas.
 
@@ -98,8 +200,8 @@ servicios, seguridad). No toco CSS ni la landing, así no hay conflictos.
 
 ## 6. Checklist antes de decir "listo"
 
-- [ ] Definí la paleta final en `:root` y no quedan colores sueltos.
-- [ ] Definí tipografía (familia, tamaños de h1/h2/h3/cuerpo).
+- [x] Definí la paleta final en `:root` y no quedan colores sueltos.
+- [x] Definí tipografía (familia, tamaños de h1/h2/h3/cuerpo).
 - [ ] Definí tamaños de botones (normal y grande) y radios.
 - [ ] Revisé 1440 px, 768 px y 375 px de ancho.
 - [ ] Probé navegar solo con Tab: se ve el foco en todo.

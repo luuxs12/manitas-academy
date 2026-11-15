@@ -8,11 +8,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.web.SecurityFilterChain;
 
 /**
- * Seguridad en modo desarrollo.
- *
- * <p>Todo está abierto para poder ver la página y navegar mientras
- * construimos las cuentas. En la fase de login se reemplaza por
- * reglas reales (formulario, roles y sesiones).</p>
+ * Seguridad en modo desarrollo: todo abierto hasta que existan las cuentas.
  */
 @Configuration
 @EnableWebSecurity

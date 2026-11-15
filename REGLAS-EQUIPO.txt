@@ -1,0 +1,625 @@
+================================================================================
+MUNDO MANITAS - REGLAS DEL PROYECTO
+Guía única para los tres integrantes
+Repositorio: https://github.com/luuxs12/manitas-academy
+Última actualización: 15 de noviembre de 2026
+================================================================================
+
+Este archivo es el contrato de trabajo del equipo. Si algo no está aquí, se
+pregunta antes de inventarlo. Las reglas aplican a los tres por igual: nadie
+commitea directo a main y nadie se salta la revisión.
+
+Leer también, en este orden:
+  1. REGLAS-EQUIPO.txt        (este archivo)
+  2. README.md                (instalación, base de datos y arranque)
+  3. docs/git-conventions.md  (convención de ramas y commits)
+  4. docs/design-system.md    (paleta, tipografía y componentes)
+
+
+--------------------------------------------------------------------------------
+1. EL PROYECTO EN UNA HOJA
+--------------------------------------------------------------------------------
+
+Plataforma de cursos de tecnología accesibles para personas sordas, con
+intérprete en Lengua de Señas Peruana (LSP) y subtítulos revisados.
+
+Es un monolito Spring Boot que genera las páginas en el servidor con Thymeleaf.
+No es una API REST con frontend separado, no hay React, no hay JavaScript.
+
+| Pieza          | Tecnología                                        |
+|----------------|---------------------------------------------------|
+| Lenguaje       | Java 25                                           |
+| Framework      | Spring Boot 4.1.2                                 |
+| Vistas         | Thymeleaf + HTML + CSS                            |
+| Base de datos  | PostgreSQL 18 (local)                             |
+| Migraciones    | Flyway                                            |
+| Build          | Maven con wrapper (.\mvnw.cmd)                    |
+| Pruebas        | JUnit 5 + AssertJ + Mockito                       |
+| Librerías      | Guava, Apache POI, Commons Lang3, Commons IO      |
+| Logs           | Logback (incluido en Spring Boot)                 |
+
+Regla de oro: el backend es 100 % Java. El frontend es HTML + CSS + Thymeleaf.
+Si una idea necesita JavaScript, se resuelve de otra forma o se descarta.
+
+--------------------------------------------------------------------------------
+2. ENTORNO DE TRABAJO
+--------------------------------------------------------------------------------
+
+2.1 Requisitos
+
+  - JDK 25.
+  - PostgreSQL 18 como servicio local (postgresql-x64-18).
+  - No hace falta instalar Maven: se usa el wrapper del repo.
+  - Git y una cuenta con acceso al repositorio.
+  - Editor: IntelliJ IDEA (recomendado) o VS Code.
+
+2.2 Variables de entorno en PowerShell (si tu java no es el 25)
+
+  $env:JAVA_HOME = "C:\Program Files\Java\jdk-25.0.5.0.2"
+  $env:Path = "$env:JAVA_HOME\bin;$env:Path"
+
+En IntelliJ: File > Project Structure > Project > SDK 25, Language level 25.
+
+2.3 Base de datos (una sola vez por máquina)
+
+  & 'C:\Program Files\PostgreSQL\18\bin\psql.exe' -U postgres -h localhost `
+      -c "CREATE USER mundo_manitas WITH PASSWORD 'mundo_manitas';"
+  & 'C:\Program Files\PostgreSQL\18\bin\psql.exe' -U postgres -h localhost `
+      -c "CREATE DATABASE mundo_manitas_api OWNER mundo_manitas;"
+
+  Host: localhost | Puerto: 5432 | Base: mundo_manitas_api
+  Usuario: mundo_manitas | Contraseña: mundo_manitas
+
+Esas credenciales son solo para desarrollo local. Se pueden pisar con las
+variables DATABASE_URL, DB_USER y DB_PASSWORD. Nunca se suben credenciales
+reales al repositorio.
+
+Las tablas NO se crean a mano: las crea Flyway al arrancar la aplicación.
+
+2.4 Comandos de todos los días
+
+  .\mvnw.cmd spring-boot:run          arrancar en http://localhost:8080
+  .\mvnw.cmd -B test                  correr las pruebas
+  .\mvnw.cmd -B -q -DskipTests package   compilar sin pruebas
+  .\mvnw.cmd clean package            compilar desde cero
+
+  http://localhost:8080/actuator/health   estado de la app y de la base
+
+2.5 Si el build falla con "archivo en uso"
+
+Es el jar bloqueado porque la aplicación está corriendo. Parar el proceso del
+puerto 8080 antes de compilar:
+
+  $c = Get-NetTCPConnection -LocalPort 8080 -State Listen -ErrorAction SilentlyContinue
+  if ($c) { Stop-Process -Id $c.OwningProcess -Force }
+
+--------------------------------------------------------------------------------
+3. ESTRUCTURA DE CARPETAS Y RESPONSABILIDADES
+--------------------------------------------------------------------------------
+
+src/main/java/com/mundomanitas/api/
+  ApiApplication.java     arranca la aplicación
+  config/                 configuración de Spring (seguridad, web)
+  controller/             recibe la petición y devuelve una vista
+  controller/admin/       lo mismo, solo para administradores
+  dto/                    datos que viajan entre capas y vistas
+  exception/              errores propios y manejador global
+  model/                  entidades JPA (una por tabla)
+  repository/             consultas a la base de datos
+  service/                reglas de negocio
+
+src/main/resources/
+  application.yml         configuración
+  db/migration/           scripts SQL versionados (Flyway)
+  static/css/             styles.css (una sola hoja)
+  static/fonts/           Tanker y Open Sans, autoalojadas
+  static/img/             imágenes del sitio y de los cursos
+  static/video/           video de la portada
+  templates/fragments/    header, footer y head reutilizables
+  templates/auth/         login y registro
+  templates/cursos/       catálogo y ficha de curso
+  templates/legal/        términos y privacidad
+  templates/student/      mis cursos, reproductor, perfil, progreso
+  templates/checkout/     pago de curso y membresía
+  templates/admin/        panel de administración
+  templates/error/        páginas 404 y de error
+
+Cada capa tiene un trabajo y solo ese:
+
+  controller -> service -> repository -> base de datos
+                   |
+                 model
+
+  - El controlador NO usa el repositorio directamente.
+  - El repositorio NO tiene reglas de negocio.
+  - El servicio NO devuelve HTML ni conoce Thymeleaf.
+  - Las entidades NO se pasan a las vistas: se convierten en dto.
+
+--------------------------------------------------------------------------------
+4. REGLAS DE CÓDIGO JAVA
+--------------------------------------------------------------------------------
+
+4.1 Nombres
+
+  - Paquete raíz: com.mundomanitas.api.
+  - Clases en singular y PascalCase; métodos y variables en inglés.
+  - Textos visibles para el usuario en español, dentro de las plantillas o
+    como constantes de mensaje.
+  - Un archivo por clase. Sin clases internas si pueden ser propias.
+  - Rutas del sitio en español (/cursos, /mi-perfil). Las rutas JSON, si
+    existen, van versionadas (/api/v1/...).
+
+4.2 Diseño
+
+  - MVC en capas, DAO por repositorios y SOLID (una responsabilidad por clase,
+    depender de interfaces, no repetir lógica).
+  - DTO para formularios y para lo que se muestra: nunca exponer entidades.
+  - Validación con Jakarta Bean Validation (@NotBlank, @Email, @Size) en los
+    DTO, no en el controlador a mano.
+  - Errores de negocio con excepciones propias y un @ControllerAdvice que
+    devuelva la vista de error.
+  - Fechas en UTC. La zona horaria se configura en Hibernate, no en cada clase.
+  - UUID como identificador público; nunca ids numéricos en la URL.
+  - Usar las librerías del proyecto cuando aportan: Guava (colecciones
+    inmutables), POI (reportes Excel), Commons Lang3/IO (texto y archivos).
+    No agregar una dependencia nueva sin hablarlo.
+
+4.3 Limpieza (esto se revisa en el merge)
+
+  - Sin código muerto: clases, métodos, variables, imports y estilos que no se
+    usan se eliminan; no se dejan "por si acaso".
+  - Sin código comentado. Si algo se reemplaza, se borra: para eso está Git.
+  - Comentarios cortos: una o dos líneas que expliquen el porqué. El código
+    debe explicarse solo. Nada de bloques de veinte líneas.
+  - Javadoc solo en clases y métodos públicos de servicio, modelo y controlador,
+    con una frase de resumen. Sin relleno.
+  - Métodos de 30 líneas como máximo; si crece, se divide.
+  - Sin números ni textos mágicos: constantes con nombre.
+  - Sin System.out.print: para logs se usa Logger de Logback.
+  - Sin printStackTrace: se registra el error con logger.error.
+
+4.4 Seguridad
+
+  - Contraseñas siempre con BCrypt; nunca en texto plano ni en el log.
+  - Nada de secretos en el código ni en application.yml versionado.
+  - Toda ruta privada se protege en SecurityConfig por rol.
+  - Toda entrada del usuario se valida en el servidor, aunque el formulario
+    también valide en el navegador.
+  - Los mensajes de error no revelan si un correo existe.
+
+--------------------------------------------------------------------------------
+5. BASE DE DATOS Y FLYWAY
+--------------------------------------------------------------------------------
+
+5.1 Migraciones
+
+  - Van en src/main/resources/db/migration/.
+  - Nombre: V<número>__<descripción>.sql  (V + número + DOS guiones bajos).
+    Ejemplo: V2__cursos_y_lecciones.sql
+  - Sin acentos, sin ñ, sin espacios, todo en minúsculas.
+  - Una migración ya ejecutada NUNCA se edita: Flyway guarda un checksum y la
+    aplicación deja de arrancar. Para corregir, se crea la siguiente versión.
+  - Una migración = un tema. No se mezcla "crear cursos" con "arreglar users".
+
+5.2 Nombres de objetos
+
+  - Tablas en plural y snake_case: courses, lesson_progress, users.
+  - Columnas en snake_case: created_at, password_hash.
+  - Clave primaria: id.
+  - Llave foránea: <tabla_en_singular>_id  (user_id, course_id).
+  - Índices: ux_<tabla>_<columna> para únicos, ix_<tabla>_<columna> para
+    normales.
+  - Restricciones: check, unique y foreign key con nombre.
+  - Trigger de updated_at: reutilizar la función set_updated_at().
+
+5.3 Tipos obligatorios
+
+  - Identificador: uuid primary key default gen_random_uuid()
+  - Fecha y hora: timestamptz (nunca timestamp ni date suelto)
+  - Texto: text
+  - Dinero: numeric(10,2)
+  - Estado: text + check (...)
+  - Booleano: boolean not null default false
+
+5.4 JPA
+
+  - application.yml usa ddl-auto: validate.
+  - Hibernate NO crea ni modifica tablas: la fuente de verdad es Flyway.
+  - Si una entidad no coincide con su tabla, la aplicación no arranca y avisa.
+  - Los cambios de esquema se hacen en una migración y después se ajusta la
+    entidad en el mismo commit.
+
+5.5 Datos personales
+
+  - No se guarda ninguna discapacidad ni dato médico.
+  - Solo la preferencia de cómo ver el contenido (LSP, subtítulos, tamaño,
+    velocidad). Es opcional y modificable.
+
+--------------------------------------------------------------------------------
+6. FRONTEND: HTML + CSS + THYMELEAF, SIN JAVASCRIPT
+--------------------------------------------------------------------------------
+
+6.1 Reglas duras
+
+  - Cero <script>, cero archivos .js, cero onclick. Nada de JavaScript.
+  - Cero frameworks y cero librerías de CSS o de íconos. Los íconos son SVG
+    de trazo escritos a mano con la clase .ico.
+  - Toda interacción se resuelve con HTML y CSS: formularios GET/POST,
+    :focus, :hover, :target, checkbox oculto, scroll-snap, details/summary.
+  - Un formulario de búsqueda siempre con method="get" para que el resultado se
+    pueda compartir.
+  - Nada de imágenes generadas por IA ni de fotos de stock genéricas: las
+    portadas de los cursos son fotos reales propias y sus créditos van en
+    src/main/resources/static/img/cursos/CREDITOS.md.
+
+6.2 Plantillas
+
+  - El head, la cabecera y el pie salen de fragments/layout.html:
+    th:replace="~{fragments/layout :: head('Título')}"
+    th:replace="~{fragments/layout :: header}"
+  - Una plantilla no repite el head ni el menú.
+  - Toda página interna empieza con <main id="contenido"> y el skip-link del
+    layout apunta ahí.
+  - Las imágenes llevan width y height para no saltar, loading="lazy" salvo la
+    portada, y alt descriptivo; si son decorativas, alt="" con aria-hidden.
+  - Los textos de la página van en español rioplatense neutro ("Aprendé",
+    "Elegí"), sin mezclar con inglés.
+  - Nada de comentarios HTML: si hace falta explicar, va en la documentación.
+
+6.3 Estilos
+
+  - Una sola hoja: static/css/styles.css. No se crean CSS por página.
+  - Todo color, radio, sombra y tamaño sale de :root. Un valor suelto en medio
+    de una regla está mal.
+  - Los bloques se ordenan con el banner existente: /* ---- Nombre ---- */
+  - Si agregás un componente, se documenta en docs/design-system.md.
+  - Nada de glassmorphism, marcos gruesos, sombras duras ni imágenes oscuras
+    detrás del texto.
+  - Antes de dar algo por listo: 360, 390, 412, 768 y 1440 px de ancho, sin
+    desborde horizontal (scrollWidth igual a clientWidth).
+
+--------------------------------------------------------------------------------
+7. DISEÑO: PALETA, TIPOGRAFÍA Y COMPONENTES
+--------------------------------------------------------------------------------
+
+7.1 Paleta oficial
+
+  #00FF00  verde   superficie de marca: botones, chip de paso, banda, foco
+                   sobre el video
+  #FFFFFF  blanco  fondo de página y de tarjetas
+  #000000  negro   todo el texto, bordes y líneas
+
+  Reglas:
+  - El verde NUNCA se usa como texto sobre blanco (contraste 1.4:1, no se lee).
+  - Texto sobre verde siempre negro, nunca blanco.
+  - Grises solo con negro y transparencia: rgba(0, 0, 0, .6). Nunca un hex gris
+    nuevo, para no meter un cuarto color.
+  - Verde sobre el video sí se permite como acento: el fondo es oscuro.
+
+7.2 Tipografía
+
+  - Tanker (FFL) para h1, h2 y cifras grandes. Un solo peso: SIEMPRE
+    font-weight: 400. Pedir 700 genera negrita sintética y deforma la letra.
+    letter-spacing entre -.015em y -.02em.
+  - Open Sans (OFL) solo en la navegación y en los títulos del pie.
+  - El cuerpo, etiquetas y párrafos usan la tipografía del sistema.
+  - Las fuentes se autoalojan en static/fonts/. Prohibido CDN de fuentes.
+  - Las licencias (FFL-Fontshare.txt y OFL-OpenSans.txt) no se borran.
+
+7.3 Movimiento
+
+  - Solo CSS, con la curva --ease (cubic-bezier(.22, 1, .36, 1)).
+  - Entradas de 400 a 650 ms; microinteracciones de 180 a 240 ms.
+  - Scroll con animation-timeline: view(), con rangos cortos.
+  - prefers-reduced-motion: reduce apaga animaciones y transiciones.
+  - Si el navegador no soporta una animación, la página se ve completa igual.
+
+7.4 Componentes
+
+  - Reutilizar el kit existente antes de crear una clase nueva: .shell, .btn,
+    .btn-primary, .btn-ghost, .btn-light, .card, .course, .section, .lead,
+    .eyebrow, .auth-card, .footer-*, .legal, .empty.
+  - El listado completo y su uso están en docs/design-system.md, sección 3.
+  - Un componente nuevo se nombra en inglés, en kebab-case, y se agrega al
+    documento.
+
+--------------------------------------------------------------------------------
+8. ACCESIBILIDAD (OBLIGATORIO, ESTÁ EN LA RÚBRICA)
+--------------------------------------------------------------------------------
+
+  - El enlace "Saltar al contenido" (.skip-link) sigue existiendo y se ve al
+    recibir foco.
+  - :focus-visible con anillo visible en TODOS los enlaces y botones. Nunca
+    outline: none sin reemplazo.
+  - Contraste mínimo 4.5:1 en texto normal y 3:1 en texto grande.
+  - Todo se opera con teclado: Tab, Enter, Espacio. El carrusel se mueve con
+    las flechas.
+  - Imágenes decorativas con alt="" o aria-hidden="true".
+  - Cada sección con aria-labelledby y su título con id.
+  - Los formularios con <label> real (o .sr-only si es visual).
+  - Los mensajes de error se anuncian con texto, no solo con color.
+  - HTML semántico: header, nav, main, section, article, footer.
+
+--------------------------------------------------------------------------------
+9. PRUEBAS
+--------------------------------------------------------------------------------
+
+  - JUnit 5 con AssertJ. Mockito solo cuando hay dependencias que simular.
+  - Se prueba la lógica de servicio y los controladores; no se prueba HTML.
+  - Los nombres de los métodos van en inglés y describen el comportamiento:
+    emptyQueryReturnsAll(), ignoresCaseAndAccents().
+  - @DisplayName en español, con una frase clara.
+  - Toda funcionalidad nueva llega con al menos una prueba.
+  - Toda corrección de error llega con la prueba que lo reproduce.
+  - Antes de pedir merge: .\mvnw.cmd -B test debe pasar completo.
+  - No se sube una prueba desactivada (@Disabled) sin justificar.
+
+--------------------------------------------------------------------------------
+10. GIT: RAMAS, COMMITS Y MERGE
+--------------------------------------------------------------------------------
+
+10.1 Ramas
+
+  main                  siempre estable y desplegable. Nadie commitea aquí.
+  feature/<tema>        una funcionalidad
+  fix/<tema>            una corrección
+  docs/<tema>           documentación
+  style/<tema>          formato o CSS sin cambio de lógica
+
+  Cada integrante trabaja en SU rama personal:
+    feature/luuxs-<tema>
+    feature/cesar-<tema>
+    feature/yefferson-<tema>
+
+  Hay ramas personales históricas en el remoto (cesaruribe, yeffersonbarriga).
+  Se pueden seguir usando, pero todo tema nuevo se abre como feature/<nombre>-<tema>.
+  Una rama = un tema. Si aparece otra cosa, se abre otra rama.
+  La rama se borra después del merge.
+
+10.2 Formato del commit
+
+  <tipo>(<alcance>): <descripción>
+
+  <por qué se hizo este cambio>
+
+  Reglas del asunto (primera línea):
+  - Máximo 72 caracteres.
+  - Minúscula inicial, sin punto final.
+  - Verbo en imperativo: "agregar", "corregir", "mover"; no "agregué" ni
+    "agregando".
+  - Tipo y alcance en inglés; la descripción en español.
+  - Un commit = un solo cambio lógico.
+
+  Tipos:
+    feat      funcionalidad nueva para el usuario
+    fix       corrección de un error
+    refactor  cambio interno sin cambiar el comportamiento
+    test      pruebas agregadas o corregidas
+    docs      documentación
+    style     formato o CSS sin cambio de lógica
+    perf      mejora de rendimiento
+    build     pom.xml, dependencias, Maven
+    chore     configuración, .gitignore, tareas menores
+    ci        pipeline de integración continua
+    revert    revertir un commit anterior
+
+  Alcances permitidos:
+    auth, db, ui, courses, lessons, admin, audit, payments, progress,
+    reports, config, deps, docs.
+
+  Bien:
+    feat(auth): registrar usuarios con contraseña cifrada
+
+    Permite crear una cuenta desde /registro. La contraseña se guarda con
+    BCrypt y el email se valida sin distinguir mayúsculas para evitar
+    cuentas duplicadas.
+
+  Mal:
+    cambios                      no dice qué ni por qué
+    arreglos varios              mezcla temas
+    Update index.html            sin tipo ni alcance
+    feat: todo el backend        commit gigante
+
+  En Windows, para conservar tildes en el mensaje, escribir el mensaje en un
+  archivo UTF-8 y usar:
+    git commit -F mensaje.txt
+
+10.3 Higiene
+
+  - Antes de commitear, compilar.
+  - Revisar qué entra con git status y git diff --stat.
+  - NUNCA git add . sin mirar. Se agrega archivo por archivo o por carpeta
+    concreta.
+  - No mezclar temas ni formato con lógica: dos commits distintos.
+  - Un commit debe poder revertirse solo.
+  - No se reescribe historia ya subida (git push --force) sin acordarlo.
+  - No se suben binarios pesados ni secretos.
+
+10.4 Flujo diario (PowerShell)
+
+  # 1. Actualizar main
+  git switch main
+  git pull
+
+  # 2. Crear la rama del tema (o entrar a la propia si ya existe)
+  git switch -c feature/cesar-catalogo
+
+  # 3. Trabajar y commitear por pasos
+  git add src/main/java/com/mundomanitas/api/service/CourseService.java
+  git commit
+
+  # 4. Subir la rama
+  git push -u origin feature/cesar-catalogo
+
+  # 5. Pull Request en GitHub y revisión antes de mergear a main
+
+10.5 Antes de pedir el merge
+
+  # Ponerse al día con main DENTRO de tu rama
+  git switch main
+  git pull
+  git switch feature/cesar-catalogo
+  git merge main
+
+  # Resolver conflictos, volver a correr las pruebas
+  .\mvnw.cmd -B test
+
+  # Subir
+  git push
+
+Los conflictos se resuelven en la rama de quien la creó, nunca en main.
+
+10.6 Merge a main
+
+  - Se entra por Pull Request en GitHub, con al menos una revisión.
+  - El merge a main lo hace quien revisa, con --no-ff, para que quede el
+    registro de la rama:
+      git switch main
+      git pull
+      git merge --no-ff feature/cesar-catalogo -m "Merge branch 'feature/cesar-catalogo' into main"
+      git push origin main
+  - Después del merge se borra la rama (local y remota).
+
+--------------------------------------------------------------------------------
+11. PROHIBICIONES
+--------------------------------------------------------------------------------
+
+No se sube ni se hace:
+
+  - target/, logs/, *.log, .env, application-local.yml, .idea/, .vscode/
+    (ya están en .gitignore; no se fuerza su entrada).
+  - Contraseñas, tokens, claves o datos personales de usuarios reales.
+  - JavaScript, frameworks de CSS, librerías de íconos, CDN de fuentes.
+  - Cambios directos a main, push forzado a main, historia reescrita.
+  - Comentarios de veinte líneas, código comentado, código muerto.
+  - Imágenes generadas por IA en el sitio.
+  - Editar una migración de Flyway ya ejecutada.
+  - Cambiar la paleta, la tipografía o los nombres de las clases del kit sin
+    actualizar docs/design-system.md.
+  - Agregar dependencias al pom.xml sin acordarlo con el equipo.
+  - Dejar la aplicación sin compilar o con pruebas rojas al subir una rama.
+
+--------------------------------------------------------------------------------
+12. CHECKLIST ANTES DE PEDIR MERGE
+--------------------------------------------------------------------------------
+
+Compilación y pruebas
+  [ ] .\mvnw.cmd -B test pasa completo.
+  [ ] .\mvnw.cmd -B -q -DskipTests package termina en BUILD SUCCESS.
+  [ ] git status no muestra archivos sin querer ni basura.
+
+Código
+  [ ] Respeta las capas controller -> service -> repository.
+  [ ] No hay imports, clases, métodos ni variables sin usar.
+  [ ] No hay código comentado ni comentarios largos.
+  [ ] Los DTO validan con Bean Validation.
+  [ ] Los textos visibles están en español y los nombres de código en inglés.
+
+Base de datos
+  [ ] La migración es nueva (no se editó una existente).
+  [ ] Usa uuid, timestamptz, text y check según la tabla de tipos.
+  [ ] La entidad coincide con la tabla (la app arranca con ddl-auto: validate).
+
+Interfaz
+  [ ] Sin <script> ni .js.
+  [ ] Colores y tamaños salen de :root.
+  [ ] Se ve bien en 360, 390, 412, 768 y 1440 px, sin desborde horizontal.
+  [ ] Se navega solo con Tab y el foco siempre se ve.
+  [ ] prefers-reduced-motion no rompe nada.
+  [ ] No hay 404 de CSS, fuentes, imágenes ni video.
+  [ ] Los componentes nuevos están en docs/design-system.md.
+
+Git
+  [ ] Los commits tienen tipo, alcance y un porqué.
+  [ ] Un commit por cambio lógico, no uno gigante.
+  [ ] La rama está actualizada con main.
+  [ ] El Pull Request explica qué hace y cómo probarlo.
+
+--------------------------------------------------------------------------------
+13. REPARTO DE ARCHIVOS PARA NO CHOCARNOS
+--------------------------------------------------------------------------------
+
+Estos archivos los toca una sola persona a la vez. Si necesitás cambiarlos,
+avisá en el grupo antes de empezar:
+
+  static/css/styles.css          hoja única: cualquier cambio afecta a todos
+  templates/fragments/layout.html   head, cabecera y pie de todo el sitio
+  templates/index.html           portada
+  application.yml                configuración compartida
+  pom.xml                        dependencias
+  docs/design-system.md          contrato visual
+  docs/git-conventions.md        reglas de Git
+
+Reparto sugerido por tema (se ajusta hablando):
+
+  Luuxs       diseño, portada, catálogo, navegación y documentación visual
+  César       autenticación, cuentas, perfil y seguridad
+  Yefferson   cursos, lecciones, progreso y panel de administración
+
+Para evitar conflictos en CSS: cada uno agrega su bloque al final del archivo,
+con su banner /* ---- Nombre ---- */, sin reordenar el resto. Así el merge
+concatena y no pelea.
+
+Nunca trabajen dos personas en la misma pantalla al mismo tiempo. Si pasa, se
+reparte por archivo: uno hace el HTML y otro el CSS, y se avisa.
+
+--------------------------------------------------------------------------------
+14. PROBLEMAS COMUNES
+--------------------------------------------------------------------------------
+
+"Port 8080 was already in use"
+  Hay otra instancia corriendo. Cerrarla:
+  $c = Get-NetTCPConnection -LocalPort 8080 -State Listen -ErrorAction SilentlyContinue
+  if ($c) { Stop-Process -Id $c.OwningProcess -Force }
+
+"Flyway detected applied migration not resolved locally" o checksum mismatch
+  Se editó una migración ya ejecutada. Restaurarla con git y crear una V nueva.
+  En local, si la base es descartable: DROP DATABASE y volver a crearla.
+
+"Schema-validation: missing table/column"
+  La entidad no coincide con la migración. Ajustar una de las dos; el esquema
+  manda por Flyway.
+
+La aplicación no arranca y pide la base
+  Verificar el servicio: Get-Service postgresql-x64-18 y Start-Service si está
+  detenido. Probar la conexión con psql.
+
+El merge trae conflictos en styles.css
+  Resolver a mano conservando los dos bloques, en el orden en que llegaron.
+  Nunca descartar el trabajo del otro. Después: compilar, probar y revisar la
+  página en el navegador.
+
+Git marca todo el archivo como modificado al cambiar de rama
+  Es el fin de línea. El repo usa .gitattributes con eol=lf. No cambiar ese
+  archivo ni forzar CRLF.
+
+--------------------------------------------------------------------------------
+15. DEFINICIÓN DE "TERMINADO"
+--------------------------------------------------------------------------------
+
+Una tarea está terminada cuando:
+
+  1. Funciona en el navegador y en la base, no solo en la cabeza.
+  2. Pasa las pruebas y compila.
+  3. Se ve bien en móvil, tablet y escritorio.
+  4. Se navega con teclado y respeta prefers-reduced-motion.
+  5. No deja código muerto, comentarios largos ni archivos sueltos.
+  6. Está documentada si cambió el diseño, el esquema o las reglas.
+  7. Está en su rama, con commits claros y subida al remoto.
+  8. Pasó revisión y se mergeó a main con --no-ff.
+
+--------------------------------------------------------------------------------
+16. ACUERDOS DEL EQUIPO
+--------------------------------------------------------------------------------
+
+  - Ante la duda, se pregunta antes de inventar una convención.
+  - Se revisa el trabajo del otro con respeto y comentarios concretos.
+  - Un Pull Request no se aprueba si no compila o si rompe la accesibilidad.
+  - Las decisiones que afectan a todos (paleta, dependencias, esquema, rutas) se
+    acuerdan en el grupo y se escriben en docs/.
+  - Este archivo se actualiza cuando cambia una regla. La versión del repo es
+    la válida.
+
+================================================================================
+Fin del documento. Cualquier regla nueva se agrega acá, no en un chat suelto.
+================================================================================

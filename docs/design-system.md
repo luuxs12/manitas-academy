@@ -81,7 +81,7 @@ en `static/fonts/FFL-Fontshare.txt`). Se autoaloja en `static/fonts/`; no se
 pide nada por CDN.
 
 - Tanker se aplica a `h1`, `h2` y a las cifras grandes (`.hero-card-mark`,
-  `.step-num`, `.band-amount`).
+  `.step-num`, `.stat-value`, `.band-amount`).
 - Tiene **un solo peso (400)**. Siempre se declara `font-weight: 400`: pedir
   650 o 700 genera una negrita sintética que deforma la letra.
 - Ya viene apretada: su `letter-spacing` va entre `-.015em` y `-.02em`.
@@ -145,12 +145,15 @@ perfil, cursos y panel de administración:
 | `.section` / `.section-kicker` | secciones de la landing |
 | `.section-alt` | panel verde claro |
 | `.section-head--row` / `.section-link` | encabezado con enlace "Ver todos" a la derecha |
-| `.courses` / `.course` | grilla de cursos: foto 16:10, etiqueta de categoría, nivel, metadatos y precio |
-| `.course-badge` / `.course-level` | etiquetas sobre la foto (categoría en verde, nivel sobre el velo) |
-| `.rail` | carrusel horizontal con `scroll-snap`; se mueve con trackpad, rueda o teclado |
-| `.steps` / `.step` | tarjetas numeradas; al pasar el mouse se rellenan de verde |
+| `.courses` / `.course` | grilla de cursos: foto 16:10, categoría y precio sobre la foto, título, resumen corto y metadatos |
+| `.course-badge` / `.course-price-tag` | etiquetas sobre la foto: categoría en verde y acceso (gratis o premium) en pastilla blanca |
+| `.course-tags` / `.course-arrow` | nivel y cantidad de lecciones al pie de la tarjeta, con flecha circular que se pinta de verde |
+| `.steps` / `.step` | tres pasos editoriales: número grande en Tanker y línea superior, sin tarjetas |
 | `.split` / `.split-head` | sección a dos columnas con el encabezado fijo al hacer scroll |
 | `.feature-list` / `.feature` / `.feature-icon` | lista de accesibilidad con ícono y filas separadas |
+| `.stories-head` / `.stats` | encabezado de historias con cifras del catálogo a la derecha |
+| `.testimonials` / `.testimonial` | testimonios en tarjetas, con avatar de iniciales en verde |
+| `.stories-note` | invitación a contar la propia experiencia |
 | `.band-points` | lista de beneficios dentro de la banda verde |
 | `.cta-band` | banda verde de membresía |
 | `.cta-action` / `.band-price` / `.band-note` | precio y botón dentro de la banda |
@@ -166,6 +169,7 @@ perfil, cursos y panel de administración:
 | `.footer-main` | rejilla del pie: marca + tres columnas de enlaces |
 | `.footer-col` | columna de enlaces del pie, con el título en Open Sans 700 |
 | `.footer-badge` | distintivo "Hecho en Perú" |
+| `.footer-mail` | correo de contacto con subrayado verde en la columna de marca |
 | `.footer-wordmark` | firma grande en Tanker que cierra la página |
 | `.footer-bottom` / `.footer-legal` | barra inferior: copyright, enlaces legales y "Volver arriba" |
 

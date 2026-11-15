@@ -124,7 +124,7 @@ perfil, cursos y panel de administración:
 
 | Clase | Uso |
 |---|---|
-| `.site-header` | cabecera fija al hacer scroll en escritorio (desde 821 px); en móvil fluye con la página |
+| `.site-header` | cabecera fija al hacer scroll (desde 821 px), con fondo blanco translúcido y desenfoque suave; en móvil fluye con la página |
 | `.shell` | contenedor de la página (blanco, a todo el ancho) |
 | `.nav-search` | buscador de la cabecera: cerrado es el ícono, se abre al enfocar (formulario GET a `/buscar`) |
 | `.nav-search-toggle` | ícono-etiqueta que abre el buscador solo con CSS |

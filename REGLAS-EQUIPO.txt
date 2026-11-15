@@ -287,8 +287,9 @@ Cada capa tiene un trabajo y solo ese:
     de una regla está mal.
   - Los bloques se ordenan con el banner existente: /* ---- Nombre ---- */
   - Si agregás un componente, se documenta en docs/design-system.md.
-  - Nada de glassmorphism, marcos gruesos, sombras duras ni imágenes oscuras
-    detrás del texto.
+  - Nada de glassmorphism recargado (el desenfoque suave de la cabecera es la
+    excepción), marcos gruesos, sombras duras ni imágenes oscuras detrás del
+    texto.
   - Antes de dar algo por listo: 360, 390, 412, 768 y 1440 px de ancho, sin
     desborde horizontal (scrollWidth igual a clientWidth).
 

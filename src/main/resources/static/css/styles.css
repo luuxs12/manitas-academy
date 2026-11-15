@@ -222,8 +222,9 @@ main { scroll-margin-top: 90px; }
     top: 0;
     z-index: 60;
     padding: 18px 32px 10px;
-    background: var(--paper);
-    box-shadow: 0 1px 0 var(--line);
+    background: rgba(255, 255, 255, .86);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
 }
 
 .nav {
@@ -1932,7 +1933,6 @@ main { scroll-margin-top: 90px; }
     /* Con dos filas la cabecera ocupa demasiado: no se queda fija. */
     .site-header {
         position: static;
-        box-shadow: none;
     }
 
     /* El buscador pasa a su propia fila. */

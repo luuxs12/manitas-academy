@@ -13,8 +13,8 @@
             <p class="section-kicker">Catálogo</p>
             <h1>¿Qué querés aprender hoy?</h1>
             <p class="lead">
-                Cursos de tecnología con intérprete en Lengua de Señas Peruana
-                y subtítulos revisados. Hay cursos gratis para empezar.
+                Elegí un curso y empezá cuando quieras. Todos tienen intérprete
+                en LSP y subtítulos revisados; varios son gratis.
             </p>
 
             <form class="search-big" role="search" th:action="@{/buscar}" method="get">
@@ -24,7 +24,7 @@
                     <path d="m16 16 4.5 4.5"></path>
                 </svg>
                 <input id="buscar-catalogo" name="q" type="search"
-                       placeholder="¿Qué deseas aprender?" th:value="${query}"
+                       placeholder="¿Qué querés aprender?" th:value="${query}"
                        autocomplete="off">
                 <button class="btn btn-solid" type="submit">Buscar</button>
             </form>

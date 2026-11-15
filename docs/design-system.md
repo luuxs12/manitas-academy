@@ -101,8 +101,8 @@ es la más legible en tamaños chicos y no suma descarga.
 
 ### Movimiento
 
-Todo el movimiento es CSS por defecto, con JavaScript solo cuando no hay otra
-forma, y comparte la curva `--ease`
+El movimiento se hace con CSS y, cuando hace falta, con JavaScript, compartiendo
+la curva `--ease`
 (`cubic-bezier(.22, 1, .36, 1)`).
 
 - **Entrada de la portada**: escalonada, de 400 a 650 ms, con retrasos de
@@ -146,7 +146,7 @@ perfil, cursos y panel de administración:
 | `.section-head--row` / `.section-link` | encabezado con enlace "Ver todos" a la derecha |
 | `.courses` / `.course` | grilla de cursos: foto 16:10, etiqueta de categoría, nivel, metadatos y precio |
 | `.course-badge` / `.course-level` | etiquetas sobre la foto (categoría en verde, nivel sobre el velo) |
-| `.rail` | carrusel horizontal con `scroll-snap`; se mueve con trackpad, rueda o teclado sin necesidad de JS |
+| `.rail` | carrusel horizontal con `scroll-snap`; se mueve con trackpad, rueda o teclado |
 | `.steps` / `.step` | tarjetas numeradas; al pasar el mouse se rellenan de verde |
 | `.split` / `.split-head` | sección a dos columnas con el encabezado fijo al hacer scroll |
 | `.feature-list` / `.feature` / `.feature-icon` | lista de accesibilidad con ícono y filas separadas |

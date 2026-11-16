@@ -164,14 +164,19 @@ perfil, cursos y panel de administración:
 | `.legal` / `.legal-date` | páginas de términos y privacidad |
 | `.empty` | estado vacío de la búsqueda |
 | `.page` / `.page-center` | contenedores de páginas internas |
-| `.auth-card` | tarjeta de login/registro |
-| `.auth-actions` | fila de botones dentro de la tarjeta |
+| `.auth-page` / `.auth-shell` | pantalla de cuenta: formulario en blanco y panel de propuesta en negro, en dos columnas |
+| `.auth-card` | columna blanca con el formulario de login o registro |
+| `.auth-aside` / `.auth-quote` / `.auth-benefits` | panel negro con la propuesta de valor, una cita y los beneficios |
+| `.auth-alert` | aviso de error, registro exitoso o cierre de sesión; siempre con texto y un signo, no solo color |
+| `.field` / `.field-toggle` / `.password-meter` | campo del formulario, botón mostrar/ocultar y medidor de contraseña |
+| `.field-error` / `.field-hint` | error de validación y ayuda bajo el campo |
+| `.nav-user` / `.nav-avatar` | saludo e iniciales de la persona con sesión abierta en la cabecera |
+| `.footer-cta` / `.footer-contact` | banda verde suave de contacto con la pastilla negra del correo |
 | `.footer-main` | rejilla del pie: marca + tres columnas de enlaces |
 | `.footer-col` | columna de enlaces del pie, con el título en Open Sans 700 |
-| `.footer-badge` | distintivo "Hecho en Perú" |
-| `.footer-mail` | correo de contacto con subrayado verde en la columna de marca |
+| `.footer-badges` / `.footer-badge` | distintivos "Hecho en Perú" y "LSP en cada clase" |
 | `.footer-wordmark` | firma grande en Tanker que cierra la página |
-| `.footer-bottom` / `.footer-legal` | barra inferior: copyright, enlaces legales y "Volver arriba" |
+| `.footer-bottom` / `.footer-legal` / `.footer-place` | barra inferior: copyright, ubicación, enlaces legales y "Volver arriba" |
 
 Si cambiás el nombre de alguna, decime y actualizo las plantillas nuevas.
 

@@ -84,6 +84,19 @@ Start-Service postgresql-x64-18
 | http://localhost:8080 | Sitio |
 | http://localhost:8080/actuator/health | Estado de la app y de la base |
 
+### Cuentas
+
+| URL | Qué es |
+|---|---|
+| `/registro` | Alta con nombre, correo, contraseña y aceptación de términos |
+| `/login` | Inicio de sesión con correo y contraseña |
+| `/logout` | Cierre de sesión (POST con token CSRF) |
+
+Las cuentas se guardan en la tabla `users`. Las contraseñas se cifran con
+BCrypt, la sesión la maneja Spring Security y "mantener sesión abierta" usa
+remember-me durante 14 días. La clave se configura en
+`app.security.remember-me-key` (variable de entorno `REMEMBER_ME_KEY`).
+
 ```powershell
 .\mvnw.cmd clean package      # compilar
 .\mvnw.cmd test               # tests
@@ -269,12 +282,13 @@ La base está en pie y funciona:
 - Catálogo de seis cursos de tecnología con foto propia, búsqueda por texto y
   ficha de curso.
 - Páginas de términos, privacidad y nosotros.
-- Pantallas base de login y registro, con seguridad abierta en desarrollo.
+- Registro e inicio de sesión reales contra `users`: BCrypt, sesión,
+  remember-me, cierre de sesión y cabecera con la cuenta activa.
 - Esquema `V1` de cuentas y preferencias de accesibilidad aplicado por Flyway.
 
 Falta:
 
-1. Cuentas reales: registro, login, roles, perfil y preferencias.
+1. Roles, perfil y preferencias de accesibilidad editables.
 2. Inscripción a cursos gratis y lecciones.
 3. Reproductor con video principal + video en LSP y subtítulos.
 4. Progreso del estudiante.

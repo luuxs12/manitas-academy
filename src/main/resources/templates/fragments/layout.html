@@ -55,15 +55,49 @@
             </button>
         </form>
 
-        <div class="nav-actions">
+        <div class="nav-actions" th:if="${currentUser == null}">
             <a class="nav-login" th:href="@{/login}">Iniciar sesión</a>
             <a class="btn btn-nav" th:href="@{/registro}">Crear cuenta</a>
+        </div>
+
+        <div class="nav-actions nav-actions--account" th:if="${currentUser != null}">
+            <span class="nav-user">
+                <span class="nav-avatar" aria-hidden="true"
+                      th:text="${currentUser.initials()}">AQ</span>
+                <span class="nav-user-name">
+                    Hola, <span th:text="${currentUser.firstName()}">Ana</span>
+                </span>
+            </span>
+            <form class="nav-logout" th:action="@{/logout}" method="post">
+                <button class="btn btn-nav" type="submit">Salir</button>
+            </form>
         </div>
 
     </nav>
 </header>
 
 <footer th:fragment="footer" class="site-footer">
+
+    <div class="footer-cta">
+        <div class="footer-cta-inner">
+            <div class="footer-cta-copy">
+                <p class="section-kicker">Hablemos</p>
+                <h2>Si tenés una duda,<br>escribinos.</h2>
+            </div>
+
+            <div class="footer-cta-action">
+                <a class="footer-contact" href="mailto:hola@mundomanitas.pe">
+                    <span class="footer-contact-label">Escribinos</span>
+                    <span class="footer-contact-mail">hola@mundomanitas.pe</span>
+                    <span class="footer-contact-arrow" aria-hidden="true">→</span>
+                </a>
+                <p class="footer-contact-note">
+                    Respondemos de lunes a viernes, de 9 a 18 h (hora de Perú).
+                </p>
+            </div>
+        </div>
+    </div>
+
     <div class="footer-main">
 
         <div class="footer-brand">
@@ -78,18 +112,20 @@
                 Cursos de tecnología con intérprete en Lengua de Señas Peruana
                 y subtítulos revisados. Aprender sin depender de escuchar.
             </p>
-            <a class="footer-mail" href="mailto:hola@mundomanitas.pe">hola@mundomanitas.pe</a>
-            <p class="footer-badge">Hecho en Perú</p>
+            <div class="footer-badges">
+                <p class="footer-badge">Hecho en Perú</p>
+                <p class="footer-badge">LSP en cada clase</p>
+            </div>
         </div>
 
-        <nav class="footer-col" aria-labelledby="pie-cursos">
-            <h2 id="pie-cursos">Cursos</h2>
+        <nav class="footer-col" aria-labelledby="pie-aprender">
+            <h2 id="pie-aprender">Aprendé</h2>
             <ul>
+                <li><a th:href="@{/cursos}">Catálogo completo</a></li>
                 <li><a th:href="@{/cursos/python-desde-cero}">Python desde cero</a></li>
                 <li><a th:href="@{/cursos/desarrollo-web-html-css}">Desarrollo web</a></li>
-                <li><a th:href="@{/cursos/redes-y-soporte-tecnico}">Redes y soporte</a></li>
                 <li><a th:href="@{/cursos/bases-de-datos-sql}">Bases de datos</a></li>
-                <li><a th:href="@{/cursos}">Catálogo completo</a></li>
+                <li><a th:href="@{/cursos/redes-y-soporte-tecnico}">Redes y soporte</a></li>
             </ul>
         </nav>
 
@@ -108,8 +144,8 @@
             <ul>
                 <li><a th:href="@{/nosotros}">Nosotros</a></li>
                 <li><a href="mailto:hola@mundomanitas.pe">Escríbenos</a></li>
-                <li><a th:href="@{/registro}">Crear cuenta</a></li>
-                <li><a th:href="@{/login}">Iniciar sesión</a></li>
+                <li><a th:href="@{/terminos}">Términos</a></li>
+                <li><a th:href="@{/privacidad}">Privacidad</a></li>
             </ul>
         </nav>
 
@@ -120,6 +156,7 @@
     <div class="footer-bottom">
         <div class="footer-bottom-inner">
             <p>© 2026 Mundo Manitas. Todos los derechos reservados.</p>
+            <p class="footer-place">Lima, Perú · Español</p>
             <nav class="footer-legal" aria-label="Enlaces legales">
                 <a th:href="@{/terminos}">Términos</a>
                 <a th:href="@{/privacidad}">Privacidad</a>

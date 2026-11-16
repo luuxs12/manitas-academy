@@ -26,6 +26,10 @@ spring:
 server:
   port: 8080
 
+app:
+  security:
+    remember-me-key: ${REMEMBER_ME_KEY:mundo-manitas-dev-key}
+
 management:
   endpoints:
     web:

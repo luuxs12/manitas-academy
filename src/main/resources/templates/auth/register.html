@@ -5,25 +5,137 @@
 
 <body>
 <div class="shell">
-<header th:replace="~{fragments/layout :: header}"></header>
+    <header th:replace="~{fragments/layout :: header}"></header>
 
-<main id="contenido" class="page page-center">
-    <div class="auth-card">
-        <p class="eyebrow">Cuentas</p>
-        <h1>Crear cuenta</h1>
-        <p class="lead">
-            Estamos terminando esta pantalla. Muy pronto vas a poder registrarte y
-            elegir cómo querés ver las clases.
-        </p>
+    <main id="contenido" class="auth-page">
 
-        <div class="auth-actions">
-            <a class="btn btn-primary" th:href="@{/login}">Ya tengo cuenta</a>
-            <a class="btn btn-ghost" th:href="@{/}">Volver al inicio</a>
+        <div class="auth-shell">
+
+            <section class="auth-card" aria-labelledby="titulo-registro">
+
+                <header class="auth-head">
+                    <p class="section-kicker">Cuentas</p>
+                    <h1 id="titulo-registro">Creá tu cuenta</h1>
+                    <p class="auth-sub">
+                        Empezá gratis y sin tarjeta. El intérprete en LSP y los
+                        subtítulos vienen activados desde la primera clase.
+                    </p>
+                </header>
+
+                <form class="auth-form" th:action="@{/registro}" method="post"
+                      th:object="${form}">
+
+                    <div class="field">
+                        <label for="fullName">Nombre completo</label>
+                        <input id="fullName" type="text" th:field="*{fullName}"
+                               th:classappend="${#fields.hasErrors('fullName')} ? ' is-invalid' : ''"
+                               th:attr="aria-invalid=${#fields.hasErrors('fullName')} ? 'true' : null,
+                                        aria-describedby=${#fields.hasErrors('fullName')} ? 'fullName-error' : null"
+                               autocomplete="name" placeholder="Ana Quispe"
+                               maxlength="120" required autofocus>
+                        <p class="field-error" id="fullName-error"
+                           th:if="${#fields.hasErrors('fullName')}"
+                           th:errors="*{fullName}" role="alert"></p>
+                    </div>
+
+                    <div class="field">
+                        <label for="email">Correo electrónico</label>
+                        <input id="email" type="email" th:field="*{email}"
+                               th:classappend="${#fields.hasErrors('email')} ? ' is-invalid' : ''"
+                               th:attr="aria-invalid=${#fields.hasErrors('email')} ? 'true' : null,
+                                        aria-describedby=${#fields.hasErrors('email')} ? 'email-error' : null"
+                               autocomplete="email" placeholder="tu@correo.com"
+                               maxlength="254" required>
+                        <p class="field-error" id="email-error"
+                           th:if="${#fields.hasErrors('email')}"
+                           th:errors="*{email}" role="alert"></p>
+                    </div>
+
+                    <div class="field">
+                        <div class="field-head">
+                            <label for="password">Contraseña</label>
+                            <button class="field-toggle" type="button"
+                                    data-toggle-password="password"
+                                    aria-controls="password"
+                                    aria-pressed="false">Mostrar</button>
+                        </div>
+                        <input id="password" type="password" th:field="*{password}"
+                               th:classappend="${#fields.hasErrors('password')} ? ' is-invalid' : ''"
+                               th:attr="aria-invalid=${#fields.hasErrors('password')} ? 'true' : null,
+                                        aria-describedby=${#fields.hasErrors('password')} ? 'password-hint password-error' : 'password-hint'"
+                               autocomplete="new-password" placeholder="Mínimo 8 caracteres"
+                               minlength="8" maxlength="72" required>
+                        <div class="password-meter" data-password-meter data-score="0"
+                             aria-hidden="true">
+                            <span></span><span></span><span></span>
+                        </div>
+                        <p class="field-hint" id="password-hint" data-password-hint
+                           aria-live="polite">
+                            Mínimo 8 caracteres. Mezclá letras y números.
+                        </p>
+                        <p class="field-error" id="password-error"
+                           th:if="${#fields.hasErrors('password')}"
+                           th:errors="*{password}" role="alert"></p>
+                    </div>
+
+                    <div class="field">
+                        <label for="confirmPassword">Repetí la contraseña</label>
+                        <input id="confirmPassword" type="password"
+                               th:field="*{confirmPassword}"
+                               th:classappend="${#fields.hasErrors('confirmPassword')} ? ' is-invalid' : ''"
+                               th:attr="aria-invalid=${#fields.hasErrors('confirmPassword')} ? 'true' : null,
+                                        aria-describedby=${#fields.hasErrors('confirmPassword')} ? 'confirmPassword-error' : null"
+                               autocomplete="new-password" placeholder="La misma de arriba"
+                               minlength="8" maxlength="72" required>
+                        <p class="field-error" id="confirmPassword-error"
+                           th:if="${#fields.hasErrors('confirmPassword')}"
+                           th:errors="*{confirmPassword}" role="alert"></p>
+                    </div>
+
+                    <div class="auth-terms">
+                        <label class="check check--terms">
+                            <input type="checkbox" th:field="*{acceptTerms}"
+                                   th:attr="aria-invalid=${#fields.hasErrors('acceptTerms')} ? 'true' : null,
+                                            aria-describedby=${#fields.hasErrors('acceptTerms')} ? 'acceptTerms-error' : null"
+                                   required>
+                            <span>
+                                Acepto los <a th:href="@{/terminos}" target="_blank"
+                                             rel="noopener">términos</a> y la
+                                <a th:href="@{/privacidad}" target="_blank"
+                                   rel="noopener">política de privacidad</a>.
+                            </span>
+                        </label>
+                        <p class="field-error" id="acceptTerms-error"
+                           th:if="${#fields.hasErrors('acceptTerms')}"
+                           th:errors="*{acceptTerms}" role="alert"></p>
+                    </div>
+
+                    <button class="btn btn-solid btn-lg auth-submit" type="submit">
+                        Crear mi cuenta
+                    </button>
+
+                </form>
+
+                <p class="auth-alt">
+                    ¿Ya tenés cuenta?
+                    <a th:href="@{/login}">Iniciá sesión</a>
+                </p>
+
+                <p class="auth-note">
+                    No pedimos tarjeta. Podés empezar por los cursos gratis.
+                </p>
+
+            </section>
+
+            <aside th:replace="~{fragments/auth :: aside}"></aside>
+
         </div>
-    </div>
-</main>
 
-<footer th:replace="~{fragments/layout :: footer}"></footer>
+    </main>
+
+    <footer th:replace="~{fragments/layout :: footer}"></footer>
 </div>
+
+<script th:src="@{/js/auth.js}" defer></script>
 </body>
 </html>

@@ -12,6 +12,25 @@
     const loginForm = dialog.querySelector("[data-auth-login]");
     const registerForm = dialog.querySelector("[data-auth-register]");
     let lastTrigger = null;
+    const pausedMedia = [];
+
+    // El fondo difuminado sobre un video en reproducción cuesta caro:
+    // al abrir el modal se pausa y al cerrar se reanuda lo que sonaba.
+    const pauseMedia = () => {
+        for (const video of document.querySelectorAll("video")) {
+            if (!video.paused) {
+                pausedMedia.push(video);
+                video.pause();
+            }
+        }
+    };
+
+    const resumeMedia = () => {
+        for (const video of pausedMedia) {
+            video.play().catch(() => {});
+        }
+        pausedMedia.length = 0;
+    };
 
     const fieldNames = ["fullName", "email", "password", "confirmPassword", "acceptTerms"];
 
@@ -195,6 +214,7 @@
         lastTrigger = trigger || document.activeElement;
         clearErrors();
         setTab(name === "register" ? "register" : "login");
+        pauseMedia();
         dialog.showModal();
         body.classList.add("has-auth-dialog");
 
@@ -241,6 +261,7 @@
 
     dialog.addEventListener("close", () => {
         body.classList.remove("has-auth-dialog");
+        resumeMedia();
         if (lastTrigger && document.contains(lastTrigger)) lastTrigger.focus();
         lastTrigger = null;
     });

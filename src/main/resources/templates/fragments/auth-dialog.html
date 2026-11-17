@@ -103,51 +103,55 @@
 
                 <form class="auth-form" th:action="@{/registro}" method="post" data-auth-register>
 
-                    <div class="field">
-                        <label for="modal-fullName">Nombre completo</label>
-                        <input id="modal-fullName" name="fullName" type="text"
-                               autocomplete="name" placeholder="Ana Quispe"
-                               maxlength="120" required>
-                        <p class="field-error" id="modal-fullName-error" role="alert" hidden></p>
-                    </div>
-
-                    <div class="field">
-                        <label for="modal-email">Correo electrónico</label>
-                        <input id="modal-email" name="email" type="email"
-                               autocomplete="email" placeholder="tu@correo.com"
-                               maxlength="254" required>
-                        <p class="field-error" id="modal-email-error" role="alert" hidden></p>
-                    </div>
-
-                    <div class="field" data-password-group>
-                        <div class="field-head">
-                            <label for="modal-password">Contraseña</label>
-                            <button class="field-toggle" type="button"
-                                    data-toggle-password="modal-password"
-                                    aria-controls="modal-password"
-                                    aria-pressed="false">Mostrar</button>
+                    <div class="auth-fields">
+                        <div class="field">
+                            <label for="modal-fullName">Nombre completo</label>
+                            <input id="modal-fullName" name="fullName" type="text"
+                                   autocomplete="name" placeholder="Ana Quispe"
+                                   maxlength="120" required>
+                            <p class="field-error" id="modal-fullName-error" role="alert" hidden></p>
                         </div>
-                        <input id="modal-password" name="password" type="password"
-                               data-password-input autocomplete="new-password"
-                               placeholder="Mínimo 8 caracteres" minlength="8" maxlength="72"
-                               aria-describedby="modal-password-hint" required>
-                        <div class="password-meter" data-password-meter data-score="0"
-                             aria-hidden="true">
-                            <span></span><span></span><span></span>
+
+                        <div class="field">
+                            <label for="modal-email">Correo electrónico</label>
+                            <input id="modal-email" name="email" type="email"
+                                   autocomplete="email" placeholder="tu@correo.com"
+                                   maxlength="254" required>
+                            <p class="field-error" id="modal-email-error" role="alert" hidden></p>
                         </div>
-                        <p class="field-hint" id="modal-password-hint" data-password-hint
-                           aria-live="polite">
-                            Mínimo 8 caracteres. Mezclá letras y números.
-                        </p>
-                        <p class="field-error" id="modal-password-error" role="alert" hidden></p>
                     </div>
 
-                    <div class="field">
-                        <label for="modal-confirmPassword">Repetí la contraseña</label>
-                        <input id="modal-confirmPassword" name="confirmPassword" type="password"
-                               autocomplete="new-password" placeholder="La misma de arriba"
-                               minlength="8" maxlength="72" required>
-                        <p class="field-error" id="modal-confirmPassword-error" role="alert" hidden></p>
+                    <div class="auth-fields">
+                        <div class="field" data-password-group>
+                            <div class="field-head">
+                                <label for="modal-password">Contraseña</label>
+                                <button class="field-toggle" type="button"
+                                        data-toggle-password="modal-password"
+                                        aria-controls="modal-password"
+                                        aria-pressed="false">Mostrar</button>
+                            </div>
+                            <input id="modal-password" name="password" type="password"
+                                   data-password-input autocomplete="new-password"
+                                   placeholder="Mínimo 8 caracteres" minlength="8" maxlength="72"
+                                   aria-describedby="modal-password-hint" required>
+                            <div class="password-meter" data-password-meter data-score="0"
+                                 aria-hidden="true">
+                                <span></span><span></span><span></span>
+                            </div>
+                            <p class="field-hint" id="modal-password-hint" data-password-hint
+                               aria-live="polite">
+                                Mínimo 8 caracteres. Mezclá letras y números.
+                            </p>
+                            <p class="field-error" id="modal-password-error" role="alert" hidden></p>
+                        </div>
+
+                        <div class="field">
+                            <label for="modal-confirmPassword">Repetí la contraseña</label>
+                            <input id="modal-confirmPassword" name="confirmPassword" type="password"
+                                   autocomplete="new-password" placeholder="La misma de arriba"
+                                   minlength="8" maxlength="72" required>
+                            <p class="field-error" id="modal-confirmPassword-error" role="alert" hidden></p>
+                        </div>
                     </div>
 
                     <div class="auth-terms">

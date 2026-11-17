@@ -1729,7 +1729,7 @@ main { scroll-margin-top: 90px; }
     border-radius: var(--radius-sm);
     background: var(--soft);
     color: var(--ink);
-    font-size: .86rem;
+    font-size: .875rem;
     line-height: 1.5;
 }
 
@@ -1774,7 +1774,7 @@ main { scroll-margin-top: 90px; }
 .field label,
 .field-head label {
     color: var(--ink);
-    font-size: .82rem;
+    font-size: .875rem;
     font-weight: 700;
     letter-spacing: .005em;
 }
@@ -1796,7 +1796,7 @@ main { scroll-margin-top: 90px; }
     background: var(--paper);
     color: var(--ink);
     font-family: inherit;
-    font-size: .96rem;
+    font-size: 1rem;
     line-height: 1.4;
     transition: border-color .18s ease, box-shadow .18s ease;
 }
@@ -1824,7 +1824,7 @@ main { scroll-margin-top: 90px; }
     gap: .4rem;
     margin: 0;
     color: var(--ink);
-    font-size: .8rem;
+    font-size: .82rem;
     font-weight: 600;
     line-height: 1.45;
 }
@@ -1847,7 +1847,7 @@ main { scroll-margin-top: 90px; }
 .field-hint {
     margin: 0;
     color: var(--muted);
-    font-size: .78rem;
+    font-size: .82rem;
     line-height: 1.5;
 }
 
@@ -1857,7 +1857,7 @@ main { scroll-margin-top: 90px; }
     background: transparent;
     color: var(--muted);
     font-family: inherit;
-    font-size: .78rem;
+    font-size: .82rem;
     font-weight: 600;
     text-decoration: underline;
     text-decoration-color: var(--accent-line);
@@ -1902,7 +1902,7 @@ main { scroll-margin-top: 90px; }
     align-items: flex-start;
     gap: .6rem;
     color: var(--ink);
-    font-size: .85rem;
+    font-size: .9rem;
     line-height: 1.5;
     cursor: pointer;
 }
@@ -1933,7 +1933,7 @@ main { scroll-margin-top: 90px; }
 
 .auth-link {
     color: var(--muted);
-    font-size: .8rem;
+    font-size: .82rem;
     text-decoration-thickness: 1px;
     text-underline-offset: 3px;
 }
@@ -1952,9 +1952,9 @@ main { scroll-margin-top: 90px; }
 }
 
 .auth-alt {
-    margin: 1.4rem 0 0;
+    margin: 1.3rem 0 0;
     color: var(--muted);
-    font-size: .88rem;
+    font-size: .9rem;
 }
 
 .auth-alt a {
@@ -1965,9 +1965,9 @@ main { scroll-margin-top: 90px; }
 }
 
 .auth-note {
-    margin: .6rem 0 0;
-    color: rgba(0, 0, 0, .48);
-    font-size: .78rem;
+    margin: .55rem 0 0;
+    color: rgba(0, 0, 0, .56);
+    font-size: .8rem;
     line-height: 1.55;
 }
 
@@ -1976,74 +1976,108 @@ main { scroll-margin-top: 90px; }
     text-decoration-thickness: 1px;
 }
 
-/* ---- Panel negro de la derecha ---- */
+/* ---- Panel de la derecha: foto, velo negro y propuesta encima ---- */
 
 .auth-aside {
     position: relative;
+    isolation: isolate;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    gap: 2.4rem;
-    padding: clamp(1.9rem, 4vw, 3.2rem);
+    gap: 1.6rem;
+    padding: clamp(1.7rem, 3.2vw, 2.6rem);
     overflow: hidden;
-    background:
-        radial-gradient(120% 84% at 100% 100%, var(--accent-soft), transparent 58%),
-        var(--ink);
+    background: var(--ink);
     color: var(--paper);
 }
 
+.auth-aside-media {
+    position: absolute;
+    inset: 0;
+    z-index: -2;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: 68% center;
+}
+
+/* Dos velos: uno parejo para leer y otro verde que trae la marca al panel. */
+
+.auth-aside-scrim {
+    position: absolute;
+    inset: 0;
+    z-index: -1;
+    background:
+        linear-gradient(180deg, rgba(0, 0, 0, .76) 0%, rgba(0, 0, 0, .56) 46%, rgba(0, 0, 0, .9) 100%),
+        linear-gradient(145deg, rgba(0, 255, 0, .18), transparent 54%);
+}
+
 .auth-aside-kicker {
-    margin: 0 0 1rem;
-    color: rgba(255, 255, 255, .58);
+    display: flex;
+    align-items: center;
+    gap: .45rem;
+    margin: 0 0 .9rem;
+    color: rgba(255, 255, 255, .68);
     font-family: var(--nav);
-    font-size: .7rem;
+    font-size: .72rem;
     font-weight: 700;
     letter-spacing: .16em;
     text-transform: uppercase;
 }
 
+.auth-aside-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--accent);
+    box-shadow: 0 0 0 4px rgba(0, 255, 0, .16);
+}
+
 .auth-aside h2 {
-    margin-bottom: .9rem;
+    margin-bottom: .7rem;
     color: var(--paper);
-    font-size: clamp(1.9rem, 3.2vw, 2.6rem);
+    font-size: clamp(1.75rem, 2.6vw, 2.35rem);
     line-height: 1.08;
 }
 
 .auth-aside-top p:not(.auth-aside-kicker) {
     margin: 0;
-    color: rgba(255, 255, 255, .68);
-    font-size: .9rem;
-    line-height: 1.65;
+    color: rgba(255, 255, 255, .78);
+    font-size: .92rem;
+    line-height: 1.6;
 }
 
-/* Cita: da vida al panel sin competir con el formulario. */
+/* Cita: una tarjeta de vidrio que apoya la foto sin competir con el formulario. */
 
 .auth-quote {
     margin: 0;
-    padding-left: .95rem;
+    padding: .85rem 1rem;
+    border: 1px solid rgba(255, 255, 255, .2);
     border-left: 2px solid var(--accent);
+    border-radius: 0 12px 12px 0;
+    background: rgba(0, 0, 0, .42);
 }
 
 .auth-quote blockquote {
-    margin: 0 0 .45rem;
+    margin: 0 0 .35rem;
     color: var(--paper);
-    font-size: .93rem;
-    line-height: 1.55;
+    font-size: .92rem;
+    line-height: 1.5;
     text-wrap: pretty;
 }
 
 .auth-quote figcaption {
-    color: rgba(255, 255, 255, .55);
-    font-size: .74rem;
+    color: rgba(255, 255, 255, .62);
+    font-size: .75rem;
     line-height: 1.45;
 }
 
 .auth-benefits {
     display: grid;
-    gap: .85rem;
+    gap: .6rem;
     margin: 0;
-    padding: 1.3rem 0 0;
-    border-top: 1px solid rgba(255, 255, 255, .16);
+    padding: 1rem 0 0;
+    border-top: 1px solid rgba(255, 255, 255, .2);
     list-style: none;
 }
 
@@ -2051,9 +2085,9 @@ main { scroll-margin-top: 90px; }
     display: flex;
     align-items: flex-start;
     gap: .6rem;
-    color: rgba(255, 255, 255, .82);
-    font-size: .86rem;
-    line-height: 1.55;
+    color: rgba(255, 255, 255, .86);
+    font-size: .875rem;
+    line-height: 1.5;
 }
 
 .auth-benefits li::before {
@@ -2068,7 +2102,7 @@ main { scroll-margin-top: 90px; }
 
 .auth-aside-note {
     margin: 0;
-    color: rgba(255, 255, 255, .5);
+    color: rgba(255, 255, 255, .58);
     font-size: .72rem;
     letter-spacing: .02em;
 }
@@ -2079,7 +2113,7 @@ main { scroll-margin-top: 90px; }
    completas. El fondo de la página queda difuminado con ::backdrop. */
 
 .auth-dialog {
-    width: min(1080px, calc(100vw - 2.5rem));
+    width: min(1100px, calc(100vw - 2.5rem));
     max-width: none;
     max-height: none;
     margin: auto;
@@ -2091,8 +2125,8 @@ main { scroll-margin-top: 90px; }
 }
 
 .auth-dialog::backdrop {
-    background: rgba(0, 0, 0, .52);
-    backdrop-filter: blur(10px) saturate(.85);
+    background: rgba(0, 0, 0, .56);
+    backdrop-filter: blur(6px);
 }
 
 .auth-dialog[open] {
@@ -2117,7 +2151,7 @@ main { scroll-margin-top: 90px; }
 
 .auth-dialog-body {
     min-height: 0;
-    padding: clamp(1.6rem, 3vw, 2.4rem);
+    padding: clamp(1.45rem, 2.6vw, 2.1rem);
     overflow-y: auto;
     overscroll-behavior: contain;
     scrollbar-width: thin;
@@ -2173,13 +2207,13 @@ main { scroll-margin-top: 90px; }
 }
 
 .auth-tab {
-    padding: .48rem 1.15rem;
+    padding: .5rem 1.15rem;
     border: 0;
     border-radius: var(--radius-pill);
     background: transparent;
     color: var(--muted);
     font-family: var(--nav);
-    font-size: .82rem;
+    font-size: .875rem;
     font-weight: 700;
     cursor: pointer;
     transition: background .18s ease, color .18s ease;
@@ -2201,15 +2235,38 @@ main { scroll-margin-top: 90px; }
 
 .auth-view { display: block; }
 
-.auth-dialog .auth-head { margin-bottom: 1.25rem; }
-
-.auth-dialog .auth-form { gap: .9rem; }
+.auth-dialog .auth-head { margin-bottom: 1.1rem; }
 
 .auth-dialog .auth-head h2 {
-    margin-bottom: .5rem;
-    font-size: clamp(1.75rem, 2.8vw, 2.35rem);
+    margin-bottom: .4rem;
+    font-size: clamp(1.65rem, 2.3vw, 2.1rem);
     line-height: 1.08;
 }
+
+.auth-dialog .auth-sub {
+    max-width: 52ch;
+    font-size: .92rem;
+    line-height: 1.55;
+}
+
+.auth-dialog .auth-form { gap: .85rem; }
+
+/* Dos columnas de campos: el registro entra sin scroll en pantallas comunes. */
+
+.auth-fields {
+    display: grid;
+    gap: 1.05rem;
+}
+
+.auth-dialog .auth-fields {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
+    gap: .85rem 1rem;
+}
+
+.auth-dialog .auth-alt { margin-top: 1rem; }
+
+.auth-dialog .auth-note { margin-top: .45rem; }
 
 /* Botón que se lee como enlace: cambia de formulario sin salir del modal. */
 
@@ -2768,7 +2825,7 @@ body.has-auth-dialog { overflow: hidden; }
 
     .auth-aside { gap: 1.8rem; }
 
-    /* En móvil el modal se ancla abajo como hoja y esconde el panel negro. */
+    /* En móvil y tablet el modal se ancla abajo como hoja y esconde la foto. */
     .auth-dialog {
         width: 100%;
         max-width: 100%;
@@ -2778,15 +2835,35 @@ body.has-auth-dialog { overflow: hidden; }
 
     .auth-dialog-panel {
         grid-template-columns: 1fr;
-        max-height: 92dvh;
+        max-height: 94dvh;
         border-radius: 22px 22px 0 0;
+    }
+
+    /* Asa de la hoja: se ve, pero no compite con el cierre ni las pestañas. */
+    .auth-dialog-panel::before {
+        content: "";
+        position: absolute;
+        z-index: 6;
+        top: .55rem;
+        left: 50%;
+        width: 40px;
+        height: 4px;
+        border-radius: var(--radius-pill);
+        background: rgba(0, 0, 0, .2);
+        translate: -50% 0;
     }
 
     .auth-dialog .auth-aside { display: none; }
 
-    .auth-dialog-body { padding: 2.1rem 1.35rem 2.2rem; }
+    .auth-dialog-body {
+        padding: 2.55rem 1.2rem max(1.7rem, env(safe-area-inset-bottom));
+    }
+
+    .auth-tabs { width: 100%; }
 
     .auth-dialog-close {
+        top: .9rem;
+        right: .9rem;
         border-color: var(--line-strong);
         background: var(--paper);
         color: var(--ink);
@@ -2915,6 +2992,18 @@ body.has-auth-dialog { overflow: hidden; }
     .auth-card { padding: 1.8rem 1.3rem 2rem; }
 
     .auth-aside { padding: 1.9rem 1.3rem; }
+
+    /* El registro del modal pasa a una columna y gana aire. */
+    .auth-dialog .auth-fields {
+        grid-template-columns: 1fr;
+        gap: .85rem;
+    }
+
+    .auth-dialog .auth-head h2 { font-size: clamp(1.5rem, 6vw, 1.8rem); }
+
+    .auth-dialog .auth-sub { font-size: .9rem; }
+
+    .auth-tab { font-size: .84rem; }
 }
 
 @media (max-width: 520px) {
@@ -2928,19 +3017,64 @@ body.has-auth-dialog { overflow: hidden; }
 
     .footer-contact-mail { font-size: .86rem; }
 
-    .auth-dialog-body { padding: 1.8rem 1.1rem 1.9rem; }
-
-    .auth-tabs { width: calc(100% - 3.4rem); }
+    .auth-dialog-body {
+        padding: 2.45rem 1rem max(1.5rem, env(safe-area-inset-bottom));
+    }
 
     .auth-tab {
         flex: 1 1 0;
-        padding: .48rem .8rem;
-        font-size: .79rem;
+        padding: .5rem .7rem;
+        font-size: .82rem;
     }
 
-    .auth-dialog .auth-head h2 { font-size: 1.75rem; }
+    .auth-dialog .auth-head h2 { font-size: 1.55rem; }
+
+    /* Las pestañas ya permiten cambiar de formulario: el enlace sobra. */
+    .auth-dialog .auth-alt { display: none; }
+
+    .auth-dialog .auth-note { display: none; }
 
     .footer-bottom-inner { padding: 1.05rem 1.25rem; }
+}
+
+@media (max-width: 900px) and (max-height: 780px) {
+
+    /* En pantallas bajas se recorta lo decorativo y el formulario manda. */
+    .auth-dialog .auth-sub { display: none; }
+
+    .auth-dialog .auth-head { margin-bottom: .7rem; }
+
+    .auth-dialog .auth-head h2 { font-size: 1.45rem; }
+
+    .auth-tabs { margin-bottom: .85rem; }
+
+    .auth-dialog .auth-form { gap: .7rem; }
+}
+
+@media (min-width: 901px) and (max-height: 760px) {
+
+    /* Con poca altura el modal prioriza el formulario y evita el scroll. */
+    .auth-dialog-body { padding-block: 1.1rem; }
+
+    .auth-dialog .auth-head { margin-bottom: .8rem; }
+
+    .auth-dialog .auth-sub { display: none; }
+
+    .auth-dialog .auth-head h2 { font-size: 1.65rem; }
+
+    .auth-tabs { margin-bottom: .9rem; }
+
+    .auth-dialog .auth-form { gap: .7rem; }
+
+    .auth-dialog .auth-alt { margin-top: .8rem; }
+
+    .auth-dialog .auth-note { display: none; }
+
+    .auth-aside { gap: 1rem; padding-block: 1.4rem; }
+
+    .auth-quote { padding: .7rem .85rem; }
+
+    .auth-quote blockquote { font-size: .875rem; }
 }
 
 /* Con movimiento reducido se apagan las animaciones y los realces. */
@@ -2964,7 +3098,8 @@ body.has-auth-dialog { overflow: hidden; }
     .courses > .course,
     .step,
     .feature,
-    .testimonial {
+    .testimonial,
+    .auth-dialog {
         animation: none !important;
     }
 

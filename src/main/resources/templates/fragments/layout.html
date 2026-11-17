@@ -11,6 +11,8 @@
     <title th:text="${title} + ' · Mundo Manitas'">Mundo Manitas</title>
     <link rel="icon" type="image/png" th:href="@{/img/brand/favicon.png}">
     <link rel="stylesheet" th:href="@{/css/styles.css}">
+    <script defer th:src="@{/js/auth.js}"></script>
+    <script defer th:src="@{/js/auth-modal.js}"></script>
 </head>
 
 <body>
@@ -56,8 +58,8 @@
         </form>
 
         <div class="nav-actions" th:if="${currentUser == null}">
-            <a class="nav-login" th:href="@{/login}">Iniciar sesión</a>
-            <a class="btn btn-nav" th:href="@{/registro}">Crear cuenta</a>
+            <a class="nav-login" th:href="@{/login}" data-auth-open="login">Iniciar sesión</a>
+            <a class="btn btn-nav" th:href="@{/registro}" data-auth-open="register">Crear cuenta</a>
         </div>
 
         <div class="nav-actions nav-actions--account" th:if="${currentUser != null}">
@@ -135,7 +137,9 @@
                 <li><a th:href="@{/} + '#como-funciona'">Cómo funciona</a></li>
                 <li><a th:href="@{/} + '#accesibilidad'">Accesibilidad</a></li>
                 <li><a th:href="@{/} + '#membresia'">Membresía</a></li>
-                <li><a th:href="@{/registro}">Empezar gratis</a></li>
+                <li th:if="${currentUser == null}">
+                    <a th:href="@{/registro}" data-auth-open="register">Empezar gratis</a>
+                </li>
             </ul>
         </nav>
 
@@ -144,6 +148,9 @@
             <ul>
                 <li><a th:href="@{/nosotros}">Nosotros</a></li>
                 <li><a href="mailto:hola@mundomanitas.pe">Escríbenos</a></li>
+                <li th:if="${currentUser == null}">
+                    <a th:href="@{/login}" data-auth-open="login">Iniciar sesión</a>
+                </li>
                 <li><a th:href="@{/terminos}">Términos</a></li>
                 <li><a th:href="@{/privacidad}">Privacidad</a></li>
             </ul>

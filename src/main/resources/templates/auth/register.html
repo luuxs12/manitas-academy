@@ -51,7 +51,7 @@
                            th:errors="*{email}" role="alert"></p>
                     </div>
 
-                    <div class="field">
+                    <div class="field" data-password-group>
                         <div class="field-head">
                             <label for="password">Contraseña</label>
                             <button class="field-toggle" type="button"
@@ -60,6 +60,7 @@
                                     aria-pressed="false">Mostrar</button>
                         </div>
                         <input id="password" type="password" th:field="*{password}"
+                               data-password-input
                                th:classappend="${#fields.hasErrors('password')} ? ' is-invalid' : ''"
                                th:attr="aria-invalid=${#fields.hasErrors('password')} ? 'true' : null,
                                         aria-describedby=${#fields.hasErrors('password')} ? 'password-hint password-error' : 'password-hint'"
@@ -135,7 +136,5 @@
 
     <footer th:replace="~{fragments/layout :: footer}"></footer>
 </div>
-
-<script th:src="@{/js/auth.js}" defer></script>
 </body>
 </html>

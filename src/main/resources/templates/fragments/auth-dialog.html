@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+<dialog th:fragment="dialog" id="auth-dialog" class="auth-dialog"
+        aria-labelledby="auth-login-title">
+
+    <div class="auth-dialog-panel">
+
+        <button class="auth-dialog-close" type="button" data-auth-close aria-label="Cerrar">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M6 6l12 12"></path>
+                <path d="M18 6 6 18"></path>
+            </svg>
+        </button>
+
+        <div class="auth-dialog-body">
+
+            <div class="auth-tabs" role="group" aria-label="Elegí el formulario">
+                <button class="auth-tab" type="button" data-auth-tab="login"
+                        aria-pressed="true">Entrar</button>
+                <button class="auth-tab" type="button" data-auth-tab="register"
+                        aria-pressed="false">Crear cuenta</button>
+            </div>
+
+            <section class="auth-view" data-auth-view="login" aria-labelledby="auth-login-title">
+
+                <header class="auth-head">
+                    <p class="section-kicker">Cuentas</p>
+                    <h2 id="auth-login-title">Entrá a tu cuenta</h2>
+                    <p class="auth-sub">
+                        Seguí tus cursos donde los dejaste, con tu progreso y tus
+                        preferencias tal como los dejaste.
+                    </p>
+                </header>
+
+                <div class="auth-alert auth-alert--error" data-auth-error role="alert" hidden></div>
+
+                <form class="auth-form" th:action="@{/login}" method="post" data-auth-login>
+
+                    <div class="field">
+                        <label for="modal-login-email">Correo electrónico</label>
+                        <input id="modal-login-email" name="username" type="email"
+                               autocomplete="email" placeholder="tu@correo.com"
+                               maxlength="254" required autofocus>
+                    </div>
+
+                    <div class="field">
+                        <div class="field-head">
+                            <label for="modal-login-password">Contraseña</label>
+                            <button class="field-toggle" type="button"
+                                    data-toggle-password="modal-login-password"
+                                    aria-controls="modal-login-password"
+                                    aria-pressed="false">Mostrar</button>
+                        </div>
+                        <input id="modal-login-password" name="password" type="password"
+                               autocomplete="current-password" placeholder="Tu contraseña"
+                               required>
+                    </div>
+
+                    <div class="auth-row">
+                        <label class="check">
+                            <input type="checkbox" name="remember-me">
+                            <span>Mantener sesión abierta</span>
+                        </label>
+                        <a class="auth-link"
+                           href="mailto:hola@mundomanitas.pe?subject=Necesito%20ayuda%20para%20entrar%20a%20mi%20cuenta">
+                            ¿Olvidaste tu contraseña?
+                        </a>
+                    </div>
+
+                    <button class="btn btn-solid btn-lg auth-submit" type="submit"
+                            data-auth-submit>Entrar</button>
+
+                </form>
+
+                <p class="auth-alt">
+                    ¿Todavía no tenés cuenta?
+                    <button class="auth-inline" type="button" data-auth-open="register">Creala gratis</button>
+                </p>
+
+                <p class="auth-note">
+                    Tus datos se usan solo para tu cuenta.
+                    <a th:href="@{/privacidad}" target="_blank" rel="noopener">Mirá cómo los cuidamos</a>.
+                </p>
+
+            </section>
+
+            <section class="auth-view" data-auth-view="register"
+                     aria-labelledby="auth-register-title" hidden>
+
+                <header class="auth-head">
+                    <p class="section-kicker">Cuentas</p>
+                    <h2 id="auth-register-title">Creá tu cuenta</h2>
+                    <p class="auth-sub">
+                        Empezá gratis y sin tarjeta. El intérprete en LSP y los
+                        subtítulos vienen activados desde la primera clase.
+                    </p>
+                </header>
+
+                <div class="auth-alert auth-alert--error" data-auth-error role="alert" hidden></div>
+
+                <form class="auth-form" th:action="@{/registro}" method="post" data-auth-register>
+
+                    <div class="field">
+                        <label for="modal-fullName">Nombre completo</label>
+                        <input id="modal-fullName" name="fullName" type="text"
+                               autocomplete="name" placeholder="Ana Quispe"
+                               maxlength="120" required>
+                        <p class="field-error" id="modal-fullName-error" role="alert" hidden></p>
+                    </div>
+
+                    <div class="field">
+                        <label for="modal-email">Correo electrónico</label>
+                        <input id="modal-email" name="email" type="email"
+                               autocomplete="email" placeholder="tu@correo.com"
+                               maxlength="254" required>
+                        <p class="field-error" id="modal-email-error" role="alert" hidden></p>
+                    </div>
+
+                    <div class="field" data-password-group>
+                        <div class="field-head">
+                            <label for="modal-password">Contraseña</label>
+                            <button class="field-toggle" type="button"
+                                    data-toggle-password="modal-password"
+                                    aria-controls="modal-password"
+                                    aria-pressed="false">Mostrar</button>
+                        </div>
+                        <input id="modal-password" name="password" type="password"
+                               data-password-input autocomplete="new-password"
+                               placeholder="Mínimo 8 caracteres" minlength="8" maxlength="72"
+                               aria-describedby="modal-password-hint" required>
+                        <div class="password-meter" data-password-meter data-score="0"
+                             aria-hidden="true">
+                            <span></span><span></span><span></span>
+                        </div>
+                        <p class="field-hint" id="modal-password-hint" data-password-hint
+                           aria-live="polite">
+                            Mínimo 8 caracteres. Mezclá letras y números.
+                        </p>
+                        <p class="field-error" id="modal-password-error" role="alert" hidden></p>
+                    </div>
+
+                    <div class="field">
+                        <label for="modal-confirmPassword">Repetí la contraseña</label>
+                        <input id="modal-confirmPassword" name="confirmPassword" type="password"
+                               autocomplete="new-password" placeholder="La misma de arriba"
+                               minlength="8" maxlength="72" required>
+                        <p class="field-error" id="modal-confirmPassword-error" role="alert" hidden></p>
+                    </div>
+
+                    <div class="auth-terms">
+                        <label class="check check--terms">
+                            <input id="modal-acceptTerms" name="acceptTerms" type="checkbox" required>
+                            <span>
+                                Acepto los <a th:href="@{/terminos}" target="_blank"
+                                             rel="noopener">términos</a> y la
+                                <a th:href="@{/privacidad}" target="_blank"
+                                   rel="noopener">política de privacidad</a>.
+                            </span>
+                        </label>
+                        <p class="field-error" id="modal-acceptTerms-error" role="alert" hidden></p>
+                    </div>
+
+                    <button class="btn btn-solid btn-lg auth-submit" type="submit"
+                            data-auth-submit>Crear mi cuenta</button>
+
+                </form>
+
+                <p class="auth-alt">
+                    ¿Ya tenés cuenta?
+                    <button class="auth-inline" type="button" data-auth-open="login">Iniciá sesión</button>
+                </p>
+
+                <p class="auth-note">
+                    No pedimos tarjeta. Podés empezar por los cursos gratis.
+                </p>
+
+            </section>
+
+        </div>
+
+        <aside th:replace="~{fragments/auth :: aside}"></aside>
+
+    </div>
+</dialog>
+
+</body>
+</html>

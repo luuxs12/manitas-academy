@@ -97,6 +97,11 @@ BCrypt, la sesión la maneja Spring Security y "mantener sesión abierta" usa
 remember-me durante 14 días. La clave se configura en
 `app.security.remember-me-key` (variable de entorno `REMEMBER_ME_KEY`).
 
+En las páginas del sitio, "Iniciar sesión" y "Crear cuenta" abren un modal
+sobre la página con el fondo difuminado; el envío usa `fetch` y, al entrar,
+se recarga la misma página con la sesión abierta. Las rutas `/login` y
+`/registro` siguen existiendo como respaldo y para enlaces directos.
+
 ```powershell
 .\mvnw.cmd clean package      # compilar
 .\mvnw.cmd test               # tests

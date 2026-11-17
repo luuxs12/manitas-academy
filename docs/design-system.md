@@ -164,7 +164,11 @@ perfil, cursos y panel de administración:
 | `.legal` / `.legal-date` | páginas de términos y privacidad |
 | `.empty` | estado vacío de la búsqueda |
 | `.page` / `.page-center` | contenedores de páginas internas |
-| `.auth-page` / `.auth-shell` | pantalla de cuenta: formulario en blanco y panel de propuesta en negro, en dos columnas |
+| `.auth-page` / `.auth-shell` | pantalla de cuenta completa: formulario en blanco y panel de propuesta en negro, en dos columnas |
+| `.auth-dialog` / `.auth-dialog-panel` | modal de cuenta sobre la página, con fondo difuminado y dos columnas |
+| `.auth-dialog-body` / `.auth-dialog-close` | columna blanca con scroll interno y botón de cierre |
+| `.auth-tabs` / `.auth-tab` | pestañas "Entrar" y "Crear cuenta"; la activa va en negro |
+| `.auth-view` / `.auth-inline` | formulario visible del modal y botón que cambia de pestaña |
 | `.auth-card` | columna blanca con el formulario de login o registro |
 | `.auth-aside` / `.auth-quote` / `.auth-benefits` | panel negro con la propuesta de valor, una cita y los beneficios |
 | `.auth-alert` | aviso de error, registro exitoso o cierre de sesión; siempre con texto y un signo, no solo color |
@@ -176,7 +180,8 @@ perfil, cursos y panel de administración:
 | `.footer-col` | columna de enlaces del pie, con el título en Open Sans 700 |
 | `.footer-badges` / `.footer-badge` | distintivos "Hecho en Perú" y "LSP en cada clase" |
 | `.footer-wordmark` | firma grande en Tanker que cierra la página |
-| `.footer-bottom` / `.footer-legal` / `.footer-place` | barra inferior: copyright, ubicación, enlaces legales y "Volver arriba" |
+| `.footer-bottom` / `.footer-legal` / `.footer-place` | barra inferior negra: copyright, ubicación y enlaces legales en blanco atenuado |
+| `.footer-top` | pastilla "Volver arriba" que se pinta de verde al pasar el mouse |
 
 Si cambiás el nombre de alguna, decime y actualizo las plantillas nuevas.
 

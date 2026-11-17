@@ -168,6 +168,10 @@ a:hover {
     border: 0;
 }
 
+/* El atributo hidden manda sobre cualquier display de componente. */
+
+[hidden] { display: none !important; }
+
 /* Íconos de trazo, sin librerías. */
 
 .ico {
@@ -2069,6 +2073,174 @@ main { scroll-margin-top: 90px; }
     letter-spacing: .02em;
 }
 
+/* ---- Modal de cuenta ---- */
+
+/* El diálogo es la capa; el panel repite las dos columnas de las páginas
+   completas. El fondo de la página queda difuminado con ::backdrop. */
+
+.auth-dialog {
+    width: min(1080px, calc(100vw - 2.5rem));
+    max-width: none;
+    max-height: none;
+    margin: auto;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    overflow: visible;
+}
+
+.auth-dialog::backdrop {
+    background: rgba(0, 0, 0, .52);
+    backdrop-filter: blur(10px) saturate(.85);
+}
+
+.auth-dialog[open] {
+    animation: dialog-in .26s var(--ease) both;
+}
+
+.auth-dialog[open]::backdrop {
+    animation: backdrop-in .26s ease both;
+}
+
+.auth-dialog-panel {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1.06fr) minmax(0, .94fr);
+    grid-template-rows: minmax(0, 1fr);
+    max-height: min(90dvh, 840px);
+    overflow: hidden;
+    border-radius: var(--radius-lg);
+    background: var(--paper);
+    box-shadow: 0 44px 100px rgba(0, 0, 0, .42);
+}
+
+.auth-dialog-body {
+    min-height: 0;
+    padding: clamp(1.6rem, 3vw, 2.4rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 0, 0, .3) transparent;
+}
+
+.auth-dialog .auth-aside {
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}
+
+/* Cerrar: sobre el panel negro en escritorio y sobre el blanco en móvil. */
+
+.auth-dialog-close {
+    position: absolute;
+    z-index: 5;
+    top: 1rem;
+    right: 1rem;
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    border: 1px solid rgba(255, 255, 255, .32);
+    border-radius: 50%;
+    background: rgba(0, 0, 0, .18);
+    color: var(--paper);
+    cursor: pointer;
+    transition: background .18s ease, color .18s ease, border-color .18s ease;
+}
+
+.auth-dialog-close .ico {
+    width: 18px;
+    height: 18px;
+}
+
+.auth-dialog-close:hover {
+    border-color: var(--accent);
+    background: var(--accent);
+    color: var(--ink);
+}
+
+/* Pestañas: una pastilla con el formulario activo en negro. */
+
+.auth-tabs {
+    display: inline-flex;
+    gap: .2rem;
+    margin-bottom: 1.5rem;
+    padding: .28rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-pill);
+    background: var(--soft);
+}
+
+.auth-tab {
+    padding: .48rem 1.15rem;
+    border: 0;
+    border-radius: var(--radius-pill);
+    background: transparent;
+    color: var(--muted);
+    font-family: var(--nav);
+    font-size: .82rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: background .18s ease, color .18s ease;
+}
+
+.auth-tab:hover { color: var(--ink); }
+
+.auth-tab[aria-pressed="true"] {
+    background: var(--ink);
+    color: var(--paper);
+}
+
+.auth-tab:focus-visible,
+.auth-dialog-close:focus-visible,
+.auth-inline:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 3px;
+}
+
+.auth-view { display: block; }
+
+.auth-dialog .auth-head { margin-bottom: 1.25rem; }
+
+.auth-dialog .auth-form { gap: .9rem; }
+
+.auth-dialog .auth-head h2 {
+    margin-bottom: .5rem;
+    font-size: clamp(1.75rem, 2.8vw, 2.35rem);
+    line-height: 1.08;
+}
+
+/* Botón que se lee como enlace: cambia de formulario sin salir del modal. */
+
+.auth-inline {
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: var(--ink);
+    font: inherit;
+    font-weight: 650;
+    text-decoration: underline;
+    text-decoration-color: var(--accent-line);
+    text-decoration-thickness: 1px;
+    text-underline-offset: 3px;
+    cursor: pointer;
+}
+
+.auth-inline:hover { text-decoration-color: var(--ink); }
+
+body.has-auth-dialog { overflow: hidden; }
+
+@keyframes dialog-in {
+    from { opacity: 0; scale: .97; }
+    to { opacity: 1; scale: 1; }
+}
+
+@keyframes backdrop-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
 /* ---- Pie ---- */
 
 .site-footer {
@@ -2173,7 +2345,7 @@ main { scroll-margin-top: 90px; }
     background: var(--accent);
     color: var(--ink);
     font-size: .95rem;
-    transition: background .2s ease, color .2s ease;
+    transition: background .2s ease, color .2s ease, translate .2s ease;
 }
 
 .footer-contact:hover {
@@ -2185,6 +2357,7 @@ main { scroll-margin-top: 90px; }
 .footer-contact:hover .footer-contact-arrow {
     background: var(--ink);
     color: var(--paper);
+    translate: 3px 0;
 }
 
 .footer-contact-note {
@@ -2273,29 +2446,33 @@ main { scroll-margin-top: 90px; }
     user-select: none;
 }
 
+/* Barra inferior negra: cierra la página y hace resaltar el verde del filo. */
+
 .footer-bottom {
-    border-top: 1px solid var(--line);
+    border-top: 0;
+    background: var(--ink);
+    color: rgba(255, 255, 255, .68);
 }
 
 .footer-bottom-inner {
     max-width: 1520px;
     margin: 0 auto;
-    padding: 1.3rem 2rem;
+    padding: 1.15rem 2rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
     flex-wrap: wrap;
-    gap: .5rem 1.6rem;
+    gap: .7rem 1.6rem;
 }
 
 .footer-bottom-inner p {
     margin: 0;
-    color: var(--muted);
+    color: rgba(255, 255, 255, .64);
     font-size: .82rem;
 }
 
 .footer-place {
-    color: rgba(0, 0, 0, .48);
+    color: rgba(255, 255, 255, .58);
 }
 
 .footer-legal {
@@ -2305,27 +2482,37 @@ main { scroll-margin-top: 90px; }
 }
 
 .footer-legal a {
-    color: var(--muted);
+    color: rgba(255, 255, 255, .64);
     font-size: .82rem;
     text-decoration: none;
+    transition: color .18s ease;
 }
 
 .footer-legal a:hover {
-    color: var(--ink);
+    color: var(--accent);
     text-decoration: underline;
     text-underline-offset: 4px;
 }
 
 .footer-top {
-    color: var(--ink);
-    font-size: .82rem;
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .42rem .95rem;
+    border: 1px solid rgba(255, 255, 255, .26);
+    border-radius: var(--radius-pill);
+    color: var(--paper);
+    font-size: .8rem;
     font-weight: 600;
     text-decoration: none;
+    transition: background .2s ease, border-color .2s ease, color .2s ease;
 }
 
 .footer-top:hover {
-    text-decoration: underline;
-    text-underline-offset: 4px;
+    border-color: var(--accent);
+    background: var(--accent);
+    color: var(--ink);
+    text-decoration: none;
 }
 
 /* ---- Movimiento ---- */
@@ -2581,6 +2768,30 @@ main { scroll-margin-top: 90px; }
 
     .auth-aside { gap: 1.8rem; }
 
+    /* En móvil el modal se ancla abajo como hoja y esconde el panel negro. */
+    .auth-dialog {
+        width: 100%;
+        max-width: 100%;
+        margin: 0;
+        inset: auto 0 0;
+    }
+
+    .auth-dialog-panel {
+        grid-template-columns: 1fr;
+        max-height: 92dvh;
+        border-radius: 22px 22px 0 0;
+    }
+
+    .auth-dialog .auth-aside { display: none; }
+
+    .auth-dialog-body { padding: 2.1rem 1.35rem 2.2rem; }
+
+    .auth-dialog-close {
+        border-color: var(--line-strong);
+        background: var(--paper);
+        color: var(--ink);
+    }
+
     .footer-cta-inner {
         flex-direction: column;
         align-items: flex-start;
@@ -2716,6 +2927,20 @@ main { scroll-margin-top: 90px; }
     }
 
     .footer-contact-mail { font-size: .86rem; }
+
+    .auth-dialog-body { padding: 1.8rem 1.1rem 1.9rem; }
+
+    .auth-tabs { width: calc(100% - 3.4rem); }
+
+    .auth-tab {
+        flex: 1 1 0;
+        padding: .48rem .8rem;
+        font-size: .79rem;
+    }
+
+    .auth-dialog .auth-head h2 { font-size: 1.75rem; }
+
+    .footer-bottom-inner { padding: 1.05rem 1.25rem; }
 }
 
 /* Con movimiento reducido se apagan las animaciones y los realces. */
@@ -2767,7 +2992,11 @@ main { scroll-margin-top: 90px; }
     .footer-contact,
     .footer-contact-arrow,
     .footer-col a,
-    .footer-legal a {
+    .footer-legal a,
+    .footer-top,
+    .auth-tab,
+    .auth-dialog-close,
+    .auth-inline {
         transition: none;
     }
 

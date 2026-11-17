@@ -169,8 +169,11 @@ perfil, cursos y panel de administración:
 | `.auth-dialog-body` / `.auth-dialog-close` | columna blanca con scroll interno y botón de cierre |
 | `.auth-tabs` / `.auth-tab` | pestañas "Entrar" y "Crear cuenta"; la activa va en negro |
 | `.auth-view` / `.auth-inline` | formulario visible del modal y botón que cambia de pestaña |
+| `.auth-fields` | pares de campos del registro; dos columnas en el modal y una en móvil |
 | `.auth-card` | columna blanca con el formulario de login o registro |
-| `.auth-aside` / `.auth-quote` / `.auth-benefits` | panel negro con la propuesta de valor, una cita y los beneficios |
+| `.auth-aside` / `.auth-aside-media` | panel derecho con foto de curso, velo negro y texto encima |
+| `.auth-aside-scrim` / `.auth-aside-kicker` | velo de contraste y rótulo de marca del panel |
+| `.auth-quote` / `.auth-benefits` | cita y beneficios sobre la foto, con una cita en tarjeta translúcida |
 | `.auth-alert` | aviso de error, registro exitoso o cierre de sesión; siempre con texto y un signo, no solo color |
 | `.field` / `.field-toggle` / `.password-meter` | campo del formulario, botón mostrar/ocultar y medidor de contraseña |
 | `.field-error` / `.field-hint` | error de validación y ayuda bajo el campo |

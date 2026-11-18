@@ -32,8 +32,18 @@
             <p class="catalog-count" th:if="${!#strings.isEmpty(query)}">
                 <span th:text="${#lists.size(courses)}">0</span> resultados para
                 «<span th:text="${query}">…</span>»
+                <a class="catalog-clear" th:href="@{/cursos}">Limpiar</a>
             </p>
         </div>
+
+        <nav class="catalog-filters" aria-label="Filtrar por área">
+            <a th:href="@{/cursos}"
+               th:classappend="${#strings.isEmpty(query)} ? 'is-active' : ''">Todos</a>
+            <a th:each="area : ${areas}"
+               th:href="@{/buscar(q=${area})}"
+               th:text="${area}"
+               th:classappend="${#strings.equalsIgnoreCase(query, area)} ? 'is-active' : ''">Programación</a>
+        </nav>
 
         <div class="courses" th:if="${!#lists.isEmpty(courses)}">
             <a class="course" th:each="course : ${courses}"

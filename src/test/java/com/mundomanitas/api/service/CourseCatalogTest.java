@@ -79,4 +79,24 @@ class CourseCatalogTest {
                 .extracting(Course::slug)
                 .doesNotHaveDuplicates();
     }
+
+    @Test
+    @DisplayName("las áreas del filtro salen del catálogo y no se repiten")
+    void categoriesComeFromTheCatalog() {
+        assertThat(catalog.categories())
+                .isNotEmpty()
+                .doesNotHaveDuplicates()
+                .contains("Programación", "Redes", "Hardware");
+    }
+
+    @Test
+    @DisplayName("el detalle sugiere otros cursos sin repetir el actual")
+    void othersSkipTheCurrentCourse() {
+        Course current = catalog.findBySlug("python-desde-cero").orElseThrow();
+
+        assertThat(catalog.others(current, 3))
+                .hasSize(3)
+                .extracting(Course::slug)
+                .doesNotContain(current.slug());
+    }
 }

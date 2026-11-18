@@ -80,6 +80,22 @@ public class CourseCatalog {
         return COURSES;
     }
 
+    /** Áreas temáticas en el orden en que aparecen en el catálogo. */
+    public List<String> categories() {
+        return COURSES.stream()
+                .map(Course::category)
+                .distinct()
+                .toList();
+    }
+
+    /** Otros cursos del catálogo, sin repetir el que se está mirando. */
+    public List<Course> others(Course current, int limit) {
+        return COURSES.stream()
+                .filter(course -> !course.slug().equals(current.slug()))
+                .limit(limit)
+                .toList();
+    }
+
     /** Filtra por texto libre; una consulta vacía devuelve todo. */
     public List<Course> search(String query) {
         String needle = normalize(query);

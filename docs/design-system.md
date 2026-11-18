@@ -159,9 +159,23 @@ perfil, cursos y panel de administración:
 | `.cta-action` / `.band-price` / `.band-note` | precio y botón dentro de la banda |
 | `.final-note` | aclaración bajo el llamado final |
 | `.catalog-head` | encabezado de la página de cursos |
-| `.detail` / `.detail-media` / `.detail-facts` | ficha de un curso, con portada 4:3 |
-| `.about-head` / `.values` / `.about-note` | página Nosotros |
-| `.legal` / `.legal-date` | páginas de términos y privacidad |
+| `.catalog-filters` | filtros por área del catálogo: pastillas que apuntan a `/buscar?q=Área` y marcan la activa en negro |
+| `.catalog-clear` | enlace "Limpiar" junto al conteo de resultados |
+| `.detail` / `.detail-media` / `.detail-facts` | ficha de un curso: texto a la izquierda y portada 4:3 a la derecha; en móvil la foto pasa abajo |
+| `.detail-actions` / `.detail-note` | botón de alta y aclaración de acceso (gratis o membresía) |
+| `.detail-includes` | bloque "Qué incluye": cuatro puntos en dos columnas con línea superior |
+| `.detail-related` | otros cursos al final del detalle, con las mismas tarjetas del catálogo |
+| `.page-about` / `.about-hero` / `.about-hero-media` | héroe editorial de Nosotros: titular, relato y foto 4:3 con pie |
+| `.about-story` / `.about-pull` | relato en dos columnas y cita destacada sobre verde suave |
+| `.about-values` / `.value-list` / `.value` | valores como filas editoriales (título a la izquierda, texto a la derecha), sin tarjetas |
+| `.about-process` / `.process-list` | proceso en tres pasos numerados por CSS con línea superior negra |
+| `.about-note` | banda verde con la aclaración sobre la LSP |
+| `.about-cta` | llamado final centrado de Nosotros |
+| `.legal` | contenedor de las páginas legales, más ancho que un artículo simple para alojar el índice |
+| `.legal-layout` / `.legal-aside` / `.legal-toc` | índice lateral pegajoso; bajo 1000 px se convierte en caja de dos columnas |
+| `.legal-summary` | caja "Lo esencial" al inicio del documento |
+| `.legal-body` | documento con secciones numeradas por CSS y `scroll-margin-top` para los enlaces del índice |
+| `.legal-definitions` | lista de definiciones (`dl`) de los términos |
 | `.empty` | estado vacío de la búsqueda |
 | `.page` / `.page-center` | contenedores de páginas internas |
 | `.auth-page` / `.auth-shell` | pantalla de cuenta completa: formulario en blanco y panel de propuesta en negro, en dos columnas |
@@ -178,13 +192,11 @@ perfil, cursos y panel de administración:
 | `.field` / `.field-toggle` / `.password-meter` | campo del formulario, botón mostrar/ocultar y medidor de contraseña |
 | `.field-error` / `.field-hint` | error de validación y ayuda bajo el campo |
 | `.nav-user` / `.nav-avatar` | saludo e iniciales de la persona con sesión abierta en la cabecera |
-| `.footer-cta` / `.footer-contact` | banda verde suave de contacto con la pastilla negra del correo |
-| `.footer-main` | rejilla del pie: marca + tres columnas de enlaces |
+| `.footer-main` | rejilla del pie: marca y correo a la izquierda, tres columnas de enlaces a la derecha |
+| `.footer-mail` / `.footer-mail-arrow` | pastilla del correo con flecha verde; es la llamada del pie |
 | `.footer-col` | columna de enlaces del pie, con el título en Open Sans 700 |
-| `.footer-badges` / `.footer-badge` | distintivos "Hecho en Perú" y "LSP en cada clase" |
-| `.footer-wordmark` | firma grande en Tanker que cierra la página |
-| `.footer-bottom` / `.footer-legal` / `.footer-place` | barra inferior negra: copyright, ubicación y enlaces legales en blanco atenuado |
-| `.footer-top` | pastilla "Volver arriba" que se pinta de verde al pasar el mouse |
+| `.footer-bottom` / `.footer-legal` | barra inferior negra: copyright y enlaces legales en blanco atenuado |
+| `.footer-top` | pastilla "Volver arriba" que se pinta de verde al pasar el mouse; se oculta bajo 520 px |
 
 Si cambiás el nombre de alguna, decime y actualizo las plantillas nuevas.
 

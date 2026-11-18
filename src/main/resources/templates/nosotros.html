@@ -7,59 +7,146 @@
 <div class="shell">
     <header th:replace="~{fragments/layout :: header}"></header>
 
-    <main id="contenido" class="page">
+    <main id="contenido" class="page page-about">
 
-        <div class="about-head">
-            <p class="section-kicker">Nosotros</p>
-            <h1>Una lengua,<br>mil manos.</h1>
-            <p class="lead">
-                Mundo Manitas es una plataforma peruana de cursos de tecnología
-                dictados en Lengua de Señas Peruana. Nació de una idea simple:
-                aprender no debería depender de escuchar.
-            </p>
-        </div>
+        <section class="about-hero" aria-labelledby="titulo-nosotros">
 
-        <div class="values">
-            <article class="value">
-                <h2>Respeto</h2>
-                <p>La LSP es una lengua con su propia gramática. No la tratamos
-                    como una traducción del español ni como un recurso de
-                    accesibilidad: es el idioma en el que se enseña.</p>
-            </article>
+            <div class="about-hero-copy">
+                <h1 id="titulo-nosotros">Una lengua,<br>mil manos.</h1>
+                <p class="lead">
+                    Mundo Manitas es una plataforma peruana de cursos de tecnología
+                    dictados en Lengua de Señas Peruana. Nació de una idea simple:
+                    aprender no debería depender de escuchar.
+                </p>
+                <div class="about-hero-actions">
+                    <a class="btn btn-solid" th:href="@{/cursos}">Ver los cursos</a>
+                    <a class="about-hero-link" href="mailto:hola@mundomanitas.pe">Escribinos</a>
+                </div>
+            </div>
 
-            <article class="value">
-                <h2>Claridad</h2>
-                <p>Cada lección tiene intérprete, subtítulos revisados y un
-                    ritmo que podés manejar. Si algo no se entiende, se puede
-                    volver atrás sin perder el hilo.</p>
-            </article>
+            <figure class="about-hero-media">
+                <img th:src="@{/img/nosotros/clase-lsp.jpg}"
+                     alt="Docente comunicándose en lengua de señas frente a su clase"
+                     width="1400" height="1050" fetchpriority="high" decoding="async">
+                <figcaption>Una clase de lengua de señas: el idioma va primero y el subtítulo acompaña. Foto de referencia: Wikimedia Commons (CC0).</figcaption>
+            </figure>
 
-            <article class="value">
-                <h2>Comunidad</h2>
-                <p>Construimos junto a personas sordas, no en su nombre. Docentes,
-                    intérpretes y estudiantes revisan el material antes de
-                    publicarlo.</p>
-            </article>
-        </div>
+        </section>
+
+        <section class="about-story" aria-labelledby="titulo-historia">
+
+            <div class="about-story-copy">
+                <h2 id="titulo-historia">Aprender no debería depender de escuchar</h2>
+                <p>
+                    La mayoría de los cursos en línea suponen que podés oír la clase.
+                    Para miles de personas sordas en el Perú, eso significa estudiar
+                    con subtítulos automáticos que llegan tarde, con audio que no
+                    explica nada y con la sensación de quedar siempre un paso atrás.
+                </p>
+                <p>
+                    Mundo Manitas invierte esa lógica: primero se graba la clase en
+                    Lengua de Señas Peruana y después se agregan los subtítulos en
+                    español como apoyo. Así, el idioma principal no es una adaptación:
+                    es el que organiza todo el curso.
+                </p>
+            </div>
+
+            <figure class="about-pull">
+                <blockquote>
+                    «Aprender una lengua también es aprender a escuchar de otra manera.»
+                </blockquote>
+                <figcaption>Equipo de Mundo Manitas</figcaption>
+            </figure>
+
+        </section>
+
+        <section class="about-values" aria-labelledby="titulo-valores">
+
+            <div class="about-section-head">
+                <h2 id="titulo-valores">Lo que cuidamos en cada clase</h2>
+            </div>
+
+            <ul class="value-list">
+                <li class="value">
+                    <h3>Respeto</h3>
+                    <p>
+                        La LSP es una lengua con su propia gramática. No la tratamos
+                        como una traducción del español ni como un recurso de
+                        accesibilidad: es el idioma en el que se enseña.
+                    </p>
+                </li>
+
+                <li class="value">
+                    <h3>Claridad</h3>
+                    <p>
+                        Cada lección tiene intérprete, subtítulos revisados y un ritmo
+                        que podés manejar. Si algo no se entiende, se puede volver atrás
+                        sin perder el hilo.
+                    </p>
+                </li>
+
+                <li class="value">
+                    <h3>Comunidad</h3>
+                    <p>
+                        Construimos junto a personas sordas, no en su nombre. Docentes,
+                        intérpretes y estudiantes revisan el material antes de
+                        publicarlo.
+                    </p>
+                </li>
+            </ul>
+
+        </section>
+
+        <section class="about-process" aria-labelledby="titulo-proceso">
+
+            <div class="about-section-head about-section-head--row">
+                <h2 id="titulo-proceso">Cómo construimos cada curso</h2>
+                <p class="lead">
+                    Un mismo material pasa por tres revisiones antes de llegar a tu
+                    pantalla.
+                </p>
+            </div>
+
+            <ol class="process-list">
+                <li>
+                    <h3>Se graba en LSP</h3>
+                    <p>
+                        La explicación se dicta directamente en Lengua de Señas
+                        Peruana, con el contenido técnico adaptado a la lengua.
+                    </p>
+                </li>
+                <li>
+                    <h3>Se subtitula a mano</h3>
+                    <p>
+                        Los subtítulos en español se sincronizan y corrigen uno por uno.
+                        No se generan solos ni se dejan a medias.
+                    </p>
+                </li>
+                <li>
+                    <h3>Se revisa en comunidad</h3>
+                    <p>
+                        Docentes, intérpretes y estudiantes revisan el material antes de
+                        publicarlo y señalan lo que todavía no se entiende.
+                    </p>
+                </li>
+            </ol>
+
+        </section>
 
         <section class="about-note" aria-labelledby="titulo-lengua">
             <h2 id="titulo-lengua">La LSP es una lengua, no una traducción</h2>
             <p>
-                Tiene su propio vocabulario, su gramática y su cultura. Por eso
-                los cursos se graban en Lengua de Señas Peruana, con subtítulos
-                en español como apoyo, y no al revés.
-            </p>
-            <p class="about-note-quote">
-                «Aprender una lengua también es aprender a escuchar de otra
-                manera.»
+                Tiene su propio vocabulario, su gramática y su cultura. Por eso los
+                cursos se graban en Lengua de Señas Peruana, con subtítulos en
+                español como apoyo, y no al revés.
             </p>
         </section>
 
-        <div class="about-cta">
-            <h2>Empezá por el primer curso</h2>
+        <section class="about-cta" aria-labelledby="titulo-empezar">
+            <h2 id="titulo-empezar">Empezá por el primer curso</h2>
             <p class="lead">Es gratis y no necesitás tarjeta.</p>
             <a class="btn btn-solid btn-lg" th:href="@{/cursos}">Ver cursos</a>
-        </div>
+        </section>
 
     </main>
 

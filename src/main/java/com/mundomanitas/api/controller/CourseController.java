@@ -25,6 +25,7 @@ public class CourseController {
     @GetMapping("/cursos")
     public String catalog(Model model) {
         model.addAttribute("courses", catalog.all());
+        model.addAttribute("areas", catalog.categories());
         model.addAttribute("query", "");
         return "cursos/index";
     }
@@ -35,6 +36,7 @@ public class CourseController {
             Model model
     ) {
         model.addAttribute("courses", catalog.search(query));
+        model.addAttribute("areas", catalog.categories());
         model.addAttribute("query", query);
         return "cursos/index";
     }
@@ -45,6 +47,7 @@ public class CourseController {
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Curso no encontrado"));
         model.addAttribute("course", course);
+        model.addAttribute("related", catalog.others(course, 3));
         return "cursos/detalle";
     }
 }

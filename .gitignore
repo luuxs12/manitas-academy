@@ -54,3 +54,7 @@ Desktop.ini
 *.tmp
 *.bak
 *.orig
+
+### Skills del agente ###
+# Se reinstalan desde skills-lock.json con `npx skills add`.
+.agents/

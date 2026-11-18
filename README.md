@@ -1,28 +1,73 @@
-# API — Plataforma de cursos accesibles
+<div align="center">
 
-Backend y sitio web de la plataforma de cursos con Lengua de Señas Peruana (LSP).
-Aplicación **monolítica** con Spring Boot y páginas HTML generadas en el servidor.
+<img src="docs/img/logo-mundo-manitas.png" alt="Mundo Manitas: un globo con manos en Lengua de Señas y el nombre de la marca" width="420">
 
-> Antes de escribir código, leé [`REGLAS-EQUIPO.txt`](REGLAS-EQUIPO.txt): ramas,
-> commits, capas, base de datos, diseño y accesibilidad.
+### Cursos de tecnología en Lengua de Señas Peruana
+
+Aprendé a tu ritmo, con intérprete y subtítulos en cada clase.
+
+<br>
+
+![Java 25](https://img.shields.io/badge/Java-25-0d0d0d)
+![Spring Boot 4.1.2](https://img.shields.io/badge/Spring_Boot-4.1.2-0d0d0d)
+![Thymeleaf](https://img.shields.io/badge/Thymeleaf-3-0d0d0d)
+![PostgreSQL 18](https://img.shields.io/badge/PostgreSQL-18-0d0d0d)
+![Flyway](https://img.shields.io/badge/Flyway-migraciones-0d0d0d)
+![Tests](https://img.shields.io/badge/tests-10_en_verde-00a63e)
+
+</div>
+
+---
+
+## Qué es
+
+Mundo Manitas es una plataforma de cursos de tecnología pensada para personas
+sordas usuarias de Lengua de Señas Peruana (LSP). Cada curso combina video,
+intérprete en LSP y subtítulos revisados, para que el contenido se entienda sin
+depender del audio.
+
+El repositorio es el sitio completo: portada, catálogo, fichas de curso, páginas
+legales, cuentas reales y el diseño documentado. Es una aplicación **monolítica**
+con Spring Boot que genera el HTML en el servidor; no hay frontend aparte ni API
+pública todavía.
+
+- **Portada** con video, curso destacado y llamadas a la acción que abren el
+  modal de cuenta.
+- **Catálogo** de seis cursos con búsqueda por texto y filtros por área.
+- **Cuentas** con registro, inicio y cierre de sesión, BCrypt y CSRF.
+- **Legal**: términos y privacidad con índice lateral.
+- **Accesibilidad**: teclado, foco visible, movimiento reducido y contraste AA.
+
+## Capturas
+
+![Portada de Mundo Manitas en escritorio](docs/img/portada.jpg)
+
+![Catálogo de cursos con filtros por área](docs/img/catalogo.jpg)
+
+<p align="center">
+  <img src="docs/img/portada-movil.jpg" alt="Portada en un teléfono" width="290">
+</p>
+
+---
+
+## Stack
 
 | Pieza | Tecnología |
 |---|---|
 | Lenguaje | Java 25 |
-| Framework | Spring Boot 4.1.2 |
-| Vistas | Thymeleaf + HTML + CSS + JavaScript |
-| Base de datos | PostgreSQL 18 **local** |
-| Migraciones | Flyway |
-| Build | Maven (wrapper incluido) |
-
----
+| Framework | Spring Boot 4.1.2 (MVC + Security + Validation) |
+| Vistas | Thymeleaf, HTML, CSS y JavaScript sin frameworks |
+| Base de datos | PostgreSQL 18 |
+| Migraciones | Flyway (`ddl-auto: validate`) |
+| Build | Maven con wrapper incluido |
+| Pruebas | JUnit 5 + AssertJ (10 pruebas) |
 
 ## Requisitos
 
-| Herramienta | Versión | Verificar |
+| Herramienta | Versión | Cómo verificar |
 |---|---|---|
-| JDK | **25** | `java -version` |
-| PostgreSQL | 18 (servicio `postgresql-x64-18`) | `Get-Service postgresql-x64-18` |
+| JDK | 25 | `java -version` |
+| PostgreSQL | 18 | `Get-Service postgresql-x64-18` |
 | Maven | no hace falta | se usa `.\mvnw.cmd` |
 
 Si tu `java` por defecto es otro:
@@ -34,44 +79,28 @@ $env:Path = "$env:JAVA_HOME\bin;$env:Path"
 
 En IntelliJ: `File > Project Structure > Project` → SDK **25**, Language level **25**.
 
-Para no escribir la ruta completa de `psql`, agregá al PATH:
+## Base de datos
 
-```powershell
-$env:Path = "C:\Program Files\PostgreSQL\18\bin;$env:Path"
-```
-
----
-
-## Crear la base de datos (una sola vez)
-
-El servidor PostgreSQL ya está instalado. Falta crear la base lógica `mundo_manitas_api` y su usuario.
-Abrí PowerShell y ejecutá (te va a pedir la contraseña del usuario `postgres`):
+La base se crea una sola vez; las tablas las crea Flyway al arrancar.
 
 ```powershell
 & 'C:\Program Files\PostgreSQL\18\bin\psql.exe' -U postgres -h localhost -c "CREATE USER mundo_manitas WITH PASSWORD 'mundo_manitas';"
 & 'C:\Program Files\PostgreSQL\18\bin\psql.exe' -U postgres -h localhost -c "CREATE DATABASE mundo_manitas_api OWNER mundo_manitas;"
 ```
 
-> La base `mundo_manitas` es la del proyecto anterior y se conserva como referencia. La del proyecto nuevo es `mundo_manitas_api`.
+| Dato | Valor por defecto |
+|---|---|
+| Host y puerto | `localhost:5432` |
+| Base | `mundo_manitas_api` |
+| Usuario | `mundo_manitas` |
+| Contraseña | `mundo_manitas` |
 
-Si el usuario ya existe, el primer comando avisa; no pasa nada.
+Se pueden pisar con variables de entorno: `DATABASE_URL`, `DB_USER`,
+`DB_PASSWORD` y `REMEMBER_ME_KEY`.
 
-Probar la conexión:
-
-```powershell
-$env:PGPASSWORD='mundo_manitas'
-& 'C:\Program Files\PostgreSQL\18\bin\psql.exe' -h localhost -U mundo_manitas -d mundo_manitas_api -c "select current_database();"
-```
-
-**Las tablas no se crean acá.** Eso lo hace Flyway cuando arranca la aplicación.
-
-Si el servicio está detenido:
-
-```powershell
-Start-Service postgresql-x64-18
-```
-
----
+La migración vigente es `V1__accounts.sql`: usuarios, roles, preferencias de
+accesibilidad y el trigger de `updated_at`. Una migración ya ejecutada **no se
+edita** (Flyway guarda su checksum); el cambio va en la versión siguiente.
 
 ## Arrancar
 
@@ -84,220 +113,139 @@ Start-Service postgresql-x64-18
 | http://localhost:8080 | Sitio |
 | http://localhost:8080/actuator/health | Estado de la app y de la base |
 
-### Cuentas
-
-| URL | Qué es |
-|---|---|
-| `/registro` | Alta con nombre, correo, contraseña y aceptación de términos |
-| `/login` | Inicio de sesión con correo y contraseña |
-| `/logout` | Cierre de sesión (POST con token CSRF) |
-
-Las cuentas se guardan en la tabla `users`. Las contraseñas se cifran con
-BCrypt, la sesión la maneja Spring Security y "mantener sesión abierta" usa
-remember-me durante 14 días. La clave se configura en
-`app.security.remember-me-key` (variable de entorno `REMEMBER_ME_KEY`).
-
-En las páginas del sitio, "Iniciar sesión" y "Crear cuenta" abren un modal
-sobre la página con el fondo difuminado; el envío usa `fetch` y, al entrar,
-se recarga la misma página con la sesión abierta. Las rutas `/login` y
-`/registro` siguen existiendo como respaldo y para enlaces directos.
+Compilar y probar:
 
 ```powershell
-.\mvnw.cmd clean package      # compilar
-.\mvnw.cmd test               # tests
+.\mvnw.cmd clean package      # jar en target\api-0.0.1-SNAPSHOT.jar
+.\mvnw.cmd test               # 10 pruebas
+java -jar target\api-0.0.1-SNAPSHOT.jar
 ```
 
----
+## Rutas
 
-## Estructura de carpetas
+| Ruta | Qué muestra |
+|---|---|
+| `/` | Portada con el curso destacado |
+| `/cursos` | Catálogo con búsqueda y filtros por área |
+| `/buscar?q=` | Resultados de búsqueda sobre el catálogo |
+| `/cursos/{slug}` | Ficha del curso, "Qué incluye" y cursos relacionados |
+| `/nosotros` | El proyecto, la misión y el equipo |
+| `/terminos` | Términos de uso |
+| `/privacidad` | Política de privacidad |
+| `/login` | Inicio de sesión (página completa) |
+| `/registro` | Alta de cuenta (página completa) |
+| `/logout` | Cierre de sesión (POST con token CSRF) |
+| `/actuator/health` · `/actuator/info` | Estado de la aplicación |
+
+Las páginas del sitio cargan el modal de cuenta como fragmento. Los botones
+"Iniciar sesión", "Crear cuenta", "Empezar gratis", "Crear mi cuenta" y "Crear
+cuenta gratis" llevan `data-auth-open` y abren el modal sobre la página con el
+fondo difuminado, sin recargar. `/login` y `/registro` siguen funcionando como
+páginas completas: si el JavaScript no corre, los enlaces llevan ahí.
+
+## Estructura
 
 ```
 api/
 ├── pom.xml                          dependencias
 ├── mvnw / mvnw.cmd                  Maven
+├── skills-lock.json                 skills del agente, fijadas por commit
+├── docs/
+│   ├── design-system.md             contrato visual y reglas de detalle
+│   ├── git-conventions.md           ramas y mensajes de commit
+│   └── img/                         logo y capturas del README
 └── src/
     ├── main/
     │   ├── java/com/mundomanitas/api/
     │   │   ├── ApiApplication.java      arranca la aplicación
-    │   │   ├── config/                  configuración de Spring
+    │   │   ├── config/                  Spring Security y beans
     │   │   ├── controller/              URLs del sitio
-    │   │   │   └── admin/               URLs del panel de administración
-    │   │   ├── dto/                     datos que viajan entre capas y vistas
-    │   │   ├── exception/               errores propios y páginas de error
-    │   │   ├── model/                   entidades JPA (una por tabla)
-    │   │   ├── repository/              consultas a la base de datos
+    │   │   ├── dto/                     datos entre capas y vistas
+    │   │   ├── exception/               errores propios
+    │   │   ├── model/                   entidades JPA
+    │   │   ├── repository/              consultas a la base
+    │   │   ├── security/                usuario autenticado
     │   │   └── service/                 reglas de negocio
     │   └── resources/
-    │       ├── application.yml          configuración (base de datos, puerto)
-    │       ├── db/migration/            scripts SQL versionados (Flyway)
-    │       ├── static/
-    │       │   ├── css/                 hojas de estilo
-    │       │   ├── fonts/               Tanker y Open Sans (autoalojadas)
-    │       │   ├── img/                 imágenes del sitio
-    │       │   ├── js/                  JavaScript del sitio
-    │       │   └── video/               video de la portada
+    │       ├── application.yml          configuración
+    │       ├── db/migration/            SQL versionado (Flyway)
+    │       ├── static/                  css, js, fuentes, imágenes y video
     │       └── templates/
-    │           ├── fragments/           pedazos reutilizables (header, footer)
+    │           ├── fragments/           cabecera, pie y modal de cuenta
     │           ├── auth/                login y registro
-    │           ├── cursos/              catálogo y detalle de curso
-    │           ├── legal/                términos y privacidad
-    │           ├── student/             mis cursos, reproductor, perfil, progreso
-    │           ├── checkout/            pago de curso y membresía
-    │           ├── admin/               panel de administración
-    │           └── error/               páginas 404 y de error
+    │           ├── cursos/              catálogo y detalle
+    │           ├── legal/               términos y privacidad
+    │           └── error/               páginas de error
     └── test/java/com/mundomanitas/api/  pruebas
 ```
 
-Las carpetas sin archivos se crean cuando llegue su primer contenido; no se
-versionan carpetas vacías.
+La regla de dependencias es `controller → service → repository`, con `model`
+debajo. El controlador no consulta el repositorio, el repositorio no tiene reglas
+y las entidades no llegan a las vistas: se convierten en `dto`.
 
-### Qué va en cada capa
+## Cuentas y seguridad
 
-| Carpeta | Responsabilidad | Ejemplos previstos |
-|---|---|---|
-| `config/` | Configurar Spring | `SecurityConfig`, `WebConfig` |
-| `controller/` | Recibir la petición y devolver una vista o JSON | `AuthController`, `CourseController`, `EnrollmentController`, `LessonController`, `ProfileController`, `CheckoutController` |
-| `controller/admin/` | Lo mismo, solo para administradores | `AdminDashboardController`, `AdminCourseController`, `AdminUserController` |
-| `dto/` | Objetos para formularios y vistas | `RegisterForm`, `ProfileForm`, `CourseForm`, `CourseSummary` |
-| `exception/` | Errores del negocio | `NotFoundException`, `GlobalExceptionHandler` |
-| `model/` | Clases que representan tablas | `User`, `Course`, `Module`, `Lesson`, `LessonMedia`, `Enrollment`, `Progress`, `Subscription` |
-| `repository/` | Interfaces que consultan la base | `UserRepository`, `CourseRepository`, `EnrollmentRepository` |
-| `service/` | Reglas del negocio | `AuthService`, `CourseService`, `EnrollmentService`, `ProgressService`, `PaymentService` |
+- Contraseñas con **BCrypt**; nunca se guarda el texto plano.
+- Correo único sin distinguir mayúsculas (`unique index lower(email)`).
+- Sesión administrada por Spring Security y **remember-me** de 14 días.
+- **CSRF** activo en todos los formularios, incluido el modal.
+- Validación en el servidor con Bean Validation y errores por campo.
+- El modal envía con `fetch`; si el navegador no ejecuta JavaScript, el mismo
+  formulario funciona como POST normal y vuelve a la página con el error.
 
-**Regla de dependencias:**
+## Diseño y accesibilidad
 
-```
-controller → service → repository → base de datos
-                ↓
-               model
-```
+La identidad es **verde `#00FF00`, blanco y negro**, con Tanker en los titulares
+y Open Sans en navegación, textos y pie. El contrato completo, los tokens y las
+reglas de detalle están en [`docs/design-system.md`](docs/design-system.md).
 
-- El controlador **no** usa el repositorio directamente.
-- El repositorio **no** tiene reglas de negocio.
-- El servicio **no** devuelve HTML ni conoce Thymeleaf.
-- Las entidades **no** se pasan a las vistas: se convierten en `dto`.
+El piso de calidad que se revisa en cada pantalla nueva:
 
----
+- Enlace "Saltar al contenido" y `:focus-visible` visible en todo.
+- Contraste AA: 4.5:1 en texto normal, 3:1 en texto grande y placeholders.
+- Todo operable con teclado; el modal atrapa el foco y lo devuelve al cerrar.
+- `prefers-reduced-motion` apaga animaciones y realces.
+- Hover solo con puntero fino; en táctil no quedan estados pegados.
+- Sin rótulos sobre los titulares y sin saltos de nivel en los encabezados.
 
-## Base de datos
-
-### Credenciales
-
-| Dato | Valor |
-|---|---|
-| Host | `localhost` |
-| Puerto | `5432` |
-| Base | `mundo_manitas_api` |
-| Usuario | `mundo_manitas` |
-| Contraseña | `mundo_manitas` |
-
-Están en `application.yml` y se pueden pisar con variables de entorno:
-
-```
-DATABASE_URL, DB_USER, DB_PASSWORD
-```
-
-### Migraciones con Flyway
-
-Los scripts van en `db/migration/`:
-
-```
-V1__usuarios.sql
-V2__cursos_y_lecciones.sql
-V3__inscripciones.sql
-```
-
-Reglas:
-
-- Nombre: **`V` + número + `__` (dos guiones bajos) + descripción + `.sql`**.
-- Sin acentos, sin ñ, sin espacios.
-- **Nunca** se edita una migración ya ejecutada: Flyway guarda un checksum y falla si cambia.
-- Para corregir algo, se crea la siguiente versión (`V2`, `V3`...).
-- En cualquier máquina se ejecutan los mismos archivos: la base queda igual.
-
-Flyway anota lo que ejecutó en la tabla `flyway_schema_history`.
-
-### JPA
-
-`application.yml` tiene `ddl-auto: validate`:
-
-- Hibernate **no** crea ni modifica tablas.
-- Solo verifica que cada entidad coincida con su tabla.
-- Si no coincide, la aplicación no arranca y avisa.
-
-La fuente de verdad del esquema es Flyway, no las anotaciones de Java.
-
-### Tipos de datos
-
-| Necesidad | Tipo |
-|---|---|
-| Identificador | `uuid default gen_random_uuid()` |
-| Fecha y hora | `timestamptz` |
-| Texto | `text` |
-| Dinero | `numeric(10,2)` |
-| Estado | `text` + `check (...)` |
-| Booleano | `boolean not null default false` |
-
-### Inspeccionar la base
-
-Con `psql`:
+## Pruebas
 
 ```powershell
-$env:PGPASSWORD='mundo_manitas'
-& 'C:\Program Files\PostgreSQL\18\bin\psql.exe' -h localhost -U mundo_manitas -d mundo_manitas_api
+.\mvnw.cmd test
 ```
 
-```sql
-\dt                    -- tablas
-\d users               -- estructura
-select * from users;   -- datos
-\q                     -- salir
-```
+| Prueba | Qué cubre |
+|---|---|
+| `ApiApplicationTests` | El contexto de Spring arranca con la base y las migraciones |
+| `CourseCatalogTest` | Búsqueda, filtros, slugs y fichas del catálogo (9 casos) |
 
-También podés instalar **DBeaver** (gratis) y conectarte con los mismos datos.
+Resultado actual: **10 de 10 en verde**.
 
-### Respaldo
+## Estado
 
-```powershell
-& 'C:\Program Files\PostgreSQL\18\bin\pg_dump.exe' -U mundo_manitas -h localhost -d mundo_manitas_api -f respaldo.sql
-```
+Funciona hoy: portada con video, catálogo de seis cursos con búsqueda y filtros,
+fichas de curso, páginas de nosotros, términos y privacidad, y cuentas reales con
+sesión, remember-me y cierre de sesión.
+
+Falta: preferencias de accesibilidad editables, inscripción y lecciones,
+reproductor con video en LSP y subtítulos, progreso, membresía con pagos y panel
+de administración. El reparto de tareas está en
+[`REGLAS-EQUIPO.txt`](REGLAS-EQUIPO.txt).
+
+## Para contribuir
+
+1. Leé [`REGLAS-EQUIPO.txt`](REGLAS-EQUIPO.txt) y
+   [`docs/git-conventions.md`](docs/git-conventions.md).
+2. Trabajá en una rama `feature/...` o `fix/...`; `main` queda siempre estable.
+3. Antes de abrir el merge: `.\mvnw.cmd test` y una mirada al render en 1440 px y
+   390 px.
+4. Los textos visibles van en español; clases, métodos y nombres de código, en
+   inglés.
 
 ---
 
-## Convenciones
+<div align="center">
 
-- Paquete raíz: `com.mundomanitas.api`. Clase principal: `ApiApplication`.
-- Rutas del sitio en español (`/cursos`, `/mi-perfil`) y rutas JSON versionadas (`/api/v1/...`).
-- Tablas en plural y `snake_case` (`courses`, `lesson_progress`).
-- Clases en singular y `PascalCase` (`Course`, `LessonProgress`).
-- Métodos y variables en inglés; textos visibles en español.
-- Un archivo por clase.
-- Fechas en UTC.
-- **Los videos de las lecciones no van en `static/`**: se guardan en un servicio
-  externo y en la base queda solo la URL. La única excepción es el video corto de
-  la portada (`static/video/hero.mp4`).
+**Mundo Manitas** · [hola@mundomanitas.com](mailto:hola@mundomanitas.com)
 
----
-
-## Estado del proyecto
-
-La base está en pie y funciona:
-
-- Portada rediseñada con video, carrusel CSS y pie compacto.
-- Catálogo de seis cursos de tecnología con foto propia, búsqueda por texto,
-  filtros por área y ficha de curso con "Qué incluye" y cursos relacionados.
-- Páginas de términos, privacidad y nosotros: lectura editorial, índice lateral
-  en los documentos legales y foto con crédito en Nosotros.
-- Registro e inicio de sesión reales contra `users`: BCrypt, sesión,
-  remember-me, cierre de sesión y cabecera con la cuenta activa.
-- Esquema `V1` de cuentas y preferencias de accesibilidad aplicado por Flyway.
-
-Falta:
-
-1. Roles, perfil y preferencias de accesibilidad editables.
-2. Inscripción a cursos gratis y lecciones.
-3. Reproductor con video principal + video en LSP y subtítulos.
-4. Progreso del estudiante.
-5. Membresía y pagos.
-6. Panel de administración y estadísticas. Las tareas del equipo se reparten
-   según `REGLAS-EQUIPO.txt`.
+</div>

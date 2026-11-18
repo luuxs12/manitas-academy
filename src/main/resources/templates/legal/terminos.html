@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="~{fragments/layout :: head('Términos de uso')}"></head>
+<head th:replace="~{fragments/layout :: head('Términos y condiciones')}"></head>
 
 <body>
 <div class="shell">
@@ -10,63 +10,332 @@
     <main id="contenido" class="page">
         <article class="legal">
 
-            <p class="section-kicker">Legal</p>
-            <h1>Términos de uso</h1>
-            <p class="lead">
-                Estas reglas valen para todo el que use Mundo Manitas. Están escritas
-                en lenguaje claro a propósito: si algo no se entiende, escribinos.
-            </p>
-            <p class="legal-date">Última actualización: noviembre de 2026.</p>
-
-            <section>
-                <h2>Tu cuenta</h2>
-                <p>
-                    Para guardar tu progreso necesitás una cuenta. Los datos que pongas
-                    tienen que ser tuyos y la contraseña es personal: no la compartas.
-                    Podés cerrar la cuenta cuando quieras desde tu perfil.
+            <header class="legal-head">
+                <h1>Términos y condiciones</h1>
+                <p class="lead">
+                    Estas condiciones regulan el uso de Mundo Manitas: qué podés esperar
+                    de la plataforma, qué esperamos de tu cuenta y cómo resolvemos las
+                    dudas. Están escritas en lenguaje claro y no reemplazan los derechos
+                    que la ley peruana te reconoce.
                 </p>
-            </section>
+                <p class="legal-date">Vigente desde el 1 de noviembre de 2026 · Versión 2.0</p>
+            </header>
 
-            <section>
-                <h2>Cursos y acceso</h2>
-                <p>
-                    Los cursos marcados como gratuitos quedan disponibles mientras
-                    mantengas tu cuenta activa. La membresía premium habilita el
-                    catálogo completo y los certificados mientras esté vigente.
-                </p>
-                <ul>
-                    <li>El acceso es personal y no se transfiere.</li>
-                    <li>No se permite descargar ni redistribuir las clases.</li>
-                    <li>Los certificados se emiten al completar el curso.</li>
-                </ul>
-            </section>
+            <div class="legal-layout">
 
-            <section>
-                <h2>Pagos y cancelación</h2>
-                <p>
-                    La membresía se cobra por mes y no tiene permanencia. Podés
-                    cancelarla cuando quieras: el acceso sigue hasta el final del
-                    período ya pagado y después volvés al plan gratuito.
-                </p>
-            </section>
+                <aside class="legal-aside">
+                    <nav class="legal-toc" aria-labelledby="titulo-contenido">
+                        <h2 id="titulo-contenido">Contenido</h2>
+                        <ol>
+                            <li><a href="#alcance">Alcance y aceptación</a></li>
+                            <li><a href="#quienes-somos">Quiénes somos</a></li>
+                            <li><a href="#definiciones">Definiciones</a></li>
+                            <li><a href="#cuenta">Tu cuenta</a></li>
+                            <li><a href="#cursos">Cursos y licencia de uso</a></li>
+                            <li><a href="#membresia">Membresía y pagos</a></li>
+                            <li><a href="#cancelacion">Cancelación y reembolsos</a></li>
+                            <li><a href="#conducta">Conducta en la comunidad</a></li>
+                            <li><a href="#propiedad">Propiedad intelectual</a></li>
+                            <li><a href="#terceros">Servicios de terceros</a></li>
+                            <li><a href="#disponibilidad">Disponibilidad y cambios</a></li>
+                            <li><a href="#responsabilidad">Responsabilidad</a></li>
+                            <li><a href="#datos">Datos personales</a></li>
+                            <li><a href="#cambios">Cambios en los términos</a></li>
+                            <li><a href="#ley">Ley aplicable</a></li>
+                            <li><a href="#contacto">Contacto</a></li>
+                        </ol>
+                    </nav>
+                </aside>
 
-            <section>
-                <h2>Contenido y respeto</h2>
-                <p>
-                    Las clases, los subtítulos y los materiales son de Mundo Manitas
-                    o se usan con permiso. La Lengua de Señas Peruana es una lengua:
-                    en los espacios de la comunidad no se toleran burlas ni imitaciones
-                    despectivas.
-                </p>
-            </section>
+                <div class="legal-body">
 
-            <section>
-                <h2>Contacto</h2>
-                <p>
-                    Cualquier duda sobre estos términos:
-                    <a href="mailto:hola@mundomanitas.pe">hola@mundomanitas.pe</a>.
-                </p>
-            </section>
+                    <div class="legal-summary">
+                        <h2>Lo esencial</h2>
+                        <ul>
+                            <li>Tu cuenta es personal. Guardá tu contraseña y no compartas el acceso.</li>
+                            <li>Los cursos gratuitos no vencen mientras tu cuenta siga activa.</li>
+                            <li>La membresía premium cuesta S/ 29 al mes, no tiene permanencia y se cancela cuando quieras.</li>
+                            <li>Las clases se ven en streaming. No se descargan ni se redistribuyen.</li>
+                            <li>La Lengua de Señas Peruana es el idioma de enseñanza, no un recurso decorativo.</li>
+                        </ul>
+                    </div>
+
+                    <section id="alcance">
+                        <h2>Alcance y aceptación</h2>
+                        <p>
+                            Al crear una cuenta, contratar una membresía o usar cualquier
+                            parte de la plataforma, aceptás estos términos y la
+                            <a th:href="@{/privacidad}">política de privacidad</a>. Si no
+                            estás de acuerdo, no uses el servicio.
+                        </p>
+                        <p>
+                            Para registrarte necesitás tener 18 años o más. Si tenés entre
+                            14 y 17 años, podés hacerlo con la autorización de tu madre,
+                            padre o representante legal. Ninguna cláusula de este documento
+                            limita los derechos que la legislación de protección al
+                            consumidor te reconoce.
+                        </p>
+                    </section>
+
+                    <section id="quienes-somos">
+                        <h2>Quiénes somos</h2>
+                        <p>
+                            Mundo Manitas es una plataforma educativa peruana dedicada a
+                            enseñar tecnología en Lengua de Señas Peruana (LSP), con
+                            intérprete y subtítulos revisados en cada lección. El servicio
+                            se ofrece en línea desde Lima, Perú.
+                        </p>
+                        <p>
+                            Para consultas sobre estos términos, sobre tu cuenta o sobre
+                            una compra, escribinos a
+                            <a href="mailto:hola@mundomanitas.pe">hola@mundomanitas.pe</a>.
+                            Respondemos de lunes a viernes, de 9 a 18 h (hora de Perú).
+                        </p>
+                    </section>
+
+                    <section id="definiciones">
+                        <h2>Definiciones</h2>
+                        <dl class="legal-definitions">
+                            <dt>Plataforma</dt>
+                            <dd>El sitio web, los cursos, los videos, los materiales y los servicios de Mundo Manitas.</dd>
+                            <dt>Cuenta</dt>
+                            <dd>El registro personal que te identifica y guarda tu progreso.</dd>
+                            <dt>Curso</dt>
+                            <dd>El conjunto de lecciones, videos, subtítulos y materiales agrupados bajo un mismo tema.</dd>
+                            <dt>Membresía</dt>
+                            <dd>El plan pago mensual que habilita el catálogo completo y los certificados.</dd>
+                            <dt>Contenido</dt>
+                            <dd>Las clases, textos, imágenes, subtítulos, ejercicios y demás materiales publicados en la plataforma.</dd>
+                        </dl>
+                    </section>
+
+                    <section id="cuenta">
+                        <h2>Tu cuenta</h2>
+                        <p>
+                            Los datos que registres deben ser verdaderos, completos y
+                            tuyos. Cada persona puede mantener una cuenta; no está permitido
+                            crear cuentas para revender acceso ni para eludir una suspensión.
+                        </p>
+                        <p>
+                            La contraseña es personal y confidencial. Avisanos de inmediato
+                            si detectás un acceso no autorizado a
+                            <a href="mailto:hola@mundomanitas.pe">hola@mundomanitas.pe</a>.
+                            Podemos suspender temporalmente una cuenta si hay indicios de
+                            fraude, suplantación o riesgo para otras personas.
+                        </p>
+                        <p>
+                            Podés pedir el cierre de tu cuenta cuando quieras desde tu
+                            perfil o escribiéndonos. El cierre no elimina las obligaciones
+                            pendientes ni el contenido que la ley exija conservar.
+                        </p>
+                    </section>
+
+                    <section id="cursos">
+                        <h2>Cursos y licencia de uso</h2>
+                        <p>
+                            Los cursos gratuitos están disponibles mientras tu cuenta siga
+                            activa y no vencen por sí solos. La membresía premium habilita
+                            el catálogo completo y los certificados mientras esté vigente.
+                        </p>
+                        <p>
+                            Mientras cumplas estos términos, te damos una licencia personal,
+                            limitada, no exclusiva, intransferible y revocable para ver los
+                            cursos en streaming y usar los materiales para tu aprendizaje.
+                            Esta licencia no incluye:
+                        </p>
+                        <ul>
+                            <li>Descargar, grabar, copiar o almacenar las clases fuera de la plataforma.</li>
+                            <li>Redistribuir, revender, alquilar o publicar el contenido.</li>
+                            <li>Proyectarlo en espacios públicos, eventos o clases de terceros sin autorización escrita.</li>
+                            <li>Compartir tu cuenta o tus credenciales con otras personas.</li>
+                        </ul>
+                        <p>
+                            Los certificados se emiten al completar el curso y quedan
+                            asociados a tu nombre y a tu cuenta.
+                        </p>
+                    </section>
+
+                    <section id="membresia">
+                        <h2>Membresía y pagos</h2>
+                        <p>
+                            La membresía premium cuesta S/ 29 al mes. Los precios se muestran
+                            en soles peruanos e incluyen los impuestos aplicables. El cobro
+                            se realiza por adelantado y se renueva automáticamente cada mes
+                            hasta que la canceles.
+                        </p>
+                        <p>
+                            Los pagos se procesan mediante proveedores de pago autorizados.
+                            Mundo Manitas no almacena los datos completos de tu tarjeta. Si
+                            un cobro es rechazado, el acceso premium puede suspenderse hasta
+                            regularizar el pago.
+                        </p>
+                        <p>
+                            Podemos modificar el precio de la membresía. Si el cambio te
+                            afecta, te avisaremos con al menos 30 días de anticipación y vas a
+                            poder cancelar antes de que se aplique. El nuevo precio rige
+                            desde tu siguiente renovación.
+                        </p>
+                    </section>
+
+                    <section id="cancelacion">
+                        <h2>Cancelación y reembolsos</h2>
+                        <p>
+                            Podés cancelar la membresía cuando quieras desde tu perfil, sin
+                            penalidad y sin permanencia. Al cancelar, conservás el acceso
+                            premium hasta el final del período ya pagado; después tu cuenta
+                            vuelve al plan gratuito y tu progreso se mantiene.
+                        </p>
+                        <p>
+                            No hacemos reembolsos proporcionales por períodos parciales ya
+                            iniciados, salvo que la ley peruana lo exija, que exista un cobro
+                            duplicado o que el servicio no se haya prestado por una causa que
+                            nos sea imputable.
+                        </p>
+                        <p>
+                            Si la legislación de protección al consumidor te reconoce derecho
+                            de retracto, podés ejercerlo dentro del plazo legal escribiendo a
+                            <a href="mailto:hola@mundomanitas.pe">hola@mundomanitas.pe</a> con
+                            los datos de tu compra. Los cursos gratuitos no generan cobro
+                            alguno.
+                        </p>
+                    </section>
+
+                    <section id="conducta">
+                        <h2>Conducta en la comunidad</h2>
+                        <p>
+                            La LSP es una lengua con gramática, cultura y comunidad propias.
+                            En los espacios de Mundo Manitas no se toleran burlas, imitaciones
+                            despectivas, acoso, discriminación ni ataques hacia personas sordas
+                            o hacia cualquier otro grupo.
+                        </p>
+                        <p>Tampoco está permitido:</p>
+                        <ul>
+                            <li>Suplantar a otra persona o falsear tu identidad.</li>
+                            <li>Publicar spam, virus, enlaces engañosos o contenido ilegal.</li>
+                            <li>Extraer datos o contenido de la plataforma de forma automatizada.</li>
+                            <li>Interferir con el funcionamiento del sitio o intentar acceder a cuentas ajenas.</li>
+                        </ul>
+                        <p>
+                            Podemos moderar, ocultar o eliminar contenido que incumpla estas
+                            reglas, y suspender o cerrar cuentas reincidentes. Si ves una
+                            conducta inapropiada, reportala a
+                            <a href="mailto:hola@mundomanitas.pe">hola@mundomanitas.pe</a>.
+                        </p>
+                    </section>
+
+                    <section id="propiedad">
+                        <h2>Propiedad intelectual</h2>
+                        <p>
+                            Las clases, los videos, los subtítulos, los textos, el diseño, los
+                            nombres y los signos distintivos de Mundo Manitas son de nuestra
+                            propiedad o se usan con autorización. La licencia de uso de la
+                            sección 5 no transfiere ningún derecho de propiedad intelectual.
+                        </p>
+                        <p>
+                            Si enviás comentarios, sugerencias o materiales, nos autorizás a
+                            usarlos para operar y mejorar la plataforma, sin obligación de
+                            compensación y sin perder tus derechos sobre ellos.
+                        </p>
+                    </section>
+
+                    <section id="terceros">
+                        <h2>Servicios de terceros</h2>
+                        <p>
+                            La plataforma puede incluir enlaces o integraciones con servicios
+                            de terceros, como pasarelas de pago o herramientas de video. No
+                            controlamos esos servicios y no respondemos por sus contenidos,
+                            políticas o fallas. Te recomendamos leer sus condiciones antes de
+                            usarlos.
+                        </p>
+                    </section>
+
+                    <section id="disponibilidad">
+                        <h2>Disponibilidad y cambios</h2>
+                        <p>
+                            Trabajamos para que la plataforma esté disponible de forma
+                            continua, pero pueden existir mantenimientos programados, fallas
+                            técnicas o interrupciones por causas ajenas a nosotros. No
+                            garantizamos un servicio ininterrumpido ni libre de errores.
+                        </p>
+                        <p>
+                            Podemos actualizar, reemplazar o retirar cursos y funciones para
+                            mejorar el servicio. Si discontinuamos un beneficio pagado antes
+                            de que termine tu período, te ofreceremos una alternativa
+                            equivalente o el reembolso proporcional correspondiente.
+                        </p>
+                    </section>
+
+                    <section id="responsabilidad">
+                        <h2>Responsabilidad</h2>
+                        <p>
+                            El servicio se presta con la diligencia razonable de un proveedor
+                            profesional. En la medida permitida por la ley, no respondemos por
+                            daños indirectos, lucro cesante, pérdida de datos por causas
+                            ajenas a la plataforma ni por el uso indebido de tu cuenta.
+                        </p>
+                        <p>
+                            Nada en esta sección excluye ni limita la responsabilidad que no
+                            puede excluirse legalmente, en particular los derechos del
+                            consumidor reconocidos por la legislación peruana.
+                        </p>
+                    </section>
+
+                    <section id="datos">
+                        <h2>Datos personales</h2>
+                        <p>
+                            Tratamos tus datos personales conforme a nuestra
+                            <a th:href="@{/privacidad}">política de privacidad</a> y a la
+                            normativa peruana de protección de datos personales. Ahí
+                            explicamos qué datos recopilamos, para qué los usamos y cómo
+                            podés ejercer tus derechos.
+                        </p>
+                    </section>
+
+                    <section id="cambios">
+                        <h2>Cambios en los términos</h2>
+                        <p>
+                            Podemos actualizar estos términos para reflejar cambios en el
+                            servicio o en la ley. Si el cambio es relevante, lo publicaremos
+                            en esta página y te avisaremos por correo o dentro de la
+                            plataforma con al menos 15 días de anticipación.
+                        </p>
+                        <p>
+                            Si seguís usando el servicio después de la fecha de entrada en
+                            vigencia, aceptás la nueva versión. Si no estás de acuerdo, podés
+                            cancelar tu membresía antes de esa fecha.
+                        </p>
+                    </section>
+
+                    <section id="ley">
+                        <h2>Ley aplicable y controversias</h2>
+                        <p>
+                            Estos términos se rigen por las leyes de la República del Perú.
+                            Ante cualquier diferencia, primero intentaremos resolverla de
+                            buena fe por correo electrónico dentro de los 30 días siguientes
+                            a tu reclamo.
+                        </p>
+                        <p>
+                            Si no llegamos a un acuerdo, podés acudir a los mecanismos de
+                            protección al consumidor que correspondan, incluido el Indecopi, o
+                            a la autoridad judicial competente según tu domicilio. Esta
+                            cláusula no te obliga a renunciar a ningún derecho.
+                        </p>
+                    </section>
+
+                    <section id="contacto">
+                        <h2>Contacto</h2>
+                        <p>
+                            Si tenés dudas sobre estos términos, tu cuenta o una compra,
+                            escribinos a
+                            <a href="mailto:hola@mundomanitas.pe">hola@mundomanitas.pe</a>.
+                            También podés consultar nuestra
+                            <a th:href="@{/privacidad}">política de privacidad</a>.
+                        </p>
+                        <p class="legal-end">Última revisión: noviembre de 2026.</p>
+                    </section>
+
+                </div>
+            </div>
 
         </article>
     </main>

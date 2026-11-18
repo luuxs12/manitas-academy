@@ -80,26 +80,6 @@
 
 <footer th:fragment="footer" class="site-footer">
 
-    <div class="footer-cta">
-        <div class="footer-cta-inner">
-            <div class="footer-cta-copy">
-                <p class="section-kicker">Hablemos</p>
-                <h2>Si tenés una duda,<br>escribinos.</h2>
-            </div>
-
-            <div class="footer-cta-action">
-                <a class="footer-contact" href="mailto:hola@mundomanitas.pe">
-                    <span class="footer-contact-label">Escribinos</span>
-                    <span class="footer-contact-mail">hola@mundomanitas.pe</span>
-                    <span class="footer-contact-arrow" aria-hidden="true">→</span>
-                </a>
-                <p class="footer-contact-note">
-                    Respondemos de lunes a viernes, de 9 a 18 h (hora de Perú).
-                </p>
-            </div>
-        </div>
-    </div>
-
     <div class="footer-main">
 
         <div class="footer-brand">
@@ -110,24 +90,20 @@
                          alt="Mundo Manitas" width="113" height="38">
                 </picture>
             </a>
-            <p>
-                Cursos de tecnología con intérprete en Lengua de Señas Peruana
-                y subtítulos revisados. Aprender sin depender de escuchar.
-            </p>
-            <div class="footer-badges">
-                <p class="footer-badge">Hecho en Perú</p>
-                <p class="footer-badge">LSP en cada clase</p>
-            </div>
+            <p>Cursos de tecnología en Lengua de Señas Peruana, con subtítulos revisados.</p>
+            <a class="footer-mail" href="mailto:hola@mundomanitas.pe">
+                hola@mundomanitas.pe
+                <span class="footer-mail-arrow" aria-hidden="true">→</span>
+            </a>
         </div>
 
         <nav class="footer-col" aria-labelledby="pie-aprender">
             <h2 id="pie-aprender">Aprendé</h2>
             <ul>
-                <li><a th:href="@{/cursos}">Catálogo completo</a></li>
-                <li><a th:href="@{/cursos/python-desde-cero}">Python desde cero</a></li>
+                <li><a th:href="@{/cursos}">Catálogo</a></li>
+                <li><a th:href="@{/cursos/python-desde-cero}">Python</a></li>
                 <li><a th:href="@{/cursos/desarrollo-web-html-css}">Desarrollo web</a></li>
                 <li><a th:href="@{/cursos/bases-de-datos-sql}">Bases de datos</a></li>
-                <li><a th:href="@{/cursos/redes-y-soporte-tecnico}">Redes y soporte</a></li>
             </ul>
         </nav>
 
@@ -137,9 +113,6 @@
                 <li><a th:href="@{/} + '#como-funciona'">Cómo funciona</a></li>
                 <li><a th:href="@{/} + '#accesibilidad'">Accesibilidad</a></li>
                 <li><a th:href="@{/} + '#membresia'">Membresía</a></li>
-                <li th:if="${currentUser == null}">
-                    <a th:href="@{/registro}" data-auth-open="register">Empezar gratis</a>
-                </li>
             </ul>
         </nav>
 
@@ -147,23 +120,22 @@
             <h2 id="pie-mundo">Mundo Manitas</h2>
             <ul>
                 <li><a th:href="@{/nosotros}">Nosotros</a></li>
-                <li><a href="mailto:hola@mundomanitas.pe">Escríbenos</a></li>
+                <li><a th:href="@{/terminos}">Términos</a></li>
+                <li><a th:href="@{/privacidad}">Privacidad</a></li>
                 <li th:if="${currentUser == null}">
                     <a th:href="@{/login}" data-auth-open="login">Iniciar sesión</a>
                 </li>
-                <li><a th:href="@{/terminos}">Términos</a></li>
-                <li><a th:href="@{/privacidad}">Privacidad</a></li>
+                <li th:if="${currentUser != null}">
+                    <a href="mailto:hola@mundomanitas.pe">Escribinos</a>
+                </li>
             </ul>
         </nav>
 
     </div>
 
-    <p class="footer-wordmark" aria-hidden="true">Mundo Manitas</p>
-
     <div class="footer-bottom">
         <div class="footer-bottom-inner">
-            <p>© 2026 Mundo Manitas. Todos los derechos reservados.</p>
-            <p class="footer-place">Lima, Perú · Español</p>
+            <p>© 2026 Mundo Manitas</p>
             <nav class="footer-legal" aria-label="Enlaces legales">
                 <a th:href="@{/terminos}">Términos</a>
                 <a th:href="@{/privacidad}">Privacidad</a>

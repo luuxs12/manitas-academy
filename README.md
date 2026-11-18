@@ -283,10 +283,11 @@ También podés instalar **DBeaver** (gratis) y conectarte con los mismos datos.
 
 La base está en pie y funciona:
 
-- Portada rediseñada con video, carrusel CSS y pie completo.
-- Catálogo de seis cursos de tecnología con foto propia, búsqueda por texto y
-  ficha de curso.
-- Páginas de términos, privacidad y nosotros.
+- Portada rediseñada con video, carrusel CSS y pie compacto.
+- Catálogo de seis cursos de tecnología con foto propia, búsqueda por texto,
+  filtros por área y ficha de curso con "Qué incluye" y cursos relacionados.
+- Páginas de términos, privacidad y nosotros: lectura editorial, índice lateral
+  en los documentos legales y foto con crédito en Nosotros.
 - Registro e inicio de sesión reales contra `users`: BCrypt, sesión,
   remember-me, cierre de sesión y cabecera con la cuenta activa.
 - Esquema `V1` de cuentas y preferencias de accesibilidad aplicado por Flyway.

@@ -14,11 +14,14 @@
         <div class="detail">
 
             <div class="detail-body">
-                <p class="section-kicker" th:text="${course.category}">Programación</p>
                 <h1 th:text="${course.title}">Nombre del curso</h1>
                 <p class="lead" th:text="${course.summary}">Descripción del curso.</p>
 
                 <dl class="detail-facts">
+                    <div>
+                        <dt>Área</dt>
+                        <dd th:text="${course.category}">Programación</dd>
+                    </div>
                     <div>
                         <dt>Lecciones</dt>
                         <dd th:text="${course.lessons}">24</dd>

@@ -146,6 +146,11 @@ a:hover {
     color: var(--on-accent);
 }
 
+/* El cursor de texto también forma parte del sistema. */
+input,
+select,
+textarea { caret-color: var(--ink); }
+
 :focus-visible {
     outline: 3px solid var(--focus);
     outline-offset: 3px;
@@ -406,7 +411,7 @@ main { scroll-margin-top: 90px; }
 .nav-search:focus-within .nav-search-input,
 .nav-search--open .nav-search-input { opacity: 1; }
 
-.nav-search-input::placeholder { color: rgba(0, 0, 0, .48); }
+.nav-search-input::placeholder { color: rgba(0, 0, 0, .56); }
 
 .nav-search-btn {
     flex: 0 0 auto;
@@ -948,7 +953,9 @@ main { scroll-margin-top: 90px; }
 
 .course-title {
     margin: 0 0 .5rem;
+    font-family: var(--body);
     font-size: 1.18rem;
+    font-weight: 650;
     letter-spacing: -.02em;
     line-height: 1.2;
 }
@@ -1449,7 +1456,7 @@ main { scroll-margin-top: 90px; }
 }
 
 .search-big input::placeholder {
-    color: rgba(0, 0, 0, .48);
+    color: rgba(0, 0, 0, .56);
 }
 
 .catalog-count {
@@ -1544,7 +1551,7 @@ main { scroll-margin-top: 90px; }
 
 .legal-layout {
     display: grid;
-    grid-template-columns: 13.5rem minmax(0, 37rem);
+    grid-template-columns: 13.5rem minmax(0, 35rem);
     gap: 2rem 3.5rem;
     align-items: start;
 }
@@ -1701,7 +1708,7 @@ main { scroll-margin-top: 90px; }
 .legal-definitions dd {
     margin: .18rem 0 0;
     padding-left: .9rem;
-    border-left: 2px solid var(--accent-line);
+    border-left: 1px solid var(--accent-line);
 }
 
 .legal-end {
@@ -2243,7 +2250,7 @@ main { scroll-margin-top: 90px; }
     transition: border-color .18s ease, box-shadow .18s ease;
 }
 
-.field input::placeholder { color: rgba(0, 0, 0, .42); }
+.field input::placeholder { color: rgba(0, 0, 0, .56); }
 
 .field input:hover { border-color: rgba(0, 0, 0, .34); }
 
@@ -2495,7 +2502,7 @@ main { scroll-margin-top: 90px; }
     margin: 0;
     padding: .85rem 1rem;
     border: 1px solid rgba(255, 255, 255, .2);
-    border-left: 2px solid var(--accent);
+    border-left: 1px solid var(--accent);
     border-radius: 0 12px 12px 0;
     background: rgba(0, 0, 0, .42);
 }
@@ -3042,6 +3049,24 @@ body.has-auth-dialog { overflow: hidden; }
 }
 
 .feature:hover .feature-icon { background: var(--accent); }
+
+/* En pantalla táctil el hover se queda pegado después del toque: se apagan
+   los desplazamientos y quedan solo los cambios de color. */
+
+@media (hover: none) {
+    .course:hover,
+    .btn:hover,
+    .step:hover { transform: none; }
+
+    .course:hover .course-media img { scale: 1; }
+
+    .btn:hover > span[aria-hidden="true"],
+    .course:hover .course-go > span[aria-hidden="true"],
+    .course:hover .course-arrow,
+    .section-link:hover span { transform: none; }
+
+    .footer-mail:hover .footer-mail-arrow { translate: none; }
+}
 
 /* ---- Animación por scroll ---- */
 

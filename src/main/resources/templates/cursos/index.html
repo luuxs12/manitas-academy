@@ -10,7 +10,6 @@
     <main id="contenido" class="page">
 
         <div class="catalog-head">
-            <p class="section-kicker">Catálogo</p>
             <h1>¿Qué querés aprender hoy?</h1>
             <p class="lead">
                 Elegí un curso y empezá cuando quieras. Todos tienen intérprete
@@ -60,7 +59,7 @@
                     <span class="course-meta">
                         <span th:text="${course.lessons}">32</span> lecciones
                     </span>
-                    <h3 class="course-title" th:text="${course.title}">Nombre del curso</h3>
+                    <h2 class="course-title" th:text="${course.title}">Nombre del curso</h2>
                     <p class="course-text" th:text="${course.summary}">Descripción del curso.</p>
                     <div class="course-foot">
                         <span class="course-price" th:text="${course.priceLabel()}">Gratis</span>

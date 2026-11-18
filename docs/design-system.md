@@ -213,6 +213,28 @@ No son adornos: están en la rúbrica y en el producto.
 - Todo operable con teclado: Tab, Enter, Espacio.
 - Respetar `prefers-reduced-motion`.
 
+### Reglas de detalle
+
+Salen de revisar el sitio con las skills de diseño (Impeccable y las de Emil
+Kowalski). Una pantalla nueva que las rompa está mal, aunque se vea bien:
+
+- **Sin rótulos sobre los titulares.** Nada de `section-kicker` encima de un `h1`:
+  el titular carga solo. Lo que decía el rótulo va dentro de la ficha, por ejemplo
+  "Área" en `.detail-facts`.
+- **Filos de color finos.** Un `border-left` o `border-right` de color no pasa de
+  1 px (definiciones legales, cita del modal). 2 px ya parece plantilla.
+- **Placeholders legibles.** Mínimo `rgba(0, 0, 0, .56)`, igual que el texto
+  secundario; el 0.42 anterior no llegaba a 4.5:1.
+- **El hover pide puntero fino.** Bajo `@media (hover: none)` se apagan los
+  desplazamientos de `.btn`, `.course` y las flechas: en táctil el hover se queda
+  pegado después del toque y la tarjeta no vuelve a su sitio.
+- **`:active` siempre.** Todo botón baja a `scale(.985)` al presionarlo.
+- **Una sola curva.** `--ease` en todo; nada de `ease-in` ni `transition: all`.
+- **El navegador también se pinta.** `::selection` en verde, `caret-color` en tinta
+  y scrollbar fina en los paneles oscuros.
+- **Medida de lectura.** 35 rem en legales (~72 caracteres) y 46 ch en la
+  descripción de un curso.
+
 ## 5. Zona de trabajo
 
 Durante el rediseño:

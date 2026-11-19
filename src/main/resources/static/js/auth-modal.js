@@ -144,7 +144,7 @@
         });
 
         if (loginSucceeded(response)) {
-            window.location.reload();
+            window.location.assign("/panel");
             return;
         }
 
@@ -167,7 +167,7 @@
         });
 
         if (loginSucceeded(response)) {
-            window.location.reload();
+            window.location.assign("/panel");
             return;
         }
 
@@ -204,6 +204,12 @@
         if (url.pathname === "/registro") {
             const doc = new DOMParser().parseFromString(text, "text/html");
             showFieldErrors(doc);
+            return;
+        }
+
+        // El servidor ya abrió la sesión: se entra al panel sin otro paso.
+        if (url.pathname === "/panel") {
+            window.location.assign(response.url);
             return;
         }
 

@@ -35,23 +35,38 @@ pública todavía.
   modal de cuenta.
 - **Catálogo** de seis cursos con búsqueda por texto y filtros por área.
 - **Cuentas** con registro, inicio y cierre de sesión, BCrypt y CSRF.
-- **Membresías**: tres planes (gratis, mensual y anual) con lo que incluye cada uno.
+- **Panel del estudiante** con sus cursos, progreso y datos de la cuenta; al
+  entrar, la sesión aterriza ahí.
+- **Membresías**: tres planes (gratis, mensual y anual) con lo que incluye y lo
+  que no incluye cada uno.
 - **Legal**: términos y privacidad con índice lateral.
 - **Accesibilidad**: teclado, foco visible, movimiento reducido y contraste AA.
 
 ## Membresías
 
 La portada presenta tres planes. Crear la cuenta es gratis y sin tarjeta; el
-cobro de la membresía se habilita dentro de la cuenta.
+cobro de la membresía se habilita dentro de la cuenta. Cada tarjeta separa lo
+que **incluye** de lo que **no incluye**.
 
-| Plan | Precio | Qué incluye |
+| Plan | Costo | Qué incluye |
 |---|---|---|
-| **Gratis** | S/ 0 para siempre | 2 cursos abiertos, intérprete en LSP y subtítulos revisados, progreso guardado |
+| **Gratis** | Sin costo | 2 cursos abiertos, intérprete en LSP y subtítulos revisados, progreso guardado |
 | **Mensual** | S/ 29 al mes | Los 6 cursos del catálogo, certificado por curso, cursos nuevos, cancelación libre |
 | **Anual** | S/ 290 al año | Todo lo del mensual, 12 meses continuos y precio fijo (equivale a S/ 24,17 al mes) |
 
 El plan anual es el destacado: se pagan diez meses y se usan doce. Los tres
 botones abren el modal de registro sobre la misma página.
+
+![Los tres planes con lo que incluye y lo que no incluye](docs/img/planes.jpg)
+
+## Panel del estudiante
+
+Al iniciar sesión se entra directo a `/panel`, sin volver a la portada. El panel
+reúne el próximo curso, los cursos disponibles, el progreso, los certificados y
+los datos de la cuenta. La barra lateral lleva a mis cursos, al catálogo, al
+perfil y a la información de accesibilidad.
+
+![Panel del estudiante con el curso siguiente y el progreso](docs/img/panel.jpg)
 
 ## Capturas
 
@@ -147,6 +162,7 @@ java -jar target\api-0.0.1-SNAPSHOT.jar
 | `/buscar?q=` | Resultados de búsqueda sobre el catálogo |
 | `/cursos/{slug}` | Ficha del curso, "Qué incluye" y cursos relacionados |
 | `/nosotros` | El proyecto, la misión y el equipo |
+| `/panel` | Panel del estudiante (requiere sesión) |
 | `/terminos` | Términos de uso |
 | `/privacidad` | Política de privacidad |
 | `/login` | Inicio de sesión (página completa) |
@@ -159,6 +175,9 @@ Las páginas del sitio cargan el modal de cuenta como fragmento. Los botones
 cuenta gratis" llevan `data-auth-open` y abren el modal sobre la página con el
 fondo difuminado, sin recargar. `/login` y `/registro` siguen funcionando como
 páginas completas: si el JavaScript no corre, los enlaces llevan ahí.
+
+Al iniciar sesión —o al terminar el registro, que deja la sesión abierta— se
+entra directo a `/panel`. Si la sesión no existe, `/panel` redirige a `/login`.
 
 ## Estructura
 
@@ -191,6 +210,7 @@ api/
     │           ├── fragments/           cabecera, pie y modal de cuenta
     │           ├── auth/                login y registro
     │           ├── cursos/              catálogo y detalle
+    │           ├── student/             panel del estudiante
     │           ├── legal/               términos y privacidad
     │           └── error/               páginas de error
     └── test/java/com/mundomanitas/api/  pruebas
@@ -205,6 +225,8 @@ y las entidades no llegan a las vistas: se convierten en `dto`.
 - Contraseñas con **BCrypt**; nunca se guarda el texto plano.
 - Correo único sin distinguir mayúsculas (`unique index lower(email)`).
 - Sesión administrada por Spring Security y **remember-me** de 14 días.
+- Al crear la cuenta la sesión queda abierta y se entra al panel; al iniciar
+  sesión también se va directo a `/panel`.
 - **CSRF** activo en todos los formularios, incluido el modal.
 - Validación en el servidor con Bean Validation y errores por campo.
 - El modal envía con `fetch`; si el navegador no ejecuta JavaScript, el mismo

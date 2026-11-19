@@ -35,14 +35,31 @@ pública todavía.
   modal de cuenta.
 - **Catálogo** de seis cursos con búsqueda por texto y filtros por área.
 - **Cuentas** con registro, inicio y cierre de sesión, BCrypt y CSRF.
+- **Membresías**: tres planes (gratis, mensual y anual) con lo que incluye cada uno.
 - **Legal**: términos y privacidad con índice lateral.
 - **Accesibilidad**: teclado, foco visible, movimiento reducido y contraste AA.
+
+## Membresías
+
+La portada presenta tres planes. Crear la cuenta es gratis y sin tarjeta; el
+cobro de la membresía se habilita dentro de la cuenta.
+
+| Plan | Precio | Qué incluye |
+|---|---|---|
+| **Gratis** | S/ 0 para siempre | 2 cursos abiertos, intérprete en LSP y subtítulos revisados, progreso guardado |
+| **Mensual** | S/ 29 al mes | Los 6 cursos del catálogo, certificado por curso, cursos nuevos, cancelación libre |
+| **Anual** | S/ 290 al año | Todo lo del mensual, 12 meses continuos y precio fijo (equivale a S/ 24,17 al mes) |
+
+El plan anual es el destacado: se pagan diez meses y se usan doce. Los tres
+botones abren el modal de registro sobre la misma página.
 
 ## Capturas
 
 ![Portada de Mundo Manitas en escritorio](docs/img/portada.jpg)
 
 ![Catálogo de cursos con filtros por área](docs/img/catalogo.jpg)
+
+![Planes de membresía: gratis, mensual y anual](docs/img/membresia.jpg)
 
 <p align="center">
   <img src="docs/img/portada-movil.jpg" alt="Portada en un teléfono" width="290">
@@ -195,9 +212,10 @@ y las entidades no llegan a las vistas: se convierten en `dto`.
 
 ## Diseño y accesibilidad
 
-La identidad es **verde `#00FF00`, blanco y negro**, con Tanker en los titulares
-y Open Sans en navegación, textos y pie. El contrato completo, los tokens y las
-reglas de detalle están en [`docs/design-system.md`](docs/design-system.md).
+La identidad es **verde `#00FF00`, blanco y negro**, con Tanker en los titulares,
+Open Sans en la navegación y el pie, y la tipografía del sistema en el cuerpo. El
+contrato completo, los tokens y las reglas de detalle están en
+[`docs/design-system.md`](docs/design-system.md).
 
 El piso de calidad que se revisa en cada pantalla nueva:
 
@@ -224,12 +242,13 @@ Resultado actual: **10 de 10 en verde**.
 ## Estado
 
 Funciona hoy: portada con video, catálogo de seis cursos con búsqueda y filtros,
-fichas de curso, páginas de nosotros, términos y privacidad, y cuentas reales con
-sesión, remember-me y cierre de sesión.
+fichas de curso, páginas de nosotros, términos y privacidad, cuentas reales con
+sesión, remember-me y cierre de sesión, y la sección de membresías con los tres
+planes.
 
 Falta: preferencias de accesibilidad editables, inscripción y lecciones,
-reproductor con video en LSP y subtítulos, progreso, membresía con pagos y panel
-de administración. El reparto de tareas está en
+reproductor con video en LSP y subtítulos, progreso, cobro real de la membresía y
+panel de administración. El reparto de tareas está en
 [`REGLAS-EQUIPO.txt`](REGLAS-EQUIPO.txt).
 
 ## Para contribuir

@@ -22,6 +22,21 @@
                     <a class="btn btn-solid" th:href="@{/cursos}">Ver los cursos</a>
                     <a class="about-hero-link" href="mailto:hola@mundomanitas.com">Escribinos</a>
                 </div>
+
+                <ul class="about-facts" aria-label="Cómo trabajamos">
+                    <li>
+                        <strong>100%</strong>
+                        <span>de las clases con intérprete</span>
+                    </li>
+                    <li>
+                        <strong>0</strong>
+                        <span>subtítulos automáticos</span>
+                    </li>
+                    <li>
+                        <strong>3</strong>
+                        <span>revisiones antes de publicar</span>
+                    </li>
+                </ul>
             </div>
 
             <figure class="about-hero-media">
@@ -97,6 +112,18 @@
 
         </section>
 
+        <section class="about-funding" aria-labelledby="titulo-financiacion">
+            <div>
+                <h2 id="titulo-financiacion">Los cursos gratis se financian con la membresía</h2>
+                <p>
+                    No hay publicidad ni venta de datos. Quien paga la membresía
+                    sostiene el catálogo abierto y las revisiones de accesibilidad
+                    de cada curso.
+                </p>
+            </div>
+            <a class="btn btn-light" th:href="@{/} + '#membresia'">Ver los planes</a>
+        </section>
+
         <section class="about-process" aria-labelledby="titulo-proceso">
 
             <div class="about-section-head about-section-head--row">
@@ -145,7 +172,10 @@
         <section class="about-cta" aria-labelledby="titulo-empezar">
             <h2 id="titulo-empezar">Empezá por el primer curso</h2>
             <p class="lead">Es gratis y no necesitás tarjeta.</p>
-            <a class="btn btn-solid btn-lg" th:href="@{/cursos}">Ver cursos</a>
+            <div class="about-cta-actions">
+                <a class="btn btn-solid btn-lg" th:href="@{/cursos}">Ver cursos</a>
+                <a class="btn btn-ghost btn-lg" th:href="@{/} + '#membresia'">Ver los planes</a>
+            </div>
         </section>
 
     </main>

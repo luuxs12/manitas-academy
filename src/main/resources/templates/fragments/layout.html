@@ -15,6 +15,17 @@
     <script defer th:src="@{/js/auth-modal.js}"></script>
 </head>
 
+<head th:fragment="panelHead(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light">
+    <meta name="theme-color" content="#000000">
+    <meta name="robots" content="noindex">
+    <title th:text="${title} + ' · Mundo Manitas'">Mi panel · Mundo Manitas</title>
+    <link rel="icon" type="image/png" th:href="@{/img/brand/favicon.png}">
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+
 <body>
 
 <header th:fragment="header" class="site-header">
@@ -63,13 +74,13 @@
         </div>
 
         <div class="nav-actions nav-actions--account" th:if="${currentUser != null}">
-            <span class="nav-user">
+            <a class="nav-user" th:href="@{/panel}" aria-label="Ir a mi panel">
                 <span class="nav-avatar" aria-hidden="true"
                       th:text="${currentUser.initials()}">AQ</span>
                 <span class="nav-user-name">
                     Hola, <span th:text="${currentUser.firstName()}">Ana</span>
                 </span>
-            </span>
+            </a>
             <form class="nav-logout" th:action="@{/logout}" method="post">
                 <button class="btn btn-nav" type="submit">Salir</button>
             </form>

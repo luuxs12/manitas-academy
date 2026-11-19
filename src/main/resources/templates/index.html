@@ -332,16 +332,27 @@
                         <h3 class="plan-name" id="plan-gratis">Gratis</h3>
                     </div>
                     <p class="plan-price">
-                        <span class="plan-amount">S/ 0</span>
-                        <span class="plan-period">para siempre</span>
+                        <span class="plan-amount plan-amount--word">Gratis</span>
                     </p>
                     <p class="plan-desc">Para probar el formato con los cursos abiertos del catálogo.</p>
-                    <ul class="plan-list">
-                        <li>2 cursos gratuitos</li>
-                        <li>Intérprete en LSP y subtítulos revisados</li>
-                        <li>Progreso guardado en tu cuenta</li>
-                        <li>Sin tarjeta</li>
-                    </ul>
+
+                    <div class="plan-features">
+                        <p class="plan-list-label">Incluye</p>
+                        <ul class="plan-list">
+                            <li>2 cursos gratuitos</li>
+                            <li>Intérprete en LSP y subtítulos revisados</li>
+                            <li>Progreso guardado en tu cuenta</li>
+                            <li>Sin tarjeta</li>
+                        </ul>
+
+                        <p class="plan-list-label">No incluye</p>
+                        <ul class="plan-list plan-list--out">
+                            <li>Certificados</li>
+                            <li>Los otros 4 cursos</li>
+                            <li>Descuento del plan anual</li>
+                        </ul>
+                    </div>
+
                     <a class="btn btn-ghost btn-lg plan-cta" th:href="@{/registro}" data-auth-open="register">Empezar gratis</a>
                 </article>
 
@@ -354,12 +365,23 @@
                         <span class="plan-period">al mes</span>
                     </p>
                     <p class="plan-desc">Todo el catálogo, mes a mes y sin permanencia.</p>
-                    <ul class="plan-list">
-                        <li>Los 6 cursos del catálogo</li>
-                        <li>Certificado al terminar cada curso</li>
-                        <li>Cursos nuevos incluidos</li>
-                        <li>Cancelás cuando quieras</li>
-                    </ul>
+
+                    <div class="plan-features">
+                        <p class="plan-list-label">Incluye</p>
+                        <ul class="plan-list">
+                            <li>Los 6 cursos del catálogo</li>
+                            <li>Certificado al terminar cada curso</li>
+                            <li>Cursos nuevos incluidos</li>
+                            <li>Cancelás cuando quieras</li>
+                        </ul>
+
+                        <p class="plan-list-label">No incluye</p>
+                        <ul class="plan-list plan-list--out">
+                            <li>Descuento del plan anual</li>
+                            <li>Precio fijo por 12 meses</li>
+                        </ul>
+                    </div>
+
                     <a class="btn btn-ghost btn-lg plan-cta" th:href="@{/registro}" data-auth-open="register">Elegir mensual</a>
                 </article>
 
@@ -373,12 +395,23 @@
                         <span class="plan-period">al año</span>
                     </p>
                     <p class="plan-desc">S/ 24,17 al mes: pagás diez meses y usás doce.</p>
-                    <ul class="plan-list">
-                        <li>Todo lo del plan mensual</li>
-                        <li>12 meses de acceso continuo</li>
-                        <li>Precio fijo durante el año</li>
-                        <li>Certificados incluidos</li>
-                    </ul>
+
+                    <div class="plan-features">
+                        <p class="plan-list-label">Incluye</p>
+                        <ul class="plan-list">
+                            <li>Todo lo del plan mensual</li>
+                            <li>12 meses de acceso continuo</li>
+                            <li>Precio fijo durante el año</li>
+                            <li>Certificados incluidos</li>
+                        </ul>
+
+                        <p class="plan-list-label">No incluye</p>
+                        <ul class="plan-list plan-list--out">
+                            <li>Pago mes a mes</li>
+                            <li>Cancelación mes a mes</li>
+                        </ul>
+                    </div>
+
                     <a class="btn btn-solid btn-lg plan-cta" th:href="@{/registro}" data-auth-open="register">Elegir anual</a>
                 </article>
 

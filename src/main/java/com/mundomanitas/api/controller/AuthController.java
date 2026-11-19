@@ -3,10 +3,18 @@ package com.mundomanitas.api.controller;
 import com.mundomanitas.api.dto.RegisterForm;
 import com.mundomanitas.api.exception.DuplicateEmailException;
 import com.mundomanitas.api.service.AuthService;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.context.HttpSessionSecurityContextRepository;
+import org.springframework.security.web.context.SecurityContextRepository;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -14,7 +22,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
  * Pantallas y acciones de acceso.
@@ -25,10 +32,15 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 @Controller
 public class AuthController {
 
-    private final AuthService authService;
+    private static final SecurityContextRepository CONTEXT_REPOSITORY =
+            new HttpSessionSecurityContextRepository();
 
-    public AuthController(AuthService authService) {
+    private final AuthService authService;
+    private final AuthenticationManager authenticationManager;
+
+    public AuthController(AuthService authService, AuthenticationManager authenticationManager) {
         this.authService = authService;
+        this.authenticationManager = authenticationManager;
     }
 
     @GetMapping("/login")
@@ -39,7 +51,7 @@ public class AuthController {
             Model model
     ) {
         if (isSignedIn(authentication)) {
-            return "redirect:/";
+            return "redirect:/panel";
         }
 
         model.addAttribute("loginError", error != null);
@@ -50,7 +62,7 @@ public class AuthController {
     @GetMapping("/registro")
     public String register(Authentication authentication, Model model) {
         if (isSignedIn(authentication)) {
-            return "redirect:/";
+            return "redirect:/panel";
         }
 
         if (!model.containsAttribute("form")) {
@@ -63,7 +75,8 @@ public class AuthController {
     public String register(
             @Valid @ModelAttribute("form") RegisterForm form,
             BindingResult result,
-            RedirectAttributes redirectAttributes
+            HttpServletRequest request,
+            HttpServletResponse response
     ) {
         if (!form.getPassword().equals(form.getConfirmPassword())) {
             result.rejectValue(
@@ -88,9 +101,20 @@ public class AuthController {
             return "auth/register";
         }
 
-        redirectAttributes.addFlashAttribute("registered", true);
-        redirectAttributes.addFlashAttribute("registeredEmail", form.getEmail().trim());
-        return "redirect:/login";
+        // La cuenta queda creada y la persona entra directo a su panel:
+        // no tiene que volver a escribir la contraseña que acaba de elegir.
+        Authentication authentication = authenticationManager.authenticate(
+                UsernamePasswordAuthenticationToken.unauthenticated(
+                        form.getEmail().trim(),
+                        form.getPassword()
+                )
+        );
+        SecurityContext context = SecurityContextHolder.createEmptyContext();
+        context.setAuthentication(authentication);
+        SecurityContextHolder.setContext(context);
+        CONTEXT_REPOSITORY.saveContext(context, request, response);
+
+        return "redirect:/panel?bienvenida";
     }
 
     private boolean isSignedIn(Authentication authentication) {

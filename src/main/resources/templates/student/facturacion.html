@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/panel-head :: panelHead('Facturación')}"></head>
+
+<body class="panel-body">
+<a class="skip-link" href="#panel-main">Saltar al contenido</a>
+
+<div class="panel">
+    <aside th:replace="~{fragments/panel-nav :: sidebar('facturacion')}"></aside>
+
+    <div class="panel-shell">
+        <header th:replace="~{fragments/panel-nav :: topbar('')}"></header>
+
+        <main id="panel-main" class="panel-main">
+            <div class="panel-page-head">
+                <div>
+                    <p class="panel-eyebrow">Tu suscripción</p>
+                    <h1>Facturación</h1>
+                    <p>Elegí tu plan, revisá tus pagos y gestioná la cancelación.</p>
+                </div>
+                <span class="panel-plan panel-plan--static"
+                      th:text="${'Plan ' + currentUser.planLabel()}">Plan gratis</span>
+            </div>
+
+            <p class="panel-flash panel-flash--ok" th:if="${panelOk}" th:text="${panelOk}" role="status"></p>
+            <p class="panel-flash panel-flash--error" th:if="${panelError}" th:text="${panelError}" role="alert"></p>
+
+            <ul class="panel-kpis" aria-label="Resumen de facturación">
+                <li class="panel-kpi">
+                    <strong th:text="${currentUser.planLabel()}">Gratis</strong>
+                    <span>Plan actual</span>
+                </li>
+                <li class="panel-kpi">
+                    <strong th:text="${#lists.size(payments)}">0</strong>
+                    <span>Movimientos</span>
+                </li>
+                <li class="panel-kpi">
+                    <strong th:text="${payments.?[status == 'PAID'].size()}">0</strong>
+                    <span>Pagos confirmados</span>
+                </li>
+                <li class="panel-kpi">
+                    <strong th:text="${subscriptionEndLabel.isEmpty() ? '—' : subscriptionEndLabel}">—</strong>
+                    <span>Acceso hasta</span>
+                </li>
+            </ul>
+
+            <section class="panel-section" id="planes" aria-labelledby="titulo-planes">
+                <div class="panel-section-head">
+                    <h2 id="titulo-planes">Planes</h2>
+                    <span class="panel-rule" aria-hidden="true"></span>
+                </div>
+
+                <div class="panel-plan-grid">
+                    <article class="panel-plan-card" th:each="option : ${planes}">
+                        <h3 th:text="${option.label}">Mensual</h3>
+                        <span class="panel-plan-price" th:text="${option.priceLabel()}">S/ 29 al mes</span>
+                        <p>Catálogo completo y certificados. Podés cancelar cuando quieras.</p>
+                        <span class="panel-plan-tag" th:if="${currentUser.plan() == option}">Plan actual</span>
+
+                        <button class="btn btn-dark" type="button" th:if="${embeddedEnabled}"
+                                th:data-checkout-plan="${option.name()}">
+                            Pagar dentro del panel <span aria-hidden="true">→</span>
+                        </button>
+                    </article>
+                </div>
+
+                <p class="panel-note" th:if="${paymentEnabled and !embeddedEnabled}">
+                    Falta la clave pública de Stripe para mostrar el pago embebido. El plan
+                    no se activa sin el cobro confirmado.
+                </p>
+                <p class="panel-note" th:unless="${paymentEnabled}">
+                    Los pagos todavía no están habilitados en este entorno: falta configurar Stripe.
+                    El plan no se puede activar sin el cobro confirmado.
+                </p>
+            </section>
+
+            <section class="panel-section" aria-labelledby="titulo-historial">
+                <div class="panel-section-head">
+                    <h2 id="titulo-historial">Historial de pagos</h2>
+                    <span class="panel-rule" aria-hidden="true"></span>
+                </div>
+
+                <div class="panel-scroll" th:if="${!#lists.isEmpty(payments)}">
+                    <table class="panel-payments">
+                        <thead>
+                        <tr>
+                            <th scope="col">Fecha</th>
+                            <th scope="col">Plan</th>
+                            <th scope="col">Monto</th>
+                            <th scope="col">Estado</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="payment : ${payments}">
+                            <td th:text="${#temporals.format(payment.createdAt, 'dd/MM/yyyy HH:mm')}">
+                                01/01/2026 12:00
+                            </td>
+                            <td th:text="${payment.plan.label}">Mensual</td>
+                            <td th:text="${(payment.currency == 'PEN' ? 'S/ ' : payment.currency + ' ') +
+                                          #numbers.formatDecimal(payment.amountCents / 100.0, 1, 2)}">
+                                S/ 29.00
+                            </td>
+                            <td>
+                                <span class="panel-payment-status"
+                                      th:classappend="${payment.paid} ? ' panel-payment-status--paid' : ''"
+                                      th:text="${payment.status == 'PAID' ? 'Pagado' :
+                                                (payment.status == 'PENDING' ? 'Pendiente' :
+                                                 (payment.status == 'FAILED' ? 'Fallido' : 'Reembolsado'))}">
+                                    Pendiente
+                                </span>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="panel-empty" th:if="${#lists.isEmpty(payments)}">
+                    <span class="panel-empty-icon" aria-hidden="true">
+                        <svg class="ico" viewBox="0 0 24 24" focusable="false">
+                            <path d="M5 3h14v18l-3-2-4 2-4-2-3 2z"></path>
+                        </svg>
+                    </span>
+                    <div>
+                        <h3>Todavía no hay pagos</h3>
+                        <p>Cuando se confirme una suscripción, el movimiento aparece acá con su monto real.</p>
+                    </div>
+                </div>
+            </section>
+
+            <section class="panel-section" th:if="${canCancel}" aria-labelledby="titulo-cancelar">
+                <div class="panel-section-head">
+                    <h2 id="titulo-cancelar">Cancelar suscripción</h2>
+                    <span class="panel-rule" aria-hidden="true"></span>
+                </div>
+                <p class="panel-progress-copy" th:if="${!cancelAtPeriodEnd}">
+                    La cancelación rige al final del período pagado. Hasta entonces conservás
+                    el acceso completo y tus certificados.
+                </p>
+                <p class="panel-note" th:if="${cancelAtPeriodEnd}">
+                    Ya pediste la cancelación. Tu acceso sigue activo hasta el final del período pagado.
+                </p>
+                <form th:action="@{/panel/facturacion/cancelar}" method="post"
+                      th:if="${!cancelAtPeriodEnd and paymentEnabled}">
+                    <button class="btn btn-ghost" type="submit">Cancelar al final del período</button>
+                </form>
+                <a class="panel-inline-btn" th:if="${!portalUrl.isEmpty()}"
+                   th:href="${portalUrl}">Gestionar pago en Stripe <span aria-hidden="true">→</span></a>
+            </section>
+
+            <p class="panel-note">
+                Los montos y estados se leen de Stripe. Nunca guardamos datos de tu tarjeta.
+            </p>
+        </main>
+    </div>
+</div>
+
+<input type="hidden" id="billing-csrf" th:value="${_csrf != null} ? ${_csrf.token} : ''">
+
+<div class="billing-checkout" id="billing-checkout"
+     th:if="${embeddedEnabled}"
+     th:attr="data-endpoint=@{/panel/facturacion/checkout/embebido},
+              data-publishable-key=${publishableKey}"
+     hidden role="dialog" aria-modal="true" aria-labelledby="billing-checkout-title">
+    <div class="billing-checkout-card">
+        <div class="billing-checkout-head">
+            <h2 id="billing-checkout-title">Finalizá tu suscripción</h2>
+            <button class="billing-checkout-close" type="button" data-billing-close
+                    aria-label="Cerrar pago">×</button>
+        </div>
+        <p class="billing-checkout-note">Completá el pago acá mismo, sin salir de Mundo Manitas.</p>
+        <p class="panel-flash panel-flash--error" id="billing-checkout-message" role="alert"></p>
+        <div id="billing-checkout-mount" class="billing-checkout-mount"></div>
+    </div>
+</div>
+
+<script th:if="${embeddedEnabled}" src="https://js.stripe.com/v3/"></script>
+<script defer th:src="@{/js/panel.js}"></script>
+<script defer th:src="@{/js/billing.js}"></script>
+</body>
+</html>

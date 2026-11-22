@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/panel-head :: panelHead('Notificaciones')}"></head>
+
+<body class="panel-body">
+<a class="skip-link" href="#panel-main">Saltar al contenido</a>
+
+<div class="panel">
+    <aside th:replace="~{fragments/panel-nav :: sidebar('notificaciones')}"></aside>
+
+    <div class="panel-shell">
+        <header th:replace="~{fragments/panel-nav :: topbar('')}"></header>
+
+        <main id="panel-main" class="panel-main">
+            <div class="panel-page-head">
+                <div>
+                    <p class="panel-eyebrow">Tu actividad</p>
+                    <h1>Notificaciones</h1>
+                    <p>Avisos reales de inscripciones, cursos terminados y pagos de tu cuenta.</p>
+                </div>
+                <form th:action="@{/panel/notificaciones/leer-todas}" method="post"
+                      th:if="${unread > 0}">
+                    <button class="btn btn-ghost" type="submit">Marcar todo como leído</button>
+                </form>
+            </div>
+
+            <p class="panel-flash panel-flash--ok" th:if="${panelOk}" th:text="${panelOk}" role="status"></p>
+            <p class="panel-flash panel-flash--error" th:if="${panelError}" th:text="${panelError}" role="alert"></p>
+
+            <ul class="panel-kpis" aria-label="Resumen de avisos">
+                <li class="panel-kpi">
+                    <strong th:text="${#lists.size(notifications)}">0</strong>
+                    <span>Avisos recientes</span>
+                </li>
+                <li class="panel-kpi">
+                    <strong th:text="${unread}">0</strong>
+                    <span>Sin leer</span>
+                </li>
+            </ul>
+
+            <section class="panel-section" aria-labelledby="titulo-avisos">
+                <div class="panel-section-head">
+                    <h2 id="titulo-avisos">Últimos avisos</h2>
+                    <span class="panel-rule" aria-hidden="true"></span>
+                </div>
+
+                <ul class="panel-notification-list" th:if="${!#lists.isEmpty(notifications)}">
+                    <li class="panel-notification-item" th:each="notice : ${notifications}"
+                        th:classappend="${notice.read} ? '' : 'is-unread'">
+                        <div>
+                            <h3>
+                                <span class="panel-notify-dot" th:if="${!notice.read}" aria-hidden="true"></span>
+                                <span th:text="${notice.title}">Aviso</span>
+                            </h3>
+                            <p th:text="${notice.message}">Mensaje del aviso.</p>
+                            <time th:datetime="${notice.createdAt}"
+                                  th:text="${#temporals.format(notice.createdAt, 'dd/MM/yyyy HH:mm')}">
+                                01/01/2026 12:00
+                            </time>
+                        </div>
+                        <div class="panel-course-actions">
+                            <a class="panel-inline-btn" th:if="${notice.targetUrl != null}"
+                               th:href="${notice.targetUrl}">Abrir <span aria-hidden="true">→</span></a>
+                            <form th:action="@{/panel/notificaciones/{id}/leer(id=${notice.id})}"
+                                  method="post" th:if="${!notice.read}">
+                                <button class="panel-inline-btn" type="submit">Marcar como leído</button>
+                            </form>
+                        </div>
+                    </li>
+                </ul>
+
+                <div class="panel-empty" th:if="${#lists.isEmpty(notifications)}">
+                    <span class="panel-empty-icon" aria-hidden="true">
+                        <svg class="ico" viewBox="0 0 24 24" focusable="false">
+                            <path d="M18 9a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6"></path>
+                            <path d="M10.3 20a2 2 0 0 0 3.4 0"></path>
+                        </svg>
+                    </span>
+                    <div>
+                        <h3>Todavía no tenés avisos</h3>
+                        <p>Van a aparecer cuando te inscribas, termines un curso o se confirme un pago.</p>
+                    </div>
+                    <a class="btn btn-ghost" th:href="@{/panel/explorar}">Explorar cursos</a>
+                </div>
+            </section>
+        </main>
+    </div>
+</div>
+
+<script defer th:src="@{/js/panel.js}"></script>
+</body>
+</html>

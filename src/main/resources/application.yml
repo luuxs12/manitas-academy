@@ -36,6 +36,30 @@ app:
     base-url: ${APP_BASE_URL:http://localhost:8080}
     endpoint: ${RESEND_ENDPOINT:https://api.resend.com}
     reset-minutes: ${RESET_MINUTES:60}
+  stripe:
+    # Sin clave o sin price ids, el cobro aparece como no disponible.
+    secret-key: ${STRIPE_SECRET_KEY:}
+    publishable-key: ${STRIPE_PUBLISHABLE_KEY:}
+    webhook-secret: ${STRIPE_WEBHOOK_SECRET:}
+    monthly-price-id: ${STRIPE_MONTHLY_PRICE_ID:}
+    annual-price-id: ${STRIPE_ANNUAL_PRICE_ID:}
+    endpoint: ${STRIPE_ENDPOINT:https://api.stripe.com}
+    api-version: ${STRIPE_API_VERSION:2026-11-18.endive}
+    customer-portal-url: ${STRIPE_CUSTOMER_PORTAL_URL:}
+  upload:
+    avatars-dir: ${AVATARS_DIR:./uploads/avatars}
+    max-avatar-bytes: ${MAX_AVATAR_BYTES:2097152}
+  r2:
+    # Sin endpoint/bucket/claves el almacenamiento remoto queda apagado.
+    # La URL pública puede ser el dominio r2.dev o un dominio propio.
+    endpoint: ${R2_ENDPOINT:}
+    bucket: ${R2_BUCKET:}
+    access-key: ${R2_ACCESS_KEY:}
+    secret-key: ${R2_SECRET_KEY:}
+    public-base-url: ${R2_PUBLIC_BASE_URL:}
+    region: ${R2_REGION:auto}
+    max-image-bytes: ${R2_MAX_IMAGE_BYTES:5242880}
+    max-video-bytes: ${R2_MAX_VIDEO_BYTES:524288000}
 
 management:
   endpoints:

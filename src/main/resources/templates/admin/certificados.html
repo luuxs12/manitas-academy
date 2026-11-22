@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{admin/fragments/admin-head :: adminHead('Certificados')}"></head>
+
+<body class="panel-body admin-body">
+<a class="skip-link" href="#panel-main">Saltar al contenido</a>
+<div class="panel admin">
+    <aside th:replace="~{admin/fragments/admin-nav :: sidebar('certificados')}"></aside>
+    <div class="panel-shell">
+        <header th:replace="~{admin/fragments/admin-nav :: topbar('Certificados', 'Emisión y revocación con reglas Premium', ${query})}"></header>
+        <main id="panel-main" class="panel-main admin-main">
+            <p class="panel-flash panel-flash--ok" th:if="${panelOk}" th:text="${panelOk}" role="status"></p>
+            <p class="panel-flash panel-flash--error" th:if="${panelError}" th:text="${panelError}" role="alert"></p>
+
+            <div class="admin-page-head">
+                <div><h1>Gestión de certificados</h1><p th:text="${page.totalElements + ' certificados'}">0 certificados</p></div>
+                <details class="admin-export"><summary>Exportar</summary><div class="panel-menu-pop">
+                    <a th:href="@{/admin/exportar/certificados(formato='csv')}">CSV</a>
+                    <a th:href="@{/admin/exportar/certificados(formato='xlsx')}">Excel (XLSX)</a>
+                    <a th:href="@{/admin/exportar/certificados(formato='pdf')}">PDF</a>
+                </div></details>
+            </div>
+
+            <section class="panel-card admin-card admin-issue" aria-labelledby="admin-issue-title">
+                <h2 id="admin-issue-title">Emitir certificado</h2>
+                <p class="admin-muted">Solo cuentas Premium con el curso finalizado. La revocación conserva el historial.</p>
+                <form th:action="@{/admin/certificados/emitir}" th:object="${adminCertificateForm}" method="post">
+                    <div class="admin-form-grid">
+                        <label>Persona
+                            <select th:field="*{userId}" required>
+                                <option value="">Elegí una persona</option>
+                                <option th:each="o : ${userOptions}" th:value="${o.id()}" th:text="${o.label()}"></option>
+                            </select>
+                        </label>
+                        <label>Curso
+                            <select th:field="*{courseId}" required>
+                                <option value="">Elegí un curso</option>
+                                <option th:each="o : ${courseOptions}" th:value="${o.id()}" th:text="${o.label()}"></option>
+                            </select>
+                        </label>
+                    </div>
+                    <button class="btn btn-admin" type="submit">Emitir certificado</button>
+                </form>
+                <p class="admin-hint" th:if="${!#lists.isEmpty(eligible)}">
+                    Listos para emitir:
+                    <span th:each="e, iter : ${eligible}">
+                        <strong th:text="${e.userName()}">Nombre</strong> · <span th:text="${e.courseTitle()}">Curso</span><span th:if="${!iter.last}">; </span>
+                    </span>
+                </p>
+                <p class="admin-hint" th:if="${#lists.isEmpty(eligible)}">No hay matrículas finalizadas de cuentas Premium pendientes de emisión.</p>
+            </section>
+
+            <form class="admin-filters admin-filters--full" method="get" th:action="@{/admin/certificados}">
+                <label class="sr-only" for="filtro-cert">Buscar certificados</label>
+                <input id="filtro-cert" name="q" type="search" th:value="${query}" placeholder="Código, persona o curso…">
+                <label class="admin-check admin-check--inline"><input type="checkbox" name="incluirRevocados" value="true"
+                      th:checked="${includeRevoked}"> Incluir revocados</label>
+                <button class="btn btn-admin" type="submit">Filtrar</button>
+            </form>
+
+            <div class="panel-card admin-card admin-table-wrap">
+                <table class="admin-table">
+                    <thead><tr><th>Código</th><th>Persona</th><th>Curso</th><th>Emisión</th><th>Estado</th><th>Acciones</th></tr></thead>
+                    <tbody>
+                    <tr th:each="item : ${page.content}">
+                        <td><strong th:text="${item.code()}">MM-XXX-00000000</strong></td>
+                        <td th:text="${item.userName()}">Nombre</td>
+                        <td th:text="${item.courseTitle()}">Curso</td>
+                        <td th:text="${item.issued()}">01/01/2026</td>
+                        <td><span class="admin-status" th:classappend="${item.active()} ? ' is-ok' : ' is-bad'"
+                                  th:text="${item.active()} ? 'Vigente' : 'Revocado'">Vigente</span></td>
+                        <td class="admin-row-actions">
+                            <form th:if="${item.active()}" th:action="@{/admin/certificados/{id}/revocar(id=${item.id()})}" method="post"
+                                  onsubmit="return confirm('¿Revocar este certificado?');">
+                                <button type="submit">Revocar</button>
+                            </form>
+                            <span th:unless="${item.active()}" class="admin-muted">Sin acciones</span>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(page.content)}"><td colspan="6" class="admin-empty">Todavía no se emitieron certificados.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <nav class="admin-pager" th:if="${page.totalPages > 1}" aria-label="Paginación de certificados">
+                <a th:if="${!page.first}" th:href="@{/admin/certificados(page=${page.number - 1}, q=${query}, incluirRevocados=${includeRevoked})}">← Anterior</a>
+                <span th:text="${'Página ' + (page.number + 1) + ' de ' + page.totalPages}">Página 1</span>
+                <a th:if="${!page.last}" th:href="@{/admin/certificados(page=${page.number + 1}, q=${query}, incluirRevocados=${includeRevoked})}">Siguiente →</a>
+            </nav>
+        </main>
+    </div>
+</div>
+<script defer th:src="@{/js/panel.js}"></script>
+<script defer th:src="@{/js/admin.js}"></script>
+</body>
+</html>

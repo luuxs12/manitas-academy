@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{admin/fragments/admin-head :: adminHead(${itemId != null} ? 'Editar módulo' : 'Nuevo módulo')}"></head>
+
+<body class="panel-body admin-body">
+<a class="skip-link" href="#panel-main">Saltar al contenido</a>
+<div class="panel admin">
+    <aside th:replace="~{admin/fragments/admin-nav :: sidebar('modulos')}"></aside>
+    <div class="panel-shell">
+        <header th:replace="~{admin/fragments/admin-nav :: topbar('Módulos', ${itemId != null} ? 'Editar módulo' : 'Nuevo módulo', '')}"></header>
+        <main id="panel-main" class="panel-main admin-main">
+            <p class="panel-flash panel-flash--error" th:if="${panelError}" th:text="${panelError}" role="alert"></p>
+            <div class="admin-page-head">
+                <div><h1 th:text="${itemId != null} ? 'Editar módulo' : 'Nuevo módulo'">Módulo</h1><p>Ordená el contenido dentro de cada curso.</p></div>
+                <a class="admin-back" th:href="@{/admin/modulos}">← Volver a módulos</a>
+            </div>
+            <form class="panel-card admin-card admin-form" th:action="${itemId != null} ? @{/admin/modulos/{id}(id=${itemId})} : @{/admin/modulos}"
+                  th:object="${adminModuleForm}" method="post" novalidate>
+                <div class="admin-form-grid">
+                    <label>Curso
+                        <select th:field="*{courseId}" required>
+                            <option value="">Elegí un curso</option>
+                            <option th:each="o : ${options}" th:value="${o.id()}" th:text="${o.label()}"></option>
+                        </select>
+                        <small class="admin-error" th:if="${#fields.hasErrors('courseId')}" th:errors="*{courseId}"></small>
+                    </label>
+                    <label>Título<input type="text" th:field="*{title}" maxlength="140" required>
+                        <small class="admin-error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></small></label>
+                    <label>Posición<input type="number" th:field="*{position}" min="0" max="999"></label>
+                </div>
+                <div class="admin-form-actions">
+                    <button class="btn btn-admin" type="submit" th:text="${itemId != null} ? 'Guardar cambios' : 'Crear módulo'">Guardar</button>
+                    <a class="admin-back" th:href="@{/admin/modulos}">Cancelar</a>
+                </div>
+            </form>
+        </main>
+    </div>
+</div>
+<script defer th:src="@{/js/panel.js}"></script>
+<script defer th:src="@{/js/admin.js}"></script>
+</body>
+</html>

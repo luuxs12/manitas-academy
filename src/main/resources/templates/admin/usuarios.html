@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{admin/fragments/admin-head :: adminHead('Usuarios')}"></head>
+
+<body class="panel-body admin-body">
+<a class="skip-link" href="#panel-main">Saltar al contenido</a>
+<div class="panel admin">
+    <aside th:replace="~{admin/fragments/admin-nav :: sidebar('usuarios')}"></aside>
+    <div class="panel-shell">
+        <header th:replace="~{admin/fragments/admin-nav :: topbar('Usuarios', 'Altas, roles y estado de las cuentas', ${query})}"></header>
+        <main id="panel-main" class="panel-main admin-main">
+            <p class="panel-flash panel-flash--ok" th:if="${panelOk}" th:text="${panelOk}" role="status"></p>
+            <p class="panel-flash panel-flash--error" th:if="${panelError}" th:text="${panelError}" role="alert"></p>
+
+            <div class="admin-page-head">
+                <div><h1>Gestión de usuarios</h1><p th:text="${page.totalElements + ' cuentas registradas'}">0 cuentas</p></div>
+                <div class="admin-actions">
+                    <p class="admin-muted">Las cuentas se crean desde el registro público; acá solo se administran.</p>
+                    <details class="admin-export">
+                        <summary>Exportar</summary>
+                        <div class="panel-menu-pop">
+                            <a th:href="@{/admin/exportar/usuarios(formato='csv')}">CSV</a>
+                            <a th:href="@{/admin/exportar/usuarios(formato='xlsx')}">Excel (XLSX)</a>
+                            <a th:href="@{/admin/exportar/usuarios(formato='pdf')}">PDF</a>
+                        </div>
+                    </details>
+                </div>
+            </div>
+
+            <form class="admin-filters admin-filters--full" method="get" th:action="@{/admin/usuarios}">
+                <label class="sr-only" for="filtro-usuarios">Buscar usuarios</label>
+                <input id="filtro-usuarios" name="q" type="search" th:value="${query}" placeholder="Nombre o correo…">
+                <label class="sr-only" for="filtro-rol">Filtrar por rol</label>
+                <select id="filtro-rol" name="rol">
+                    <option value="">Todos los roles</option>
+                    <option value="STUDENT" th:selected="${role == 'STUDENT'}">Estudiante</option>
+                    <option value="TEACHER" th:selected="${role == 'TEACHER'}">Docente</option>
+                    <option value="ADMIN" th:selected="${role == 'ADMIN'}">Administrador</option>
+                </select>
+                <button class="btn btn-admin" type="submit">Filtrar</button>
+            </form>
+
+            <div class="panel-card admin-card admin-table-wrap">
+                <table class="admin-table">
+                    <thead><tr><th>Nombre</th><th>Correo</th><th>Rol</th><th>Plan</th><th>Estado</th><th>Alta</th><th>Acciones</th></tr></thead>
+                    <tbody>
+                    <tr th:each="user : ${page.content}">
+                        <td><strong th:text="${user.fullName()}">Nombre</strong></td>
+                        <td th:text="${user.email()}">correo</td>
+                        <td th:text="${user.role() == 'ADMIN' ? 'Admin' : user.role() == 'TEACHER' ? 'Docente' : 'Estudiante'}">Rol</td>
+                        <td th:text="${user.plan()}">Plan</td>
+                        <td><span class="admin-status" th:classappend="${user.active()} ? ' is-ok' : ' is-bad'"
+                                  th:text="${user.active()} ? 'Activo' : 'Inactivo'">Activo</span></td>
+                        <td th:text="${user.created()}">01/01/2026</td>
+                        <td class="admin-row-actions">
+                            <a th:href="@{/admin/usuarios/{id}/editar(id=${user.id()})}">Editar</a>
+                            <span th:if="${user.current()}" class="admin-muted">Tu cuenta</span>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(page.content)}">
+                        <td colspan="7" class="admin-empty">No hay cuentas que coincidan con el filtro.</td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+            <nav class="admin-pager" th:if="${page.totalPages > 1}" aria-label="Paginación de usuarios">
+                <a th:if="${!page.first}" th:href="@{/admin/usuarios(page=${page.number - 1}, q=${query}, rol=${role})}">← Anterior</a>
+                <span th:text="${'Página ' + (page.number + 1) + ' de ' + page.totalPages}">Página 1</span>
+                <a th:if="${!page.last}" th:href="@{/admin/usuarios(page=${page.number + 1}, q=${query}, rol=${role})}">Siguiente →</a>
+            </nav>
+        </main>
+    </div>
+</div>
+<script defer th:src="@{/js/panel.js}"></script>
+<script defer th:src="@{/js/admin.js}"></script>
+</body>
+</html>

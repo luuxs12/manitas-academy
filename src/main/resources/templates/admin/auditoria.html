@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{admin/fragments/admin-head :: adminHead('Auditoría')}"></head>
+
+<body class="panel-body admin-body">
+<a class="skip-link" href="#panel-main">Saltar al contenido</a>
+<div class="panel admin">
+    <aside th:replace="~{admin/fragments/admin-nav :: sidebar('auditoria')}"></aside>
+    <div class="panel-shell">
+        <header th:replace="~{admin/fragments/admin-nav :: topbar('Auditoría', 'Registro de acciones administrativas', '')}"></header>
+        <main id="panel-main" class="panel-main admin-main">
+            <div class="admin-page-head">
+                <div><h1>Logs de auditoría</h1><p th:text="${page.totalElements + ' acciones registradas'}">0 acciones</p></div>
+                <details class="admin-export"><summary>Exportar</summary><div class="panel-menu-pop">
+                    <a th:href="@{/admin/exportar/auditoria(formato='csv')}">CSV</a>
+                    <a th:href="@{/admin/exportar/auditoria(formato='xlsx')}">Excel (XLSX)</a>
+                    <a th:href="@{/admin/exportar/auditoria(formato='pdf')}">PDF</a>
+                </div></details>
+            </div>
+            <div class="panel-card admin-card admin-table-wrap">
+                <table class="admin-table">
+                    <thead><tr><th>Fecha</th><th>Quién</th><th>Acción</th><th>Entidad / detalle</th></tr></thead>
+                    <tbody>
+                    <tr th:each="event : ${page.content}">
+                        <td th:text="${event.when()}">01/01/2026 10:00</td>
+                        <td th:text="${event.title()}">Administrador</td>
+                        <td><span class="admin-status" th:text="${event.kind()}">CREATE</span></td>
+                        <td th:text="${event.detail()}">USUARIO: correo</td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(page.content)}"><td colspan="4" class="admin-empty">Todavía no hay acciones registradas. Se registran altas, ediciones, bajas y emisiones.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <nav class="admin-pager" th:if="${page.totalPages > 1}" aria-label="Paginación de auditoría">
+                <a th:if="${!page.first}" th:href="@{/admin/auditoria(page=${page.number - 1})}">← Anterior</a>
+                <span th:text="${'Página ' + (page.number + 1) + ' de ' + page.totalPages}">Página 1</span>
+                <a th:if="${!page.last}" th:href="@{/admin/auditoria(page=${page.number + 1})}">Siguiente →</a>
+            </nav>
+        </main>
+    </div>
+</div>
+<script defer th:src="@{/js/panel.js}"></script>
+<script defer th:src="@{/js/admin.js}"></script>
+</body>
+</html>

@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{admin/fragments/admin-head :: adminHead('Editar usuario')}"></head>
+
+<body class="panel-body admin-body">
+<a class="skip-link" href="#panel-main">Saltar al contenido</a>
+<div class="panel admin">
+    <aside th:replace="~{admin/fragments/admin-nav :: sidebar('usuarios')}"></aside>
+    <div class="panel-shell">
+        <header th:replace="~{admin/fragments/admin-nav :: topbar('Usuarios', 'Editar cuenta', '')}"></header>
+        <main id="panel-main" class="panel-main admin-main">
+            <p class="panel-flash panel-flash--ok" th:if="${panelOk}" th:text="${panelOk}" role="status"></p>
+            <p class="panel-flash panel-flash--error" th:if="${panelError}" th:text="${panelError}" role="alert"></p>
+
+            <div class="admin-page-head">
+                <div>
+                    <h1>Editar usuario</h1>
+                    <p>Actualizá datos, rol o contraseña por soporte. Todo queda registrado en auditoría.</p>
+                </div>
+                <a class="admin-back" th:href="@{/admin/usuarios}">← Volver a usuarios</a>
+            </div>
+
+            <form class="panel-card admin-card admin-form" th:action="@{/admin/usuarios/{id}(id=${userId})}"
+                  th:object="${adminUserForm}" method="post" novalidate>
+                <div class="admin-form-grid">
+                    <label>Nombre completo
+                        <input type="text" th:field="*{fullName}" maxlength="120" autocomplete="name" required>
+                        <small class="admin-error" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></small>
+                    </label>
+                    <label>Correo electrónico
+                        <input type="email" th:field="*{email}" maxlength="160" autocomplete="email" required>
+                        <small class="admin-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></small>
+                    </label>
+                    <label>Rol
+                        <select th:field="*{role}">
+                            <option th:each="r : ${roles}" th:value="${r}" th:text="${r == 'ADMIN' ? 'Administrador' : r == 'TEACHER' ? 'Docente' : 'Estudiante'}">Rol</option>
+                        </select>
+                    </label>
+                    <label>Contraseña <span class="admin-muted">(dejar vacía para mantenerla; escribí una nueva para el reseteo por soporte)</span>
+                        <input type="password" th:field="*{password}" minlength="8" autocomplete="new-password">
+                        <small class="admin-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></small>
+                    </label>
+                </div>
+                <label class="admin-check"><input type="checkbox" th:field="*{active}"> Cuenta activa</label>
+                <div class="admin-form-actions">
+                    <button class="btn btn-admin" type="submit" th:text="${userId != null} ? 'Guardar cambios' : 'Crear cuenta'">Guardar</button>
+                    <a class="admin-back" th:href="@{/admin/usuarios}">Cancelar</a>
+                </div>
+            </form>
+        </main>
+    </div>
+</div>
+<script defer th:src="@{/js/panel.js}"></script>
+<script defer th:src="@{/js/admin.js}"></script>
+</body>
+</html>

@@ -232,8 +232,6 @@
         }, 0);
     };
 
-    const close = () => dialog.close();
-
     for (const trigger of document.querySelectorAll("[data-auth-open]")) {
         trigger.addEventListener("click", (event) => {
             event.preventDefault();
@@ -249,6 +247,16 @@
             open(name, trigger);
         });
     }
+
+    // Al cerrar sesión se vuelve a la portada con «/?login»: el formulario
+    // queda abierto sobre la página principal, sin pantalla de login aparte.
+    const params = new URLSearchParams(window.location.search);
+    if (params.has("login") || params.has("registro")) {
+        open(params.has("registro") ? "register" : "login");
+        window.history.replaceState({}, "", window.location.pathname);
+    }
+
+    const close = () => dialog.close();
 
     for (const tab of tabs) {
         tab.addEventListener("click", () => {

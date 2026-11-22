@@ -1,8 +1,12 @@
 package com.mundomanitas.api.controller;
 
 import com.mundomanitas.api.model.Course;
+import com.mundomanitas.api.security.AuthenticatedUser;
+import com.mundomanitas.api.service.AccountService;
 import com.mundomanitas.api.service.CourseCatalog;
+import com.mundomanitas.api.service.EnrollmentService;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,9 +21,17 @@ import org.springframework.web.server.ResponseStatusException;
 public class CourseController {
 
     private final CourseCatalog catalog;
+    private final AccountService accounts;
+    private final EnrollmentService enrollments;
 
-    public CourseController(CourseCatalog catalog) {
+    public CourseController(
+            CourseCatalog catalog,
+            AccountService accounts,
+            EnrollmentService enrollments
+    ) {
         this.catalog = catalog;
+        this.accounts = accounts;
+        this.enrollments = enrollments;
     }
 
     @GetMapping("/cursos")
@@ -42,12 +54,24 @@ public class CourseController {
     }
 
     @GetMapping("/cursos/{slug}")
-    public String detail(@PathVariable String slug, Model model) {
+    public String detail(
+            @PathVariable String slug,
+            @AuthenticationPrincipal AuthenticatedUser principal,
+            Model model
+    ) {
         Course course = catalog.findBySlug(slug)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Curso no encontrado"));
+
+        boolean signedIn = principal != null;
+        boolean premium = signedIn && accounts.require(principal.getId()).isPremium();
+        boolean enrolled = signedIn && enrollments.isEnrolled(principal.getId(), slug);
+
         model.addAttribute("course", course);
         model.addAttribute("related", catalog.others(course, 3));
+        model.addAttribute("signedIn", signedIn);
+        model.addAttribute("enrolled", enrolled);
+        model.addAttribute("canEnroll", signedIn && (course.isFree() || premium));
         return "cursos/detalle";
     }
 }

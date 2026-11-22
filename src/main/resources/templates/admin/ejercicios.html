@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{admin/fragments/admin-head :: adminHead('Ejercicios')}"></head>
+
+<body class="panel-body admin-body">
+<a class="skip-link" href="#panel-main">Saltar al contenido</a>
+<div class="panel admin">
+    <aside th:replace="~{admin/fragments/admin-nav :: sidebar('ejercicios')}"></aside>
+    <div class="panel-shell">
+        <header th:replace="~{admin/fragments/admin-nav :: topbar('Ejercicios', 'Actividades por módulo', ${query})}"></header>
+        <main id="panel-main" class="panel-main admin-main">
+            <p class="panel-flash panel-flash--ok" th:if="${panelOk}" th:text="${panelOk}" role="status"></p>
+            <p class="panel-flash panel-flash--error" th:if="${panelError}" th:text="${panelError}" role="alert"></p>
+
+            <div class="admin-page-head">
+                <div><h1>Gestión de ejercicios</h1><p th:text="${page.totalElements + ' ejercicios'}">0 ejercicios</p></div>
+                <div class="admin-actions">
+                    <a class="btn btn-admin" th:href="@{/admin/ejercicios/nuevo}">Nuevo ejercicio</a>
+                    <details class="admin-export"><summary>Exportar</summary><div class="panel-menu-pop">
+                        <a th:href="@{/admin/exportar/ejercicios(formato='csv')}">CSV</a>
+                        <a th:href="@{/admin/exportar/ejercicios(formato='xlsx')}">Excel (XLSX)</a>
+                        <a th:href="@{/admin/exportar/ejercicios(formato='pdf')}">PDF</a>
+                    </div></details>
+                </div>
+            </div>
+
+            <form class="admin-filters admin-filters--full" method="get" th:action="@{/admin/ejercicios}">
+                <label class="sr-only" for="filtro-ejercicios">Buscar ejercicios</label>
+                <input id="filtro-ejercicios" name="q" type="search" th:value="${query}" placeholder="Título del ejercicio…">
+                <label class="sr-only" for="filtro-modulo-ej">Filtrar por módulo</label>
+                <select id="filtro-modulo-ej" name="modulo">
+                    <option value="">Todos los módulos</option>
+                    <option th:each="o : ${options}" th:value="${o.id()}" th:text="${o.label()}"
+                            th:selected="${moduleId != null and moduleId.toString() == o.id().toString()}"></option>
+                </select>
+                <button class="btn btn-admin" type="submit">Filtrar</button>
+            </form>
+
+            <div class="panel-card admin-card admin-table-wrap">
+                <table class="admin-table">
+                    <thead><tr><th>Ejercicio</th><th>Curso / Módulo</th><th>Consigna</th><th>Pos.</th><th>Acciones</th></tr></thead>
+                    <tbody>
+                    <tr th:each="item : ${page.content}">
+                        <td><strong th:text="${item.title()}">Ejercicio</strong></td>
+                        <td><small th:text="${item.courseTitle()}">Curso</small><br><small th:text="${item.moduleTitle()}">Módulo</small></td>
+                        <td class="admin-clip" th:text="${item.prompt()}">Consigna</td>
+                        <td th:text="${item.position()}">0</td>
+                        <td class="admin-row-actions">
+                            <a th:href="@{/admin/ejercicios/{id}/editar(id=${item.id()})}">Editar</a>
+                            <form th:action="@{/admin/ejercicios/{id}/eliminar(id=${item.id()})}" method="post"
+                                  onsubmit="return confirm('¿Eliminar este ejercicio?');">
+                                <button type="submit">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(page.content)}"><td colspan="5" class="admin-empty">Todavía no hay ejercicios cargados.</td></tr>
+                    </tbody>
+                </table>
+            </div>
+            <nav class="admin-pager" th:if="${page.totalPages > 1}" aria-label="Paginación de ejercicios">
+                <a th:if="${!page.first}" th:href="@{/admin/ejercicios(page=${page.number - 1}, q=${query}, modulo=${moduleId})}">← Anterior</a>
+                <span th:text="${'Página ' + (page.number + 1) + ' de ' + page.totalPages}">Página 1</span>
+                <a th:if="${!page.last}" th:href="@{/admin/ejercicios(page=${page.number + 1}, q=${query}, modulo=${moduleId})}">Siguiente →</a>
+            </nav>
+        </main>
+    </div>
+</div>
+<script defer th:src="@{/js/panel.js}"></script>
+<script defer th:src="@{/js/admin.js}"></script>
+</body>
+</html>

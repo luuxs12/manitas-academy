@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/panel-head :: panelHead('Mis cursos')}"></head>
+
+<body class="panel-body">
+<a class="skip-link" href="#panel-main">Saltar al contenido</a>
+
+<div class="panel">
+    <aside th:replace="~{fragments/panel-nav :: sidebar('cursos')}"></aside>
+
+    <div class="panel-shell">
+        <header th:replace="~{fragments/panel-nav :: topbar('')}"></header>
+
+        <main id="panel-main" class="panel-main">
+            <div class="panel-page-head">
+                <div>
+                    <p class="panel-eyebrow">Tu aprendizaje</p>
+                    <h1>Mis cursos</h1>
+                    <p>Solo aparecen los cursos en los que te inscribiste.</p>
+                </div>
+                <a class="btn btn-dark" th:href="@{/panel/explorar}">
+                    Inscribirme a otro curso <span aria-hidden="true">→</span>
+                </a>
+            </div>
+
+            <p class="panel-flash panel-flash--ok" th:if="${panelOk}" th:text="${panelOk}" role="status"></p>
+            <p class="panel-flash panel-flash--error" th:if="${panelError}" th:text="${panelError}" role="alert"></p>
+
+            <ul class="panel-kpis" aria-label="Resumen de cursos">
+                <li class="panel-kpi">
+                    <strong th:text="${#lists.size(enrollments)}">0</strong>
+                    <span>Inscripciones</span>
+                </li>
+                <li class="panel-kpi">
+                    <strong th:text="${lessonTotals.completed()}">0</strong>
+                    <span>Lecciones terminadas</span>
+                </li>
+                <li class="panel-kpi">
+                    <strong th:text="${completed}">0</strong>
+                    <span>Cursos terminados</span>
+                </li>
+                <li class="panel-kpi">
+                    <strong th:text="${lessonTotals.percent() + '%'}">0%</strong>
+                    <span>Avance general</span>
+                </li>
+            </ul>
+
+            <section class="panel-section" aria-labelledby="titulo-lista">
+                <div class="panel-section-head">
+                    <h2 id="titulo-lista">Listado</h2>
+                    <span class="panel-rule" aria-hidden="true"></span>
+                </div>
+
+                <div class="panel-course-grid" th:if="${!#lists.isEmpty(enrollments)}">
+                    <article class="panel-course" th:each="enrollment : ${enrollments}">
+                        <img th:src="${enrollment.course.image}" alt=""
+                             width="960" height="600" loading="lazy">
+                        <div class="panel-course-body">
+                            <h3 th:text="${enrollment.course.title}">Python desde cero</h3>
+                            <span class="panel-chip" th:text="${enrollment.course.category}">Área</span>
+                            <p class="panel-course-summary" th:text="${enrollment.course.summary}">Resumen.</p>
+                            <span class="panel-course-status"
+                                  th:classappend="${enrollment.completed} ? ' is-done' : ''"
+                                  th:text="${enrollment.completed} ? 'Completado' : 'En curso'">
+                                En curso
+                            </span>
+
+                            <div class="panel-lessons" th:with="done=${doneLessons[enrollment.id]}, total=${enrollment.course.lessons}"
+                                 aria-label="Avance por lección">
+                                <form th:each="lesson : ${#numbers.sequence(1, total)}"
+                                      th:action="@{/panel/cursos/{slug}/lecciones/{lesson}(slug=${enrollment.course.slug},lesson=${lesson})}"
+                                      method="post">
+                                    <button class="panel-lesson-btn" type="submit"
+                                            th:classappend="${done.contains(lesson)} ? ' is-done' : ''"
+                                            th:attr="aria-pressed=${done.contains(lesson)},aria-label=${'Lección ' + lesson + (done.contains(lesson) ? ', terminada' : ', pendiente')}"
+                                            th:text="${lesson}">1</button>
+                                </form>
+                            </div>
+                            <p class="panel-lesson-label"
+                               th:text="${lessonCounts[enrollment.id] + ' de ' + enrollment.course.lessons + ' lecciones terminadas'}">
+                                0 de 0 lecciones terminadas
+                            </p>
+                            <div class="panel-lesson-track" role="img"
+                                 th:attr="aria-label=${lessonCounts[enrollment.id] + ' de ' + enrollment.course.lessons + ' lecciones terminadas'}">
+                                <span th:style="${'width: ' + (lessonCounts[enrollment.id] * 100 / enrollment.course.lessons) + '%'}"></span>
+                            </div>
+
+                            <div class="panel-course-actions">
+                                <form th:action="@{/panel/cursos/{slug}/completar(slug=${enrollment.course.slug})}"
+                                      method="post" th:if="${!enrollment.completed}">
+                                    <button class="panel-inline-btn" type="submit">Ya terminé el curso</button>
+                                </form>
+                                <a class="panel-inline-btn"
+                                   th:if="${enrollment.completed and currentUser.premium()}"
+                                   th:href="@{/panel/certificados/{slug}(slug=${enrollment.course.slug})}">
+                                    Ver certificado
+                                </a>
+                                <a class="panel-inline-btn"
+                                   th:if="${enrollment.completed and !currentUser.premium()}"
+                                   th:href="@{/panel/facturacion}">Certificado con Premium</a>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+
+                <div class="panel-empty" th:if="${#lists.isEmpty(enrollments)}">
+                    <span class="panel-empty-icon" aria-hidden="true">
+                        <svg class="ico" viewBox="0 0 24 24" focusable="false">
+                            <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"></path>
+                            <path d="M8 7h8"></path>
+                        </svg>
+                    </span>
+                    <div>
+                        <h3>Todavía no estás inscripto en ningún curso</h3>
+                        <p>Buscá uno en el panel y elegí el que quieras empezar.</p>
+                    </div>
+                    <a class="btn btn-ghost" th:href="@{/panel/explorar}">Ver cursos disponibles</a>
+                </div>
+            </section>
+        </main>
+    </div>
+</div>
+
+<script defer th:src="@{/js/panel.js}"></script>
+</body>
+</html>

@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+<aside th:fragment="sidebar(active)" class="panel-sidebar admin-sidebar">
+    <a class="panel-brand" th:href="@{/admin}" aria-label="Mundo Manitas, ir al panel administrativo">
+        <img th:src="@{/img/brand/favicon.png}" alt="" width="46" height="46">
+        <span class="panel-brand-text">
+            <span>Mundo</span>
+            <span>Manitas</span>
+        </span>
+    </a>
+
+    <nav class="panel-nav" aria-label="Panel administrativo">
+        <a class="panel-nav-link" th:href="@{/admin}"
+           th:attr="aria-current=${active == 'inicio'} ? 'page' : null">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M4 10.5 12 4l8 6.5"></path><path d="M6 9.8V20h12V9.8"></path>
+                <path d="M10 20v-5h4v5"></path>
+            </svg>
+            <span>Inicio</span>
+        </a>
+
+        <a class="panel-nav-link" th:href="@{/admin/usuarios}"
+           th:attr="aria-current=${active == 'usuarios'} ? 'page' : null">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M16 20v-1.5a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4V20"></path>
+                <circle cx="9.5" cy="7" r="3.5"></circle><path d="M17 4a3 3 0 0 1 0 6"></path>
+            </svg>
+            <span>Usuarios</span>
+        </a>
+
+        <a class="panel-nav-link" th:href="@{/admin/cursos}"
+           th:attr="aria-current=${active == 'cursos'} ? 'page' : null">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"></path>
+                <path d="M4 20.5A2.5 2.5 0 0 1 6.5 18H20v3H6.5A2.5 2.5 0 0 1 4 20.5z"></path>
+            </svg>
+            <span>Cursos</span>
+        </a>
+
+        <a class="panel-nav-link" th:href="@{/admin/modulos}"
+           th:attr="aria-current=${active == 'modulos'} ? 'page' : null">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <rect x="3" y="4" width="7" height="7" rx="1.5"></rect>
+                <rect x="14" y="4" width="7" height="7" rx="1.5"></rect>
+                <rect x="3" y="14" width="7" height="6" rx="1.5"></rect>
+                <rect x="14" y="14" width="7" height="6" rx="1.5"></rect>
+            </svg>
+            <span>Módulos</span>
+        </a>
+
+        <a class="panel-nav-link" th:href="@{/admin/videos}"
+           th:attr="aria-current=${active == 'videos'} ? 'page' : null">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <rect x="3" y="5" width="18" height="14" rx="2"></rect>
+                <path d="m10 9 5 3-5 3z"></path>
+            </svg>
+            <span>Videos</span>
+        </a>
+
+        <a class="panel-nav-link" th:href="@{/admin/ejercicios}"
+           th:attr="aria-current=${active == 'ejercicios'} ? 'page' : null">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M5 4h14v16H5z"></path><path d="M8 9h8M8 13h8M8 17h5"></path>
+            </svg>
+            <span>Ejercicios</span>
+        </a>
+
+        <a class="panel-nav-link" th:href="@{/admin/certificados}"
+           th:attr="aria-current=${active == 'certificados'} ? 'page' : null">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <circle cx="12" cy="9" r="5"></circle>
+                <path d="m8.5 13-1 7 4.5-2.5 4.5 2.5-1-7"></path>
+            </svg>
+            <span>Certificados</span>
+        </a>
+
+        <a class="panel-nav-link" th:href="@{/admin/reportes}"
+           th:attr="aria-current=${active == 'reportes'} ? 'page' : null">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path>
+            </svg>
+            <span>Reportes</span>
+        </a>
+
+        <a class="panel-nav-link" th:href="@{/admin/auditoria}"
+           th:attr="aria-current=${active == 'auditoria'} ? 'page' : null">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M6 3h9l4 4v14H6z"></path><path d="M9 12h7M9 16h7M9 8h4"></path>
+            </svg>
+            <span>Auditoría</span>
+        </a>
+
+        <a class="panel-nav-link" th:href="@{/admin/configuracion}"
+           th:attr="aria-current=${active == 'configuracion'} ? 'page' : null">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V21h-4v-.2a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H3v-3h.2a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.6V3h4v.2a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v3h-.2a1.7 1.7 0 0 0-1.6 1z"></path>
+            </svg>
+            <span>Configuración</span>
+        </a>
+    </nav>
+
+    <div class="panel-sidebar-foot">
+        <a class="panel-side-link" th:href="@{/panel/perfil}">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <circle cx="12" cy="8" r="3.5"></circle><path d="M5 20a7 7 0 0 1 14 0"></path>
+            </svg>
+            <span>Mi cuenta</span>
+        </a>
+        <form th:action="@{/logout}" method="post">
+            <button class="panel-side-link panel-logout" type="submit">
+                <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M14 4H6v16h8"></path><path d="M11 12h9"></path>
+                    <path d="m17 8 4 4-4 4"></path>
+                </svg>
+                <span>Cerrar sesión</span>
+            </button>
+        </form>
+        <p class="panel-tagline admin-tagline">Aprender<br>también es incluir.</p>
+    </div>
+</aside>
+
+<header th:fragment="topbar(heading, subtitle, query)" class="panel-topbar admin-topbar">
+    <div class="admin-topbar-title">
+        <p class="panel-area" th:text="${heading}">Panel Administrativo</p>
+        <p class="admin-subtitle" th:text="${subtitle}">Gestión integral de Mundo Manitas</p>
+    </div>
+
+    <form class="panel-search" role="search" th:action="@{/admin/buscar}" method="get">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+            <circle cx="11" cy="11" r="6.5"></circle><path d="m16 16 4.5 4.5"></path>
+        </svg>
+        <label class="sr-only" for="admin-buscar">Buscar en todo el panel</label>
+        <input id="admin-buscar" name="q" type="search" th:value="${query}"
+               placeholder="Buscar usuarios, cursos o contenido…" autocomplete="off">
+    </form>
+
+    <div class="panel-account">
+        <details class="panel-notify" data-panel-menu>
+            <summary class="panel-icon-btn" aria-label="Ver notificaciones" title="Notificaciones">
+                <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <path d="M18 9a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6"></path>
+                    <path d="M10.3 20a2 2 0 0 0 3.4 0"></path>
+                </svg>
+                <span class="panel-notify-count" id="admin-notify-badge"
+                      th:if="${adminUnread != null and adminUnread > 0}"
+                      th:text="${adminUnread > 9 ? '9+' : adminUnread}"
+                      aria-label="Avisos sin leer">0</span>
+            </summary>
+            <div class="panel-menu-pop panel-notify-pop admin-notify-pop" data-admin-notify>
+                <p class="panel-menu-name">Actividad reciente</p>
+                <ul class="panel-notify-list" data-admin-events>
+                    <li class="panel-notify-item" th:each="event : ${adminEvents}">
+                        <strong th:text="${event.title()}">Actividad</strong>
+                        <span th:text="${event.detail()}">Detalle.</span>
+                        <span class="admin-event-when" th:text="${event.when()}">hace un momento</span>
+                    </li>
+                </ul>
+                <p class="panel-notify-empty" data-admin-empty
+                   th:if="${adminEvents == null or #lists.isEmpty(adminEvents)}">
+                    Todavía no hay actividad: aparece cuando se crea o edita contenido,
+                    se emite un certificado o se confirma un pago.
+                </p>
+                <a th:href="@{/admin/auditoria}">Ver registro de auditoría <span aria-hidden="true">→</span></a>
+            </div>
+        </details>
+
+        <button class="theme-toggle panel-theme" type="button" data-theme-toggle
+                aria-pressed="false" aria-label="Cambiar a modo oscuro" title="Modo oscuro">
+            <svg class="ico ico-moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"></path>
+            </svg>
+            <svg class="ico ico-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <circle cx="12" cy="12" r="4.2"></circle>
+                <path d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6"></path>
+            </svg>
+        </button>
+
+        <details class="panel-menu" data-panel-menu>
+            <summary class="panel-menu-trigger" aria-label="Abrir menú de la cuenta">
+                <span class="panel-avatar" aria-hidden="true"
+                      th:classappend="${currentUser.hasAvatar()} ? ' panel-avatar--photo' : ''">
+                    <img th:if="${currentUser.hasAvatar()}"
+                         th:src="${currentUser.avatarPath()}" alt="">
+                    <span th:unless="${currentUser.hasAvatar()}"
+                          th:text="${currentUser.initials()}">LF</span>
+                </span>
+                <svg class="ico panel-menu-chevron" viewBox="0 0 24 24"
+                     aria-hidden="true" focusable="false">
+                    <path d="m6 9 6 6 6-6"></path>
+                </svg>
+            </summary>
+            <div class="panel-menu-pop">
+                <p class="panel-menu-name" th:text="${currentUser.fullName()}">Luis Fernando</p>
+                <p class="panel-menu-mail" th:text="${currentUser.email()}">admin@damianprint.com</p>
+                <p class="panel-menu-role" th:text="${currentUser.roleLabel()}">Administrador</p>
+                <a th:href="@{/admin/configuracion}">Configuración</a>
+                <a th:href="@{/panel/perfil}">Mi cuenta</a>
+                <a th:href="@{/panel}">Panel del estudiante</a>
+                <form th:action="@{/logout}" method="post">
+                    <button type="submit">Cerrar sesión</button>
+                </form>
+            </div>
+        </details>
+    </div>
+</header>
+
+</body>
+</html>

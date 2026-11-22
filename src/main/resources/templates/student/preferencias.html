@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/panel-head :: panelHead('Preferencias')}"></head>
+
+<body class="panel-body">
+<a class="skip-link" href="#panel-main">Saltar al contenido</a>
+
+<div class="panel">
+    <aside th:replace="~{fragments/panel-nav :: sidebar('preferencias')}"></aside>
+
+    <div class="panel-shell">
+        <header th:replace="~{fragments/panel-nav :: topbar('')}"></header>
+
+        <main id="panel-main" class="panel-main">
+            <div class="panel-page-head">
+                <div>
+                    <p class="panel-eyebrow">Tu cuenta</p>
+                    <h1>Preferencias</h1>
+                    <p>Configurá el aspecto del panel y cómo te avisamos de tu actividad.</p>
+                </div>
+            </div>
+
+            <p class="panel-flash panel-flash--ok" th:if="${panelOk}" th:text="${panelOk}" role="status"></p>
+            <p class="panel-flash panel-flash--error" th:if="${panelError}" th:text="${panelError}" role="alert"></p>
+
+            <section class="panel-section" aria-labelledby="titulo-preferencias">
+                <div class="panel-section-head">
+                    <h2 id="titulo-preferencias">Aspecto y avisos</h2>
+                    <span class="panel-rule" aria-hidden="true"></span>
+                </div>
+
+                <form class="panel-card panel-form auth-form" th:action="@{/panel/preferencias}"
+                      th:object="${preferencesForm}" method="post">
+                    <div class="field">
+                        <label for="theme">Tema del panel</label>
+                        <select id="theme" th:field="*{theme}">
+                            <option th:each="option : ${themes}" th:value="${option}"
+                                    th:text="${option == 'SYSTEM' ? 'Del sistema' :
+                                              (option == 'LIGHT' ? 'Claro' : 'Oscuro')}">
+                                Del sistema
+                            </option>
+                        </select>
+                        <p class="field-hint">
+                            «Del sistema» sigue la preferencia de tu dispositivo. El botón de la barra
+                            superior sigue permitiendo cambiar el tema en cada visita.
+                        </p>
+                    </div>
+
+                    <div class="field field--check">
+                        <label for="notifyEmail">
+                            <input id="notifyEmail" type="checkbox" th:field="*{notifyEmail}">
+                            Quiero recibir avisos por correo
+                        </label>
+                        <p class="field-hint">
+                            Los avisos del panel siempre se guardan en tu cuenta; esta opción
+                            decide si además se envían a tu correo.
+                        </p>
+                    </div>
+
+                    <button class="btn btn-dark" type="submit">Guardar preferencias</button>
+                </form>
+            </section>
+
+            <section class="panel-section" aria-labelledby="titulo-mas">
+                <div class="panel-section-head">
+                    <h2 id="titulo-mas">Más opciones</h2>
+                    <span class="panel-rule" aria-hidden="true"></span>
+                </div>
+                <div class="panel-account-links">
+                    <a th:href="@{/panel/accesibilidad}">Accesibilidad</a>
+                    <a th:href="@{/panel/perfil}">Mis datos</a>
+                    <a th:href="@{/panel/facturacion}">Suscripción y pagos</a>
+                </div>
+            </section>
+
+            <section class="panel-danger-zone" aria-labelledby="titulo-eliminar">
+                <h2 id="titulo-eliminar">Cerrar mi cuenta</h2>
+                <p class="panel-note">
+                    Borra tus datos personales, matrículas, avances y pagos de esta plataforma.
+                    No se puede deshacer. Escribí <strong>ELIMINAR</strong> para confirmar.
+                </p>
+                <form th:action="@{/panel/preferencias/eliminar}" method="post"
+                      th:object="${deleteForm}">
+                    <div class="field">
+                        <label for="confirmation">Confirmación</label>
+                        <input id="confirmation" type="text" th:field="*{confirmation}"
+                               placeholder="ELIMINAR" autocomplete="off"
+                               th:classappend="${#fields.hasErrors('confirmation')} ? 'is-invalid' : ''">
+                        <p class="field-error" th:if="${#fields.hasErrors('confirmation')}"
+                           th:errors="*{confirmation}">Revisá este dato.</p>
+                    </div>
+                    <button class="btn btn-ghost" type="submit">Eliminar mi cuenta</button>
+                </form>
+            </section>
+        </main>
+    </div>
+</div>
+
+<script defer th:src="@{/js/panel.js}"></script>
+<script>
+    // El tema elegido se aplica enseguida; «Del sistema» quita el ajuste manual.
+    (() => {
+        const select = document.getElementById("theme");
+        if (!select) return;
+        select.closest("form").addEventListener("submit", () => {
+            try {
+                if (select.value === "SYSTEM") localStorage.removeItem("mm-theme");
+                else localStorage.setItem("mm-theme", select.value.toLowerCase());
+            } catch (e) { /* modo privado */ }
+        });
+    })();
+</script>
+</body>
+</html>

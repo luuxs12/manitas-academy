@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/panel-head :: panelHead('Inscribirme a cursos')}"></head>
+
+<body class="panel-body">
+<a class="skip-link" href="#panel-main">Saltar al contenido</a>
+
+<div class="panel">
+    <aside th:replace="~{fragments/panel-nav :: sidebar('explorar')}"></aside>
+
+    <div class="panel-shell">
+        <header th:replace="~{fragments/panel-nav :: topbar(${query})}"></header>
+
+        <main id="panel-main" class="panel-main">
+            <div class="panel-page-head">
+                <div>
+                    <p class="panel-eyebrow">Catálogo del panel</p>
+                    <h1>Inscribirme a cursos</h1>
+                    <p>Buscá aquí mismo y sumá cursos a tu cuenta sin salir del panel.</p>
+                </div>
+                <a class="panel-plan panel-plan--link"
+                   th:href="@{/panel/facturacion}"
+                   th:text="${'Tu plan: ' + currentUser.planLabel()}">Tu plan: Gratis</a>
+            </div>
+
+            <p class="panel-flash panel-flash--ok" th:if="${panelOk}" th:text="${panelOk}" role="status"></p>
+            <p class="panel-flash panel-flash--error" th:if="${panelError}" th:text="${panelError}" role="alert"></p>
+
+            <form class="panel-explore-search" role="search" th:action="@{/panel/explorar}" method="get">
+                <label class="sr-only" for="explorar-buscar">Buscar cursos</label>
+                <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                    <circle cx="11" cy="11" r="6.5"></circle>
+                    <path d="m16 16 4.5 4.5"></path>
+                </svg>
+                <input id="explorar-buscar" name="q" type="search" th:value="${query}"
+                       placeholder="Nombre, área o nivel…" autocomplete="off">
+                <button class="btn btn-dark" type="submit">Buscar</button>
+            </form>
+
+            <nav class="panel-filters" aria-label="Filtrar por área">
+                <a th:href="@{/panel/explorar}"
+                   th:classappend="${#strings.isEmpty(query)} ? 'is-active' : ''">Todos</a>
+                <a th:each="area : ${areas}"
+                   th:href="@{/panel/explorar(q=${area})}"
+                   th:text="${area}"
+                   th:classappend="${#strings.equalsIgnoreCase(query, area)} ? 'is-active' : ''">Área</a>
+            </nav>
+
+            <p class="catalog-count" th:if="${!#strings.isEmpty(query)}">
+                <span th:text="${#lists.size(courses)}">0</span> resultados para
+                «<span th:text="${query}">…</span>»
+                <a th:href="@{/panel/explorar}">Limpiar</a>
+            </p>
+
+            <section class="panel-section" aria-labelledby="titulo-catalogo">
+                <div class="panel-section-head">
+                    <h2 id="titulo-catalogo">Catálogo</h2>
+                    <span class="panel-rule" aria-hidden="true"></span>
+                </div>
+
+                <div class="panel-course-grid" th:if="${!#lists.isEmpty(courses)}">
+                    <article class="panel-course" th:each="course : ${courses}">
+                        <img th:src="${course.image}" alt="" width="960" height="600" loading="lazy">
+                        <div class="panel-course-body">
+                            <h3 th:text="${course.title}">Curso</h3>
+                            <span class="panel-chip" th:text="${course.category}">Área</span>
+                            <p class="panel-course-summary" th:text="${course.summary}">Resumen.</p>
+                            <p class="panel-course-meta">
+                                <span th:text="${course.level}">Nivel</span>
+                                ·
+                                <span th:text="${course.lessons} + ' lecciones'">20 lecciones</span>
+                            </p>
+
+                            <div class="panel-course-foot">
+                                <span class="panel-course-percent" th:text="${course.priceLabel()}">Gratis</span>
+                                <span class="panel-course-status is-done"
+                                      th:if="${enrolledSlugs.contains(course.slug)}">Ya inscripto</span>
+                            </div>
+
+                            <form class="panel-enroll-form"
+                                  th:if="${!enrolledSlugs.contains(course.slug) and (course.free or currentUser.premium())}"
+                                  th:action="@{/panel/cursos/{slug}/inscribir(slug=${course.slug})}"
+                                  method="post">
+                                <button class="btn btn-dark panel-enroll-btn" type="submit">
+                                    Inscribirme <span aria-hidden="true">→</span>
+                                </button>
+                            </form>
+
+                            <a class="panel-inline-btn panel-locked"
+                               th:if="${!enrolledSlugs.contains(course.slug) and !course.free and !currentUser.premium()}"
+                               th:href="@{/panel/facturacion}">
+                                Requiere plan Premium →
+                            </a>
+                        </div>
+                    </article>
+                </div>
+
+                <div class="panel-empty" th:if="${#lists.isEmpty(courses)}">
+                    <span class="panel-empty-icon" aria-hidden="true">
+                        <svg class="ico" viewBox="0 0 24 24" focusable="false">
+                            <circle cx="11" cy="11" r="6.5"></circle>
+                            <path d="m16 16 4.5 4.5"></path>
+                        </svg>
+                    </span>
+                    <div>
+                        <h3>No encontramos cursos</h3>
+                        <p>Probá con otra palabra o mirá el catálogo completo.</p>
+                    </div>
+                    <a class="btn btn-ghost" th:href="@{/panel/explorar}">Ver todos</a>
+                </div>
+            </section>
+        </main>
+    </div>
+</div>
+
+<script defer th:src="@{/js/panel.js}"></script>
+</body>
+</html>

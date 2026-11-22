@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/panel-head :: panelHead('Ayuda')}"></head>
+
+<body class="panel-body">
+<a class="skip-link" href="#panel-main">Saltar al contenido</a>
+
+<div class="panel">
+    <aside th:replace="~{fragments/panel-nav :: sidebar('ayuda')}"></aside>
+
+    <div class="panel-shell">
+        <header th:replace="~{fragments/panel-nav :: topbar('')}"></header>
+
+        <main id="panel-main" class="panel-main">
+            <div class="panel-page-head">
+                <div>
+                    <p class="panel-eyebrow">Estamos acá</p>
+                    <h1>Ayuda</h1>
+                    <p>Respuestas rápidas sobre cursos, matrículas, plan y certificados.</p>
+                </div>
+            </div>
+
+            <section class="panel-card" aria-labelledby="titulo-preguntas">
+                <h2 id="titulo-preguntas">Preguntas frecuentes</h2>
+                <div class="panel-faq">
+                    <details>
+                        <summary>¿Cómo me inscribo a un curso?</summary>
+                        <p>
+                            Entrá a <a th:href="@{/panel/explorar}">Inscribirme a cursos</a>,
+                            buscá el curso que quieras y tocá «Inscribirme». El curso
+                            aparece en <a th:href="@{/panel/cursos}">Mis cursos</a>.
+                        </p>
+                    </details>
+                    <details>
+                        <summary>¿Por qué no puedo inscribirme a algunos cursos?</summary>
+                        <p>
+                            Los cursos de paga requieren un plan mensual o anual. Podés
+                            ver tu tipo de cuenta y cambiarlo en
+                            <a th:href="@{/panel/perfil} + '#plan'">Mi perfil</a>.
+                        </p>
+                    </details>
+                    <details>
+                        <summary>¿Cómo consigo un certificado?</summary>
+                        <p>
+                            En <a th:href="@{/panel/cursos}">Mis cursos</a>, tocá
+                            «Ya terminé el curso». Con un plan Premium, el certificado
+                            queda disponible en
+                            <a th:href="@{/panel/certificados}">Certificados</a>.
+                        </p>
+                    </details>
+                    <details>
+                        <summary>¿Olvidé mi contraseña?</summary>
+                        <p>
+                            Desde <a th:href="@{/recuperar}">Recuperar contraseña</a>
+                            te enviamos un enlace de un solo uso a tu correo.
+                        </p>
+                    </details>
+                    <details>
+                        <summary>¿Dónde edito mis datos?</summary>
+                        <p>
+                            En <a th:href="@{/panel/perfil}">Mi perfil</a> podés cambiar
+                            tu nombre, tu correo y tu contraseña.
+                        </p>
+                    </details>
+                </div>
+            </section>
+
+            <section class="panel-card panel-help-contact" aria-labelledby="titulo-contacto">
+                <h2 id="titulo-contacto">¿Necesitás algo más?</h2>
+                <p>Escribinos y te respondemos en español, con soporte en LSP.</p>
+                <a class="btn btn-dark" href="mailto:hola@mundomanitas.com">
+                    hola@mundomanitas.com <span aria-hidden="true">→</span>
+                </a>
+                <p class="panel-progress-copy">
+                    También podés leer nuestros
+                    <a th:href="@{/terminos}">términos</a> y
+                    <a th:href="@{/privacidad}">política de privacidad</a>.
+                </p>
+            </section>
+        </main>
+    </div>
+</div>
+
+<script defer th:src="@{/js/panel.js}"></script>
+</body>
+</html>

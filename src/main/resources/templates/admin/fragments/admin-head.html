@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:fragment="adminHead(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <meta name="theme-color" content="#000000">
+    <meta name="robots" content="noindex">
+    <meta name="account-theme" th:content="${currentUser != null ? currentUser.theme() : null}">
+    <title th:text="${title} + ' · Mundo Manitas'">Panel Administrativo · Mundo Manitas</title>
+    <link rel="icon" type="image/png" th:href="@{/img/brand/favicon.png}">
+    <script th:src="@{/js/theme.js}"></script>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+
+<body></body>
+</html>

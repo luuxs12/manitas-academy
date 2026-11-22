@@ -8,7 +8,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -58,23 +57,33 @@ public class SecurityConfig {
     ) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/panel", "/panel/**").authenticated()
+                        .requestMatchers("/pagos/stripe/webhook").permitAll()
+                        .requestMatchers("/admin", "/admin/**").hasRole("ADMIN")
+                        // Paneles aislados: ADMIN nunca entra al área de estudiante.
+                        .requestMatchers("/panel", "/panel/**").hasAnyRole("STUDENT", "TEACHER")
                         .anyRequest().permitAll())
                 .formLogin(form -> form
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
-                        .defaultSuccessUrl("/panel", true)
+                        .successHandler((request, response, authentication) -> {
+                            boolean admin = authentication.getAuthorities().stream()
+                                    .anyMatch(authority -> "ROLE_ADMIN".equals(authority.getAuthority()));
+                            response.sendRedirect(admin ? "/admin" : "/panel");
+                        })
                         .failureUrl("/login?error")
                         .permitAll())
                 .logout(logout -> logout
                         .logoutUrl("/logout")
-                        .logoutSuccessUrl("/login?logout")
+                        // Cerrar sesión devuelve a la portada con el acceso abierto;
+                        // no se muestra una pantalla de login separada.
+                        .logoutSuccessUrl("/?login")
                         .permitAll())
                 .rememberMe(remember -> remember
                         .key(rememberMeKey)
                         .tokenValiditySeconds(60 * 60 * 24 * 14)
                         .userDetailsService(userDetailsService))
-                .csrf(Customizer.withDefaults());
+                // Stripe firma el cuerpo: no puede enviar el token CSRF del sitio.
+                .csrf(csrf -> csrf.ignoringRequestMatchers("/pagos/stripe/webhook"));
 
         return http.build();
     }

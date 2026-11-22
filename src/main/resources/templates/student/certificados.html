@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/panel-head :: panelHead('Certificados')}"></head>
+
+<body class="panel-body">
+<a class="skip-link" href="#panel-main">Saltar al contenido</a>
+
+<div class="panel">
+    <aside th:replace="~{fragments/panel-nav :: sidebar('certificados')}"></aside>
+
+    <div class="panel-shell">
+        <header th:replace="~{fragments/panel-nav :: topbar('')}"></header>
+
+        <main id="panel-main" class="panel-main">
+            <div class="panel-page-head">
+                <div>
+                    <p class="panel-eyebrow">Tus logros</p>
+                    <h1>Certificados</h1>
+                    <p>Se emiten al terminar un curso y están incluidos en los planes Premium.</p>
+                </div>
+                <a class="panel-plan panel-plan--link" th:href="@{/panel/facturacion}"
+                   th:text="${'Tu plan: ' + currentUser.planLabel()}">Tu plan: Gratis</a>
+            </div>
+
+            <p class="panel-flash panel-flash--ok" th:if="${panelOk}" th:text="${panelOk}" role="status"></p>
+            <p class="panel-flash panel-flash--error" th:if="${panelError}" th:text="${panelError}" role="alert"></p>
+
+            <section class="panel-section" aria-labelledby="titulo-certificados">
+                <div class="panel-section-head">
+                    <h2 id="titulo-certificados">Disponibles</h2>
+                    <span class="panel-rule" aria-hidden="true"></span>
+                </div>
+
+                <div class="panel-cert-grid" th:if="${!#lists.isEmpty(certificates)}">
+                    <article class="panel-cert" th:each="enrollment : ${certificates}">
+                        <span class="panel-cert-icon" aria-hidden="true">
+                            <svg class="ico" viewBox="0 0 24 24" focusable="false">
+                                <circle cx="12" cy="9" r="5"></circle>
+                                <path d="m8.5 13-1 7 4.5-2.5 4.5 2.5-1-7"></path>
+                            </svg>
+                        </span>
+                        <div>
+                            <h3 th:text="${enrollment.course.title}">Curso terminado</h3>
+                            <p th:text="${enrollment.course.lessons + ' lecciones · ' +
+                                #temporals.format(enrollment.completedAt, 'dd/MM/yyyy')}">
+                                32 lecciones · 20/11/2026
+                            </p>
+                        </div>
+                        <a class="btn btn-ghost"
+                           th:href="@{/panel/certificados/{slug}(slug=${enrollment.course.slug})}">
+                            Ver certificado
+                        </a>
+                    </article>
+                </div>
+
+                <div class="panel-empty" th:if="${#lists.isEmpty(certificates) and currentUser.premium()}">
+                    <span class="panel-empty-icon" aria-hidden="true">
+                        <svg class="ico" viewBox="0 0 24 24" focusable="false">
+                            <circle cx="12" cy="9" r="5"></circle>
+                            <path d="m8.5 13-1 7 4.5-2.5 4.5 2.5-1-7"></path>
+                        </svg>
+                    </span>
+                    <div>
+                        <h3>Todavía no tenés certificados</h3>
+                        <p>Terminá un curso inscripto para descargar el tuyo.</p>
+                    </div>
+                    <a class="btn btn-ghost" th:href="@{/panel/cursos}">Ver mis cursos</a>
+                </div>
+
+                <div class="panel-upgrade" th:if="${!currentUser.premium()}">
+                    <strong th:if="${completed > 0}"
+                            th:text="'Ya terminaste ' + completed + ' cursos. Los certificados son parte del plan Premium.'">
+                        Ya terminaste cursos. Los certificados son parte del plan Premium.
+                    </strong>
+                    <strong th:if="${completed == 0}">
+                        Los certificados se incluyen en los planes Premium.
+                    </strong>
+                    <a th:href="@{/panel/facturacion}">Ver planes</a>
+                </div>
+            </section>
+        </main>
+    </div>
+</div>
+
+<script defer th:src="@{/js/panel.js}"></script>
+</body>
+</html>

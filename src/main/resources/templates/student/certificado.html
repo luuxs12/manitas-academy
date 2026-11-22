@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/panel-head :: panelHead('Certificado')}"></head>
+
+<body class="certificate-body">
+<a class="skip-link" href="#certificado">Saltar al certificado</a>
+
+<main class="certificate-page">
+    <nav class="certificate-actions" aria-label="Acciones del certificado">
+        <a th:href="@{/panel/certificados}">← Volver a certificados</a>
+        <button type="button" class="btn btn-dark" data-print>Imprimir o guardar en PDF</button>
+    </nav>
+
+    <article id="certificado" class="certificate">
+        <header class="certificate-head">
+            <img th:src="@{/img/brand/logo-claro.png}" alt="Mundo Manitas" width="143" height="48">
+            <p class="certificate-kicker">Mundo Manitas · Formación en Lengua de Señas Peruana</p>
+        </header>
+
+        <p class="certificate-label">Certificado de finalización</p>
+        <h1 th:text="${account.fullName}">Nombre completo</h1>
+        <p class="certificate-text">Completó con éxito el curso</p>
+        <h2 th:text="${course.title}">Nombre del curso</h2>
+
+        <p class="certificate-detail">
+            <span th:text="${course.lessons} + ' lecciones'">32 lecciones</span>
+            <span aria-hidden="true">·</span>
+            <span th:text="${#temporals.format(enrollment.completedAt, 'dd MMMM yyyy')}">20 noviembre 2026</span>
+        </p>
+
+        <footer class="certificate-foot">
+            <span>Emitido por Mundo Manitas</span>
+            <span class="certificate-code" th:text="${'MM-' + #strings.substring(enrollment.id.toString(), 0, 8)}">MM-00000000</span>
+        </footer>
+    </article>
+</main>
+
+<script defer th:src="@{/js/panel.js}"></script>
+</body>
+</html>

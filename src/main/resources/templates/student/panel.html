@@ -7,165 +7,19 @@
 <a class="skip-link" href="#panel-main">Saltar al contenido</a>
 
 <div class="panel">
-
-    <aside class="panel-sidebar">
-
-        <a class="panel-brand" th:href="@{/panel}" aria-label="Mundo Manitas, ir al inicio del panel">
-            <img th:src="@{/img/brand/favicon.png}" alt="" width="46" height="46">
-            <span class="panel-brand-text">
-                <span>Mundo</span>
-                <span>Manitas</span>
-            </span>
-        </a>
-
-        <nav class="panel-nav" aria-label="Panel del estudiante">
-            <a class="panel-nav-link" th:href="@{/panel}" aria-current="page">
-                <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                    <path d="M4 10.5 12 4l8 6.5"></path>
-                    <path d="M6 9.8V20h12V9.8"></path>
-                    <path d="M10 20v-5h4v5"></path>
-                </svg>
-                <span>Inicio</span>
-            </a>
-
-            <a class="panel-nav-link" href="#mis-cursos">
-                <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                    <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"></path>
-                    <path d="M4 20.5A2.5 2.5 0 0 1 6.5 18H20v3H6.5A2.5 2.5 0 0 1 4 20.5z"></path>
-                    <path d="M8 7h8"></path>
-                </svg>
-                <span>Mis cursos</span>
-            </a>
-
-            <a class="panel-nav-link" th:href="@{/cursos}">
-                <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                    <circle cx="11" cy="11" r="6.5"></circle>
-                    <path d="m16 16 4.5 4.5"></path>
-                </svg>
-                <span>Explorar cursos</span>
-            </a>
-
-            <a class="panel-nav-link" href="#certificados">
-                <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                    <circle cx="12" cy="9" r="5"></circle>
-                    <path d="m8.5 13-1 7 4.5-2.5 4.5 2.5-1-7"></path>
-                </svg>
-                <span>Certificados</span>
-            </a>
-
-            <a class="panel-nav-link" href="#perfil">
-                <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                    <circle cx="12" cy="8" r="3.5"></circle>
-                    <path d="M5 20a7 7 0 0 1 14 0"></path>
-                </svg>
-                <span>Mi perfil</span>
-            </a>
-
-            <a class="panel-nav-link" href="#accesibilidad">
-                <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                    <circle cx="12" cy="4.5" r="1.8"></circle>
-                    <path d="M12 8v6"></path>
-                    <path d="m5 9 7 2 7-2"></path>
-                    <path d="m9 21 3-7 3 7"></path>
-                </svg>
-                <span>Accesibilidad</span>
-            </a>
-        </nav>
-
-        <div class="panel-sidebar-foot">
-            <a class="panel-side-link" href="mailto:hola@mundomanitas.com">
-                <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                    <circle cx="12" cy="12" r="9"></circle>
-                    <path d="M9.2 9.2a3 3 0 1 1 4.2 2.8c-.9.4-1.4 1-1.4 2"></path>
-                    <path d="M12 17h.01"></path>
-                </svg>
-                <span>Ayuda</span>
-            </a>
-
-            <form th:action="@{/logout}" method="post">
-                <button class="panel-side-link panel-logout" type="submit">
-                    <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                        <path d="M14 4H6v16h8"></path>
-                        <path d="M11 12h9"></path>
-                        <path d="m17 8 4 4-4 4"></path>
-                    </svg>
-                    <span>Cerrar sesión</span>
-                </button>
-            </form>
-
-            <p class="panel-tagline">Aprendé,<br>creá y crecé.</p>
-        </div>
-
-    </aside>
+    <aside th:replace="~{fragments/panel-nav :: sidebar('inicio')}"></aside>
 
     <div class="panel-shell">
-
-        <header class="panel-topbar">
-            <p class="panel-area">Área de estudiante</p>
-
-            <form class="panel-search" role="search" th:action="@{/buscar}" method="get">
-                <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                    <circle cx="11" cy="11" r="6.5"></circle>
-                    <path d="m16 16 4.5 4.5"></path>
-                </svg>
-                <label class="sr-only" for="panel-buscar">Buscar cursos o lecciones</label>
-                <input id="panel-buscar" name="q" type="search"
-                       placeholder="Buscar cursos o lecciones…" autocomplete="off">
-            </form>
-
-            <div class="panel-account">
-                <details class="panel-notify" data-panel-menu>
-                    <summary class="panel-icon-btn" aria-label="Ver notificaciones" title="Notificaciones">
-                        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                            <path d="M18 9a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6"></path>
-                            <path d="M10.3 20a2 2 0 0 0 3.4 0"></path>
-                        </svg>
-                    </summary>
-                    <div class="panel-menu-pop panel-notify-pop">
-                        <p class="panel-menu-name">Notificaciones</p>
-                        <p class="panel-menu-mail">No tenés novedades por ahora.</p>
-                    </div>
-                </details>
-
-                <button class="theme-toggle panel-theme" type="button" data-theme-toggle
-                        aria-pressed="false" aria-label="Cambiar a modo oscuro" title="Modo oscuro">
-                    <svg class="ico ico-moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                        <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"></path>
-                    </svg>
-                    <svg class="ico ico-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                        <circle cx="12" cy="12" r="4.2"></circle>
-                        <path d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6"></path>
-                    </svg>
-                </button>
-
-                <details class="panel-menu" data-panel-menu>
-                    <summary class="panel-menu-trigger" aria-label="Abrir menú de la cuenta">
-                        <span class="panel-avatar" aria-hidden="true"
-                              th:text="${currentUser.initials()}">LM</span>
-                        <svg class="ico panel-menu-chevron" viewBox="0 0 24 24"
-                             aria-hidden="true" focusable="false">
-                            <path d="m6 9 6 6 6-6"></path>
-                        </svg>
-                    </summary>
-
-                    <div class="panel-menu-pop">
-                        <p class="panel-menu-name" th:text="${currentUser.fullName()}">Lucía Méndez</p>
-                        <p class="panel-menu-mail" th:text="${currentUser.email()}">lucia@correo.com</p>
-                        <a href="#perfil">Mi perfil</a>
-                        <form th:action="@{/logout}" method="post">
-                            <button type="submit">Cerrar sesión</button>
-                        </form>
-                    </div>
-                </details>
-            </div>
-        </header>
+        <header th:replace="~{fragments/panel-nav :: topbar('')}"></header>
 
         <main id="panel-main" class="panel-main">
 
             <div class="panel-welcome-alert" th:if="${welcome}" role="status">
                 <strong>Tu cuenta está lista.</strong>
-                <span>Este es tu panel: acá vas a encontrar tus cursos y tu progreso.</span>
+                <span>Acá vas a inscribirte a cursos y seguir tu aprendizaje.</span>
             </div>
+            <p class="panel-flash panel-flash--ok" th:if="${panelOk}" th:text="${panelOk}" role="status"></p>
+            <p class="panel-flash panel-flash--error" th:if="${panelError}" th:text="${panelError}" role="alert"></p>
 
             <section class="panel-welcome" aria-labelledby="titulo-panel">
                 <div class="panel-welcome-copy">
@@ -173,139 +27,141 @@
                         <h1 id="titulo-panel">
                             ¡Hola, <span class="panel-name" th:text="${currentUser.firstName()}">Lucía</span>!
                         </h1>
-                        <a class="panel-plan" th:href="@{/} + '#membresia'"
-                           title="Ver los planes de membresía">Plan gratis</a>
+                        <a class="panel-plan" th:href="@{/panel/perfil} + '#plan'"
+                           th:text="${'Plan ' + currentUser.planLabel()}"
+                           title="Ver mi tipo de cuenta">Plan gratis</a>
                     </div>
                     <p>Continuá aprendiendo a tu ritmo.</p>
                 </div>
             </section>
 
-            <section class="panel-continue" th:if="${nextCourse != null}"
-                     th:with="course=${nextCourse}" aria-labelledby="titulo-continuar">
-                <a class="panel-continue-media"
-                   th:href="@{/cursos/{slug}(slug=${course.slug()})}">
-                    <img th:src="@{${course.image()}}" alt="" width="960" height="600">
-                </a>
-
+            <section class="panel-continue" th:if="${next != null}"
+                     th:with="course=${next.course}" aria-labelledby="titulo-continuar">
+                <img class="panel-continue-media" th:src="${course.image}" alt=""
+                     width="960" height="600">
                 <div class="panel-continue-copy">
                     <p class="panel-eyebrow">Tu próximo curso</p>
-                    <h2 id="titulo-continuar" th:text="${course.title()}">Python desde cero</h2>
+                    <h2 id="titulo-continuar" th:text="${course.title}">Python desde cero</h2>
                     <p class="panel-continue-meta">
-                        <span th:text="${course.level()}">Nivel inicial</span>
+                        <span th:text="${course.level}">Nivel inicial</span>
                         ·
-                        <span th:text="${course.lessons()} + ' lecciones'">32 lecciones</span>
+                        <span th:text="${course.lessons + ' lecciones'}">32 lecciones</span>
                     </p>
-                    <div class="panel-progress" aria-hidden="true">
-                        <span style="width: 0%"></span>
-                    </div>
-                    <p class="panel-progress-label">0% completado</p>
+                    <p class="panel-progress-label">Listo para continuar</p>
                 </div>
-
-                <a class="btn btn-dark panel-continue-cta"
-                   th:href="@{/cursos/{slug}(slug=${course.slug()})}">
-                    Empezar curso <span aria-hidden="true">→</span>
+                <a class="btn btn-dark panel-continue-cta" th:href="@{/panel/cursos}">
+                    Ver mis cursos <span aria-hidden="true">→</span>
                 </a>
             </section>
 
-            <ul class="panel-stats" aria-label="Resumen de aprendizaje">
-                <li>
-                    <span class="panel-stat-icon" aria-hidden="true">
-                        <svg class="ico" viewBox="0 0 24 24" focusable="false">
-                            <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"></path>
-                            <path d="M4 20.5A2.5 2.5 0 0 1 6.5 18H20v3H6.5A2.5 2.5 0 0 1 4 20.5z"></path>
-                        </svg>
-                    </span>
-                    <div>
-                        <strong th:text="${#numbers.formatInteger(activeCourses, 2)}">02</strong>
-                        <span>Cursos activos</span>
-                    </div>
+            <ul class="panel-kpis" aria-label="Resumen de aprendizaje">
+                <li class="panel-kpi">
+                    <strong th:text="${enrolled}">0</strong>
+                    <span>Cursos inscriptos</span>
                 </li>
-
-                <li>
-                    <span class="panel-stat-icon" aria-hidden="true">
-                        <svg class="ico" viewBox="0 0 24 24" focusable="false">
-                            <circle cx="12" cy="12" r="9"></circle>
-                            <path d="m10 8.5 5.5 3.5-5.5 3.5z"></path>
-                        </svg>
-                    </span>
-                    <div>
-                        <strong>00</strong>
-                        <span>Lecciones vistas</span>
-                    </div>
+                <li class="panel-kpi">
+                    <strong th:text="${lessonTotals.completed()}">0</strong>
+                    <span>Lecciones terminadas</span>
                 </li>
-
-                <li>
-                    <span class="panel-stat-icon" aria-hidden="true">
-                        <svg class="ico" viewBox="0 0 24 24" focusable="false">
-                            <circle cx="12" cy="12" r="9"></circle>
-                            <path d="M12 7v5l3.5 2"></path>
-                        </svg>
-                    </span>
-                    <div>
-                        <strong>00 h 00 min</strong>
-                        <span>Tiempo de aprendizaje</span>
-                    </div>
+                <li class="panel-kpi">
+                    <strong th:text="${completed}">0</strong>
+                    <span>Cursos terminados</span>
+                </li>
+                <li class="panel-kpi">
+                    <strong th:text="${certificates}">0</strong>
+                    <span>Certificados disponibles</span>
                 </li>
             </ul>
 
             <div class="panel-grid">
-
                 <section class="panel-courses" id="mis-cursos" aria-labelledby="titulo-mis-cursos">
                     <div class="panel-section-head">
                         <h2 id="titulo-mis-cursos">Mis cursos</h2>
                         <span class="panel-rule" aria-hidden="true"></span>
-                        <a th:href="@{/cursos}">Ver todos <span aria-hidden="true">→</span></a>
+                        <a th:href="@{/panel/cursos}">Ver todos <span aria-hidden="true">→</span></a>
                     </div>
 
-                    <div class="panel-course-grid">
-                        <a class="panel-course" th:each="course : ${myCourses}"
-                           th:href="@{/cursos/{slug}(slug=${course.slug()})}">
-                            <img th:src="@{${course.image()}}" alt="" width="960" height="600" loading="lazy">
+                    <div class="panel-course-grid" th:if="${!#lists.isEmpty(enrollments)}">
+                        <article class="panel-course" th:each="enrollment : ${enrollments}">
+                            <img th:src="${enrollment.course.image}" alt=""
+                                 width="960" height="600" loading="lazy">
                             <div class="panel-course-body">
-                                <h3 th:text="${course.title()}">Python desde cero</h3>
-                                <span class="panel-chip">
-                                    <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                                        <path d="M4 12.5V5a1 1 0 0 1 1-1h7.5L20 11.5 12.5 19z"></path>
-                                        <circle cx="8.5" cy="8.5" r="1.2"></circle>
-                                    </svg>
-                                    <span th:text="${course.category()}">Programación</span>
+                                <h3 th:text="${enrollment.course.title}">Python desde cero</h3>
+                                <span class="panel-chip"
+                                      th:text="${enrollment.course.category}">Programación</span>
+                                <span class="panel-course-status"
+                                      th:classappend="${enrollment.completed} ? ' is-done' : ''"
+                                      th:text="${enrollment.completed} ? 'Completado' : 'En curso'">
+                                    En curso
                                 </span>
-                                <div class="panel-course-foot">
-                                    <div class="panel-progress panel-progress--sm" aria-hidden="true">
-                                        <span style="width: 0%"></span>
-                                    </div>
-                                    <span class="panel-course-percent">0%</span>
-                                </div>
-                                <span class="panel-course-cta">Empezar <span aria-hidden="true">→</span></span>
+                                <a class="panel-course-cta" th:href="@{/panel/cursos}">
+                                    Ver detalle <span aria-hidden="true">→</span>
+                                </a>
                             </div>
-                        </a>
+                        </article>
                     </div>
 
-                    <p class="panel-upgrade" th:if="${lockedCourses > 0}">
-                        <strong th:text="${lockedCourses} + ' cursos más con la membresía.'">4 cursos más con la membresía.</strong>
-                        <a th:href="@{/} + '#membresia'">Ver planes</a>
-                    </p>
+                    <div class="panel-empty" th:if="${#lists.isEmpty(enrollments)}">
+                        <span class="panel-empty-icon" aria-hidden="true">
+                            <svg class="ico" viewBox="0 0 24 24" focusable="false">
+                                <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"></path>
+                                <path d="M8 7h8"></path>
+                            </svg>
+                        </span>
+                        <div>
+                            <h3>Todavía no estás inscripto</h3>
+                            <p>Elegí un curso gratis y empezá cuando quieras.</p>
+                        </div>
+                        <a class="btn btn-ghost" th:href="@{/panel/explorar}">Explorar cursos</a>
+                    </div>
                 </section>
 
                 <aside class="panel-progress-card" aria-labelledby="titulo-progreso">
                     <h2 id="titulo-progreso">Tu progreso</h2>
-
-                    <div class="panel-donut" style="--value: 0"
-                         role="img" aria-label="Progreso general: 0 por ciento">
-                        <span>0%</span>
+                    <div class="panel-donut" th:style="${'--value: ' + progress}"
+                         role="img" th:attr="aria-label=${'Cursos terminados: ' + progress + ' por ciento'}">
+                        <span th:text="${progress + '%'}">0%</span>
                     </div>
-
-                    <p class="panel-progress-title">Tu primer paso</p>
-                    <p class="panel-progress-copy">
-                        Cuando termines una lección, acá vas a ver cuánto avanzaste.
+                    <p class="panel-progress-title" th:text="${enrolled == 0 ? 'Empezá con un curso' : 'Vas avanzando'}">
+                        Empezá con un curso
                     </p>
-                    <p class="panel-goal" th:if="${nextCourse != null}">
-                        <span>Próximo objetivo</span>
-                        Empezar <strong th:text="${nextCourse.title()}">Python desde cero</strong>
+                    <p class="panel-progress-copy"
+                       th:text="${enrolled} == 0
+                           ? 'Buscá un curso en el panel e inscribite para verlo acá.'
+                           : completed + ' de ' + enrolled + ' cursos terminados.'">
+                        Buscá un curso en el panel e inscribite para verlo acá.
                     </p>
+                    <a class="btn btn-ghost panel-progress-action"
+                       th:href="@{/panel/explorar}">Buscar cursos</a>
                 </aside>
-
             </div>
+
+            <section class="panel-section" th:if="${!#lists.isEmpty(recommended)}"
+                     aria-labelledby="titulo-recomendados">
+                <div class="panel-section-head">
+                    <h2 id="titulo-recomendados">Sumá un curso</h2>
+                    <span class="panel-rule" aria-hidden="true"></span>
+                    <a th:href="@{/panel/explorar}">Ver el catálogo <span aria-hidden="true">→</span></a>
+                </div>
+                <div class="panel-course-grid panel-course-grid--compact">
+                    <article class="panel-course" th:each="course : ${recommended}">
+                        <img th:src="${course.image}" alt="" width="960" height="600" loading="lazy">
+                        <div class="panel-course-body">
+                            <h3 th:text="${course.title}">Curso</h3>
+                            <span class="panel-chip" th:text="${course.category}">Área</span>
+                            <div class="panel-course-foot">
+                                <span class="panel-course-percent" th:text="${course.priceLabel()}">Gratis</span>
+                                <form th:action="@{/panel/cursos/{slug}/inscribir(slug=${course.slug})}"
+                                      method="post" th:if="${course.free or currentUser.premium()}">
+                                    <button class="panel-inline-btn" type="submit">Inscribirme</button>
+                                </form>
+                                <a class="panel-inline-btn" th:if="${!course.free and !currentUser.premium()}"
+                                   th:href="@{/panel/facturacion}">Requiere Premium</a>
+                            </div>
+                        </div>
+                    </article>
+                </div>
+            </section>
 
             <section class="panel-lsp" aria-labelledby="titulo-lsp">
                 <div class="panel-lsp-media">
@@ -330,63 +186,8 @@
                 </div>
             </section>
 
-            <section class="panel-section" id="certificados" aria-labelledby="titulo-certificados">
-                <div class="panel-section-head">
-                    <h2 id="titulo-certificados">Certificados</h2>
-                </div>
-
-                <div class="panel-empty">
-                    <span class="panel-empty-icon" aria-hidden="true">
-                        <svg class="ico" viewBox="0 0 24 24" focusable="false">
-                            <circle cx="12" cy="9" r="5"></circle>
-                            <path d="m8.5 13-1 7 4.5-2.5 4.5 2.5-1-7"></path>
-                        </svg>
-                    </span>
-                    <div>
-                        <h3>Todavía no tenés certificados</h3>
-                        <p>Terminá un curso para descargar el tuyo.</p>
-                    </div>
-                    <a class="btn btn-ghost" th:href="@{/cursos}">Ver cursos</a>
-                </div>
-            </section>
-
-            <div class="panel-two-col">
-
-                <section class="panel-card" id="perfil" aria-labelledby="titulo-perfil">
-                    <h2 id="titulo-perfil">Mi perfil</h2>
-                    <dl class="panel-data">
-                        <div>
-                            <dt>Nombre</dt>
-                            <dd th:text="${currentUser.fullName()}">Lucía Méndez</dd>
-                        </div>
-                        <div>
-                            <dt>Correo</dt>
-                            <dd th:text="${currentUser.email()}">lucia@correo.com</dd>
-                        </div>
-                        <div>
-                            <dt>Plan</dt>
-                            <dd>Gratis</dd>
-                        </div>
-                    </dl>
-                    <a class="btn btn-ghost" th:href="@{/} + '#membresia'">Ver planes</a>
-                </section>
-
-                <section class="panel-card" id="accesibilidad" aria-labelledby="titulo-accesibilidad-panel">
-                    <h2 id="titulo-accesibilidad-panel">Accesibilidad</h2>
-                    <ul class="panel-check-list">
-                        <li>Intérprete en LSP activado</li>
-                        <li>Subtítulos revisados activados</li>
-                        <li>El tamaño y la velocidad se ajustan en cada lección</li>
-                    </ul>
-                    <a class="btn btn-ghost" th:href="@{/} + '#accesibilidad'">Cómo funciona</a>
-                </section>
-
-            </div>
-
         </main>
-
     </div>
-
 </div>
 
 <script defer th:src="@{/js/panel.js}"></script>

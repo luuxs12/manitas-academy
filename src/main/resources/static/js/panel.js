@@ -32,3 +32,10 @@
         });
     }
 })();
+
+/* El certificado se imprime (o se guarda en PDF) desde el navegador. */
+(() => {
+    for (const button of document.querySelectorAll("[data-print]")) {
+        button.addEventListener("click", () => window.print());
+    }
+})();

@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{admin/fragments/admin-head :: adminHead(${courseId != null} ? 'Editar curso' : 'Nuevo curso')}"></head>
+
+<body class="panel-body admin-body">
+<a class="skip-link" href="#panel-main">Saltar al contenido</a>
+<div class="panel admin">
+    <aside th:replace="~{admin/fragments/admin-nav :: sidebar('cursos')}"></aside>
+    <div class="panel-shell">
+        <header th:replace="~{admin/fragments/admin-nav :: topbar('Cursos', ${courseId != null} ? 'Editar ficha' : 'Nueva ficha', '')}"></header>
+        <main id="panel-main" class="panel-main admin-main">
+            <p class="panel-flash panel-flash--ok" th:if="${panelOk}" th:text="${panelOk}" role="status"></p>
+            <p class="panel-flash panel-flash--error" th:if="${panelError}" th:text="${panelError}" role="alert"></p>
+
+            <div class="admin-page-head">
+                <div><h1 th:text="${courseId != null} ? 'Editar curso' : 'Nuevo curso'">Curso</h1><p>Subí la imagen a R2 o usá una ruta real de <code>/img/cursos/</code>.</p></div>
+                <a class="admin-back" th:href="@{/admin/cursos}">← Volver a cursos</a>
+            </div>
+
+            <form class="panel-card admin-card admin-form" th:action="${courseId != null} ? @{/admin/cursos/{id}(id=${courseId})} : @{/admin/cursos}"
+                  th:object="${adminCourseForm}" method="post" novalidate>
+                <div class="admin-form-grid">
+                    <label>Título<input type="text" th:field="*{title}" maxlength="140" required>
+                        <small class="admin-error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></small></label>
+                    <label>Identificador (slug)<input type="text" th:field="*{slug}" maxlength="80" required>
+                        <small class="admin-error" th:if="${#fields.hasErrors('slug')}" th:errors="*{slug}"></small></label>
+                    <label>Nivel<input type="text" th:field="*{level}" maxlength="60" required>
+                        <small class="admin-error" th:if="${#fields.hasErrors('level')}" th:errors="*{level}"></small></label>
+                    <label>Categoría<input type="text" th:field="*{category}" maxlength="80" required>
+                        <small class="admin-error" th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></small></label>
+                    <label>Lecciones<input type="number" th:field="*{lessons}" min="1" max="999" required>
+                        <small class="admin-error" th:if="${#fields.hasErrors('lessons')}" th:errors="*{lessons}"></small></label>
+                    <label>Posición<input type="number" th:field="*{position}" min="0" max="999"></label>
+                    <label class="admin-span-2">Resumen<textarea th:field="*{summary}" rows="3" maxlength="400" required></textarea>
+                        <small class="admin-error" th:if="${#fields.hasErrors('summary')}" th:errors="*{summary}"></small></label>
+                    <label class="admin-span-2">Imagen (ruta real)<input id="course-image" type="text" th:field="*{image}" maxlength="300" required>
+                        <small class="admin-error" th:if="${#fields.hasErrors('image')}" th:errors="*{image}"></small></label>
+                </div>
+                <div class="admin-upload" data-upload data-upload-target="#course-image"
+                     th:attr="data-upload-endpoint=@{/admin/archivos/imagenes}">
+                    <label>Subir imagen a R2
+                        <input type="file" accept="image/jpeg,image/png,image/webp" data-upload-file>
+                    </label>
+                    <input type="hidden" data-upload-csrf th:value="${_csrf != null} ? ${_csrf.token} : ''">
+                    <span class="admin-upload-status" data-upload-status>
+                        Sin R2 configurado, podés pegar una URL existente.
+                    </span>
+                </div>
+                <label class="admin-check"><input type="checkbox" th:field="*{free}"> Curso gratuito (sin plan Premium)</label>
+                <div class="admin-form-actions">
+                    <button class="btn btn-admin" type="submit" th:text="${courseId != null} ? 'Guardar cambios' : 'Crear curso'">Guardar</button>
+                    <a class="admin-back" th:href="@{/admin/cursos}">Cancelar</a>
+                </div>
+            </form>
+        </main>
+    </div>
+</div>
+<script defer th:src="@{/js/panel.js}"></script>
+<script defer th:src="@{/js/admin.js}"></script>
+</body>
+</html>

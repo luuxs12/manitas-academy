@@ -41,12 +41,32 @@
                 </dl>
 
                 <div class="detail-actions">
-                    <a class="btn btn-solid btn-lg" th:href="@{/registro}" data-auth-open="register">
+                    <form th:if="${signedIn and !enrolled and canEnroll}"
+                          th:action="@{/panel/cursos/{slug}/inscribir(slug=${course.slug})}"
+                          method="post">
+                        <button class="btn btn-solid btn-lg" type="submit">
+                            Inscribirme <span aria-hidden="true">→</span>
+                        </button>
+                    </form>
+
+                    <a th:if="${signedIn and enrolled}" class="btn btn-solid btn-lg"
+                       th:href="@{/panel/cursos}">
+                        Ir a mis cursos <span aria-hidden="true">→</span>
+                    </a>
+
+                    <a th:if="${signedIn and !enrolled and !canEnroll}"
+                       class="btn btn-solid btn-lg" th:href="@{/panel/facturacion}">
+                        Hacerme Premium para inscribirme
+                    </a>
+
+                    <a th:if="${!signedIn}" class="btn btn-solid btn-lg"
+                       th:href="@{/registro}" data-auth-open="register">
                         Crear cuenta para empezar
                     </a>
+
                     <p class="detail-note">
-                        <span th:if="${course.free()}">Gratis, sin tarjeta.</span>
-                        <span th:unless="${course.free()}">Incluido en la membresía de S/ 29 al mes.</span>
+                        <span th:if="${course.free}">Gratis, sin tarjeta.</span>
+                        <span th:unless="${course.free}">Incluido en la membresía de S/ 29 al mes.</span>
                         Podés cancelar cuando quieras.
                     </p>
                 </div>

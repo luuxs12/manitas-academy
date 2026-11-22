@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{admin/fragments/admin-head :: adminHead('Búsqueda')}"></head>
+
+<body class="panel-body admin-body">
+<a class="skip-link" href="#panel-main">Saltar al contenido</a>
+<div class="panel admin">
+    <aside th:replace="~{admin/fragments/admin-nav :: sidebar('buscar')}"></aside>
+    <div class="panel-shell">
+        <header th:replace="~{admin/fragments/admin-nav :: topbar('Búsqueda', 'Resultados globales del panel', ${query})}"></header>
+        <main id="panel-main" class="panel-main admin-main">
+            <div class="admin-page-head"><div><h1>Resultados</h1><p th:text="${query == ''} ? 'Ingresá un término en el buscador de la cabecera.' : ${'Coincidencias para “' + query + '”'}">Resultados</p></div></div>
+
+            <section class="panel-card admin-card" th:if="${query != ''}">
+                <h2>Usuarios</h2>
+                <ul class="admin-search-list">
+                    <li th:each="u : ${users.content}"><a th:href="@{/admin/usuarios/{id}/editar(id=${u.id()})}"
+                        th:text="${u.fullName() + ' · ' + u.email()}">Usuario</a></li>
+                </ul>
+                <p class="admin-empty" th:if="${#lists.isEmpty(users.content)}">Sin coincidencias.</p>
+            </section>
+
+            <section class="panel-card admin-card" th:if="${query != ''}">
+                <h2>Cursos</h2>
+                <ul class="admin-search-list">
+                    <li th:each="c : ${courses.content}"><a th:href="@{/admin/cursos/{id}/editar(id=${c.id()})}"
+                        th:text="${c.title() + ' · ' + c.slug()}">Curso</a></li>
+                </ul>
+                <p class="admin-empty" th:if="${#lists.isEmpty(courses.content)}">Sin coincidencias.</p>
+            </section>
+
+            <section class="panel-card admin-card" th:if="${query != ''}">
+                <h2>Módulos, videos y ejercicios</h2>
+                <ul class="admin-search-list">
+                    <li th:each="m : ${modules.content}"><a th:href="@{/admin/modulos/{id}/editar(id=${m.id()})}"
+                        th:text="${'Módulo · ' + m.title()}">Módulo</a></li>
+                    <li th:each="v : ${videos.content}"><a th:href="@{/admin/videos/{id}/editar(id=${v.id()})}"
+                        th:text="${'Video · ' + v.title()}">Video</a></li>
+                    <li th:each="e : ${exercises.content}"><a th:href="@{/admin/ejercicios/{id}/editar(id=${e.id()})}"
+                        th:text="${'Ejercicio · ' + e.title()}">Ejercicio</a></li>
+                </ul>
+                <p class="admin-empty" th:if="${#lists.isEmpty(modules.content) and #lists.isEmpty(videos.content) and #lists.isEmpty(exercises.content)}">Sin coincidencias.</p>
+            </section>
+        </main>
+    </div>
+</div>
+<script defer th:src="@{/js/panel.js}"></script>
+<script defer th:src="@{/js/admin.js}"></script>
+</body>
+</html>

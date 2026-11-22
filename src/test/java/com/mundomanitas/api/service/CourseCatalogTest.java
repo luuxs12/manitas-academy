@@ -1,17 +1,39 @@
 package com.mundomanitas.api.service;
 
 import com.mundomanitas.api.model.Course;
+import com.mundomanitas.api.repository.CourseRepository;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.lenient;
 
+@ExtendWith(MockitoExtension.class)
 @DisplayName("Catálogo de cursos")
 class CourseCatalogTest {
 
-    private final CourseCatalog catalog = new CourseCatalog();
+    @Mock
+    private CourseRepository courses;
+
+    private CourseCatalog catalog;
+
+    @BeforeEach
+    void setUp() {
+        List<Course> data = fixture();
+        lenient().when(courses.findAllByOrderByPositionAsc()).thenReturn(data);
+        lenient().when(courses.findBySlug(anyString())).thenAnswer(invocation ->
+                data.stream()
+                        .filter(course -> course.getSlug().equals(invocation.getArgument(0)))
+                        .findFirst());
+        catalog = new CourseCatalog(courses);
+    }
 
     @Test
     @DisplayName("sin consulta devuelve todo el catálogo")
@@ -32,10 +54,8 @@ class CourseCatalogTest {
     @Test
     @DisplayName("busca por categoría")
     void searchesByCategory() {
-        List<Course> data = catalog.search("datos");
-
-        assertThat(data)
-                .extracting(Course::slug)
+        assertThat(catalog.search("datos"))
+                .extracting(Course::getSlug)
                 .contains("bases-de-datos-sql");
     }
 
@@ -51,7 +71,7 @@ class CourseCatalogTest {
         assertThat(catalog.findBySlug("python-desde-cero"))
                 .isPresent()
                 .get()
-                .extracting(Course::title)
+                .extracting(Course::getTitle)
                 .isEqualTo("Python desde cero");
 
         assertThat(catalog.findBySlug("no-existe")).isEmpty();
@@ -60,11 +80,10 @@ class CourseCatalogTest {
     @Test
     @DisplayName("etiqueta el acceso según sea gratis o premium")
     void labelsAccess() {
-        Course free = catalog.findBySlug("python-desde-cero").orElseThrow();
-        Course premium = catalog.findBySlug("redes-y-soporte-tecnico").orElseThrow();
-
-        assertThat(free.priceLabel()).isEqualTo("Gratis");
-        assertThat(premium.priceLabel()).isEqualTo("Premium");
+        assertThat(catalog.findBySlug("python-desde-cero").orElseThrow().priceLabel())
+                .isEqualTo("Gratis");
+        assertThat(catalog.findBySlug("redes-y-soporte-tecnico").orElseThrow().priceLabel())
+                .isEqualTo("Premium");
     }
 
     @Test
@@ -72,11 +91,11 @@ class CourseCatalogTest {
     void everyCourseIsPublishable() {
         assertThat(catalog.all())
                 .allSatisfy(course -> {
-                    assertThat(course.slug()).isNotBlank();
-                    assertThat(course.image()).startsWith("/img/cursos/");
-                    assertThat(course.summary()).isNotBlank();
+                    assertThat(course.getSlug()).isNotBlank();
+                    assertThat(course.getImage()).startsWith("/img/cursos/");
+                    assertThat(course.getSummary()).isNotBlank();
                 })
-                .extracting(Course::slug)
+                .extracting(Course::getSlug)
                 .doesNotHaveDuplicates();
     }
 
@@ -96,7 +115,24 @@ class CourseCatalogTest {
 
         assertThat(catalog.others(current, 3))
                 .hasSize(3)
-                .extracting(Course::slug)
-                .doesNotContain(current.slug());
+                .extracting(Course::getSlug)
+                .doesNotContain(current.getSlug());
+    }
+
+    private List<Course> fixture() {
+        return List.of(
+                new Course("python-desde-cero", "Python desde cero", "Nivel inicial",
+                        32, true, "Programación", "Variables y ciclos", "/img/cursos/python.jpg", 1),
+                new Course("desarrollo-web-html-css", "Desarrollo web con HTML y CSS", "Nivel inicial",
+                        28, true, "Desarrollo web", "Primeras páginas", "/img/cursos/desarrollo-web.jpg", 2),
+                new Course("redes-y-soporte-tecnico", "Redes y soporte técnico", "Nivel intermedio",
+                        24, false, "Redes", "Redes e IP", "/img/cursos/redes.jpg", 3),
+                new Course("ciberseguridad-basica", "Ciberseguridad básica", "Nivel intermedio",
+                        20, false, "Seguridad", "Contraseñas", "/img/cursos/ciberseguridad.jpg", 4),
+                new Course("bases-de-datos-sql", "Bases de datos con SQL", "Nivel intermedio",
+                        26, false, "Datos", "Consultas", "/img/cursos/bases-de-datos.jpg", 5),
+                new Course("mantenimiento-de-hardware", "Mantenimiento de hardware", "Nivel inicial",
+                        18, false, "Hardware", "Diagnóstico", "/img/cursos/hardware.jpg", 6)
+        );
     }
 }

@@ -1,35 +1,150 @@
 package com.mundomanitas.api.model;
 
-/**
- * Curso del catálogo público.
- *
- * <p>Registro inmutable; cuando el catálogo pase a PostgreSQL se reemplaza
- * por una entidad JPA.</p>
- *
- * @param slug      identificador legible para la URL
- * @param title     nombre del curso
- * @param level     nivel (inicial, intermedio, avanzado)
- * @param lessons   cantidad de lecciones
- * @param free      {@code true} si se puede ver sin membresía
- * @param category  área temática, usada en la búsqueda
- * @param summary   descripción breve para las tarjetas
- * @param image     ruta de la foto de portada dentro de {@code /img/cursos}
- */
-public record Course(
-        String slug,
-        String title,
-        String level,
-        int lessons,
-        boolean free,
-        String category,
-        String summary,
-        String image
-) {
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 
-    /**
-     * Texto de acceso que se muestra en la tarjeta y en el detalle.
-     */
+import java.time.OffsetDateTime;
+import java.util.UUID;
+
+/**
+ * Curso del catálogo, guardado en PostgreSQL.
+ *
+ * <p>La tabla la crea Flyway en {@code V3__courses_and_enrollments.sql}.
+ * {@code position} conserva el orden en el que se muestran las tarjetas.</p>
+ */
+@Entity
+@Table(name = "courses")
+public class Course {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private UUID id;
+
+    @Column(nullable = false, unique = true)
+    private String slug;
+
+    @Column(nullable = false)
+    private String title;
+
+    @Column(nullable = false)
+    private String level;
+
+    @Column(nullable = false)
+    private int lessons;
+
+    @Column(nullable = false)
+    private boolean free;
+
+    @Column(nullable = false)
+    private String category;
+
+    @Column(nullable = false)
+    private String summary;
+
+    @Column(nullable = false)
+    private String image;
+
+    @Column(nullable = false)
+    private int position;
+
+    @Column(name = "created_at", insertable = false, updatable = false)
+    private OffsetDateTime createdAt;
+
+    /** Constructor vacío que exige JPA. */
+    protected Course() {
+    }
+
+    public Course(
+            String slug,
+            String title,
+            String level,
+            int lessons,
+            boolean free,
+            String category,
+            String summary,
+            String image,
+            int position
+    ) {
+        this.slug = slug;
+        this.title = title;
+        this.level = level;
+        this.lessons = lessons;
+        this.free = free;
+        this.category = category;
+        this.summary = summary;
+        this.image = image;
+        this.position = position;
+    }
+
+    public UUID getId() {
+        return id;
+    }
+
+    public String getSlug() {
+        return slug;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public String getLevel() {
+        return level;
+    }
+
+    public int getLessons() {
+        return lessons;
+    }
+
+    public boolean isFree() {
+        return free;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public String getSummary() {
+        return summary;
+    }
+
+    public String getImage() {
+        return image;
+    }
+
+    public int getPosition() {
+        return position;
+    }
+
+    /** Texto de acceso que se muestra en la tarjeta y en el detalle. */
     public String priceLabel() {
         return free ? "Gratis" : "Premium";
+    }
+
+    /** Actualiza la ficha desde el panel administrativo. */
+    public void update(
+            String slug,
+            String title,
+            String level,
+            int lessons,
+            boolean free,
+            String category,
+            String summary,
+            String image,
+            int position
+    ) {
+        this.slug = slug;
+        this.title = title;
+        this.level = level;
+        this.lessons = lessons;
+        this.free = free;
+        this.category = category;
+        this.summary = summary;
+        this.image = image;
+        this.position = position;
     }
 }

@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{admin/fragments/admin-head :: adminHead('Panel Administrativo')}"></head>
+
+<body class="panel-body admin-body">
+<a class="skip-link" href="#panel-main">Saltar al contenido</a>
+
+<div class="panel admin">
+    <aside th:replace="~{admin/fragments/admin-nav :: sidebar('inicio')}"></aside>
+
+    <div class="panel-shell">
+        <header th:replace="~{admin/fragments/admin-nav :: topbar('Panel Administrativo', 'Gestión integral de Mundo Manitas', '')}"></header>
+
+        <main id="panel-main" class="panel-main admin-main"
+              th:attr="data-admin-since=${adminSince}">
+            <p class="panel-flash panel-flash--ok" th:if="${panelOk}" th:text="${panelOk}" role="status"></p>
+            <p class="panel-flash panel-flash--error" th:if="${panelError}" th:text="${panelError}" role="alert"></p>
+
+            <section class="admin-hero" aria-labelledby="admin-hero-title">
+                <div class="admin-hero-copy">
+                    <h1 id="admin-hero-title">Bienvenido, Administrador</h1>
+                    <p>Administrá cuentas, cursos y contenido accesible desde un solo lugar.</p>
+                    <a class="btn btn-admin" th:href="@{/admin/usuarios}">Gestionar usuarios <span aria-hidden="true">→</span></a>
+                </div>
+                <img class="admin-hero-media" th:src="@{/img/nosotros/clase-lsp.jpg}"
+                     alt="Personas aprendiendo lengua de señas en una clase de Mundo Manitas"
+                     width="1400" height="1050" loading="lazy">
+            </section>
+
+            <ul class="admin-kpis" aria-label="Indicadores generales">
+                <li class="admin-kpi" th:each="kpi : ${kpis}">
+                    <span class="admin-kpi-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" focusable="false">
+                            <path th:attr="d=${kpi.iconPath()}"></path>
+                        </svg>
+                    </span>
+                    <span class="admin-kpi-label" th:text="${kpi.label()}">Usuarios registrados</span>
+                    <strong class="admin-kpi-value" th:text="${kpi.value()}">0</strong>
+                    <span class="admin-kpi-foot">
+                        <span class="admin-trend" th:text="${kpi.trend()}">0%</span>
+                        <span th:text="${kpi.detail()}">Detalle</span>
+                    </span>
+                </li>
+            </ul>
+
+            <div class="admin-grid">
+                <section class="panel-card admin-card admin-chart-card" aria-labelledby="admin-activity">
+                    <div class="panel-section-head">
+                        <h2 id="admin-activity">Actividad General</h2>
+                        <span class="panel-rule" aria-hidden="true"></span>
+                        <form class="admin-filters" method="get" th:action="@{/admin}">
+                            <label class="sr-only" for="admin-days">Filtrar actividad</label>
+                            <select id="admin-days" name="dias" onchange="this.form.submit()">
+                                <option value="7" th:selected="${selectedDays == 7}">Últimos 7 días</option>
+                                <option value="30" th:selected="${selectedDays == 30}">Últimos 30 días</option>
+                                <option value="90" th:selected="${selectedDays == 90}">Últimos 90 días</option>
+                            </select>
+                        </form>
+                    </div>
+                    <p class="admin-chart-legend">
+                        <span><i class="admin-dot admin-dot--users" aria-hidden="true"></i>Usuarios
+                            <strong th:text="${chart.usersTotal()}">0</strong></span>
+                        <span><i class="admin-dot admin-dot--courses" aria-hidden="true"></i>Cursos
+                            <strong th:text="${chart.coursesTotal()}">0</strong></span>
+                    </p>
+                    <svg class="admin-chart" viewBox="0 0 900 250" role="img"
+                         th:attr="aria-label=${'Usuarios y cursos entre el ' + #temporals.format(chart.from(), 'dd/MM/yyyy') + ' y el ' + #temporals.format(chart.to(), 'dd/MM/yyyy')}">
+                        <g class="admin-chart-grid" aria-hidden="true">
+                            <line x1="40" y1="40" x2="860" y2="40"></line>
+                            <line x1="40" y1="90" x2="860" y2="90"></line>
+                            <line x1="40" y1="140" x2="860" y2="140"></line>
+                            <line x1="40" y1="190" x2="860" y2="190"></line>
+                            <line x1="40" y1="210" x2="860" y2="210"></line>
+                        </g>
+                        <g class="admin-axis-y" aria-hidden="true">
+                            <text x="8" y="44" th:text="${chart.max()}">1</text>
+                            <text x="8" y="94" th:text="${#numbers.formatInteger(chart.max() * 3 / 4, 0)}">1</text>
+                            <text x="8" y="144" th:text="${#numbers.formatInteger(chart.max() / 2, 0)}">0</text>
+                            <text x="8" y="194" th:text="${#numbers.formatInteger(chart.max() / 4, 0)}">0</text>
+                            <text x="18" y="214">0</text>
+                        </g>
+                        <polyline class="admin-line admin-line--users"
+                                  th:attr="points=${#strings.listJoin(chart.usersPoints(), ' ')}"></polyline>
+                        <polyline class="admin-line admin-line--courses"
+                                  th:attr="points=${#strings.listJoin(chart.coursesPoints(), ' ')}"></polyline>
+                        <g class="admin-axis-x" aria-hidden="true">
+                            <text th:each="label, iter : ${chart.labels()}" th:if="${label != ''}"
+                                  th:text="${label}"
+                                  th:attr="x=${40 + iter.index * 820 / (chart.days() - 1)}, y=${235}">01/01</text>
+                        </g>
+                    </svg>
+                </section>
+
+                <div class="admin-side">
+                    <section class="panel-card admin-card" aria-labelledby="admin-popular">
+                        <div class="panel-section-head">
+                            <h2 id="admin-popular">Cursos Más Populares</h2>
+                            <span class="panel-rule" aria-hidden="true"></span>
+                            <a th:href="@{/admin/cursos}">Ver todos</a>
+                        </div>
+                        <ul class="admin-popular" th:if="${!#lists.isEmpty(popular)}">
+                            <li class="admin-popular-item" th:each="course, iter : ${popular}">
+                                <img th:src="${course.image()}" alt="" width="960" height="600" loading="lazy">
+                                <div class="admin-popular-body">
+                                    <strong th:text="${course.title()}">Curso</strong>
+                                    <span th:text="${course.enrolled() + ' inscriptos'}">0 inscriptos</span>
+                                    <div class="panel-progress panel-progress--sm" role="img"
+                                         th:attr="aria-label=${'Avance ' + course.percent() + '%'}">
+                                        <span th:style="${'width:' + course.percent() + '%'}"></span>
+                                    </div>
+                                </div>
+                                <b th:text="${course.percent() + '%'}">0%</b>
+                            </li>
+                        </ul>
+                        <p class="admin-empty" th:if="${#lists.isEmpty(popular)}">
+                            Todavía no hay inscripciones. El ranking aparece cuando el alumnado se inscriba.
+                        </p>
+                    </section>
+
+                    <section class="panel-card admin-card" aria-labelledby="admin-recent">
+                        <div class="panel-section-head">
+                            <h2 id="admin-recent">Usuarios Recientes</h2>
+                            <span class="panel-rule" aria-hidden="true"></span>
+                            <a th:href="@{/admin/usuarios}">Ver todos</a>
+                        </div>
+                        <ul class="admin-recent" th:if="${!#lists.isEmpty(recentUsers)}">
+                            <li th:each="user : ${recentUsers}">
+                                <span class="panel-avatar" aria-hidden="true" th:text="${user.initials()}">LF</span>
+                                <span class="admin-recent-name">
+                                    <strong th:text="${user.fullName()}">Nombre</strong>
+                                    <small th:text="${user.email()}">correo</small>
+                                </span>
+                                <span class="admin-recent-meta">
+                                    <small th:text="${user.role() == 'ADMIN' ? 'Admin' : user.role() == 'TEACHER' ? 'Docente' : 'Estudiante'}">Rol</small>
+                                    <small th:text="${user.when()}">hace 1 día</small>
+                                </span>
+                            </li>
+                        </ul>
+                        <p class="admin-empty" th:if="${#lists.isEmpty(recentUsers)}">No hay cuentas registradas.</p>
+                    </section>
+                </div>
+            </div>
+
+            <section class="admin-two" aria-label="Gestión rápida y estado del sistema">
+                <section class="panel-card admin-card" aria-labelledby="admin-quick">
+                    <div class="panel-section-head">
+                        <h2 id="admin-quick">Gestión Rápida</h2>
+                        <span class="panel-rule" aria-hidden="true"></span>
+                    </div>
+                    <div class="admin-quick-grid">
+                        <a th:href="@{/admin/cursos/nuevo}"><span aria-hidden="true">＋</span>Crear Curso</a>
+                        <a th:href="@{/admin/usuarios}"><span aria-hidden="true">◉</span>Modificar Usuarios</a>
+                        <a th:href="@{/admin/reportes}"><span aria-hidden="true">◫</span>Ver Reportes</a>
+                        <a th:href="@{/admin/certificados}"><span aria-hidden="true">◆</span>Gestionar Certificados</a>
+                    </div>
+                </section>
+
+                <section class="panel-card admin-card" aria-labelledby="admin-system">
+                    <div class="panel-section-head">
+                        <h2 id="admin-system">Estado del Sistema</h2>
+                        <span class="panel-rule" aria-hidden="true"></span>
+                        <span class="admin-online"><i aria-hidden="true"></i>En línea</span>
+                    </div>
+                    <ul class="admin-checks">
+                        <li th:each="check : ${system}">
+                            <span th:classappend="${check.ok()} ? ' is-ok' : ' is-bad'" aria-hidden="true">✓</span>
+                            <strong th:text="${check.name()}">Base de Datos</strong>
+                            <small th:text="${check.detail()}">Detalle</small>
+                        </li>
+                    </ul>
+                </section>
+            </section>
+
+            <aside class="admin-banner" aria-label="Educación sin barreras">
+                <img th:src="@{/img/brand/logo-claro.png}" alt="Mundo Manitas" width="2979" height="1001" loading="lazy">
+                <p>Educación sin barreras</p>
+            </aside>
+        </main>
+    </div>
+</div>
+
+<script defer th:src="@{/js/panel.js}"></script>
+<script defer th:src="@{/js/admin.js}"></script>
+</body>
+</html>

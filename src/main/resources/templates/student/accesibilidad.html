@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/panel-head :: panelHead('Accesibilidad')}"></head>
+
+<body class="panel-body">
+<a class="skip-link" href="#panel-main">Saltar al contenido</a>
+
+<div class="panel">
+    <aside th:replace="~{fragments/panel-nav :: sidebar('accesibilidad')}"></aside>
+
+    <div class="panel-shell">
+        <header th:replace="~{fragments/panel-nav :: topbar('')}"></header>
+
+        <main id="panel-main" class="panel-main">
+            <div class="panel-page-head">
+                <div>
+                    <p class="panel-eyebrow">Tu experiencia</p>
+                    <h1>Accesibilidad</h1>
+                    <p>Elegí cómo querés ver el contenido. Tus elecciones se guardan en tu cuenta.</p>
+                </div>
+            </div>
+
+            <p class="panel-flash panel-flash--ok" th:if="${panelOk}" th:text="${panelOk}" role="status"></p>
+            <p class="panel-flash panel-flash--error" th:if="${panelError}" th:text="${panelError}" role="alert"></p>
+
+            <section class="panel-section" aria-labelledby="titulo-accesibilidad">
+                <div class="panel-section-head">
+                    <h2 id="titulo-accesibilidad">Preferencias de aprendizaje</h2>
+                    <span class="panel-rule" aria-hidden="true"></span>
+                </div>
+
+                <div class="panel-profile-grid">
+                    <form class="panel-card panel-form auth-form" th:action="@{/panel/accesibilidad}"
+                          th:object="${accessibilityForm}" method="post">
+                        <div class="field field--check">
+                            <label for="signLanguageEnabled">
+                                <input id="signLanguageEnabled" type="checkbox"
+                                       th:field="*{signLanguageEnabled}">
+                                Quiero contenido en Lengua de Señas
+                            </label>
+                            <p class="field-hint">
+                                Activá esta opción si preferís las clases con intérprete en LSP.
+                            </p>
+                        </div>
+
+                        <div class="field">
+                            <label for="signLanguageVariant">Variante de lengua de señas</label>
+                            <input id="signLanguageVariant" type="text"
+                                   th:field="*{signLanguageVariant}" maxlength="60"
+                                   placeholder="Por ejemplo, Lengua de Señas Peruana">
+                            <p class="field-error" th:if="${#fields.hasErrors('signLanguageVariant')}"
+                               th:errors="*{signLanguageVariant}">Revisá este dato.</p>
+                        </div>
+
+                        <div class="field field--check">
+                            <label for="captionsEnabled">
+                                <input id="captionsEnabled" type="checkbox"
+                                       th:field="*{captionsEnabled}">
+                                Activar subtítulos
+                            </label>
+                        </div>
+
+                        <div class="field">
+                            <label for="captionSize">Tamaño de los subtítulos</label>
+                            <select id="captionSize" th:field="*{captionSize}"
+                                    th:classappend="${#fields.hasErrors('captionSize')} ? 'is-invalid' : ''">
+                                <option th:each="size : ${captionSizes}" th:value="${size}"
+                                        th:text="${size == 'SMALL' ? 'Pequeño' :
+                                                  (size == 'MEDIUM' ? 'Mediano' : 'Grande')}">
+                                    Mediano
+                                </option>
+                            </select>
+                            <p class="field-error" th:if="${#fields.hasErrors('captionSize')}"
+                               th:errors="*{captionSize}">Revisá este dato.</p>
+                        </div>
+
+                        <div class="field">
+                            <label for="playbackSpeed">Velocidad de reproducción</label>
+                            <select id="playbackSpeed" th:field="*{playbackSpeed}"
+                                    th:classappend="${#fields.hasErrors('playbackSpeed')} ? 'is-invalid' : ''">
+                                <option th:each="speed : ${speeds}" th:value="${speed}"
+                                        th:text="${speed + '×'}">1×</option>
+                            </select>
+                            <p class="field-error" th:if="${#fields.hasErrors('playbackSpeed')}"
+                               th:errors="*{playbackSpeed}">Revisá este dato.</p>
+                        </div>
+
+                        <button class="btn btn-dark" type="submit">Guardar preferencias</button>
+                    </form>
+
+                    <aside class="panel-card">
+                        <h2>Sobre tus preferencias</h2>
+                        <p class="panel-note">
+                            No guardamos datos médicos ni discapacidades: solo cómo preferís ver
+                            las clases. Podés cambiar estas opciones las veces que quieras.
+                        </p>
+                        <p class="panel-note">
+                            También podés elegir el tema claro, oscuro o del sistema en
+                            <a th:href="@{/panel/preferencias}">Preferencias de la cuenta</a>.
+                        </p>
+                        <dl class="panel-data panel-data--compact">
+                            <div>
+                                <dt>Lengua de señas</dt>
+                                <dd th:text="${accessibilityForm.signLanguageEnabled} ? 'Activada' : 'Desactivada'">
+                                    Desactivada
+                                </dd>
+                            </div>
+                            <div>
+                                <dt>Subtítulos</dt>
+                                <dd th:text="${accessibilityForm.captionsEnabled} ? 'Activados' : 'Desactivados'">
+                                    Activados
+                                </dd>
+                            </div>
+                        </dl>
+                    </aside>
+                </div>
+            </section>
+        </main>
+    </div>
+</div>
+
+<script defer th:src="@{/js/panel.js}"></script>
+</body>
+</html>

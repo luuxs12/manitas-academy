@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{admin/fragments/admin-head :: adminHead(${itemId != null} ? 'Editar video' : 'Nuevo video')}"></head>
+
+<body class="panel-body admin-body">
+<a class="skip-link" href="#panel-main">Saltar al contenido</a>
+<div class="panel admin">
+    <aside th:replace="~{admin/fragments/admin-nav :: sidebar('videos')}"></aside>
+    <div class="panel-shell">
+        <header th:replace="~{admin/fragments/admin-nav :: topbar('Videos', ${itemId != null} ? 'Editar video' : 'Nuevo video', '')}"></header>
+        <main id="panel-main" class="panel-main admin-main">
+            <p class="panel-flash panel-flash--error" th:if="${panelError}" th:text="${panelError}" role="alert"></p>
+            <div class="admin-page-head">
+                <div><h1 th:text="${itemId != null} ? 'Editar video' : 'Nuevo video'">Video</h1><p>Usá una URL http(s) o una ruta real <code>/video/….mp4</code>.</p></div>
+                <a class="admin-back" th:href="@{/admin/videos}">← Volver a videos</a>
+            </div>
+            <form class="panel-card admin-card admin-form" th:action="${itemId != null} ? @{/admin/videos/{id}(id=${itemId})} : @{/admin/videos}"
+                  th:object="${adminVideoForm}" method="post" novalidate>
+                <div class="admin-form-grid">
+                    <label>Módulo
+                        <select th:field="*{moduleId}" required>
+                            <option value="">Elegí un módulo</option>
+                            <option th:each="o : ${options}" th:value="${o.id()}" th:text="${o.label()}"></option>
+                        </select>
+                        <small class="admin-error" th:if="${#fields.hasErrors('moduleId')}" th:errors="*{moduleId}"></small>
+                    </label>
+                    <label>Título<input type="text" th:field="*{title}" maxlength="140" required>
+                        <small class="admin-error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></small></label>
+                    <label class="admin-span-2">URL del video<input id="video-url" type="text" th:field="*{url}" maxlength="300" required>
+                        <small class="admin-error" th:if="${#fields.hasErrors('url')}" th:errors="*{url}"></small></label>
+                    <label>Posición<input type="number" th:field="*{position}" min="0" max="999"></label>
+                </div>
+                <div class="admin-upload" data-upload data-upload-target="#video-url"
+                     th:attr="data-upload-endpoint=@{/admin/archivos/videos}">
+                    <label>Subir video a R2
+                        <input type="file" accept="video/mp4,video/webm,video/quicktime" data-upload-file>
+                    </label>
+                    <input type="hidden" data-upload-csrf th:value="${_csrf != null} ? ${_csrf.token} : ''">
+                    <span class="admin-upload-status" data-upload-status>
+                        Sin R2 configurado, podés pegar una URL existente.
+                    </span>
+                </div>
+                <div class="admin-form-actions">
+                    <button class="btn btn-admin" type="submit" th:text="${itemId != null} ? 'Guardar cambios' : 'Crear video'">Guardar</button>
+                    <a class="admin-back" th:href="@{/admin/videos}">Cancelar</a>
+                </div>
+            </form>
+        </main>
+    </div>
+</div>
+<script defer th:src="@{/js/panel.js}"></script>
+<script defer th:src="@{/js/admin.js}"></script>
+</body>
+</html>

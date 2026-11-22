@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{admin/fragments/admin-head :: adminHead('Reportes')}"></head>
+
+<body class="panel-body admin-body">
+<a class="skip-link" href="#panel-main">Saltar al contenido</a>
+<div class="panel admin">
+    <aside th:replace="~{admin/fragments/admin-nav :: sidebar('reportes')}"></aside>
+    <div class="panel-shell">
+        <header th:replace="~{admin/fragments/admin-nav :: topbar('Reportes', 'Finalización, ingresos y retención reales', '')}"></header>
+        <main id="panel-main" class="panel-main admin-main">
+            <div class="admin-page-head">
+                <div><h1>Reportes</h1><p>Datos calculados sobre PostgreSQL; sin valores de ejemplo.</p></div>
+                <div class="admin-actions">
+                    <form class="admin-filters" method="get" th:action="@{/admin/reportes}">
+                        <label class="sr-only" for="report-days">Período</label>
+                        <select id="report-days" name="dias" onchange="this.form.submit()">
+                            <option value="7" th:selected="${selectedDays == 7}">Últimos 7 días</option>
+                            <option value="30" th:selected="${selectedDays == 30}">Últimos 30 días</option>
+                            <option value="90" th:selected="${selectedDays == 90}">Últimos 90 días</option>
+                        </select>
+                    </form>
+                    <details class="admin-export"><summary>Exportar</summary><div class="panel-menu-pop">
+                        <a th:href="@{/admin/exportar/reportes(formato='csv')}">CSV</a>
+                        <a th:href="@{/admin/exportar/reportes(formato='xlsx')}">Excel (XLSX)</a>
+                        <a th:href="@{/admin/exportar/reportes(formato='pdf')}">PDF</a>
+                    </div></details>
+                </div>
+            </div>
+
+            <ul class="admin-kpis admin-kpis--report">
+                <li class="admin-kpi"><span class="admin-kpi-label">Matrículas</span><strong class="admin-kpi-value" th:text="${report.enrollments()}">0</strong></li>
+                <li class="admin-kpi"><span class="admin-kpi-label">Finalizaciones</span><strong class="admin-kpi-value" th:text="${report.completed()}">0</strong></li>
+                <li class="admin-kpi"><span class="admin-kpi-label">Tasa de finalización</span><strong class="admin-kpi-value" th:text="${report.completionPercent() + '%'}">0%</strong></li>
+                <li class="admin-kpi"><span class="admin-kpi-label">Ingresos cobrados</span><strong class="admin-kpi-value" th:text="${'S/ ' + report.revenueCents() / 100}">S/ 0</strong>
+                    <span class="admin-kpi-foot">Solo pagos confirmados por Stripe</span></li>
+                <li class="admin-kpi"><span class="admin-kpi-label">Usuarios activos (30 días)</span><strong class="admin-kpi-value" th:text="${report.activeUsers()}">0</strong></li>
+                <li class="admin-kpi"><span class="admin-kpi-label">Retención</span><strong class="admin-kpi-value" th:text="${report.retentionPercent() + '%'}">0%</strong></li>
+            </ul>
+
+            <section class="panel-card admin-card" aria-labelledby="admin-report-activity">
+                <div class="panel-section-head"><h2 id="admin-report-activity">Actividad del período</h2><span class="panel-rule" aria-hidden="true"></span></div>
+                <svg class="admin-chart" viewBox="0 0 900 250" role="img"
+                     th:attr="aria-label=${'Actividad entre el ' + #temporals.format(chart.from(), 'dd/MM/yyyy') + ' y el ' + #temporals.format(chart.to(), 'dd/MM/yyyy')}">
+                    <g class="admin-chart-grid" aria-hidden="true">
+                        <line x1="40" y1="40" x2="860" y2="40"></line><line x1="40" y1="90" x2="860" y2="90"></line>
+                        <line x1="40" y1="140" x2="860" y2="140"></line><line x1="40" y1="190" x2="860" y2="190"></line>
+                        <line x1="40" y1="210" x2="860" y2="210"></line>
+                    </g>
+                    <polyline class="admin-line admin-line--users" th:attr="points=${#strings.listJoin(chart.usersPoints(), ' ')}"></polyline>
+                    <polyline class="admin-line admin-line--courses" th:attr="points=${#strings.listJoin(chart.coursesPoints(), ' ')}"></polyline>
+                    <g class="admin-axis-x" aria-hidden="true">
+                        <text th:each="label, iter : ${chart.labels()}" th:if="${label != ''}" th:text="${label}"
+                              th:attr="x=${40 + iter.index * 820 / (chart.days() - 1)}, y=${235}">01/01</text>
+                    </g>
+                </svg>
+                <p class="admin-chart-legend">
+                    <span><i class="admin-dot admin-dot--users" aria-hidden="true"></i>Usuarios <strong th:text="${chart.usersTotal()}">0</strong></span>
+                    <span><i class="admin-dot admin-dot--courses" aria-hidden="true"></i>Cursos <strong th:text="${chart.coursesTotal()}">0</strong></span>
+                </p>
+            </section>
+
+            <div class="admin-report-extra">
+                <section class="panel-card admin-card" aria-labelledby="admin-report-rates">
+                    <div class="panel-section-head"><h2 id="admin-report-rates">Finalización y retención</h2><span class="panel-rule" aria-hidden="true"></span></div>
+                    <div class="admin-bars">
+                        <div class="admin-bar-row">
+                            <div class="admin-bar-head"><span>Cursos finalizados</span><strong th:text="${report.completionPercent() + '%'}">0%</strong></div>
+                            <div class="admin-bar" role="img" th:attr="aria-label=${'Finalización ' + report.completionPercent() + '%'}">
+                                <span th:style="${'width:' + report.completionPercent() + '%'}"></span>
+                            </div>
+                            <small th:text="${report.completed() + ' de ' + report.enrollments() + ' matrículas'}">0 de 0</small>
+                        </div>
+                        <div class="admin-bar-row">
+                            <div class="admin-bar-head"><span>Retención de cuentas</span><strong th:text="${report.retentionPercent() + '%'}">0%</strong></div>
+                            <div class="admin-bar admin-bar--alt" role="img" th:attr="aria-label=${'Retención ' + report.retentionPercent() + '%'}">
+                                <span th:style="${'width:' + report.retentionPercent() + '%'}"></span>
+                            </div>
+                            <small th:text="${report.activeUsers() + ' de ' + report.totalUsers() + ' cuentas con actividad en 30 días'}">0 de 0</small>
+                        </div>
+                    </div>
+                </section>
+
+                <section class="panel-card admin-card" aria-labelledby="admin-report-income">
+                    <div class="panel-section-head"><h2 id="admin-report-income">Ingresos cobrados</h2><span class="panel-rule" aria-hidden="true"></span></div>
+                    <p class="admin-income-total" th:text="${'S/ ' + income.totalCents() / 100}">S/ 0</p>
+                    <p class="admin-muted">Pagos confirmados por Stripe entre el
+                        <span th:text="${#temporals.format(income.from(), 'dd/MM/yyyy')}">01/01/2026</span> y el
+                        <span th:text="${#temporals.format(income.to(), 'dd/MM/yyyy')}">01/01/2026</span>.
+                    </p>
+                    <svg class="admin-chart admin-chart--income" viewBox="0 0 900 250" role="img"
+                         th:attr="aria-label=${'Ingresos diarios entre el ' + #temporals.format(income.from(), 'dd/MM/yyyy') + ' y el ' + #temporals.format(income.to(), 'dd/MM/yyyy')}">
+                        <g class="admin-chart-grid" aria-hidden="true">
+                            <line x1="40" y1="40" x2="860" y2="40"></line><line x1="40" y1="90" x2="860" y2="90"></line>
+                            <line x1="40" y1="140" x2="860" y2="140"></line><line x1="40" y1="190" x2="860" y2="190"></line>
+                            <line x1="40" y1="210" x2="860" y2="210"></line>
+                        </g>
+                        <polyline class="admin-line admin-line--income" th:attr="points=${#strings.listJoin(income.points(), ' ')}"></polyline>
+                        <g class="admin-axis-x" aria-hidden="true">
+                            <text th:each="label, iter : ${income.labels()}" th:if="${label != ''}" th:text="${label}"
+                                  th:attr="x=${40 + iter.index * 820 / (income.labels().size() - 1)}, y=${235}">01/01</text>
+                        </g>
+                    </svg>
+                </section>
+            </div>
+        </main>
+    </div>
+</div>
+<script defer th:src="@{/js/panel.js}"></script>
+<script defer th:src="@{/js/admin.js}"></script>
+</body>
+</html>

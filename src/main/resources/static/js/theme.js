@@ -36,7 +36,13 @@
     };
 
     const preferred = () => (media.matches ? "dark" : "light");
-    apply(stored() === "dark" || stored() === "light" ? stored() : preferred());
+    const account = () => {
+        const meta = document.querySelector('meta[name="account-theme"]');
+        const value = meta?.content;
+        return value === "LIGHT" ? "light" : value === "DARK" ? "dark" : null;
+    };
+    const manual = stored();
+    apply(manual === "dark" || manual === "light" ? manual : account() || preferred());
 
     // Los botones pueden venir después de este script: se enlazan al
     // terminar de parsear el documento.
@@ -59,6 +65,6 @@
     }
 
     media.addEventListener("change", () => {
-        if (!stored()) apply(preferred());
+        if (!stored() && !account()) apply(preferred());
     });
 })();

@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<!-- Cabecera del panel aparte: si convive con la cabecera pública, el
+     selector `head` de Thymeleaf encuentra los dos <head>. -->
+<head th:fragment="panelHead(title)">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="light dark">
+    <meta name="theme-color" content="#000000">
+    <meta name="robots" content="noindex">
+    <title th:text="${title} + ' · Mundo Manitas'">Mi panel · Mundo Manitas</title>
+    <link rel="icon" type="image/png" th:href="@{/img/brand/favicon.png}">
+    <script th:src="@{/js/theme.js}"></script>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+
+<body></body>
+</html>

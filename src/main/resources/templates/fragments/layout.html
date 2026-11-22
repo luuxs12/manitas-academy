@@ -4,26 +4,16 @@
 <head th:fragment="head(title)">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="color-scheme" content="light">
+    <meta name="color-scheme" content="light dark">
     <meta name="theme-color" content="#FFFFFF">
     <meta name="description"
           content="Cursos de tecnología en Lengua de Señas Peruana, con intérprete y subtítulos en cada clase. Empezá gratis y avanzá a tu ritmo.">
     <title th:text="${title} + ' · Mundo Manitas'">Mundo Manitas</title>
     <link rel="icon" type="image/png" th:href="@{/img/brand/favicon.png}">
+    <script th:src="@{/js/theme.js}"></script>
     <link rel="stylesheet" th:href="@{/css/styles.css}">
     <script defer th:src="@{/js/auth.js}"></script>
     <script defer th:src="@{/js/auth-modal.js}"></script>
-</head>
-
-<head th:fragment="panelHead(title)">
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="color-scheme" content="light">
-    <meta name="theme-color" content="#000000">
-    <meta name="robots" content="noindex">
-    <title th:text="${title} + ' · Mundo Manitas'">Mi panel · Mundo Manitas</title>
-    <link rel="icon" type="image/png" th:href="@{/img/brand/favicon.png}">
-    <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 
 <body>
@@ -36,9 +26,11 @@
         <a class="brand" th:href="@{/}">
             <picture>
                 <source th:srcset="@{/img/brand/logo-claro.webp}" type="image/webp">
-                <img class="brand-logo" th:src="@{/img/brand/logo-claro.png}"
+                <img class="brand-logo brand-logo--light" th:src="@{/img/brand/logo-claro.png}"
                      alt="Mundo Manitas" width="143" height="48">
             </picture>
+            <img class="brand-logo brand-logo--dark" th:src="@{/img/brand/logo-oscuro.png}"
+                 alt="Mundo Manitas" width="143" height="48">
         </a>
 
         <ul class="nav-links">
@@ -67,6 +59,17 @@
                 </svg>
             </button>
         </form>
+
+        <button class="theme-toggle" type="button" data-theme-toggle
+                aria-pressed="false" aria-label="Cambiar a modo oscuro" title="Modo oscuro">
+            <svg class="ico ico-moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"></path>
+            </svg>
+            <svg class="ico ico-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <circle cx="12" cy="12" r="4.2"></circle>
+                <path d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6"></path>
+            </svg>
+        </button>
 
         <div class="nav-actions" th:if="${currentUser == null}">
             <a class="nav-login" th:href="@{/login}" data-auth-open="login">Iniciar sesión</a>
@@ -97,9 +100,11 @@
             <a class="brand" th:href="@{/}">
                 <picture>
                     <source th:srcset="@{/img/brand/logo-claro.webp}" type="image/webp">
-                    <img class="brand-logo" th:src="@{/img/brand/logo-claro.png}"
+                    <img class="brand-logo brand-logo--light" th:src="@{/img/brand/logo-claro.png}"
                          alt="Mundo Manitas" width="113" height="38">
                 </picture>
+                <img class="brand-logo brand-logo--dark" th:src="@{/img/brand/logo-oscuro.png}"
+                     alt="Mundo Manitas" width="113" height="38">
             </a>
             <p>Cursos de tecnología en Lengua de Señas Peruana, con subtítulos revisados.</p>
             <a class="footer-mail" href="mailto:hola@mundomanitas.com">

@@ -95,7 +95,7 @@
 
                     <div class="auth-terms">
                         <label class="check check--terms">
-                            <input type="checkbox" th:field="*{acceptTerms}"
+                            <input id="acceptTerms" type="checkbox" th:field="*{acceptTerms}"
                                    th:attr="aria-invalid=${#fields.hasErrors('acceptTerms')} ? 'true' : null,
                                             aria-describedby=${#fields.hasErrors('acceptTerms')} ? 'acceptTerms-error' : null"
                                    required>

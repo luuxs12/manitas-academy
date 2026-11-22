@@ -13,7 +13,7 @@ Aprendé a tu ritmo, con intérprete y subtítulos en cada clase.
 ![Thymeleaf](https://img.shields.io/badge/Thymeleaf-3-0d0d0d)
 ![PostgreSQL 18](https://img.shields.io/badge/PostgreSQL-18-0d0d0d)
 ![Flyway](https://img.shields.io/badge/Flyway-migraciones-0d0d0d)
-![Tests](https://img.shields.io/badge/tests-10_en_verde-00a63e)
+![Tests](https://img.shields.io/badge/tests-14_en_verde-00a63e)
 
 </div>
 
@@ -68,6 +68,17 @@ perfil y a la información de accesibilidad.
 
 ![Panel del estudiante con el curso siguiente y el progreso](docs/img/panel.jpg)
 
+## Modo claro y oscuro
+
+El sitio completo respeta `prefers-color-scheme` y el botón de la cabecera
+permite alternar el tema. La elección queda guardada en el navegador y se
+mantiene al navegar entre la portada, las páginas internas y el panel.
+
+| Claro | Oscuro |
+|---|---|
+| ![Portada en modo claro](docs/img/portada.jpg) | ![Portada en modo oscuro](docs/img/portada-oscuro.jpg) |
+| ![Panel en modo claro](docs/img/panel.jpg) | ![Panel en modo oscuro](docs/img/panel-oscuro.jpg) |
+
 ## Capturas
 
 ![Portada de Mundo Manitas en escritorio](docs/img/portada.jpg)
@@ -76,8 +87,11 @@ perfil y a la información de accesibilidad.
 
 ![Planes de membresía: gratis, mensual y anual](docs/img/membresia.jpg)
 
+![Inicio de sesión en modo oscuro](docs/img/login-oscuro.png)
+
 <p align="center">
   <img src="docs/img/portada-movil.jpg" alt="Portada en un teléfono" width="290">
+  <img src="docs/img/panel-movil.jpg" alt="Panel en un teléfono" width="290">
 </p>
 
 ---
@@ -92,7 +106,7 @@ perfil y a la información de accesibilidad.
 | Base de datos | PostgreSQL 18 |
 | Migraciones | Flyway (`ddl-auto: validate`) |
 | Build | Maven con wrapper incluido |
-| Pruebas | JUnit 5 + AssertJ (10 pruebas) |
+| Pruebas | JUnit 5 + AssertJ (14 pruebas) |
 
 ## Requisitos
 
@@ -149,7 +163,7 @@ Compilar y probar:
 
 ```powershell
 .\mvnw.cmd clean package      # jar en target\api-0.0.1-SNAPSHOT.jar
-.\mvnw.cmd test               # 10 pruebas
+.\mvnw.cmd test               # 14 pruebas
 java -jar target\api-0.0.1-SNAPSHOT.jar
 ```
 
@@ -167,6 +181,8 @@ java -jar target\api-0.0.1-SNAPSHOT.jar
 | `/privacidad` | Política de privacidad |
 | `/login` | Inicio de sesión (página completa) |
 | `/registro` | Alta de cuenta (página completa) |
+| `/recuperar` | Pedir el enlace para restablecer la contraseña |
+| `/restablecer?token=` | Elegir la contraseña nueva desde el enlace del correo |
 | `/logout` | Cierre de sesión (POST con token CSRF) |
 | `/actuator/health` · `/actuator/info` | Estado de la aplicación |
 
@@ -232,6 +248,40 @@ y las entidades no llegan a las vistas: se convierten en `dto`.
 - El modal envía con `fetch`; si el navegador no ejecuta JavaScript, el mismo
   formulario funciona como POST normal y vuelve a la página con el error.
 
+## Correos y recuperación de contraseña
+
+Los correos salen con **Resend** por su API REST, no por SMTP. Se envían dos:
+bienvenida al crear la cuenta y enlace para restablecer la contraseña.
+
+```powershell
+$env:RESEND_API_KEY = "re_..."
+$env:MAIL_FROM = "Mundo Manitas <hola@tudominio.com>"
+$env:APP_BASE_URL = "https://mundomanitas.com"
+$env:RESET_MINUTES = "60"
+```
+
+| Variable | Para qué | Valor por defecto |
+|---|---|---|
+| `RESEND_API_KEY` | Clave de Resend | vacía: el correo se omite |
+| `MAIL_FROM` | Remitente verificado en Resend | `onboarding@resend.dev` |
+| `APP_BASE_URL` | Dominio de los enlaces de los correos | `http://localhost:8080` |
+| `RESEND_ENDPOINT` | Raíz de la API (pruebas) | `https://api.resend.com` |
+| `RESET_MINUTES` | Vigencia del enlace | `60` |
+
+Sin clave, el registro y el resto del sitio funcionan: el envío se anota en el
+log y se omite. Con un dominio verificado en Resend se cambia `MAIL_FROM` al
+remitente propio; antes de eso solo se puede escribir al correo dueño de la
+cuenta de Resend.
+
+Reglas del restablecimiento:
+
+- El token viaja solo en el correo; en la base queda su **hash SHA-256**.
+- Sirve **una vez**, vence a los 60 minutos y el pedido nuevo borra los anteriores.
+- La pantalla de `/recuperar` responde igual exista o no la cuenta, para no
+  revelar correos registrados.
+- Al guardar la contraseña se quema el token y se entra con la nueva por `/login`.
+- La migración es `V2__password_reset.sql`.
+
 ## Diseño y accesibilidad
 
 La identidad es **verde `#00FF00`, blanco y negro**, con Tanker en los titulares,
@@ -248,6 +298,15 @@ El piso de calidad que se revisa en cada pantalla nueva:
 - Hover solo con puntero fino; en táctil no quedan estados pegados.
 - Sin rótulos sobre los titulares y sin saltos de nivel en los encabezados.
 
+### Modo claro y oscuro
+
+La portada, las páginas internas y el panel comparten el mismo interruptor
+(`theme.js`): la luna pasa a oscuro y el sol vuelve a claro. La elección se guarda
+en `localStorage`; si nadie eligió todavía, se respeta `prefers-color-scheme` y se
+sigue en vivo cuando el sistema cambia. El tema se fija antes de pintar para que
+no aparezca un destello blanco. Los tokens y las reglas están en
+[`docs/design-system.md`](docs/design-system.md#modo-oscuro).
+
 ## Pruebas
 
 ```powershell
@@ -258,15 +317,17 @@ El piso de calidad que se revisa en cada pantalla nueva:
 |---|---|
 | `ApiApplicationTests` | El contexto de Spring arranca con la base y las migraciones |
 | `CourseCatalogTest` | Búsqueda, filtros, slugs y fichas del catálogo (9 casos) |
+| `PasswordResetServiceTest` | Hash del token, vencimiento, un solo uso y correo (4 casos) |
 
-Resultado actual: **10 de 10 en verde**.
+Resultado actual: **14 de 14 en verde**.
 
 ## Estado
 
 Funciona hoy: portada con video, catálogo de seis cursos con búsqueda y filtros,
 fichas de curso, páginas de nosotros, términos y privacidad, cuentas reales con
-sesión, remember-me y cierre de sesión, y la sección de membresías con los tres
-planes.
+sesión, remember-me y cierre de sesión, la sección de membresías con los tres
+planes, el panel del estudiante, el modo claro/oscuro en todo el sitio y los
+correos de bienvenida y restablecimiento con Resend.
 
 Falta: preferencias de accesibilidad editables, inscripción y lecciones,
 reproductor con video en LSP y subtítulos, progreso, cobro real de la membresía y

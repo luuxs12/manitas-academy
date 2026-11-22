@@ -2,7 +2,9 @@ package com.mundomanitas.api.controller;
 
 import com.mundomanitas.api.dto.RegisterForm;
 import com.mundomanitas.api.exception.DuplicateEmailException;
+import com.mundomanitas.api.model.User;
 import com.mundomanitas.api.service.AuthService;
+import com.mundomanitas.api.service.MailService;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -37,10 +39,16 @@ public class AuthController {
 
     private final AuthService authService;
     private final AuthenticationManager authenticationManager;
+    private final MailService mailService;
 
-    public AuthController(AuthService authService, AuthenticationManager authenticationManager) {
+    public AuthController(
+            AuthService authService,
+            AuthenticationManager authenticationManager,
+            MailService mailService
+    ) {
         this.authService = authService;
         this.authenticationManager = authenticationManager;
+        this.mailService = mailService;
     }
 
     @GetMapping("/login")
@@ -48,6 +56,7 @@ public class AuthController {
             Authentication authentication,
             @RequestParam(name = "error", required = false) String error,
             @RequestParam(name = "logout", required = false) String logout,
+            @RequestParam(name = "reset", required = false) String reset,
             Model model
     ) {
         if (isSignedIn(authentication)) {
@@ -56,6 +65,7 @@ public class AuthController {
 
         model.addAttribute("loginError", error != null);
         model.addAttribute("loggedOut", logout != null);
+        model.addAttribute("passwordReset", reset != null);
         return "auth/login";
     }
 
@@ -90,8 +100,9 @@ public class AuthController {
             return "auth/register";
         }
 
+        User user;
         try {
-            authService.register(form);
+            user = authService.register(form);
         } catch (DuplicateEmailException | DataIntegrityViolationException exception) {
             result.rejectValue(
                     "email",
@@ -100,6 +111,10 @@ public class AuthController {
             );
             return "auth/register";
         }
+
+        // El aviso de bienvenida es opcional: si Resend falla, la cuenta y la
+        // sesión siguen adelante.
+        mailService.sendWelcome(user);
 
         // La cuenta queda creada y la persona entra directo a su panel:
         // no tiene que volver a escribir la contraseña que acaba de elegir.

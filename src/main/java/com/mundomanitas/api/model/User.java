@@ -73,6 +73,11 @@ public class User {
         return passwordHash;
     }
 
+    /** Cambia la contraseña ya cifrada; la regla de largo vive en el servicio. */
+    public void changePasswordHash(String passwordHash) {
+        this.passwordHash = passwordHash;
+    }
+
     public String getFullName() {
         return fullName;
     }

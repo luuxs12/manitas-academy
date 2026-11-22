@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="~{fragments/layout :: panelHead('Mi panel')}"></head>
+<head th:replace="~{fragments/panel-head :: panelHead('Mi panel')}"></head>
 
 <body class="panel-body">
 <a class="skip-link" href="#panel-main">Saltar al contenido</a>
@@ -114,6 +114,30 @@
             </form>
 
             <div class="panel-account">
+                <details class="panel-notify" data-panel-menu>
+                    <summary class="panel-icon-btn" aria-label="Ver notificaciones" title="Notificaciones">
+                        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                            <path d="M18 9a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6"></path>
+                            <path d="M10.3 20a2 2 0 0 0 3.4 0"></path>
+                        </svg>
+                    </summary>
+                    <div class="panel-menu-pop panel-notify-pop">
+                        <p class="panel-menu-name">Notificaciones</p>
+                        <p class="panel-menu-mail">No tenés novedades por ahora.</p>
+                    </div>
+                </details>
+
+                <button class="theme-toggle panel-theme" type="button" data-theme-toggle
+                        aria-pressed="false" aria-label="Cambiar a modo oscuro" title="Modo oscuro">
+                    <svg class="ico ico-moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"></path>
+                    </svg>
+                    <svg class="ico ico-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <circle cx="12" cy="12" r="4.2"></circle>
+                        <path d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6"></path>
+                    </svg>
+                </button>
+
                 <details class="panel-menu" data-panel-menu>
                     <summary class="panel-menu-trigger" aria-label="Abrir menú de la cuenta">
                         <span class="panel-avatar" aria-hidden="true"
@@ -144,14 +168,16 @@
             </div>
 
             <section class="panel-welcome" aria-labelledby="titulo-panel">
-                <div>
-                    <h1 id="titulo-panel">
-                        ¡Hola, <span th:text="${currentUser.firstName()}">Lucía</span>!
-                    </h1>
+                <div class="panel-welcome-copy">
+                    <div class="panel-welcome-line">
+                        <h1 id="titulo-panel">
+                            ¡Hola, <span class="panel-name" th:text="${currentUser.firstName()}">Lucía</span>!
+                        </h1>
+                        <a class="panel-plan" th:href="@{/} + '#membresia'"
+                           title="Ver los planes de membresía">Plan gratis</a>
+                    </div>
                     <p>Continuá aprendiendo a tu ritmo.</p>
                 </div>
-                <a class="panel-plan" th:href="@{/} + '#membresia'"
-                   title="Ver los planes de membresía">Plan gratis</a>
             </section>
 
             <section class="panel-continue" th:if="${nextCourse != null}"
@@ -191,7 +217,7 @@
                     </span>
                     <div>
                         <strong th:text="${#numbers.formatInteger(activeCourses, 2)}">02</strong>
-                        <span>Cursos disponibles</span>
+                        <span>Cursos activos</span>
                     </div>
                 </li>
 
@@ -227,6 +253,7 @@
                 <section class="panel-courses" id="mis-cursos" aria-labelledby="titulo-mis-cursos">
                     <div class="panel-section-head">
                         <h2 id="titulo-mis-cursos">Mis cursos</h2>
+                        <span class="panel-rule" aria-hidden="true"></span>
                         <a th:href="@{/cursos}">Ver todos <span aria-hidden="true">→</span></a>
                     </div>
 

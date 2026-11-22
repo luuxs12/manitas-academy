@@ -74,6 +74,22 @@ Reglas de uso de la paleta:
 Podés renombrar o agregar variables **siempre que actualices este archivo**.
 Si agregás una nueva (por ejemplo `--accent-2`), avisame y la uso en las pantallas nuevas.
 
+### Modo oscuro
+
+El tema no duplica reglas: cambia los **mismos tokens** en
+`html[data-theme="dark"]`. Todo lo que usa `var(--paper)`, `var(--surface)`,
+`var(--ink)` o `var(--line)` se adapta solo; las superficies inversas (portada,
+pie, barra del panel y plan anual) siguen siendo negras a propósito.
+
+- `static/js/theme.js` se carga en el `<head>` sin `defer`, antes de pintar, para
+  evitar el destello blanco.
+- La elección manual se guarda en `localStorage` (`mm-theme`). Si no hay
+  elección, manda `prefers-color-scheme` y se sigue en vivo si el sistema cambia.
+- El interruptor es un botón con `data-theme-toggle`; muestra la luna en claro y
+  el sol en oscuro. Hay uno en la cabecera pública y otro en el panel.
+- El modo oscuro no cambia la identidad: el verde sigue siendo superficie y el
+  texto sobre verde sigue siendo negro.
+
 ### Tipografía
 
 Una familia de titulares: **Tanker** (Fontshare, licencia ITF Free Font License

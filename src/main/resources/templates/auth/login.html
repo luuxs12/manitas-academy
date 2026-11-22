@@ -34,6 +34,10 @@
                     Cerraste sesión. Nos vemos en la próxima clase.
                 </div>
 
+                <div class="auth-alert auth-alert--ok" th:if="${passwordReset}" role="status">
+                    Tu contraseña nueva quedó guardada. Entrá con ella.
+                </div>
+
                 <form class="auth-form" th:action="@{/login}" method="post">
 
                     <div class="field">
@@ -61,8 +65,7 @@
                             <input type="checkbox" name="remember-me">
                             <span>Mantener sesión abierta</span>
                         </label>
-                        <a class="auth-link"
-                           href="mailto:hola@mundomanitas.com?subject=Necesito%20ayuda%20para%20entrar%20a%20mi%20cuenta">
+                        <a class="auth-link" th:href="@{/recuperar}">
                             ¿Olvidaste tu contraseña?
                         </a>
                     </div>

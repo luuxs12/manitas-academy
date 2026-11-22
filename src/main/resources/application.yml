@@ -29,6 +29,13 @@ server:
 app:
   security:
     remember-me-key: ${REMEMBER_ME_KEY:mundo-manitas-dev-key}
+  mail:
+    # Sin clave, el correo se omite y el sitio sigue funcionando.
+    api-key: ${RESEND_API_KEY:}
+    from: "${MAIL_FROM:Mundo Manitas <onboarding@resend.dev>}"
+    base-url: ${APP_BASE_URL:http://localhost:8080}
+    endpoint: ${RESEND_ENDPOINT:https://api.resend.com}
+    reset-minutes: ${RESET_MINUTES:60}
 
 management:
   endpoints:

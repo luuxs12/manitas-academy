@@ -97,6 +97,11 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-actuator</artifactId>
 		</dependency>
+		<!-- Exporta /actuator/prometheus; aprobado explícitamente para la Fase 2. -->
+		<dependency>
+			<groupId>io.micrometer</groupId>
+			<artifactId>micrometer-registry-prometheus</artifactId>
+		</dependency>
 
 		<!-- Librerias obligatorias del proyecto -->
 		<dependency>

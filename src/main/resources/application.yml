@@ -29,6 +29,10 @@ server:
 app:
   security:
     remember-me-key: ${REMEMBER_ME_KEY:mundo-manitas-dev-key}
+  monitoring:
+    # Sin contraseña, Actuator queda protegido con la cuenta ADMIN del sitio.
+    username: ${MONITOR_USER:monitor}
+    password: ${MONITOR_PASSWORD:}
   mail:
     # Sin clave, el correo se omite y el sitio sigue funcionando.
     api-key: ${RESEND_API_KEY:}
@@ -65,8 +69,12 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,metrics,prometheus
   endpoint:
     health:
       probes:
         enabled: true
+      show-details: always
+  metrics:
+    tags:
+      application: mundo-manitas-api

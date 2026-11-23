@@ -60,6 +60,8 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/pagos/stripe/webhook").permitAll()
+                        // Sin usuario de monitoreo, Actuator queda solo para ADMIN.
+                        .requestMatchers("/actuator/**").hasRole("ADMIN")
                         .requestMatchers("/admin", "/admin/**").hasRole("ADMIN")
                         // Paneles aislados: ADMIN nunca entra al área de estudiante.
                         .requestMatchers("/panel", "/panel/**").hasAnyRole("STUDENT", "TEACHER")

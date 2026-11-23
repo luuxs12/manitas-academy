@@ -32,7 +32,7 @@ class CertificateIssuerServiceTest {
     private NotificationService notifications;
 
     @InjectMocks
-    private CertificateIssuerService issuer;
+    private CertificateIssuerServiceImpl issuer;
 
     @Mock
     private Enrollment enrollment;

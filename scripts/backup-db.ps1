@@ -47,7 +47,7 @@ $stamp = [DateTime]::UtcNow.ToString('yyyyMMddTHHmmssZ')
 $file = Join-Path $BackupDir "mundomanitas_$stamp.dump"
 
 $dumpArgs = @(
-    '--format=custom', '--no-owner', '--no-privileges',
+    '--format=custom', '-w', '--no-owner', '--no-privileges',
     '--host', $DbHost, '--port', "$DbPort",
     '--username', $DbUser, '--dbname', $DbName,
     '--file', $file

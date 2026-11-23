@@ -90,8 +90,8 @@ coincida con lo que realmente tiene el proyecto.
 
 ### Qué cambió
 
-- `scripts/backup-db.ps1` genera backups lógicos con `pg_dump`, los firma con
-  SHA-256 y conserva 14 días.
+- `scripts/backup-db.ps1` genera backups lógicos con `pg_dump`, les calcula un
+  checksum SHA-256 y conserva 14 días.
 - `scripts/restore-db.ps1` exige confirmación, valida el checksum y restaura con
   `pg_restore`.
 - `scripts/test-backup-restore.ps1` prueba el ciclo completo en un schema

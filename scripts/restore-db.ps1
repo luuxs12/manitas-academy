@@ -55,7 +55,8 @@ if ($expected -ne $actual) {
 }
 
 $restoreArgs = @(
-    '--clean', '--if-exists', '--no-owner', '--no-privileges',
+    '--clean', '--if-exists', '--single-transaction', '-w',
+    '--no-owner', '--no-privileges',
     '--host', $DbHost, '--port', "$DbPort",
     '--username', $DbUser, '--dbname', $DbName
 )

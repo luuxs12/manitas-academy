@@ -37,7 +37,11 @@ $env:DB_PASSWORD = 'valor-secreto'
 - Valida el `.sha256` antes de conectar con la base; si no coincide, aborta.
 - Usa `--clean --if-exists`, así que **borra los objetos existentes** antes de
   recrearlos. En producción se debe restaurar en una base de prueba primero.
+- Usa `--single-transaction`: si algo falla a mitad de camino, se revierte todo
+  y la base no queda a medias.
 - Con `-Schema nombre` limita la restauración a ese schema.
+- Las tres herramientas se llaman con `-w` (sin prompt interactivo): si la
+  contraseña está mal, el comando falla en vez de quedarse esperando.
 
 ## Prueba real
 

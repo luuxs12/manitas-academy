@@ -30,13 +30,14 @@ $schema = 'mm_backup_test_' + [DateTime]::UtcNow.ToString('yyyyMMddHHmmssfff')
 $work = Join-Path ([IO.Path]::GetTempPath()) "mm-backup-test-$schema"
 New-Item -ItemType Directory -Path $work -Force | Out-Null
 
+$previousPgPassword = $env:PGPASSWORD
 $env:PGPASSWORD = $env:DB_PASSWORD
 
 function Invoke-Psql([string]$sql) {
-    # Los scripts de backup limpian PGPASSWORD al terminar; se restaura acá.
+    # Los scripts de backup restauran PGPASSWORD al terminar; se fija acá.
     $env:PGPASSWORD = $env:DB_PASSWORD
     $psql = Join-Path $PgBin 'psql.exe'
-    $sqlArgs = @('-v', 'ON_ERROR_STOP=1', '-q', '-h', $DbHost, '-p', "$DbPort",
+    $sqlArgs = @('-v', 'ON_ERROR_STOP=1', '-q', '-w', '-h', $DbHost, '-p', "$DbPort",
                  '-U', $DbUser, '-d', $DbName, '-tAc', $sql)
     $result = & $psql @sqlArgs 2>&1
     if ($LASTEXITCODE -ne 0) {
@@ -72,6 +73,35 @@ INSERT INTO $schema.backup_probe (note) VALUES ('backup-ok');
     $before = (Invoke-Psql "SELECT count(*) FROM $schema.backup_probe;").Trim()
     if ($before -ne '0') { throw "La tabla debería estar vacía antes de restaurar (count=$before)" }
 
+    Write-Host 'Verificando que la restauración exija confirmación...'
+    $rechazoSinConfirm = $false
+    try {
+        & "$root\scripts\restore-db.ps1" -PgBin $PgBin -DbHost $DbHost -DbPort $DbPort `
+            -DbUser $DbUser -DbName $DbName -Schema $schema -BackupFile $backupFile.FullName 2>&1 | Out-Null
+    }
+    catch {
+        $rechazoSinConfirm = $true
+    }
+    if (-not $rechazoSinConfirm) {
+        throw 'restore-db.ps1 aceptó restaurar sin -ConfirmRestore'
+    }
+
+    Write-Host 'Verificando que rechace un checksum inválido...'
+    $copia = Join-Path $work 'tampered.dump'
+    Copy-Item -LiteralPath $backupFile.FullName -Destination $copia
+    Set-Content -LiteralPath "$copia.sha256" -Value "$('0' * 64)  tampered.dump" -Encoding ascii
+    $rechazoChecksum = $false
+    try {
+        & "$root\scripts\restore-db.ps1" -PgBin $PgBin -DbHost $DbHost -DbPort $DbPort `
+            -DbUser $DbUser -DbName $DbName -Schema $schema -BackupFile $copia -ConfirmRestore 2>&1 | Out-Null
+    }
+    catch {
+        $rechazoChecksum = $true
+    }
+    if (-not $rechazoChecksum) {
+        throw 'restore-db.ps1 aceptó un backup con checksum inválido'
+    }
+
     Write-Host 'Restaurando...'
     & "$root\scripts\restore-db.ps1" -PgBin $PgBin -DbHost $DbHost -DbPort $DbPort `
         -DbUser $DbUser -DbName $DbName -Schema $schema -BackupFile $backupFile.FullName -ConfirmRestore
@@ -86,7 +116,17 @@ INSERT INTO $schema.backup_probe (note) VALUES ('backup-ok');
     Write-Host 'OK: backup y restore verificados sin tocar las tablas de la aplicación'
 }
 finally {
-    Invoke-Psql "DROP SCHEMA IF EXISTS $schema CASCADE;" | Out-Null
+    try {
+        Invoke-Psql "DROP SCHEMA IF EXISTS $schema CASCADE;" | Out-Null
+    }
+    catch {
+        Write-Warning "No se pudo borrar el schema temporal ${schema}: $_"
+    }
     Remove-Item -LiteralPath $work -Recurse -Force -ErrorAction SilentlyContinue
-    Remove-Item Env:PGPASSWORD -ErrorAction SilentlyContinue
+    if ($null -eq $previousPgPassword) {
+        Remove-Item Env:PGPASSWORD -ErrorAction SilentlyContinue
+    }
+    else {
+        $env:PGPASSWORD = $previousPgPassword
+    }
 }

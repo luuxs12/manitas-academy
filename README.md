@@ -156,7 +156,7 @@ Los scripts están en `scripts/` y trabajan con `pg_dump`/`pg_restore` en format
 custom. La contraseña se pasa por `DB_PASSWORD`, nunca se guarda en el repo.
 
 ```powershell
-$env:DB_PASSWORD = 'mundo_manitas'
+$env:DB_PASSWORD = 'valor-secreto'
 .\scripts\backup-db.ps1 -BackupDir .\backups   # genera .dump y .sha256
 .\scripts\restore-db.ps1 -BackupFile .\backups\mundomanitas_....dump -ConfirmRestore
 .\scripts\test-backup-restore.ps1              # prueba real en un schema temporario
@@ -175,7 +175,7 @@ verifica el checksum antes de tocar la base. El detalle está en
 | URL | Qué es |
 |---|---|
 | http://localhost:8080 | Sitio |
-| http://localhost:8080/actuator/health | Estado de la app y de la base |
+| http://localhost:8080/actuator/health | Estado de la app, R2 y pagos (protegido) |
 
 Compilar y probar:
 

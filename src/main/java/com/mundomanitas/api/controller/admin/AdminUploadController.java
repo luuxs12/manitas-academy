@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
@@ -15,6 +16,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 /** Sube imágenes y videos a R2 desde los formularios del panel admin. */
+@PreAuthorize("hasRole('ADMIN')")
 @RestController
 @RequestMapping("/admin/archivos")
 public class AdminUploadController {

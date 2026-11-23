@@ -5,6 +5,7 @@ import com.mundomanitas.api.service.admin.AdminNotificationService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.OffsetDateTime;
@@ -13,6 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 /** Endpoint consultado por el polling de notificaciones del panel. */
+@PreAuthorize("hasRole('ADMIN')")
 @RestController
 @RequestMapping("/admin/api/notificaciones")
 public class AdminNotificationApiController {

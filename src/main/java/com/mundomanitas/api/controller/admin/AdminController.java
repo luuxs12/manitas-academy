@@ -4,12 +4,14 @@ import com.mundomanitas.api.service.MailService;
 import com.mundomanitas.api.service.PaymentService;
 import com.mundomanitas.api.service.admin.AdminDashboardService;
 import com.mundomanitas.api.service.admin.AdminNotificationService;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+@PreAuthorize("hasRole('ADMIN')")
 @Controller
 @RequestMapping("/admin")
 public class AdminController extends AdminBaseController {

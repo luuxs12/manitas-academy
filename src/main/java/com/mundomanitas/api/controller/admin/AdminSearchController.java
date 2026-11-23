@@ -5,6 +5,7 @@ import com.mundomanitas.api.service.admin.AdminCatalogService;
 import com.mundomanitas.api.service.admin.AdminNotificationService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 /** Búsqueda global dentro del panel administrativo. */
+@PreAuthorize("hasRole('ADMIN')")
 @Controller
 @RequestMapping("/admin/buscar")
 public class AdminSearchController extends AdminBaseController {

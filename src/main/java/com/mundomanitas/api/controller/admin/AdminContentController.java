@@ -9,6 +9,7 @@ import com.mundomanitas.api.service.admin.AdminNotificationService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -23,6 +24,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.UUID;
 
 /** Gestión de módulos, videos y ejercicios del catálogo. */
+@PreAuthorize("hasRole('ADMIN')")
 @Controller
 @RequestMapping("/admin")
 public class AdminContentController extends AdminBaseController {

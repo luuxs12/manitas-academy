@@ -13,7 +13,7 @@ Aprendé a tu ritmo, con intérprete y subtítulos en cada clase.
 ![Thymeleaf](https://img.shields.io/badge/Thymeleaf-3-0d0d0d)
 ![PostgreSQL 18](https://img.shields.io/badge/PostgreSQL-18-0d0d0d)
 ![Flyway](https://img.shields.io/badge/Flyway-migraciones-0d0d0d)
-![Tests](https://img.shields.io/badge/tests-14_en_verde-00a63e)
+![Tests](https://img.shields.io/badge/tests-57_en_verde-00a63e)
 
 </div>
 
@@ -106,7 +106,8 @@ mantiene al navegar entre la portada, las páginas internas y el panel.
 | Base de datos | PostgreSQL 18 |
 | Migraciones | Flyway (`ddl-auto: validate`) |
 | Build | Maven con wrapper incluido |
-| Pruebas | JUnit 5 + AssertJ (14 pruebas) |
+| Pruebas | JUnit 5 + AssertJ + Mockito (57 pruebas) |
+| Métricas | Spring Boot Actuator + Micrometer/Prometheus |
 
 ## Requisitos
 
@@ -144,9 +145,26 @@ La base se crea una sola vez; las tablas las crea Flyway al arrancar.
 Se pueden pisar con variables de entorno: `DATABASE_URL`, `DB_USER`,
 `DB_PASSWORD` y `REMEMBER_ME_KEY`.
 
-La migración vigente es `V1__accounts.sql`: usuarios, roles, preferencias de
-accesibilidad y el trigger de `updated_at`. Una migración ya ejecutada **no se
-edita** (Flyway guarda su checksum); el cambio va en la versión siguiente.
+Las migraciones van de `V1__accounts.sql` a `V6__audit_actor_foreign_key.sql`:
+cuentas, recuperación de contraseña, cursos e inscripciones, módulos de cuenta,
+administración y la llave foránea de auditoría. Una migración ya ejecutada
+**no se edita** (Flyway guarda su checksum); el cambio va en `V7` o posterior.
+
+### Backup y restauración
+
+Los scripts están en `scripts/` y trabajan con `pg_dump`/`pg_restore` en formato
+custom. La contraseña se pasa por `DB_PASSWORD`, nunca se guarda en el repo.
+
+```powershell
+$env:DB_PASSWORD = 'mundo_manitas'
+.\scripts\backup-db.ps1 -BackupDir .\backups   # genera .dump y .sha256
+.\scripts\restore-db.ps1 -BackupFile .\backups\mundomanitas_....dump -ConfirmRestore
+.\scripts\test-backup-restore.ps1              # prueba real en un schema temporario
+```
+
+Los backups se conservan 14 días y la restauración exige `-ConfirmRestore` y
+verifica el checksum antes de tocar la base. El detalle está en
+[`docs/plan-de-backups.md`](docs/plan-de-backups.md).
 
 ## Arrancar
 
@@ -163,7 +181,7 @@ Compilar y probar:
 
 ```powershell
 .\mvnw.cmd clean package      # jar en target\api-0.0.1-SNAPSHOT.jar
-.\mvnw.cmd test               # 14 pruebas
+.\mvnw.cmd test               # 57 pruebas
 java -jar target\api-0.0.1-SNAPSHOT.jar
 ```
 
@@ -184,7 +202,8 @@ java -jar target\api-0.0.1-SNAPSHOT.jar
 | `/recuperar` | Pedir el enlace para restablecer la contraseña |
 | `/restablecer?token=` | Elegir la contraseña nueva desde el enlace del correo |
 | `/logout` | Cierre de sesión (POST con token CSRF) |
-| `/actuator/health` · `/actuator/info` | Estado de la aplicación |
+| `/actuator/health` | Estado de la app, R2 y pagos (protegido) |
+| `/actuator/info` · `/actuator/metrics` · `/actuator/prometheus` | Métricas (protegido) |
 
 Las páginas del sitio cargan el modal de cuenta como fragmento. Los botones
 "Iniciar sesión", "Crear cuenta", "Empezar gratis", "Crear mi cuenta" y "Crear
@@ -316,10 +335,18 @@ no aparezca un destello blanco. Los tokens y las reglas están en
 | Prueba | Qué cubre |
 |---|---|
 | `ApiApplicationTests` | El contexto de Spring arranca con la base y las migraciones |
-| `CourseCatalogTest` | Búsqueda, filtros, slugs y fichas del catálogo (9 casos) |
-| `PasswordResetServiceTest` | Hash del token, vencimiento, un solo uso y correo (4 casos) |
+| `CourseCatalogTest` | Búsqueda, filtros, slugs y fichas del catálogo |
+| `AuthServiceTest`, `CurrentUserServiceTest` | Registro y usuario de la sesión |
+| `LessonProgressServiceTest`, `EnrollmentServiceTest`, `CertificateIssuerServiceTest` | Progreso, matrículas y certificados |
+| `PaymentServiceTest` | Checkout, webhook y confirmación de pago |
+| `AdminCatalogServiceTest`, `AdminMethodSecurityTest` | CRUD admin y exigencia de `ROLE_ADMIN` |
+| `PasswordResetServiceTest` | Hash del token, vencimiento, un solo uso y correo |
+| `RequestIdFilterTest` | `X-Request-Id`, validación y limpieza del MDC |
+| `ActuatorSecurityTest`, `BusinessMetricsTest` | Acceso a Actuator y contadores `mundomanitas_*` |
+| `R2HealthIndicatorTest`, `PaymentHealthIndicatorTest` | Estado de R2 y de la pasarela |
 
-Resultado actual: **14 de 14 en verde**.
+Resultado actual: **57 de 57 en verde**. El detalle de monitoreo está en
+[`docs/plan-de-monitoreo.md`](docs/plan-de-monitoreo.md).
 
 ## Estado
 

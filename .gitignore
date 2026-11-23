@@ -50,10 +50,13 @@ Thumbs.db
 Desktop.ini
 .DS_Store
 
-### Archivos temporales ###
+### Archivos temporales y backups ###
 *.tmp
 *.bak
 *.orig
+*.dump
+*.dump.sha256
+backups/
 
 ### Skills del agente ###
 # Se reinstalan desde skills-lock.json con `npx skills add`.

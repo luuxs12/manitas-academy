@@ -80,3 +80,35 @@ health indicators y el acceso a Actuator. Las pruebas de acceso verifican que
 2. Buscar ese id en el log y explicar que no expone datos personales.
 3. Llamar a `/actuator/prometheus` sin credenciales: debe fallar.
 4. Mostrar los contadores `mundomanitas_*` y las alertas propuestas.
+
+## Fase 3 — Mantenimiento
+
+### Qué se buscó
+
+Poder recuperar la base sin depender de memoria, y que la documentación
+coincida con lo que realmente tiene el proyecto.
+
+### Qué cambió
+
+- `scripts/backup-db.ps1` genera backups lógicos con `pg_dump`, los firma con
+  SHA-256 y conserva 14 días.
+- `scripts/restore-db.ps1` exige confirmación, valida el checksum y restaura con
+  `pg_restore`.
+- `scripts/test-backup-restore.ps1` prueba el ciclo completo en un schema
+  temporario, sin tocar las tablas de la aplicación.
+- Se actualizó el README: ahora dice 57 pruebas, migraciones hasta V6 y enlaces
+  a los planes de monitoreo y backups.
+- Se ignoran los `.dump` y la carpeta `backups/` para no versionar archivos
+  sensibles.
+
+### Cómo se probó
+
+Primero se ejecutó la prueba con el script de backup ausente: falló. Después se
+implementaron los scripts y la prueba pasó, verificando que la fila borrada
+vuelve después de la restauración. `.\mvnw.cmd -B test` sigue en verde.
+
+### Qué se puede explicar en la demo
+
+1. Mostrar el `.dump` y su `.sha256` generados por el script.
+2. Explicar que la restauración pide confirmación y valida el checksum.
+3. Mostrar que la prueba usa un schema temporario y no toca los datos reales.

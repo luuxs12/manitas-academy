@@ -1,6 +1,7 @@
 package com.mundomanitas.api.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.mundomanitas.api.actuator.BusinessMetrics;
 import com.mundomanitas.api.config.StripeProperties;
 import com.mundomanitas.api.exception.PaymentUnavailableException;
 import com.mundomanitas.api.model.Payment;
@@ -33,19 +34,22 @@ public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository payments;
     private final UserRepository users;
     private final NotificationService notifications;
+    private final BusinessMetrics metrics;
 
     public PaymentServiceImpl(
             StripeProperties properties,
             StripeClient stripe,
             PaymentRepository payments,
             UserRepository users,
-            NotificationService notifications
+            NotificationService notifications,
+            BusinessMetrics metrics
     ) {
         this.properties = properties;
         this.stripe = stripe;
         this.payments = payments;
         this.users = users;
         this.notifications = notifications;
+        this.metrics = metrics;
     }
 
     @Override
@@ -98,6 +102,7 @@ public class PaymentServiceImpl implements PaymentService {
         Payment payment = new Payment(user, plan);
         payment.linkSession(session.id());
         payments.save(payment);
+        metrics.checkoutStarted(plan.name());
         log.info("Checkout iniciado usuario={} plan={} sesión={}",
                 user.getId(), plan, session.id());
         return session.url();
@@ -130,6 +135,7 @@ public class PaymentServiceImpl implements PaymentService {
         Payment payment = new Payment(user, plan);
         payment.linkSession(session.id());
         payments.save(payment);
+        metrics.checkoutStarted(plan.name());
         log.info("Checkout embebido iniciado usuario={} plan={} sesión={}",
                 user.getId(), plan, session.id());
         return new EmbeddedCheckout(session.clientSecret(), session.id());
@@ -163,6 +169,7 @@ public class PaymentServiceImpl implements PaymentService {
                     .ifPresent(payment -> {
                         payment.markFailed();
                         payments.save(payment);
+                        metrics.paymentFailed();
                         log.info("Checkout vencido marcado como fallido sesión={}",
                                 payment.getStripeSessionId());
                     });
@@ -232,6 +239,7 @@ public class PaymentServiceImpl implements PaymentService {
             owner.changeStripeCustomerId(text(session.path("customer")));
         }
         users.save(owner);
+        metrics.paymentConfirmed(payment.getPlan().name());
         notifications.notify(
                 owner,
                 NotificationService.PAYMENT,

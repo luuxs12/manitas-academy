@@ -1,5 +1,6 @@
 package com.mundomanitas.api.service;
 
+import com.mundomanitas.api.actuator.BusinessMetrics;
 import com.mundomanitas.api.model.Certificate;
 import com.mundomanitas.api.model.Course;
 import com.mundomanitas.api.model.Enrollment;
@@ -30,6 +31,9 @@ class CertificateIssuerServiceTest {
 
     @Mock
     private NotificationService notifications;
+
+    @Mock
+    private BusinessMetrics metrics;
 
     @InjectMocks
     private CertificateIssuerServiceImpl issuer;

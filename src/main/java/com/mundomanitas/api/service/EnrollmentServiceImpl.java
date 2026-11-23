@@ -1,5 +1,6 @@
 package com.mundomanitas.api.service;
 
+import com.mundomanitas.api.actuator.BusinessMetrics;
 import com.mundomanitas.api.exception.PremiumRequiredException;
 import com.mundomanitas.api.model.Course;
 import com.mundomanitas.api.model.Enrollment;
@@ -32,19 +33,22 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     private final LessonProgressService lessons;
     private final NotificationService notifications;
     private final CertificateIssuerService certificates;
+    private final BusinessMetrics metrics;
 
     public EnrollmentServiceImpl(
             EnrollmentRepository enrollments,
             CourseCatalog catalog,
             LessonProgressService lessons,
             NotificationService notifications,
-            CertificateIssuerService certificates
+            CertificateIssuerService certificates,
+            BusinessMetrics metrics
     ) {
         this.enrollments = enrollments;
         this.catalog = catalog;
         this.lessons = lessons;
         this.notifications = notifications;
         this.certificates = certificates;
+        this.metrics = metrics;
     }
 
     @Override
@@ -94,6 +98,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
         }
 
         Enrollment enrollment = enrollments.save(new Enrollment(user, course));
+        metrics.enrollmentCreated();
         notifications.notify(
                 user,
                 NotificationService.ENROLLMENT,

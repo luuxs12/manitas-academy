@@ -1,6 +1,7 @@
 package com.mundomanitas.api.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.mundomanitas.api.actuator.BusinessMetrics;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mundomanitas.api.config.StripeProperties;
 import com.mundomanitas.api.exception.PaymentUnavailableException;
@@ -56,13 +57,17 @@ class PaymentServiceTest {
     private NotificationService notifications;
 
     @Mock
+    private BusinessMetrics metrics;
+
+    @Mock
     private User user;
 
     private PaymentService service;
 
     @BeforeEach
     void setUp() {
-        service = new PaymentServiceImpl(properties, stripe, payments, users, notifications);
+        service = new PaymentServiceImpl(
+                properties, stripe, payments, users, notifications, metrics);
     }
 
     @Test

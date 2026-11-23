@@ -1,6 +1,7 @@
 package com.mundomanitas.api.service;
 
 import com.mundomanitas.api.model.Certificate;
+import com.mundomanitas.api.actuator.BusinessMetrics;
 import com.mundomanitas.api.model.Enrollment;
 import com.mundomanitas.api.model.User;
 import com.mundomanitas.api.repository.CertificateRepository;
@@ -24,11 +25,14 @@ public class CertificateIssuerServiceImpl implements CertificateIssuerService {
 
     private final CertificateRepository certificates;
     private final NotificationService notifications;
+    private final BusinessMetrics metrics;
 
     public CertificateIssuerServiceImpl(CertificateRepository certificates,
-                                        NotificationService notifications) {
+                                        NotificationService notifications,
+                                        BusinessMetrics metrics) {
         this.certificates = certificates;
         this.notifications = notifications;
+        this.metrics = metrics;
     }
 
     /** Devuelve true cuando se emitió un certificado nuevo. */
@@ -48,6 +52,7 @@ public class CertificateIssuerServiceImpl implements CertificateIssuerService {
         String prefix = slug.substring(0, Math.min(3, slug.length())).toUpperCase();
         String code = "MM-" + prefix + "-" + UUID.randomUUID().toString().substring(0, 8).toUpperCase();
         certificates.save(new Certificate(user.getId(), enrollment.getCourse().getId(), code));
+        metrics.certificateIssued();
         notifications.notify(
                 user,
                 NotificationService.CERTIFICATE,

@@ -1,5 +1,6 @@
 package com.mundomanitas.api.service;
 
+import com.mundomanitas.api.actuator.BusinessMetrics;
 import com.mundomanitas.api.exception.PremiumRequiredException;
 import com.mundomanitas.api.model.Course;
 import com.mundomanitas.api.model.Enrollment;
@@ -42,6 +43,9 @@ class EnrollmentServiceTest {
     private CertificateIssuerService certificates;
 
     @Mock
+    private BusinessMetrics metrics;
+
+    @Mock
     private User user;
 
     @Mock
@@ -55,7 +59,7 @@ class EnrollmentServiceTest {
     @BeforeEach
     void setUp() {
         service = new EnrollmentServiceImpl(
-                enrollments, catalog, lessons, notifications, certificates);
+                enrollments, catalog, lessons, notifications, certificates, metrics);
     }
 
     @Test

@@ -1,0 +1,94 @@
+# Plan de monitoreo
+
+Esta guía explica cómo observar la API sin exponer datos privados. Todo lo que
+se describe acá se configura con variables de entorno: no hay claves en el
+repositorio.
+
+## Logs
+
+- Formato: fecha, nivel, `requestId`, logger y mensaje.
+- `requestId` viene del header `X-Request-Id` cuando es válido; si no, se genera
+  un UUID. Se devuelve en la respuesta para poder pedir el log de una petición.
+- Niveles: `INFO` para la aplicación, `WARN` para Spring Security, Hibernate y
+  el SDK de AWS. Así no se registran consultas con datos personales.
+- Rotación: `logs/mundomanitas.log`, hasta 10 MB por archivo, 14 días de
+  historia y 500 MB total. Se puede cambiar con `LOG_FILE`.
+- Regla: nunca se loguean correos, contraseñas, tokens de pago, claves de R2 ni
+  residuos de formularios. Solo ids internos, planes, ids de matrícula y el
+  `requestId`.
+
+## Endpoints de Actuator
+
+| Endpoint | Uso | Acceso |
+|---|---|---|
+| `/actuator/health` | estado de la app, R2 y pagos | credenciales de monitoreo |
+| `/actuator/info` | versión del servicio | credenciales de monitoreo |
+| `/actuator/metrics` | métricas disponibles | credenciales de monitoreo |
+| `/actuator/prometheus` | scrape de Prometheus | credenciales de monitoreo |
+
+Cuando `MONITOR_PASSWORD` está vacío, Actuator queda detrás del rol `ADMIN`
+del sitio. Cuando se define, se crea un usuario separado:
+
+```bash
+MONITOR_USER=monitor
+MONITOR_PASSWORD=<valor-secreto>
+```
+
+Prometheus no usa la cuenta administrativa del panel. La contraseña se guarda
+hasheada en memoria y nunca se escribe en logs.
+
+## Health indicators
+
+- `r2`: `UP` si hay endpoint, bucket, claves y URL pública; `UNKNOWN` si el
+  almacenamiento está apagado. Muestra el nombre del bucket, nunca las claves.
+- `payments`: `UP` si la pasarela tiene credenciales; `UNKNOWN` si el cobro está
+  apagado. No llama a la red durante el scrape.
+
+Un indicator en `UNKNOWN` no derriba la app: significa "integración opcional no
+configurada", algo esperado en desarrollo.
+
+## Métricas propias
+
+Todas usan el prefijo `mundomanitas_`:
+
+| Métrica | Qué cuenta |
+|---|---|
+| `mundomanitas_checkouts_started_total` | checkouts iniciados, con tag `plan` |
+| `mundomanitas_payments_confirmed_total` | pagos confirmados, con tag `plan` |
+| `mundomanitas_payments_failed_total` | checkouts vencidos o pagos fallidos |
+| `mundomanitas_enrollments_created_total` | matrículas nuevas |
+| `mundomanitas_certificates_issued_total` | certificados emitidos |
+
+Además se exportan las métricas automáticas de Actuator:
+`http_server_requests_seconds_*`, `jvm_memory_used_bytes`, Hikari y Flyway.
+El tag `application=mundo-manitas-api` se agrega a todas.
+
+## Prometheus y Grafana
+
+Los archivos de ejemplo están en `ops/monitoring/`:
+
+- `prometheus.yml`: scrape cada 15 s de `/actuator/prometheus`, con
+  `password_file` montado como secreto (nunca inline).
+- `alerts.yml`: API caída, errores 5xx, latencia p95, fallos de pago y
+  ausencia de pagos confirmados en 24 h.
+- `grafana-dashboard.json`: paneles de tráfico, errores, latencia, pagos por
+  plan, inscripciones, certificados y heap.
+
+Para importar el dashboard, crear un datasource Prometheus y usar el JSON con
+el datasource variable `DS_PROMETHEUS`.
+
+## Verificación
+
+```bash
+.\mvnw.cmd -B "-Dtest=RequestIdFilterTest,BusinessMetricsTest,R2HealthIndicatorTest,PaymentHealthIndicatorTest,ActuatorSecurityTest" test
+.\mvnw.cmd -B test
+```
+
+En un entorno con `MONITOR_PASSWORD`:
+
+```bash
+curl -u monitor:<password> http://localhost:8080/actuator/health
+curl -u monitor:<password> http://localhost:8080/actuator/prometheus | grep mundomanitas_
+```
+
+Sin credenciales, ambas rutas deben devolver `401`.

@@ -43,3 +43,40 @@ exige que `mvnw.cmd -B test` termine en verde.
 4. Las pruebas cubren el camino feliz y los rechazos importantes: correo
    duplicado, curso premium sin plan, lección fuera de rango, checkout apagado
    y curso con identificador repetido.
+
+## Fase 2 — Monitoreo y logs
+
+### Qué se buscó
+
+Poder responder “qué pasó” sin mirar la base de datos ni exponer secretos. Se
+quería saber si R2 y la pasarela están configuradas, contar los hechos de
+negocio y tener un id de petición para seguir un problema en los logs.
+
+### Qué cambió
+
+- Cada petición recibe un `requestId`: se toma del header `X-Request-Id` si es
+  válido y se genera si no. Ese valor aparece en el log y en la respuesta.
+- Los logs tienen niveles por paquete y rotación por tamaño y días. No se
+  escriben correos, contraseñas, tokens ni claves.
+- Actuator expone `health`, `info`, `metrics` y `prometheus`, pero todos los
+  endpoints están protegidos. Si se define `MONITOR_PASSWORD`, Prometheus usa
+  un usuario propio con rol de monitoreo; si no, queda con rol `ADMIN`.
+- Hay dos health indicators nuevos: `r2` y `payments`. Cuando la integración no
+  está configurada informan `UNKNOWN`, no `DOWN`.
+- Se agregaron contadores `mundomanitas_*` para checkouts, pagos, matrículas y
+  certificados.
+- Se dejaron ejemplos de Prometheus, alertas y dashboard de Grafana en
+  `ops/monitoring/`, y el detalle en `docs/plan-de-monitoreo.md`.
+
+### Cómo se probó
+
+Se escribieron pruebas para el filtro de `requestId`, los contadores, los dos
+health indicators y el acceso a Actuator. Las pruebas de acceso verifican que
+`health`, `info`, `metrics` y `prometheus` devuelvan `401` sin credenciales.
+
+### Qué se puede explicar en la demo
+
+1. Mostrar una respuesta con su header `X-Request-Id`.
+2. Buscar ese id en el log y explicar que no expone datos personales.
+3. Llamar a `/actuator/prometheus` sin credenciales: debe fallar.
+4. Mostrar los contadores `mundomanitas_*` y las alertas propuestas.

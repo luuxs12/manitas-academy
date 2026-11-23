@@ -1,0 +1,47 @@
+groups:
+  - name: mundo-manitas-api
+    rules:
+      - alert: ApiCaida
+        expr: up{job="mundo-manitas-api"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "La API no responde"
+          description: "Prometheus no pudo scrapear /actuator/prometheus durante 2 minutos."
+
+      - alert: Errores5xx
+        expr: sum(rate(http_server_requests_seconds_count{job="mundo-manitas-api",status=~"5.."}[5m])) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Hay errores 5xx"
+          description: "Más de un error por segundo sostenido durante 5 minutos. Revisar logs con el X-Request-Id."
+
+      - alert: LatenciaP95Alta
+        expr: histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{job="mundo-manitas-api"}[5m])) by (le)) > 1.5
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Latencia p95 alta"
+          description: "El 95% de las peticiones tarda más de 1,5 s durante 10 minutos."
+
+      - alert: FallosDePago
+        expr: sum(increase(mundomanitas_payments_failed_total[15m])) > 3
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Varios pagos fallaron"
+          description: "Más de 3 pagos fallidos en 15 minutos. Revisar configuración de la pasarela."
+
+      - alert: SinAltasDeMembresia
+        expr: sum(increase(mundomanitas_payments_confirmed_total[24h])) == 0
+        for: 30m
+        labels:
+          severity: info
+        annotations:
+          summary: "No se confirmaron pagos en 24 horas"
+          description: "Puede ser normal en desarrollo; revisar antes de escalar."

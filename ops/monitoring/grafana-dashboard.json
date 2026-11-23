@@ -1,0 +1,79 @@
+{
+  "title": "Mundo Manitas — API",
+  "uid": "mundomanitas-api",
+  "schemaVersion": 39,
+  "tags": ["mundo-manitas"],
+  "templating": {
+    "list": [
+      {
+        "name": "DS_PROMETHEUS",
+        "label": "Prometheus",
+        "type": "datasource",
+        "query": "prometheus",
+        "current": {}
+      }
+    ]
+  },
+  "panels": [
+    {
+      "title": "Peticiones por segundo",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "targets": [{
+        "expr": "sum(rate(http_server_requests_seconds_count{application=\"mundo-manitas-api\"}[5m]))",
+        "legendFormat": "requests"
+      }]
+    },
+    {
+      "title": "Errores 5xx por segundo",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "targets": [{
+        "expr": "sum(rate(http_server_requests_seconds_count{application=\"mundo-manitas-api\",status=~\"5..\"}[5m]))",
+        "legendFormat": "5xx"
+      }]
+    },
+    {
+      "title": "Latencia p95",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "targets": [{
+        "expr": "histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket{application=\"mundo-manitas-api\"}[5m])) by (le))",
+        "legendFormat": "p95"
+      }]
+    },
+    {
+      "title": "Pagos confirmados por plan",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "targets": [{
+        "expr": "sum by (plan) (rate(mundomanitas_payments_confirmed_total[5m]))",
+        "legendFormat": "{{plan}}"
+      }]
+    },
+    {
+      "title": "Inscripciones y certificados",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+      "targets": [
+        {
+          "expr": "sum(rate(mundomanitas_enrollments_created_total[5m]))",
+          "legendFormat": "inscripciones"
+        },
+        {
+          "expr": "sum(rate(mundomanitas_certificates_issued_total[5m]))",
+          "legendFormat": "certificados"
+        }
+      ]
+    },
+    {
+      "title": "Heap usada",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+      "targets": [{
+        "expr": "jvm_memory_used_bytes{application=\"mundo-manitas-api\",area=\"heap\"}",
+        "legendFormat": "{{id}}"
+      }]
+    }
+  ]
+}

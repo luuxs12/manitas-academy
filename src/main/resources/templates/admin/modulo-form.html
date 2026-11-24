@@ -18,16 +18,30 @@
             <form class="panel-card admin-card admin-form" th:action="${itemId != null} ? @{/admin/modulos/{id}(id=${itemId})} : @{/admin/modulos}"
                   th:object="${adminModuleForm}" method="post" novalidate>
                 <div class="admin-form-grid">
-                    <label>Curso
-                        <select th:field="*{courseId}" required>
+                    <div class="admin-field">
+                        <label for="modulo-curso">Curso</label>
+                        <select id="modulo-curso" th:field="*{courseId}" required
+                                th:attr="aria-invalid=${#fields.hasErrors('courseId')} ? 'true' : null,
+                                         aria-describedby=${#fields.hasErrors('courseId')} ? 'error-modulo-curso' : null">
                             <option value="">Elegí un curso</option>
                             <option th:each="o : ${options}" th:value="${o.id()}" th:text="${o.label()}"></option>
                         </select>
-                        <small class="admin-error" th:if="${#fields.hasErrors('courseId')}" th:errors="*{courseId}"></small>
-                    </label>
-                    <label>Título<input type="text" th:field="*{title}" maxlength="140" required>
-                        <small class="admin-error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></small></label>
-                    <label>Posición<input type="number" th:field="*{position}" min="0" max="999"></label>
+                        <small id="error-modulo-curso" class="admin-error" th:if="${#fields.hasErrors('courseId')}" th:errors="*{courseId}"></small>
+                    </div>
+                    <div class="admin-field">
+                        <label for="modulo-titulo">Título</label>
+                        <input id="modulo-titulo" type="text" th:field="*{title}" maxlength="140" required
+                               th:attr="aria-invalid=${#fields.hasErrors('title')} ? 'true' : null,
+                                        aria-describedby=${#fields.hasErrors('title')} ? 'error-modulo-titulo' : null">
+                        <small id="error-modulo-titulo" class="admin-error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></small>
+                    </div>
+                    <div class="admin-field">
+                        <label for="modulo-posicion">Posición</label>
+                        <input id="modulo-posicion" type="number" th:field="*{position}" min="0" max="9999"
+                               th:attr="aria-invalid=${#fields.hasErrors('position')} ? 'true' : null,
+                                        aria-describedby=${#fields.hasErrors('position')} ? 'error-modulo-posicion' : null">
+                        <small id="error-modulo-posicion" class="admin-error" th:if="${#fields.hasErrors('position')}" th:errors="*{position}"></small>
+                    </div>
                 </div>
                 <div class="admin-form-actions">
                     <button class="btn btn-admin" type="submit" th:text="${itemId != null} ? 'Guardar cambios' : 'Crear módulo'">Guardar</button>

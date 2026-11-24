@@ -61,7 +61,8 @@
 
             <div class="panel-card admin-card admin-table-wrap">
                 <table class="admin-table">
-                    <thead><tr><th>Código</th><th>Persona</th><th>Curso</th><th>Emisión</th><th>Estado</th><th>Acciones</th></tr></thead>
+                    <caption>Certificados emitidos desde la base, con su estado vigente o revocado.</caption>
+                    <thead><tr><th scope="col">Código</th><th scope="col">Persona</th><th scope="col">Curso</th><th scope="col">Emisión</th><th scope="col">Estado</th><th scope="col">Acciones</th></tr></thead>
                     <tbody>
                     <tr th:each="item : ${page.content}">
                         <td><strong th:text="${item.code()}">MM-XXX-00000000</strong></td>
@@ -71,10 +72,9 @@
                         <td><span class="admin-status" th:classappend="${item.active()} ? ' is-ok' : ' is-bad'"
                                   th:text="${item.active()} ? 'Vigente' : 'Revocado'">Vigente</span></td>
                         <td class="admin-row-actions">
-                            <form th:if="${item.active()}" th:action="@{/admin/certificados/{id}/revocar(id=${item.id()})}" method="post"
-                                  th:attr="data-confirm='¿Revocar este certificado?',data-confirm-accept='Revocar'">
-                                <button type="submit" th:attr="aria-label='Revocar ' + ${item.code()}">Revocar</button>
-                            </form>
+                            <a th:if="${item.active()}" class="admin-confirm-link"
+                               th:href="@{/admin/certificados/{id}/revocar(id=${item.id()}, code=${item.code()})}"
+                               th:attr="aria-label='Revocar ' + ${item.code()}">Revocar</a>
                             <span th:unless="${item.active()}" class="admin-muted">Sin acciones</span>
                         </td>
                     </tr>
@@ -90,7 +90,6 @@
         </main>
     </div>
 </div>
-<div th:replace="~{admin/fragments/confirm-dialog :: confirmDialog}"></div>
 <script defer th:src="@{/js/panel.js}"></script>
 <script defer th:src="@{/js/admin.js}"></script>
 </body>

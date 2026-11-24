@@ -36,6 +36,11 @@ import static org.mockito.Mockito.when;
 @DisplayName("Catálogo administrativo")
 class AdminCatalogServiceTest {
 
+    private static final String OLD_COVER =
+            "/uploads/covers/11111111-1111-1111-1111-111111111111.jpg";
+    private static final String NEW_COVER =
+            "/uploads/covers/22222222-2222-2222-2222-222222222222.webp";
+
     @Mock private UserRepository users;
     @Mock private CourseRepository courses;
     @Mock private CourseModuleRepository modules;
@@ -155,6 +160,46 @@ class AdminCatalogServiceTest {
         UUID id = UUID.randomUUID();
         when(videos.countByCourseId(id)).thenReturn(6);
         assertThat(service.lessonCount(id)).isEqualTo(6);
+    }
+
+    @Test
+    @DisplayName("informa el estado real del curso")
+    void courseStatus() {
+        UUID id = UUID.randomUUID();
+        Course course = course();
+        when(courses.findById(id)).thenReturn(Optional.of(course));
+
+        assertThat(service.courseStatus(id)).isEqualTo("BORRADOR");
+        course.publish();
+        assertThat(service.courseStatus(id)).isEqualTo("PUBLICADO");
+    }
+
+    @Test
+    @DisplayName("cambia la portada local y devuelve la anterior")
+    void updateCourseCover() {
+        UUID id = UUID.randomUUID();
+        UUID actor = UUID.randomUUID();
+        Course course = course();
+        course.update("curso", "Curso", "Inicial", false, "Programación", "Resumen",
+                OLD_COVER, 1);
+        when(courses.findById(id)).thenReturn(Optional.of(course));
+
+        String previous = service.updateCourseCover(id, NEW_COVER, actor);
+
+        assertThat(previous).isEqualTo(OLD_COVER);
+        assertThat(course.getImage()).isEqualTo(NEW_COVER);
+        verify(audit).record(actor, "UPDATE", "CURSO", id, "PORTADA");
+    }
+
+    @Test
+    @DisplayName("rechaza una portada que no está en disco local")
+    void rejectsRemoteCover() {
+        UUID id = UUID.randomUUID();
+
+        assertThatThrownBy(() -> service.updateCourseCover(
+                id, "https://ejemplo.com/portada.jpg", UUID.randomUUID()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("local");
     }
 
     @Test

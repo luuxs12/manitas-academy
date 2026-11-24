@@ -201,6 +201,20 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
     }
 
     @Override
+    @Transactional
+    public String updateCourseCover(UUID id, String image, UUID actor) {
+        checkArgument(image != null
+                        && image.matches("/uploads/covers/[0-9a-f-]+\\.(jpg|png|webp)"),
+                "La portada debe ser una imagen local.");
+        Course course = requireCourse(id);
+        String previous = course.getImage();
+        course.changeImage(image);
+        audit.record(actor, "UPDATE", "CURSO", id, "PORTADA");
+        log.info("Portada actualizada id={} actor={} anterior={}", id, actor, previous);
+        return previous;
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public PublishChecklist publishChecklist(UUID id) {
         Course course = requireCourse(id);
@@ -217,6 +231,12 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
             if (!hasVideo) missing.add("video");
         }
         return new PublishChecklist(List.copyOf(missing), missing.isEmpty());
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public String courseStatus(UUID id) {
+        return requireCourse(id).getStatus();
     }
 
     @Override

@@ -14,26 +14,58 @@
             <p class="panel-flash panel-flash--error" th:if="${panelError}" th:text="${panelError}" role="alert"></p>
 
             <div class="admin-page-head">
-                <div><h1 th:text="${courseId != null} ? 'Editar curso' : 'Nuevo curso'">Curso</h1><p>Usá una portada local guardada en el servidor.</p></div>
+                <div><h1 th:text="${courseId != null} ? 'Editar curso' : 'Nuevo curso'">Curso</h1>
+                    <p>La ficha se guarda en PostgreSQL; la portada se sube al servidor.</p></div>
                 <a class="admin-back" th:href="@{/admin/cursos}">← Volver a cursos</a>
             </div>
 
             <form class="panel-card admin-card admin-form" th:action="${courseId != null} ? @{/admin/cursos/{id}(id=${courseId})} : @{/admin/cursos}"
                   th:object="${adminCourseForm}" method="post" novalidate>
+                <input type="hidden" th:field="*{image}">
                 <div class="admin-form-grid">
-                    <label>Título<input type="text" th:field="*{title}" maxlength="140" required>
-                        <small class="admin-error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></small></label>
-                    <label>Identificador (slug)<input type="text" th:field="*{slug}" maxlength="80" required>
-                        <small class="admin-error" th:if="${#fields.hasErrors('slug')}" th:errors="*{slug}"></small></label>
-                    <label>Nivel<input type="text" th:field="*{level}" maxlength="60" required>
-                        <small class="admin-error" th:if="${#fields.hasErrors('level')}" th:errors="*{level}"></small></label>
-                    <label>Categoría<input type="text" th:field="*{category}" maxlength="80" required>
-                        <small class="admin-error" th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></small></label>
-                    <label>Posición<input type="number" th:field="*{position}" min="0" max="999"></label>
-                    <label class="admin-span-2">Resumen<textarea th:field="*{summary}" rows="3" maxlength="400" required></textarea>
-                        <small class="admin-error" th:if="${#fields.hasErrors('summary')}" th:errors="*{summary}"></small></label>
-                    <label class="admin-span-2">Imagen (ruta real)<input id="course-image" type="text" th:field="*{image}" maxlength="300" required>
-                        <small class="admin-error" th:if="${#fields.hasErrors('image')}" th:errors="*{image}"></small></label>
+                    <div class="admin-field">
+                        <label for="curso-titulo">Título</label>
+                        <input id="curso-titulo" type="text" th:field="*{title}" maxlength="140" required
+                               th:attr="aria-invalid=${#fields.hasErrors('title')} ? 'true' : null,
+                                        aria-describedby=${#fields.hasErrors('title')} ? 'error-titulo' : null">
+                        <small id="error-titulo" class="admin-error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></small>
+                    </div>
+                    <div class="admin-field">
+                        <label for="curso-slug">Identificador (slug)</label>
+                        <input id="curso-slug" type="text" th:field="*{slug}" maxlength="80"
+                               th:attr="aria-invalid=${#fields.hasErrors('slug')} ? 'true' : null,
+                                        aria-describedby=${#fields.hasErrors('slug')} ? 'error-slug hint-slug' : 'hint-slug'">
+                        <small id="hint-slug" class="admin-hint">Si lo dejás vacío se genera desde el título.</small>
+                        <small id="error-slug" class="admin-error" th:if="${#fields.hasErrors('slug')}" th:errors="*{slug}"></small>
+                    </div>
+                    <div class="admin-field">
+                        <label for="curso-nivel">Nivel</label>
+                        <input id="curso-nivel" type="text" th:field="*{level}" maxlength="60" required
+                               th:attr="aria-invalid=${#fields.hasErrors('level')} ? 'true' : null,
+                                        aria-describedby=${#fields.hasErrors('level')} ? 'error-nivel' : null">
+                        <small id="error-nivel" class="admin-error" th:if="${#fields.hasErrors('level')}" th:errors="*{level}"></small>
+                    </div>
+                    <div class="admin-field">
+                        <label for="curso-categoria">Categoría</label>
+                        <input id="curso-categoria" type="text" th:field="*{category}" maxlength="60" required
+                               th:attr="aria-invalid=${#fields.hasErrors('category')} ? 'true' : null,
+                                        aria-describedby=${#fields.hasErrors('category')} ? 'error-categoria' : null">
+                        <small id="error-categoria" class="admin-error" th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></small>
+                    </div>
+                    <div class="admin-field">
+                        <label for="curso-posicion">Posición</label>
+                        <input id="curso-posicion" type="number" th:field="*{position}" min="0" max="9999"
+                               th:attr="aria-invalid=${#fields.hasErrors('position')} ? 'true' : null,
+                                        aria-describedby=${#fields.hasErrors('position')} ? 'error-posicion' : null">
+                        <small id="error-posicion" class="admin-error" th:if="${#fields.hasErrors('position')}" th:errors="*{position}"></small>
+                    </div>
+                    <div class="admin-field admin-span-2">
+                        <label for="curso-resumen">Resumen</label>
+                        <textarea id="curso-resumen" th:field="*{summary}" rows="3" maxlength="320" required
+                                  th:attr="aria-invalid=${#fields.hasErrors('summary')} ? 'true' : null,
+                                           aria-describedby=${#fields.hasErrors('summary')} ? 'error-resumen' : null"></textarea>
+                        <small id="error-resumen" class="admin-error" th:if="${#fields.hasErrors('summary')}" th:errors="*{summary}"></small>
+                    </div>
                 </div>
                 <label class="admin-check"><input type="checkbox" th:field="*{free}"> Curso gratuito (sin plan Premium)</label>
                 <div class="admin-form-actions">
@@ -41,6 +73,47 @@
                     <a class="admin-back" th:href="@{/admin/cursos}">Cancelar</a>
                 </div>
             </form>
+
+            <section id="portada" class="panel-card admin-card admin-cover" th:if="${courseId != null}"
+                     aria-labelledby="portada-title">
+                <h2 id="portada-title">Portada local</h2>
+                <p class="admin-muted" th:text="${adminCourseForm.image() != null and !#strings.isEmpty(adminCourseForm.image())
+                        ? 'Ruta actual: ' + adminCourseForm.image() : 'Todavía no hay portada.'}">Sin portada.</p>
+                <form th:action="@{/admin/cursos/{id}/portada(id=${courseId})}" method="post" enctype="multipart/form-data">
+                    <div class="admin-field">
+                        <label for="portada-archivo">Archivo JPG, PNG o WebP (hasta 2 MB)</label>
+                        <input id="portada-archivo" name="portada" type="file"
+                               accept="image/jpeg,image/png,image/webp" required>
+                    </div>
+                    <div class="admin-form-actions">
+                        <button class="btn btn-admin" type="submit">Guardar portada</button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="panel-card admin-card admin-publication" th:if="${courseId != null}"
+                     aria-labelledby="publicacion-title">
+                <h2 id="publicacion-title">Publicación</h2>
+                <p>Estado actual:
+                    <span class="admin-status" th:classappend="${courseStatus == 'PUBLICADO'} ? ' is-ok' : ' is-bad'"
+                          th:text="${courseStatus == 'PUBLICADO'} ? 'Publicado' : 'Borrador'">Borrador</span>
+                </p>
+                <p id="checklist-help" class="admin-muted">Requisitos calculados desde la base.</p>
+                <ul id="checklist" class="admin-checklist">
+                    <li th:each="missing : ${checklist.missing()}" th:text="'Falta ' + ${missing}"></li>
+                    <li th:if="${checklist.canPublish()}">El curso está listo para publicarse.</li>
+                </ul>
+                <div class="admin-form-actions">
+                    <form th:if="${courseStatus != 'PUBLICADO'}"
+                          th:action="@{/admin/cursos/{id}/publicar(id=${courseId})}" method="post">
+                        <button class="btn btn-admin" type="submit" aria-describedby="checklist-help checklist">Publicar curso</button>
+                    </form>
+                    <form th:if="${courseStatus == 'PUBLICADO'}"
+                          th:action="@{/admin/cursos/{id}/despublicar(id=${courseId})}" method="post">
+                        <button class="btn btn-ghost" type="submit">Pasar a borrador</button>
+                    </form>
+                </div>
+            </section>
         </main>
     </div>
 </div>

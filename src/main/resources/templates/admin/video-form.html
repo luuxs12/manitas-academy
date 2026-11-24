@@ -18,21 +18,39 @@
             <form class="panel-card admin-card admin-form" th:action="${itemId != null} ? @{/admin/videos/{id}(id=${itemId})} : @{/admin/videos}"
                   th:object="${adminVideoForm}" method="post" novalidate>
                 <div class="admin-form-grid">
-                    <label>Módulo
-                        <select th:field="*{moduleId}" required>
+                    <div class="admin-field">
+                        <label for="video-modulo">Módulo</label>
+                        <select id="video-modulo" th:field="*{moduleId}" required
+                                th:attr="aria-invalid=${#fields.hasErrors('moduleId')} ? 'true' : null,
+                                         aria-describedby=${#fields.hasErrors('moduleId')} ? 'error-video-modulo' : null">
                             <option value="">Elegí un módulo</option>
                             <option th:each="o : ${options}" th:value="${o.id()}" th:text="${o.label()}"></option>
                         </select>
-                        <small class="admin-error" th:if="${#fields.hasErrors('moduleId')}" th:errors="*{moduleId}"></small>
-                    </label>
-                    <label>Título<input type="text" th:field="*{title}" maxlength="140" required>
-                        <small class="admin-error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></small></label>
-                    <label class="admin-span-2">Enlace de YouTube
-                        <input id="video-youtube-url" type="url" th:field="*{youtubeUrl}" maxlength="300"
-                               placeholder="https://www.youtube.com/watch?v=…">
-                        <small class="admin-hint">Se reproduce desde YouTube en modo sin cookies.</small>
-                        <small class="admin-error" th:if="${#fields.hasErrors('youtubeUrl')}" th:errors="*{youtubeUrl}"></small></label>
-                    <label>Posición<input type="number" th:field="*{position}" min="0" max="999"></label>
+                        <small id="error-video-modulo" class="admin-error" th:if="${#fields.hasErrors('moduleId')}" th:errors="*{moduleId}"></small>
+                    </div>
+                    <div class="admin-field">
+                        <label for="video-titulo">Título</label>
+                        <input id="video-titulo" type="text" th:field="*{title}" maxlength="140" required
+                               th:attr="aria-invalid=${#fields.hasErrors('title')} ? 'true' : null,
+                                        aria-describedby=${#fields.hasErrors('title')} ? 'error-video-titulo' : null">
+                        <small id="error-video-titulo" class="admin-error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></small>
+                    </div>
+                    <div class="admin-field admin-span-2">
+                        <label for="video-youtube-url">Enlace de YouTube</label>
+                        <input id="video-youtube-url" type="url" th:field="*{youtubeUrl}" maxlength="300" required
+                               placeholder="https://www.youtube.com/watch?v=…"
+                               th:attr="aria-invalid=${#fields.hasErrors('youtubeUrl')} ? 'true' : null,
+                                        aria-describedby=${#fields.hasErrors('youtubeUrl')} ? 'hint-youtube error-video-youtube' : 'hint-youtube'">
+                        <small id="hint-youtube" class="admin-hint">Se reproduce desde YouTube en modo sin cookies.</small>
+                        <small id="error-video-youtube" class="admin-error" th:if="${#fields.hasErrors('youtubeUrl')}" th:errors="*{youtubeUrl}"></small>
+                    </div>
+                    <div class="admin-field">
+                        <label for="video-posicion">Posición</label>
+                        <input id="video-posicion" type="number" th:field="*{position}" min="0" max="9999"
+                               th:attr="aria-invalid=${#fields.hasErrors('position')} ? 'true' : null,
+                                        aria-describedby=${#fields.hasErrors('position')} ? 'error-video-posicion' : null">
+                        <small id="error-video-posicion" class="admin-error" th:if="${#fields.hasErrors('position')}" th:errors="*{position}"></small>
+                    </div>
                 </div>
                 <div class="admin-form-actions">
                     <button class="btn btn-admin" type="submit" th:text="${itemId != null} ? 'Guardar cambios' : 'Crear video'">Guardar</button>

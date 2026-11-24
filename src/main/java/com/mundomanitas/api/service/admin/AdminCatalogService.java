@@ -46,7 +46,12 @@ public interface AdminCatalogService {
 
     void updateCourse(UUID id, AdminCourseForm form, UUID actor);
 
+    /** Guarda la portada local y devuelve la ruta anterior para limpiar el archivo. */
+    String updateCourseCover(UUID id, String image, UUID actor);
+
     PublishChecklist publishChecklist(UUID id);
+
+    String courseStatus(UUID id);
 
     void setPublished(UUID id, boolean published, UUID actor);
 

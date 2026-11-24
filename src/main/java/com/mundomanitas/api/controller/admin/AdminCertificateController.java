@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
 import java.util.UUID;
 
 @PreAuthorize("hasRole('ADMIN')")
@@ -78,6 +79,19 @@ public class AdminCertificateController extends AdminBaseController {
             redirect.addFlashAttribute("panelError", exception.getMessage());
         }
         return "redirect:/admin/certificados";
+    }
+
+    @GetMapping("/{id}/revocar")
+    public String confirmRevoke(@PathVariable UUID id,
+                                @RequestParam(name = "code", required = false) String code,
+                                Model model,
+                                RedirectAttributes redirect) {
+        List<String> details = code == null || code.isBlank()
+                ? List.of() : List.of("Código: " + code.trim());
+        return confirmation(model, "certificados", "Revocar certificado",
+                "La persona dejará de tener vigente este certificado.",
+                "/admin/certificados/" + id + "/revocar", "Revocar certificado",
+                "/admin/certificados", details);
     }
 
     @PostMapping("/{id}/revocar")

@@ -137,6 +137,11 @@ public class Course {
         return image;
     }
 
+    /** Cambia la portada sin reescribir el resto de la ficha. */
+    public void changeImage(String image) {
+        this.image = image;
+    }
+
     public int getPosition() {
         return position;
     }

@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
 import java.util.UUID;
 
 /** Gestión de módulos, videos y ejercicios del catálogo. */
@@ -108,6 +109,34 @@ public class AdminContentController extends AdminBaseController {
         return "redirect:/admin/modulos/" + id + "/editar";
     }
 
+    @PostMapping("/modulos/{id}/mover")
+    public String moveModule(@PathVariable UUID id,
+                             @RequestParam boolean up,
+                             @AuthenticationPrincipal AuthenticatedUser principal,
+                             RedirectAttributes redirect) {
+        try {
+            catalog.moveModule(id, up, principal.getId());
+        } catch (IllegalArgumentException exception) {
+            redirect.addFlashAttribute("panelError", exception.getMessage());
+        }
+        return "redirect:/admin/modulos";
+    }
+
+    @GetMapping("/modulos/{id}/eliminar")
+    public String confirmDeleteModule(@PathVariable UUID id, Model model,
+                                      RedirectAttributes redirect) {
+        try {
+            String title = catalog.moduleForm(id).title();
+            return confirmation(model, "modulos", "Eliminar módulo",
+                    "Se borrará el módulo y su contenido. Esta acción no se puede deshacer.",
+                    "/admin/modulos/" + id + "/eliminar", "Eliminar módulo",
+                    "/admin/modulos", List.of("Módulo: " + title));
+        } catch (IllegalArgumentException exception) {
+            redirect.addFlashAttribute("panelError", exception.getMessage());
+            return "redirect:/admin/modulos";
+        }
+    }
+
     @PostMapping("/modulos/{id}/eliminar")
     public String deleteModule(@PathVariable UUID id,
                                @AuthenticationPrincipal AuthenticatedUser principal,
@@ -193,6 +222,35 @@ public class AdminContentController extends AdminBaseController {
         return "redirect:/admin/videos/" + id + "/editar";
     }
 
+    @PostMapping("/videos/{id}/mover")
+    public String moveVideo(@PathVariable UUID id,
+                            @RequestParam boolean up,
+                            @AuthenticationPrincipal AuthenticatedUser principal,
+                            RedirectAttributes redirect) {
+        try {
+            catalog.moveVideo(id, up, principal.getId());
+        } catch (IllegalArgumentException exception) {
+            redirect.addFlashAttribute("panelError", exception.getMessage());
+        }
+        return "redirect:/admin/videos";
+    }
+
+    @GetMapping("/videos/{id}/eliminar")
+    public String confirmDeleteVideo(@PathVariable UUID id, Model model,
+                                     RedirectAttributes redirect) {
+        try {
+            AdminVideoForm form = catalog.videoForm(id);
+            return confirmation(model, "videos", "Eliminar video",
+                    "Se borrará la clase y dejará de contar como lección.",
+                    "/admin/videos/" + id + "/eliminar", "Eliminar video",
+                    "/admin/videos", List.of("Clase: " + form.title(),
+                    "YouTube: " + form.youtubeUrl()));
+        } catch (IllegalArgumentException exception) {
+            redirect.addFlashAttribute("panelError", exception.getMessage());
+            return "redirect:/admin/videos";
+        }
+    }
+
     @PostMapping("/videos/{id}/eliminar")
     public String deleteVideo(@PathVariable UUID id,
                               @AuthenticationPrincipal AuthenticatedUser principal,
@@ -276,6 +334,21 @@ public class AdminContentController extends AdminBaseController {
             redirect.addFlashAttribute("panelError", exception.getMessage());
         }
         return "redirect:/admin/ejercicios/" + id + "/editar";
+    }
+
+    @GetMapping("/ejercicios/{id}/eliminar")
+    public String confirmDeleteExercise(@PathVariable UUID id, Model model,
+                                        RedirectAttributes redirect) {
+        try {
+            AdminExerciseForm form = catalog.exerciseForm(id);
+            return confirmation(model, "ejercicios", "Eliminar ejercicio",
+                    "Se borrará la consigna de este módulo.",
+                    "/admin/ejercicios/" + id + "/eliminar", "Eliminar ejercicio",
+                    "/admin/ejercicios", List.of("Ejercicio: " + form.title()));
+        } catch (IllegalArgumentException exception) {
+            redirect.addFlashAttribute("panelError", exception.getMessage());
+            return "redirect:/admin/ejercicios";
+        }
     }
 
     @PostMapping("/ejercicios/{id}/eliminar")

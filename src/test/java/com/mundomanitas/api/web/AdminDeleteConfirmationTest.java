@@ -10,7 +10,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DisplayName("Confirmación accesible de borrados")
+@DisplayName("Confirmación de borrados en páginas")
 class AdminDeleteConfirmationTest {
 
     private static final List<String> TEMPLATES = List.of(
@@ -21,40 +21,44 @@ class AdminDeleteConfirmationTest {
             "templates/admin/certificados.html");
 
     @Test
-    @DisplayName("los cinco borrados usan el diálogo compartido y no el confirm nativo")
-    void destructiveActionsUseSharedDialog() throws IOException {
+    @DisplayName("los cinco borrados enlazan a una página, sin diálogos ni overlays")
+    void destructiveActionsUsePages() throws IOException {
         for (String path : TEMPLATES) {
             String html = read(path);
-            assertThat(html).as(path).doesNotContain("confirm(");
-            assertThat(html).as(path).contains("data-confirm=");
-            assertThat(html).as(path).contains("admin/fragments/confirm-dialog :: confirmDialog");
+            assertThat(html).as(path).doesNotContain("<dialog");
+            assertThat(html).as(path).doesNotContain("data-confirm=");
+            assertThat(html).as(path).doesNotContain("confirm-dialog");
+            assertThat(html).as(path).contains("admin-confirm-link");
         }
     }
 
     @Test
-    @DisplayName("el diálogo compartido nombra el aviso y separa cancelar de confirmar")
-    void dialogIsAccessible() throws IOException {
-        String html = read("templates/admin/fragments/confirm-dialog.html");
+    @DisplayName("la página compartida muestra datos reales y envía el POST con CSRF")
+    void confirmationPageIsAccessible() throws IOException {
+        String html = read("templates/admin/confirmar.html");
 
-        assertThat(html).contains("<dialog");
-        assertThat(html).contains("aria-labelledby=");
-        assertThat(html).contains("aria-describedby=");
-        assertThat(html).contains("data-confirm-message");
-        assertThat(html).contains("data-confirm-cancel");
-        assertThat(html).contains("data-confirm-accept");
+        assertThat(html).contains("<main");
+        assertThat(html).contains("<h1");
+        assertThat(html).contains("admin-confirm-page");
+        assertThat(html).contains("th:action=\"@{${confirmAction}}\"");
+        assertThat(html).contains("method=\"post\"");
+        assertThat(html).contains("confirmMessage");
+        assertThat(html).contains("confirmDetails");
+        assertThat(html).contains("cancelUrl");
     }
 
     @Test
-    @DisplayName("el script enfoca cancelar, usa el diálogo modal y envía solo al confirmar")
-    void scriptFocusesCancelAndSubmitsOnConfirm() throws IOException {
+    @DisplayName("el script y el CSS ya no mantienen el diálogo modal")
+    void modalConfirmationIsGone() throws IOException {
         String js = read("static/js/admin.js");
-
-        assertThat(js).contains("showModal()");
-        assertThat(js).contains("cancel.focus()");
-        assertThat(js).contains("form.submit()");
+        assertThat(js).doesNotContain("showModal()");
+        assertThat(js).doesNotContain("form.submit()");
+        assertThat(js).doesNotContain("data-confirm");
+        assertThat(js).doesNotContain("data-upload");
 
         String css = read("static/css/styles.css");
-        assertThat(css).contains("admin-confirm");
+        assertThat(css).doesNotContain(".admin-confirm {");
+        assertThat(css).contains(".admin-confirm-page");
         assertThat(css).contains("panel-flash--ok::before");
     }
 

@@ -220,6 +220,19 @@ perfil, cursos y panel de administración:
 | `.course-syllabus` / `.syllabus-list` / `.syllabus-item` | temario ordenado: módulo, título, duración, vistos y distintivos de subtítulos o transcripción |
 | `.syllabus-item.is-active` / `.syllabus-item.is-done` | clase abierta (borde verde) y clase marcada como terminada (estado verde) |
 
+### Componentes del panel administrativo
+
+| Clase | Uso |
+|---|---|
+| `.admin-confirm-page` | página de confirmación de borrados; reemplaza al diálogo modal, con título, aviso y datos reales |
+| `.admin-confirm-details` | lista de datos calculados que se muestran antes de confirmar |
+| `.admin-confirm-actions` / `.admin-confirm-accept` | acciones separadas: cancelar vuelve al listado y confirmar envía el POST con CSRF |
+| `.admin-confirm-link` | enlace del listado que abre la página de confirmación; nunca dispara un borrado directo |
+| `.admin-cover` | alta de portada local con `multipart/form-data`; muestra la ruta real guardada |
+| `.admin-publication` / `.admin-checklist` | estado `PUBLICADO`/`BORRADOR` y requisitos calculados desde la base antes de publicar |
+| `.admin-field` | envoltorio de etiqueta, control, ayuda y error; el error se enlaza con `aria-describedby` y `aria-invalid` |
+| `.admin-table caption` | título accesible de las tablas del panel, con encabezados `scope="col"` |
+
 Si cambiás el nombre de alguna, decime y actualizo las plantillas nuevas.
 
 ## 4. Lo que necesito que respetes (accesibilidad)

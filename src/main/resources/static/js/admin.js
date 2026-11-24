@@ -103,3 +103,42 @@
         if (!document.hidden) refresh();
     });
 })();
+
+/* Confirmación accesible: un solo diálogo modal para todos los borrados.
+   El formulario se envía únicamente cuando la persona confirma; Escape y
+   Cancelar lo dejan intacto y el foco vuelve al control que abrió el diálogo. */
+(() => {
+    const dialog = document.getElementById("admin-confirm-dialog");
+    if (!dialog) return;
+
+    const message = dialog.querySelector("[data-confirm-message]");
+    const accept = dialog.querySelector("[data-confirm-accept]");
+    const cancel = dialog.querySelector("[data-confirm-cancel]");
+    let pending = null;
+    let opener = null;
+
+    for (const form of document.querySelectorAll("form[data-confirm]")) {
+        form.addEventListener("submit", (event) => {
+            event.preventDefault();
+            pending = form;
+            opener = document.activeElement;
+            message.textContent = form.dataset.confirm || "¿Continuar?";
+            accept.textContent = form.dataset.confirmAccept || "Eliminar";
+            dialog.showModal();
+            cancel.focus();
+        });
+    }
+
+    cancel.addEventListener("click", () => dialog.close());
+    accept.addEventListener("click", () => {
+        const form = pending;
+        pending = null;
+        dialog.close();
+        if (form) form.submit();
+    });
+    dialog.addEventListener("close", () => {
+        pending = null;
+        if (opener && typeof opener.focus === "function") opener.focus();
+        opener = null;
+    });
+})();

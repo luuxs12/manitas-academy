@@ -5179,6 +5179,42 @@ html[data-theme="dark"] .panel-stats li {
     background: var(--soft);
 }
 
+.panel-flash--ok::before {
+    content: "✓";
+    display: inline-block;
+    margin-right: .5rem;
+    color: var(--ink);
+    font-weight: 700;
+}
+
+.admin-confirm {
+    max-width: min(440px, calc(100vw - 2rem));
+    padding: 1.5rem;
+    border: 1px solid var(--line-strong);
+    border-radius: 16px;
+    background: var(--surface);
+    color: var(--ink);
+    box-shadow: 0 18px 50px rgba(0, 0, 0, .35);
+}
+.admin-confirm::backdrop { background: rgba(0, 0, 0, .6); }
+.admin-confirm h2 { margin: 0 0 .75rem; font-size: 1.15rem; }
+.admin-confirm p { margin: 0; color: var(--muted); font-size: .9rem; line-height: 1.5; }
+.admin-confirm-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .75rem;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+}
+.admin-confirm-accept {
+    background: var(--accent);
+    color: var(--on-accent, #000);
+}
+.admin-confirm button:focus-visible {
+    outline: 3px solid var(--focus);
+    outline-offset: 2px;
+}
+
 .panel-explore-search {
     display: flex;
     align-items: center;

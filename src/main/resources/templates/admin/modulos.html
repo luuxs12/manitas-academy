@@ -50,8 +50,8 @@
                         <td class="admin-row-actions">
                             <a th:href="@{/admin/modulos/{id}/editar(id=${item.id()})}">Editar</a>
                             <form th:action="@{/admin/modulos/{id}/eliminar(id=${item.id()})}" method="post"
-                                  onsubmit="return confirm('¿Eliminar este módulo y su contenido?');">
-                                <button type="submit">Eliminar</button>
+                                  th:attr="data-confirm='¿Eliminar este módulo y su contenido?'">
+                                <button type="submit" th:attr="aria-label='Eliminar ' + ${item.title()}">Eliminar</button>
                             </form>
                         </td>
                     </tr>
@@ -67,6 +67,7 @@
         </main>
     </div>
 </div>
+<div th:replace="~{admin/fragments/confirm-dialog :: confirmDialog}"></div>
 <script defer th:src="@{/js/panel.js}"></script>
 <script defer th:src="@{/js/admin.js}"></script>
 </body>

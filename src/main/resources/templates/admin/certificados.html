@@ -72,8 +72,8 @@
                                   th:text="${item.active()} ? 'Vigente' : 'Revocado'">Vigente</span></td>
                         <td class="admin-row-actions">
                             <form th:if="${item.active()}" th:action="@{/admin/certificados/{id}/revocar(id=${item.id()})}" method="post"
-                                  onsubmit="return confirm('¿Revocar este certificado?');">
-                                <button type="submit">Revocar</button>
+                                  th:attr="data-confirm='¿Revocar este certificado?',data-confirm-accept='Revocar'">
+                                <button type="submit" th:attr="aria-label='Revocar ' + ${item.code()}">Revocar</button>
                             </form>
                             <span th:unless="${item.active()}" class="admin-muted">Sin acciones</span>
                         </td>
@@ -90,6 +90,7 @@
         </main>
     </div>
 </div>
+<div th:replace="~{admin/fragments/confirm-dialog :: confirmDialog}"></div>
 <script defer th:src="@{/js/panel.js}"></script>
 <script defer th:src="@{/js/admin.js}"></script>
 </body>

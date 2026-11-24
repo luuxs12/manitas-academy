@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+<!-- Diálogo único para los borrados del panel: se comparte en los cinco listados. -->
+<dialog id="admin-confirm-dialog" class="admin-confirm" th:fragment="confirmDialog"
+        aria-labelledby="admin-confirm-title" aria-describedby="admin-confirm-message">
+    <h2 id="admin-confirm-title">Confirmá la acción</h2>
+    <p id="admin-confirm-message" data-confirm-message></p>
+    <div class="admin-confirm-actions">
+        <button type="button" class="btn btn-admin" data-confirm-cancel>Cancelar</button>
+        <button type="button" class="btn btn-admin admin-confirm-accept" data-confirm-accept>Eliminar</button>
+    </div>
+</dialog>
+</body>
+</html>

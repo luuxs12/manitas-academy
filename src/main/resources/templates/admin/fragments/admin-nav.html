@@ -104,12 +104,6 @@
     </nav>
 
     <div class="panel-sidebar-foot">
-        <a class="panel-side-link" th:href="@{/panel/perfil}">
-            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <circle cx="12" cy="8" r="3.5"></circle><path d="M5 20a7 7 0 0 1 14 0"></path>
-            </svg>
-            <span>Mi cuenta</span>
-        </a>
         <form th:action="@{/logout}" method="post">
             <button class="panel-side-link panel-logout" type="submit">
                 <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
@@ -198,8 +192,6 @@
                 <p class="panel-menu-mail" th:text="${currentUser.email()}">admin@damianprint.com</p>
                 <p class="panel-menu-role" th:text="${currentUser.roleLabel()}">Administrador</p>
                 <a th:href="@{/admin/configuracion}">Configuración</a>
-                <a th:href="@{/panel/perfil}">Mi cuenta</a>
-                <a th:href="@{/panel}">Panel del estudiante</a>
                 <form th:action="@{/logout}" method="post">
                     <button type="submit">Cerrar sesión</button>
                 </form>

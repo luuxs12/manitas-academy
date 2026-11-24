@@ -144,7 +144,7 @@
         });
 
         if (loginSucceeded(response)) {
-            window.location.assign("/panel");
+            window.location.assign(response.url);
             return;
         }
 
@@ -167,7 +167,7 @@
         });
 
         if (loginSucceeded(response)) {
-            window.location.assign("/panel");
+            window.location.assign(response.url);
             return;
         }
 
@@ -207,8 +207,8 @@
             return;
         }
 
-        // El servidor ya abrió la sesión: se entra al panel sin otro paso.
-        if (url.pathname === "/panel") {
+        // El servidor ya abrió la sesión: se entra al panel según el rol.
+        if (loginSucceeded(response)) {
             window.location.assign(response.url);
             return;
         }

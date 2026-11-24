@@ -77,7 +77,9 @@
         </div>
 
         <div class="nav-actions nav-actions--account" th:if="${currentUser != null}">
-            <a class="nav-user" th:href="@{/panel}" aria-label="Ir a mi panel">
+            <a class="nav-user"
+               th:href="${currentUser.admin()} ? @{/admin} : @{/panel}"
+               th:aria-label="${currentUser.admin()} ? 'Ir al panel administrativo' : 'Ir a mi panel'">
                 <span class="nav-avatar" aria-hidden="true"
                       th:text="${currentUser.initials()}">AQ</span>
                 <span class="nav-user-name">

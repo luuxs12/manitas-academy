@@ -41,6 +41,27 @@ class PanelIsolationTest {
         }
     }
 
+    @Test
+    @DisplayName("el acceso público elige el panel según el rol")
+    void publicNavigationUsesTheRole() throws IOException {
+        String header = html(resolver.getResource("classpath:templates/fragments/layout.html"));
+
+        assertThat(header).contains("currentUser.admin()")
+                .doesNotContain("th:href=\"@{/panel}\" aria-label=\"Ir a mi panel\"");
+
+        String authModal = html(resolver.getResource("classpath:static/js/auth-modal.js"));
+
+        assertThat(authModal).doesNotContain("assign(\"/panel\")")
+                .contains("assign(response.url)");
+
+        String detalle = html(resolver.getResource("classpath:templates/cursos/detalle.html"));
+
+        assertThat(detalle).contains("!currentUser.admin()")
+                .doesNotContain("th:if=\"${signedIn and enrolled}\"")
+                .doesNotContain("th:if=\"${signedIn and !enrolled and canEnroll}\"")
+                .doesNotContain("th:if=\"${signedIn and !enrolled and !canEnroll}\"");
+    }
+
     private static String html(Resource template) throws IOException {
         try (var stream = template.getInputStream()) {
             return new String(stream.readAllBytes(), StandardCharsets.UTF_8);

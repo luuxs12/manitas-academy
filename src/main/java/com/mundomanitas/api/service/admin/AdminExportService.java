@@ -106,17 +106,8 @@ public class AdminExportService {
             case "xlsx" -> new ExportResult(xlsx(name, generatedAt, data), file,
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             case "pdf" -> new ExportResult(pdf.write(name, generatedAt, data), file, "application/pdf");
-            default -> new ExportResult(csv(decorated(data, name)), file, "text/csv; charset=UTF-8");
+            default -> new ExportResult(csv(name, generatedAt, data), file, "text/csv; charset=UTF-8");
         };
-    }
-
-    /** Antepone la marca y el nombre del informe sin alterar los datos exportados. */
-    private List<List<String>> decorated(List<List<String>> rows, String module) {
-        List<List<String>> result = new ArrayList<>();
-        result.add(row("Mundo Manitas"));
-        result.add(row("Informe de " + module));
-        result.addAll(rows);
-        return result;
     }
 
     private List<List<String>> rows(String module) {
@@ -226,16 +217,31 @@ public class AdminExportService {
         };
     }
 
-    private byte[] csv(List<List<String>> rows) {
+    /** El CSV no admite imágenes ni colores: identifica el informe con texto y metadatos. */
+    private byte[] csv(String module, String generatedAt, List<List<String>> table) {
         StringBuilder text = new StringBuilder("\uFEFF");
-        for (List<String> row : rows) {
-            for (int index = 0; index < row.size(); index++) {
-                if (index > 0) text.append(';');
-                text.append('"').append(row.get(index).replace("\"", "\"\"")).append('"');
-            }
-            text.append("\r\n");
-        }
+        appendCsvRow(text, List.of("Mundo Manitas"));
+        appendCsvRow(text, List.of("Informe de " + module));
+        appendCsvRow(text, List.of("Generado", generatedAt));
+        appendCsvRow(text, List.of("Registros", String.valueOf(Math.max(0, table.size() - 1))));
+        appendCsvRow(text, List.of(""));
+        for (List<String> row : table) appendCsvRow(text, row);
         return text.toString().getBytes(StandardCharsets.UTF_8);
+    }
+
+    /** Las celdas que empiezan con signo de fórmula se neutralizan con apóstrofo. */
+    private void appendCsvRow(StringBuilder text, List<String> values) {
+        for (int index = 0; index < values.size(); index++) {
+            if (index > 0) text.append(';');
+            String value = values.get(index) == null ? "" : values.get(index);
+            String trimmed = value.stripLeading();
+            if (trimmed.startsWith("=") || trimmed.startsWith("+") || trimmed.startsWith("-")
+                    || trimmed.startsWith("@")) {
+                value = "'" + value;
+            }
+            text.append('"').append(value.replace("\"", "\"\"")).append('"');
+        }
+        text.append("\r\n");
     }
 
     private byte[] xlsx(String module, String generatedAt, List<List<String>> table) {

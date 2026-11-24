@@ -50,25 +50,46 @@ class AdminExportServiceTest {
     void setUp() {
         service = new AdminExportService(users, courses, modules, videos, exercises,
                 certificates, payments, logs, dashboard, format, new PlainPdfWriter());
+    }
+
+    private void cursosDePrueba() {
         Course course = mock(Course.class);
         when(course.getTitle()).thenReturn("Python desde cero");
         when(courses.findAllByOrderByPositionAsc()).thenReturn(List.of(course));
     }
 
     @Test
-    @DisplayName("el CSV abre con la marca y el nombre del informe")
+    @DisplayName("el CSV separa la marca, los metadatos y la tabla")
     void csvCarriesBrandHeader() {
+        cursosDePrueba();
         ExportResult result = service.export("cursos", "csv");
 
-        String text = new String(result.bytes(), StandardCharsets.UTF_8);
-        assertThat(text).startsWith("\uFEFF\"Mundo Manitas\"");
-        assertThat(text).contains("Informe de cursos");
-        assertThat(text).contains("\"Título\";\"Identificador\"");
+        String[] lines = new String(result.bytes(), StandardCharsets.UTF_8).split("\r\n");
+        assertThat(lines[0]).isEqualTo("\uFEFF\"Mundo Manitas\"");
+        assertThat(lines[1]).isEqualTo("\"Informe de cursos\"");
+        assertThat(lines[2]).startsWith("\"Generado\";\"");
+        assertThat(lines[3]).isEqualTo("\"Registros\";\"1\"");
+        assertThat(lines[4]).isEqualTo("\"\"");
+        assertThat(lines[5]).contains("\"Título\";\"Identificador\"");
+        assertThat(lines[6]).contains("\"Python desde cero\"");
+    }
+
+    @Test
+    @DisplayName("el CSV neutraliza lo que Excel leería como fórmula")
+    void csvNeutralizaFormulas() {
+        Course course = mock(Course.class);
+        when(course.getTitle()).thenReturn("=HYPERLINK(\"http://ejemplo\")");
+        when(courses.findAllByOrderByPositionAsc()).thenReturn(List.of(course));
+
+        String text = new String(service.export("cursos", "csv").bytes(), StandardCharsets.UTF_8);
+
+        assertThat(text).contains("\"'=HYPERLINK(\"\"http://ejemplo\"\")\"");
     }
 
     @Test
     @DisplayName("el Excel lleva el logo, banda de marca y tabla con cebra y filtro completo")
     void xlsxHasBrandedTable() throws Exception {
+        cursosDePrueba();
         ExportResult result = service.export("cursos", "xlsx");
 
         assertThat(hasImage(result.bytes())).isTrue();
@@ -111,6 +132,7 @@ class AdminExportServiceTest {
     @Test
     @DisplayName("el PDF lleva el logo, la tabla con estilo y la paginación")
     void pdfHasBrandedTable() {
+        cursosDePrueba();
         ExportResult result = service.export("cursos", "pdf");
 
         String text = new String(result.bytes(), StandardCharsets.ISO_8859_1);

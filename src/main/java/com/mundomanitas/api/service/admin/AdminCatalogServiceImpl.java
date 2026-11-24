@@ -22,6 +22,7 @@ import com.mundomanitas.api.repository.EnrollmentRepository;
 import com.mundomanitas.api.repository.ExerciseRepository;
 import com.mundomanitas.api.repository.UserRepository;
 import com.mundomanitas.api.repository.VideoRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -35,6 +36,8 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /** Implementación del CRUD administrativo de cuentas, cursos y contenido. */
 @Service
@@ -162,6 +165,7 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
         course.update(form.slug(), form.title(), form.level(), form.lessons(), form.free(),
                 form.category(), form.summary(), form.image(), form.position());
         audit.record(actor, "UPDATE", "CURSO", id, form.title());
+        log.info("Curso actualizado id={} actor={}", id, actor);
     }
 
     @Transactional
@@ -201,6 +205,7 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
         CourseModule module = new CourseModule(form.courseId(), form.title().trim(), form.position());
         modules.save(module);
         audit.record(actor, "CREATE", "MODULO", module.getId(), form.title().trim());
+        log.info("Módulo creado id={} actor={}", module.getId(), actor);
         return module.getId();
     }
 
@@ -211,6 +216,7 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
         module.update(form.title().trim(), form.position());
         module.moveTo(form.courseId());
         audit.record(actor, "UPDATE", "MODULO", id, form.title().trim());
+        log.info("Módulo actualizado id={} actor={}", id, actor);
     }
 
     @Transactional
@@ -219,6 +225,7 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
         String title = module.getTitle();
         modules.delete(module);
         audit.record(actor, "DELETE", "MODULO", id, title);
+        log.info("Módulo eliminado id={} actor={}", id, actor);
     }
 
     /* ------------------------------- videos ------------------------------ */
@@ -261,6 +268,7 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
         video.update(form.title().trim(), form.url().trim(), form.position());
         video.moveTo(form.moduleId());
         audit.record(actor, "UPDATE", "VIDEO", id, form.title().trim());
+        log.info("Video actualizado id={} actor={}", id, actor);
     }
 
     @Transactional
@@ -269,6 +277,7 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
         String title = video.getTitle();
         videos.delete(video);
         audit.record(actor, "DELETE", "VIDEO", id, title);
+        log.info("Video eliminado id={} actor={}", id, actor);
     }
 
     /* ----------------------------- ejercicios ---------------------------- */
@@ -301,6 +310,7 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
                 form.prompt().trim(), form.position());
         exercises.save(exercise);
         audit.record(actor, "CREATE", "EJERCICIO", exercise.getId(), form.title().trim());
+        log.info("Ejercicio creado id={} actor={}", exercise.getId(), actor);
         return exercise.getId();
     }
 
@@ -311,6 +321,7 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
         exercise.update(form.title().trim(), form.prompt().trim(), form.position());
         exercise.moveTo(form.moduleId());
         audit.record(actor, "UPDATE", "EJERCICIO", id, form.title().trim());
+        log.info("Ejercicio actualizado id={} actor={}", id, actor);
     }
 
     @Transactional
@@ -319,6 +330,7 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
         String title = exercise.getTitle();
         exercises.delete(exercise);
         audit.record(actor, "DELETE", "EJERCICIO", id, title);
+        log.info("Ejercicio eliminado id={} actor={}", id, actor);
     }
 
     /* ---------------------------- opciones ------------------------------- */
@@ -350,14 +362,17 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
     /* ---------------------------- privados ------------------------------- */
 
     private User requireUser(UUID id) {
+        checkNotNull(id, "id");
         return users.findById(id).orElseThrow(() -> new IllegalArgumentException("No existe esa cuenta."));
     }
 
     private Course requireCourse(UUID id) {
+        checkNotNull(id, "id");
         return courses.findById(id).orElseThrow(() -> new IllegalArgumentException("No existe ese curso."));
     }
 
     private void requireModule(UUID id) {
+        checkNotNull(id, "id");
         if (modules.findById(id).isEmpty()) {
             throw new IllegalArgumentException("No existe ese módulo.");
         }
@@ -372,6 +387,6 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
     }
 
     private String blankToNull(String value) {
-        return value == null || value.isBlank() ? null : value.trim();
+        return StringUtils.trimToNull(value);
     }
 }

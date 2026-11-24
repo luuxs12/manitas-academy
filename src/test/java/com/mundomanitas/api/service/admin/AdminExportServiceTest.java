@@ -83,14 +83,20 @@ class AdminExportServiceTest {
     }
 
     @Test
-    @DisplayName("el PDF dibuja la banda de marca y el título del informe")
-    void pdfHasBrandedBand() {
+    @DisplayName("el PDF lleva el logo, la tabla con estilo y la paginación")
+    void pdfHasBrandedTable() {
         ExportResult result = service.export("cursos", "pdf");
 
         String text = new String(result.bytes(), StandardCharsets.ISO_8859_1);
         assertThat(text).startsWith("%PDF-1.4");
+        assertThat(text).contains("/Subtype /Image");
+        assertThat(text).contains("/Filter /FlateDecode");
+        assertThat(text).contains("/Im0 Do");
         assertThat(text).contains("Mundo Manitas");
         assertThat(text).contains("Informe de cursos");
-        assertThat(text).contains("0 1 0 rg");
+        assertThat(text).contains("Generado");
+        assertThat(text).contains("Título");
+        assertThat(text).contains("0.96 0.96 0.95 rg");
+        assertThat(text).contains("Página 1 / 1");
     }
 }

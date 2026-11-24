@@ -35,6 +35,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -88,14 +89,14 @@ public class AdminExportService {
         String name = module == null ? "" : module.toLowerCase();
         String extension = "pdf".equalsIgnoreCase(requestedFormat) ? "pdf"
                 : "xlsx".equalsIgnoreCase(requestedFormat) ? "xlsx" : "csv";
-        List<List<String>> rows = decorated(rows(name), name);
+        List<List<String>> data = rows(name);
+        List<List<String>> rows = decorated(data, name);
         String file = "mundo-manitas-" + name + "-" + LocalDate.now() + "." + extension;
+        String generatedAt = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
         return switch (extension) {
             case "xlsx" -> new ExportResult(xlsx(rows), file,
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            case "pdf" -> new ExportResult(
-                    pdf.write("Mundo Manitas · Informe de " + name, flatten(rows)),
-                    file, "application/pdf");
+            case "pdf" -> new ExportResult(pdf.write(name, generatedAt, data), file, "application/pdf");
             default -> new ExportResult(csv(rows), file, "text/csv; charset=UTF-8");
         };
     }
@@ -286,12 +287,6 @@ public class AdminExportService {
         style.setFillForegroundColor(IndexedColors.BRIGHT_GREEN.getIndex());
         style.setFont(font);
         return style;
-    }
-
-    private List<String> flatten(List<List<String>> rows) {
-        List<String> lines = new ArrayList<>();
-        for (List<String> row : rows) lines.add(String.join(" | ", row));
-        return lines;
     }
 
     private List<List<String>> header(String... names) {

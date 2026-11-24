@@ -1,0 +1,131 @@
+package com.mundomanitas.api.service;
+
+import com.mundomanitas.api.model.Course;
+import com.mundomanitas.api.model.Enrollment;
+import com.mundomanitas.api.model.Video;
+import com.mundomanitas.api.repository.VideoRepository;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.util.Optional;
+import java.util.UUID;
+
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verifyNoInteractions;
+import static org.mockito.Mockito.when;
+
+@ExtendWith(MockitoExtension.class)
+class VideoPlaybackServiceTest {
+
+    @Mock
+    private VideoRepository videos;
+
+    @Mock
+    private R2StorageService storage;
+
+    private VideoPlaybackService service;
+    private UUID videoId;
+    private UUID courseId;
+    private Enrollment enrollment;
+
+    @BeforeEach
+    void setUp() {
+        service = new VideoPlaybackService(videos, storage);
+        videoId = UUID.randomUUID();
+        courseId = UUID.randomUUID();
+        Course course = mock(Course.class);
+        lenient().when(course.getId()).thenReturn(courseId);
+        enrollment = mock(Enrollment.class);
+        when(enrollment.getCourse()).thenReturn(course);
+    }
+
+    @Test
+    @DisplayName("reproduce un video privado con URL firmada, subtítulo y transcripción")
+    void playsPrivateVideo() {
+        Video video = new Video(UUID.randomUUID(), "Clase 1", null, 1,
+                "videos/clase.mp4", "subtitles/clase.vtt", 620, "Texto de la clase");
+        when(videos.findById(videoId)).thenReturn(Optional.of(video));
+        when(videos.existsInCourse(videoId, courseId)).thenReturn(true);
+        when(storage.presignedUrl("videos/clase.mp4"))
+                .thenReturn("https://firmado.example/video?firma=1");
+        when(storage.presignedUrl("subtitles/clase.vtt"))
+                .thenReturn("https://firmado.example/vtt?firma=2");
+
+        VideoPlaybackService.Playback playback = service.play(videoId, enrollment);
+
+        assertThat(playback.title()).isEqualTo("Clase 1");
+        assertThat(playback.url()).isEqualTo("https://firmado.example/video?firma=1");
+        assertThat(playback.subtitleUrl()).isEqualTo("https://firmado.example/vtt?firma=2");
+        assertThat(playback.durationSeconds()).isEqualTo(620);
+        assertThat(playback.transcript()).isEqualTo("Texto de la clase");
+        assertThat(playback.legacy()).isFalse();
+        assertThat(playback.available()).isTrue();
+    }
+
+    @Test
+    @DisplayName("usa la URL histórica cuando el video viejo todavía no tiene clave privada")
+    void fallsBackToLegacyUrl() {
+        Video video = new Video(UUID.randomUUID(), "Clase vieja",
+                "https://antiguo.example/clase.mp4", 1, null, null, 0, null);
+        when(videos.findById(videoId)).thenReturn(Optional.of(video));
+        when(videos.existsInCourse(videoId, courseId)).thenReturn(true);
+
+        VideoPlaybackService.Playback playback = service.play(videoId, enrollment);
+
+        assertThat(playback.url()).isEqualTo("https://antiguo.example/clase.mp4");
+        assertThat(playback.subtitleUrl()).isNull();
+        assertThat(playback.legacy()).isTrue();
+        verifyNoInteractions(storage);
+    }
+
+    @Test
+    @DisplayName("no sirve un video que pertenece a otro curso")
+    void rejectsVideoFromAnotherCourse() {
+        Video video = new Video(UUID.randomUUID(), "Ajeno", null, 1,
+                "videos/ajeno.mp4", null, 30, null);
+        when(videos.findById(videoId)).thenReturn(Optional.of(video));
+        when(videos.existsInCourse(videoId, courseId)).thenReturn(false);
+
+        assertThatThrownBy(() -> service.play(videoId, enrollment))
+                .isInstanceOfSatisfying(ResponseStatusException.class,
+                        exception -> assertThat(exception.getStatusCode())
+                                .isEqualTo(HttpStatus.NOT_FOUND));
+        verifyNoInteractions(storage);
+    }
+
+    @Test
+    @DisplayName("devuelve estado vacío si el curso todavía no cargó el video")
+    void returnsEmptyState() {
+        Video video = new Video(UUID.randomUUID(), "Sin archivo", null, 1,
+                null, null, 0, null);
+        when(videos.findById(videoId)).thenReturn(Optional.of(video));
+        when(videos.existsInCourse(videoId, courseId)).thenReturn(true);
+
+        VideoPlaybackService.Playback playback = service.play(videoId, enrollment);
+
+        assertThat(playback.available()).isFalse();
+        assertThat(playback.url()).isNull();
+        verifyNoInteractions(storage);
+    }
+
+    @Test
+    @DisplayName("avisa cuando el video no existe")
+    void rejectsMissingVideo() {
+        when(videos.findById(videoId)).thenReturn(Optional.empty());
+
+        assertThatThrownBy(() -> service.play(videoId, enrollment))
+                .isInstanceOfSatisfying(ResponseStatusException.class,
+                        exception -> assertThat(exception.getStatusCode())
+                                .isEqualTo(HttpStatus.NOT_FOUND));
+        verifyNoInteractions(storage);
+    }
+}

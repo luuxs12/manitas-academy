@@ -14,6 +14,14 @@ public interface VideoRepository extends JpaRepository<Video, UUID> {
 
     List<Video> findByModuleIdOrderByPositionAsc(UUID moduleId);
 
+    /** Evita servir un video de un curso ajeno a la matrícula. */
+    @Query("""
+            select case when count(v) > 0 then true else false end
+            from Video v, CourseModule m
+            where v.id = :videoId and v.moduleId = m.id and m.courseId = :courseId
+            """)
+    boolean existsInCourse(@Param("videoId") UUID videoId, @Param("courseId") UUID courseId);
+
     @Query("""
             select v from Video v
             where (:moduleId is null or v.moduleId = :moduleId)

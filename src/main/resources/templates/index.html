@@ -46,22 +46,29 @@
 
             </div>
 
-            <aside class="hero-card" aria-labelledby="curso-destacado">
+            <aside class="hero-card" aria-labelledby="curso-destacado"
+                   th:if="${featured != null}">
 
                 <span class="hero-card-media" aria-hidden="true">
-                    <span class="hero-card-mark">PY</span>
-                    <span class="hero-card-level">Nivel inicial</span>
+                    <span class="hero-card-level" th:text="${featured.level}"></span>
                 </span>
 
                 <p class="hero-card-tag">Curso destacado</p>
-                <h2 class="hero-card-title" id="curso-destacado">Python desde cero</h2>
-                <p class="hero-card-text">32 lecciones con intérprete y subtítulos revisados.</p>
+                <h2 class="hero-card-title" id="curso-destacado"
+                    th:text="${featured.title}"></h2>
+                <p class="hero-card-text" th:text="${featured.lessons + ' lecciones'}"></p>
                 <p class="hero-card-foot">
-                    <span class="hero-card-price">Gratis</span>
+                    <span class="hero-card-price" th:text="${featured.priceLabel()}"></span>
                     <a class="hero-card-link"
-                       th:href="@{/cursos/python-desde-cero}">Ver curso →</a>
+                       th:href="@{/cursos/{slug}(slug=${featured.slug})}">Ver curso →</a>
                 </p>
 
+            </aside>
+
+            <aside class="hero-card" th:unless="${featured != null}">
+                <p class="hero-card-tag">Catálogo</p>
+                <h2 class="hero-card-title">Todavía no hay cursos publicados</h2>
+                <p class="hero-card-text">El catálogo se arma con los cursos que publica el equipo.</p>
             </aside>
 
         </section>
@@ -86,19 +93,19 @@
                     <figure class="course-media">
                         <img th:src="${course.image}" alt="" width="960" height="600"
                              loading="lazy" decoding="async">
-                        <span class="course-badge" th:text="${course.category}">Programación</span>
+                        <span class="course-badge" th:text="${course.category}"></span>
                         <span class="course-price-tag"
                               th:classappend="${course.free} ? ' course-price-tag--free' : ''"
-                              th:text="${course.priceLabel()}">Gratis</span>
+                              th:text="${course.priceLabel()}"></span>
                     </figure>
 
                     <div class="course-body">
-                        <h3 class="course-title" th:text="${course.title}">Python desde cero</h3>
-                        <p class="course-text" th:text="${course.summary}">Descripción del curso.</p>
+                        <h3 class="course-title" th:text="${course.title}"></h3>
+                        <p class="course-text" th:text="${course.summary}"></p>
                         <div class="course-foot">
                             <span class="course-tags">
-                                <span th:text="${course.level}">Nivel inicial</span>
-                                <span th:text="${course.lessons} + ' lecciones'">32 lecciones</span>
+                                <span th:text="${course.level}"></span>
+                                <span th:text="${course.lessons} + ' lecciones'"></span>
                             </span>
                             <span class="course-arrow" aria-hidden="true">
                                 <svg class="ico" viewBox="0 0 24 24" focusable="false">
@@ -241,73 +248,21 @@
 
             <div class="stories-head">
                 <div class="stories-title">
-                    <p class="section-kicker">Historias</p>
-                    <h2 id="titulo-historias">Cuando la clase se entiende, se nota</h2>
+                    <p class="section-kicker">Catálogo</p>
+                    <h2 id="titulo-historias">El catálogo, en números</h2>
                 </div>
 
                 <ul class="stats" aria-label="Mundo Manitas en números">
                     <li>
-                        <span class="stat-value" th:text="${#lists.size(courses)}">6</span>
+                        <span class="stat-value" th:text="${#lists.size(courses)}"></span>
                         <span class="stat-label">cursos</span>
                     </li>
                     <li>
                         <span class="stat-value"
-                              th:text="${#lists.size(courses.?[free])}">2</span>
+                              th:text="${#lists.size(courses.?[free])}"></span>
                         <span class="stat-label">gratis</span>
                     </li>
-                    <li>
-                        <span class="stat-value">100%</span>
-                        <span class="stat-label">con intérprete</span>
-                    </li>
                 </ul>
-            </div>
-
-            <div class="testimonials">
-
-                <figure class="testimonial">
-                    <blockquote>
-                        <p>“Nunca había terminado un curso online. Acá el intérprete
-                            va al mismo ritmo que la explicación, así que no me
-                            pierdo a la mitad.”</p>
-                    </blockquote>
-                    <figcaption>
-                        <span class="avatar" aria-hidden="true">RQ</span>
-                        <span class="who">
-                            <strong>Rosa Quispe</strong>
-                            <span>Python desde cero</span>
-                        </span>
-                    </figcaption>
-                </figure>
-
-                <figure class="testimonial">
-                    <blockquote>
-                        <p>“Los subtítulos de otros videos siempre iban atrasados.
-                            Acá están revisados y puedo seguir la clase sin
-                            adivinar lo que se dijo.”</p>
-                    </blockquote>
-                    <figcaption>
-                        <span class="avatar" aria-hidden="true">LM</span>
-                        <span class="who">
-                            <strong>Luis Mamani</strong>
-                            <span>Desarrollo web con HTML y CSS</span>
-                        </span>
-                    </figcaption>
-                </figure>
-
-                <figure class="testimonial">
-                    <blockquote>
-                        <p>“Estudio después del trabajo. Retomo donde dejé y no
-                            tengo que volver a buscar la parte que me faltaba.”</p>
-                    </blockquote>
-                    <figcaption>
-                        <span class="avatar" aria-hidden="true">KS</span>
-                        <span class="who">
-                            <strong>Katherine Salazar</strong>
-                            <span>Bases de datos con SQL</span>
-                        </span>
-                    </figcaption>
-                </figure>
-
             </div>
 
             <p class="stories-note">
@@ -339,7 +294,7 @@
                     <div class="plan-features">
                         <p class="plan-list-label">Incluye</p>
                         <ul class="plan-list">
-                            <li>2 cursos gratuitos</li>
+                            <li>Cursos gratuitos</li>
                             <li>Intérprete en LSP y subtítulos revisados</li>
                             <li>Progreso guardado en tu cuenta</li>
                             <li>Sin tarjeta</li>
@@ -369,7 +324,7 @@
                     <div class="plan-features">
                         <p class="plan-list-label">Incluye</p>
                         <ul class="plan-list">
-                            <li>Los 6 cursos del catálogo</li>
+                            <li>Todo el catálogo</li>
                             <li>Certificado al terminar cada curso</li>
                             <li>Cursos nuevos incluidos</li>
                             <li>Cancelás cuando quieras</li>

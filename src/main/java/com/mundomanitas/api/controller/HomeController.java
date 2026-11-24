@@ -1,9 +1,12 @@
 package com.mundomanitas.api.controller;
 
+import com.mundomanitas.api.model.Course;
 import com.mundomanitas.api.service.CourseCatalog;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+
+import java.util.List;
 
 /**
  * Página principal de la plataforma.
@@ -19,7 +22,12 @@ public class HomeController {
 
     @GetMapping("/")
     public String home(Model model) {
-        model.addAttribute("courses", catalog.all());
+        List<Course> published = catalog.all();
+        model.addAttribute("courses", published);
+        model.addAttribute("featured", published.stream()
+                .filter(Course::isFree)
+                .findFirst()
+                .orElse(null));
         return "index";
     }
 

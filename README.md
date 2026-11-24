@@ -50,8 +50,8 @@ que **incluye** de lo que **no incluye**.
 
 | Plan | Costo | Qué incluye |
 |---|---|---|
-| **Gratis** | Sin costo | 2 cursos abiertos, intérprete en LSP y subtítulos revisados, progreso guardado |
-| **Mensual** | S/ 29 al mes | Los 6 cursos del catálogo, certificado por curso, cursos nuevos, cancelación libre |
+| **Gratis** | Sin costo | Cursos gratuitos, intérprete en LSP y subtítulos revisados, progreso guardado |
+| **Mensual** | S/ 29 al mes | Todo el catálogo, certificado por curso, cursos nuevos, cancelación libre |
 | **Anual** | S/ 290 al año | Todo lo del mensual, 12 meses continuos y precio fijo (equivale a S/ 24,17 al mes) |
 
 El plan anual es el destacado: se pagan diez meses y se usan doce. Los tres

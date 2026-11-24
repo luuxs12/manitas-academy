@@ -4,7 +4,7 @@
 <head th:replace="~{fragments/panel-head :: panelHead('Mis cursos')}"></head>
 
 <body class="panel-body">
-<a class="skip-link" href="#panel-main">Saltar al contenido</a>
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
 
 <div class="panel">
     <aside th:replace="~{fragments/panel-nav :: sidebar('cursos')}"></aside>
@@ -12,7 +12,7 @@
     <div class="panel-shell">
         <header th:replace="~{fragments/panel-nav :: topbar('')}"></header>
 
-        <main id="panel-main" class="panel-main">
+        <main id="contenido" class="panel-main">
             <div class="panel-page-head">
                 <div>
                     <p class="panel-eyebrow">Tu aprendizaje</p>
@@ -33,15 +33,15 @@
                     <span>Inscripciones</span>
                 </li>
                 <li class="panel-kpi">
-                    <strong th:text="${lessonTotals.completed()}">0</strong>
-                    <span>Lecciones terminadas</span>
+                    <strong th:text="${videoTotals.completed()}">0</strong>
+                    <span>Videos terminados</span>
                 </li>
                 <li class="panel-kpi">
                     <strong th:text="${completed}">0</strong>
                     <span>Cursos terminados</span>
                 </li>
                 <li class="panel-kpi">
-                    <strong th:text="${lessonTotals.percent() + '%'}">0%</strong>
+                    <strong th:text="${videoTotals.percent() + '%'}">0%</strong>
                     <span>Avance general</span>
                 </li>
             </ul>
@@ -66,27 +66,20 @@
                                 En curso
                             </span>
 
-                            <div class="panel-lessons" th:with="done=${doneLessons[enrollment.id]}, total=${enrollment.course.lessons}"
-                                 aria-label="Avance por lección">
-                                <form th:each="lesson : ${#numbers.sequence(1, total)}"
-                                      th:action="@{/panel/cursos/{slug}/lecciones/{lesson}(slug=${enrollment.course.slug},lesson=${lesson})}"
-                                      method="post">
-                                    <button class="panel-lesson-btn" type="submit"
-                                            th:classappend="${done.contains(lesson)} ? ' is-done' : ''"
-                                            th:attr="aria-pressed=${done.contains(lesson)},aria-label=${'Lección ' + lesson + (done.contains(lesson) ? ', terminada' : ', pendiente')}"
-                                            th:text="${lesson}">1</button>
-                                </form>
-                            </div>
                             <p class="panel-lesson-label"
-                               th:text="${lessonCounts[enrollment.id] + ' de ' + enrollment.course.lessons + ' lecciones terminadas'}">
-                                0 de 0 lecciones terminadas
+                               th:text="${doneVideos[enrollment.id].size() + ' de ' + videoCounts[enrollment.id] + ' videos terminados'}">
+                                0 de 0 videos terminados
                             </p>
                             <div class="panel-lesson-track" role="img"
-                                 th:attr="aria-label=${lessonCounts[enrollment.id] + ' de ' + enrollment.course.lessons + ' lecciones terminadas'}">
-                                <span th:style="${'width: ' + (lessonCounts[enrollment.id] * 100 / enrollment.course.lessons) + '%'}"></span>
+                                 th:attr="aria-label=${doneVideos[enrollment.id].size() + ' de ' + videoCounts[enrollment.id] + ' videos terminados'}">
+                                <span th:style="${'width: ' + videoProgress[enrollment.id] + '%'}"></span>
                             </div>
 
                             <div class="panel-course-actions">
+                                <a class="panel-inline-btn"
+                                   th:href="@{/panel/cursos/{slug}(slug=${enrollment.course.slug})}">
+                                    Ver clases
+                                </a>
                                 <form th:action="@{/panel/cursos/{slug}/completar(slug=${enrollment.course.slug})}"
                                       method="post" th:if="${!enrollment.completed}">
                                     <button class="panel-inline-btn" type="submit">Ya terminé el curso</button>

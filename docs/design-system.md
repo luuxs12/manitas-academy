@@ -213,6 +213,12 @@ perfil, cursos y panel de administración:
 | `.footer-col` | columna de enlaces del pie, con el título en Open Sans 700 |
 | `.footer-bottom` / `.footer-legal` | barra inferior negra: copyright y enlaces legales en blanco atenuado |
 | `.footer-top` | pastilla "Volver arriba" que se pinta de verde al pasar el mouse; se oculta bajo 520 px |
+| `.course-lesson-layout` | grilla del curso del estudiante: reproductor a la izquierda y temario a la derecha; se apila bajo 900 px |
+| `.player-card` / `.player-empty` | contenedor del reproductor y estado cuando todavía no se eligió una clase |
+| `.player-frame` / `.player-frame video` | video 16:9 sobre negro, con foco verde hacia adentro y controles nativos |
+| `.player-note` / `.player-transcript` | aviso de archivo pendiente o video histórico, y transcripción en `details` |
+| `.course-syllabus` / `.syllabus-list` / `.syllabus-item` | temario ordenado: módulo, título, duración, vistos y distintivos de subtítulos o transcripción |
+| `.syllabus-item.is-active` / `.syllabus-item.is-done` | clase abierta (borde verde) y clase marcada como terminada (estado verde) |
 
 Si cambiás el nombre de alguna, decime y actualizo las plantillas nuevas.
 

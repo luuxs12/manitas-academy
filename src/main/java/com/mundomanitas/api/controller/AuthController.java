@@ -23,13 +23,12 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 
 /**
  * Pantallas y acciones de acceso.
  *
- * <p>El POST de login lo atiende Spring Security; acá solo se muestra el
- * formulario y se reciben los avisos de error, registro o cierre de sesión.</p>
+ * <p>El acceso se abre como modal sobre el sitio; el POST de login lo atiende
+ * Spring Security y acá solo se gestiona el alta de cuentas.</p>
  */
 @Controller
 public class AuthController {
@@ -51,22 +50,10 @@ public class AuthController {
         this.mailService = mailService;
     }
 
+    /** La URL histórica no muestra pantalla: vuelve al inicio o al panel del rol. */
     @GetMapping("/login")
-    public String login(
-            Authentication authentication,
-            @RequestParam(name = "error", required = false) String error,
-            @RequestParam(name = "logout", required = false) String logout,
-            @RequestParam(name = "reset", required = false) String reset,
-            Model model
-    ) {
-        if (isSignedIn(authentication)) {
-            return panelFor(authentication);
-        }
-
-        model.addAttribute("loginError", error != null);
-        model.addAttribute("loggedOut", logout != null);
-        model.addAttribute("passwordReset", reset != null);
-        return "auth/login";
+    public String legacyLogin(Authentication authentication) {
+        return isSignedIn(authentication) ? panelFor(authentication) : "redirect:/?login";
     }
 
     @GetMapping("/registro")

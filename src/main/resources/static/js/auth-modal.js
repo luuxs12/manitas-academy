@@ -1,6 +1,5 @@
 /* Modal de cuenta: abre login o registro sobre la página, sin recargar.
-   Si el navegador no ejecuta este archivo, los enlaces siguen llevando a
-   /login y /registro, que funcionan como páginas completas. */
+   No hay página de login: /login solo procesa el POST del formulario. */
 
 (() => {
     const dialog = document.getElementById("auth-dialog");
@@ -132,7 +131,7 @@
 
     const loginSucceeded = (response) => {
         const url = new URL(response.url);
-        return response.ok && !(url.pathname === "/login" && url.searchParams.has("error"));
+        return response.ok && !url.searchParams.has("error");
     };
 
     const sendLogin = async (form) => {
@@ -248,11 +247,17 @@
         });
     }
 
-    // Al cerrar sesión se vuelve a la portada con «/?login»: el formulario
-    // queda abierto sobre la página principal, sin pantalla de login aparte.
+    // Toda vuelta al acceso (logout, error o contraseña cambiada) abre el
+    // modal sobre la portada; los avisos se muestran dentro del diálogo.
     const params = new URLSearchParams(window.location.search);
     if (params.has("login") || params.has("registro")) {
         open(params.has("registro") ? "register" : "login");
+        if (params.has("error")) {
+            showAlert(loginForm, "El correo o la contraseña no coinciden. Revisalos y probá de nuevo.");
+        }
+        if (params.has("reset")) {
+            showAlert(loginForm, "Tu contraseña se actualizó. Ya podés entrar.");
+        }
         window.history.replaceState({}, "", window.location.pathname);
     }
 

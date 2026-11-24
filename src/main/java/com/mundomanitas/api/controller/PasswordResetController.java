@@ -100,6 +100,6 @@ public class PasswordResetController {
             return "auth/reset-password";
         }
 
-        return "redirect:/login?reset";
+        return "redirect:/?login&reset";
     }
 }

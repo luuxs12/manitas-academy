@@ -67,14 +67,14 @@ public class SecurityConfig {
                         .requestMatchers("/panel", "/panel/**").hasRole("STUDENT")
                         .anyRequest().permitAll())
                 .formLogin(form -> form
-                        .loginPage("/login")
+                        .loginPage("/?login")
                         .loginProcessingUrl("/login")
                         .successHandler((request, response, authentication) -> {
                             boolean admin = authentication.getAuthorities().stream()
                                     .anyMatch(authority -> "ROLE_ADMIN".equals(authority.getAuthority()));
                             response.sendRedirect(admin ? "/admin" : "/panel");
                         })
-                        .failureUrl("/login?error")
+                        .failureUrl("/?login&error")
                         .permitAll())
                 .logout(logout -> logout
                         .logoutUrl("/logout")

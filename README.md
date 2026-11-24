@@ -197,7 +197,7 @@ java -jar target\api-0.0.1-SNAPSHOT.jar
 | `/panel` | Panel del estudiante (requiere sesión) |
 | `/terminos` | Términos de uso |
 | `/privacidad` | Política de privacidad |
-| `/login` | Inicio de sesión (página completa) |
+| `/login` | Solo POST: procesa el acceso; la vista es el modal en `/?login` |
 | `/registro` | Alta de cuenta (página completa) |
 | `/recuperar` | Pedir el enlace para restablecer la contraseña |
 | `/restablecer?token=` | Elegir la contraseña nueva desde el enlace del correo |
@@ -208,11 +208,13 @@ java -jar target\api-0.0.1-SNAPSHOT.jar
 Las páginas del sitio cargan el modal de cuenta como fragmento. Los botones
 "Iniciar sesión", "Crear cuenta", "Empezar gratis", "Crear mi cuenta" y "Crear
 cuenta gratis" llevan `data-auth-open` y abren el modal sobre la página con el
-fondo difuminado, sin recargar. `/login` y `/registro` siguen funcionando como
-páginas completas: si el JavaScript no corre, los enlaces llevan ahí.
+fondo difuminado, sin recargar. No existe página de login: `GET /login` vuelve a
+la portada y `/login` solo atiende el POST de autenticación. `/registro` sigue
+siendo una página completa.
 
 Al iniciar sesión —o al terminar el registro, que deja la sesión abierta— se
-entra directo a `/panel`. Si la sesión no existe, `/panel` redirige a `/login`.
+entra directo al panel según el rol. Si la sesión no existe, `/panel` y
+`/admin` redirigen a `/?login`.
 
 ## Estructura
 
@@ -298,7 +300,8 @@ Reglas del restablecimiento:
 - Sirve **una vez**, vence a los 60 minutos y el pedido nuevo borra los anteriores.
 - La pantalla de `/recuperar` responde igual exista o no la cuenta, para no
   revelar correos registrados.
-- Al guardar la contraseña se quema el token y se entra con la nueva por `/login`.
+- Al guardar la contraseña se quema el token y se vuelve al inicio con el modal
+  en `/?login&reset`.
 - La migración es `V2__password_reset.sql`.
 
 ## Diseño y accesibilidad

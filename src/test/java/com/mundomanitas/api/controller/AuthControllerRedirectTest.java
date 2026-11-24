@@ -16,8 +16,8 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
 
-/** Al volver a una pantalla de acceso, cada rol cae en su propio panel. */
-@DisplayName("Redirección de acceso según el rol")
+/** Al crear una cuenta con sesión iniciada, cada rol cae en su panel. */
+@DisplayName("Redirección de registro según el rol")
 class AuthControllerRedirectTest {
 
     private AuthController controller;
@@ -34,8 +34,6 @@ class AuthControllerRedirectTest {
     @Test
     @DisplayName("un administrador con sesión vuelve al panel administrativo")
     void adminReturnsToAdminPanel() {
-        assertThat(controller.login(auth("ADMIN"), null, null, null, new ExtendedModelMap()))
-                .isEqualTo("redirect:/admin");
         assertThat(controller.register(auth("ADMIN"), new ExtendedModelMap()))
                 .isEqualTo("redirect:/admin");
     }
@@ -43,10 +41,16 @@ class AuthControllerRedirectTest {
     @Test
     @DisplayName("un estudiante con sesión vuelve a su panel")
     void studentReturnsToStudentPanel() {
-        assertThat(controller.login(auth("STUDENT"), null, null, null, new ExtendedModelMap()))
-                .isEqualTo("redirect:/panel");
         assertThat(controller.register(auth("STUDENT"), new ExtendedModelMap()))
                 .isEqualTo("redirect:/panel");
+    }
+
+    @Test
+    @DisplayName("la vieja URL /login no muestra pantalla: vuelve al modal o al panel")
+    void legacyLoginNeverRendersPage() {
+        assertThat(controller.legacyLogin(null)).isEqualTo("redirect:/?login");
+        assertThat(controller.legacyLogin(auth("ADMIN"))).isEqualTo("redirect:/admin");
+        assertThat(controller.legacyLogin(auth("STUDENT"))).isEqualTo("redirect:/panel");
     }
 
     private static Authentication auth(String role) {

@@ -73,7 +73,7 @@
         </button>
 
         <div class="nav-actions" th:if="${currentUser == null}">
-            <a class="nav-login" th:href="@{/login}" data-auth-open="login">Iniciar sesión</a>
+            <a class="nav-login" th:href="@{/} + '?login'" data-auth-open="login">Iniciar sesión</a>
             <a class="btn btn-nav" th:href="@{/registro}" data-auth-open="register">Crear cuenta</a>
         </div>
 
@@ -142,7 +142,7 @@
                 <li><a th:href="@{/terminos}">Términos</a></li>
                 <li><a th:href="@{/privacidad}">Privacidad</a></li>
                 <li th:if="${currentUser == null}">
-                    <a th:href="@{/login}" data-auth-open="login">Iniciar sesión</a>
+                    <a th:href="@{/} + '?login'" data-auth-open="login">Iniciar sesión</a>
                 </li>
                 <li th:if="${currentUser != null}">
                     <a href="mailto:hola@mundomanitas.com">Escribinos</a>

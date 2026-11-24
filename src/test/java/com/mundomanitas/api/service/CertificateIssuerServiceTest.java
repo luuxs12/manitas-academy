@@ -65,6 +65,7 @@ class CertificateIssuerServiceTest {
         assertTrue(issuer.issueFor(enrollment));
         verify(certificates).save(any(Certificate.class));
         verify(notifications).notify(any(User.class), anyString(), anyString(), anyString(), anyString());
+        verify(metrics).certificateIssued();
     }
 
     @Test

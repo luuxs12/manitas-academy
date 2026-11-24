@@ -18,10 +18,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-/**
- * CRUD administrativo de cuentas, cursos y contenido, con auditoría.
- */
+/** CRUD administrativo de cuentas, cursos y contenido, con auditoría. */
 public interface AdminCatalogService {
+
+    /** Requisitos reales para publicar un curso. */
+    record PublishChecklist(List<String> missing, boolean canPublish) {
+    }
+
+    /** Impacto real de borrar un curso, calculado desde la base. */
+    record DeletionImpact(int modules, int videos, int exercises,
+                          long enrollments, long certificates) {
+    }
+
+    String slugFromTitle(String title);
 
     Page<AdminUserRow> users(String role, String term, Pageable pageable, UUID currentId);
 
@@ -37,7 +46,19 @@ public interface AdminCatalogService {
 
     void updateCourse(UUID id, AdminCourseForm form, UUID actor);
 
+    PublishChecklist publishChecklist(UUID id);
+
+    void setPublished(UUID id, boolean published, UUID actor);
+
+    DeletionImpact deletionImpact(UUID id);
+
     void deleteCourse(UUID id, UUID actor);
+
+    int lessonCount(UUID courseId);
+
+    void moveModule(UUID id, boolean up, UUID actor);
+
+    void moveVideo(UUID id, boolean up, UUID actor);
 
     Page<ModuleRow> modules(UUID courseId, String term, Pageable pageable);
 

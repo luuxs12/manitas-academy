@@ -46,8 +46,7 @@ public class AdminCourseController extends AdminBaseController {
     @GetMapping("/nuevo")
     public String createForm(Model model) {
         common(model, "cursos", "Nuevo curso");
-        model.addAttribute("adminCourseForm", new AdminCourseForm("", "", "Nivel inicial", 1,
-                true, "", "", "/img/cursos/python.jpg", 0));
+        model.addAttribute("adminCourseForm", new AdminCourseForm("", "", "", true, "", "", "", 0));
         return "admin/curso-form";
     }
 

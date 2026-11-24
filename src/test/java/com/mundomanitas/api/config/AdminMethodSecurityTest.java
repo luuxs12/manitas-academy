@@ -9,7 +9,6 @@ import com.mundomanitas.api.controller.admin.AdminExportController;
 import com.mundomanitas.api.controller.admin.AdminNotificationApiController;
 import com.mundomanitas.api.controller.admin.AdminReportController;
 import com.mundomanitas.api.controller.admin.AdminSearchController;
-import com.mundomanitas.api.controller.admin.AdminUploadController;
 import com.mundomanitas.api.controller.admin.AdminUserController;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -33,8 +32,7 @@ class AdminMethodSecurityTest {
             AdminReportController.class,
             AdminExportController.class,
             AdminSearchController.class,
-            AdminNotificationApiController.class,
-            AdminUploadController.class
+            AdminNotificationApiController.class
     );
 
     @Test

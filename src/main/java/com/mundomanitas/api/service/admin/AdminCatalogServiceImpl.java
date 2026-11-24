@@ -17,12 +17,12 @@ import com.mundomanitas.api.model.Exercise;
 import com.mundomanitas.api.model.User;
 import com.mundomanitas.api.model.Video;
 import com.mundomanitas.api.repository.CourseModuleRepository;
+import com.mundomanitas.api.repository.CertificateRepository;
 import com.mundomanitas.api.repository.CourseRepository;
 import com.mundomanitas.api.repository.EnrollmentRepository;
 import com.mundomanitas.api.repository.ExerciseRepository;
 import com.mundomanitas.api.repository.UserRepository;
 import com.mundomanitas.api.repository.VideoRepository;
-import com.mundomanitas.api.service.R2StorageService;
 import com.mundomanitas.api.service.YouTubeLink;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -33,12 +33,15 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
+import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
 
 /** Implementación del CRUD administrativo de cuentas, cursos y contenido. */
@@ -53,10 +56,10 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
     private final VideoRepository videos;
     private final ExerciseRepository exercises;
     private final EnrollmentRepository enrollments;
+    private final CertificateRepository certificates;
     private final PasswordEncoder encoder;
     private final AdminAuditService audit;
     private final AdminFormat format;
-    private final R2StorageService storage;
 
     public AdminCatalogServiceImpl(
             UserRepository users,
@@ -65,10 +68,10 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
             VideoRepository videos,
             ExerciseRepository exercises,
             EnrollmentRepository enrollments,
+            CertificateRepository certificates,
             PasswordEncoder encoder,
             AdminAuditService audit,
-            AdminFormat format,
-            R2StorageService storage
+            AdminFormat format
     ) {
         this.users = users;
         this.courses = courses;
@@ -76,10 +79,10 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
         this.videos = videos;
         this.exercises = exercises;
         this.enrollments = enrollments;
+        this.certificates = certificates;
         this.encoder = encoder;
         this.audit = audit;
         this.format = format;
-        this.storage = storage;
     }
 
     /* ------------------------------ cuentas ------------------------------ */
@@ -122,6 +125,17 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
 
     /* ------------------------------ cursos ------------------------------- */
 
+    @Override
+    @Transactional(readOnly = true)
+    public String slugFromTitle(String title) {
+        String slug = StringUtils.trimToEmpty(title).toLowerCase(Locale.ROOT)
+                .replaceAll("[^a-z0-9]+", "-")
+                .replaceAll("^-+|-+$", "");
+        checkArgument(!slug.isBlank(), "El título no permite generar un identificador.");
+        return slug;
+    }
+
+    @Override
     @Transactional(readOnly = true)
     public Page<AdminCourseRow> courses(String term, Pageable pageable) {
         String clean = blankToNull(term);
@@ -135,51 +149,158 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
         }
         return page.map(course -> new AdminCourseRow(
                 course.getId(), course.getSlug(), course.getTitle(), course.getCategory(),
-                course.getLessons(), course.priceLabel(), course.getPosition(),
-                totals.getOrDefault(course.getId(), 0L), course.getImage()));
+                lessonCount(course.getId()), course.getStatus(), course.priceLabel(),
+                course.getPosition(), totals.getOrDefault(course.getId(), 0L), course.getImage()));
     }
 
+    @Override
     @Transactional(readOnly = true)
     public AdminCourseForm courseForm(UUID id) {
         Course course = requireCourse(id);
         return new AdminCourseForm(course.getSlug(), course.getTitle(), course.getLevel(),
-                course.getLessons(), course.isFree(), course.getCategory(), course.getSummary(),
+                course.isFree(), course.getCategory(), course.getSummary(),
                 course.getImage(), course.getPosition());
     }
 
+    @Override
     @Transactional
     public UUID createCourse(AdminCourseForm form, UUID actor) {
-        if (courses.findBySlug(form.slug()).isPresent()) {
-            throw new IllegalArgumentException("Ya existe un curso con ese identificador.");
-        }
-        Course course = new Course(form.slug(), form.title(), form.level(), form.lessons(),
-                form.free(), form.category(), form.summary(), form.image(), form.position());
+        String slug = blankToNull(form.slug()) == null
+                ? slugFromTitle(form.title()) : form.slug().trim();
+        checkArgument(courses.findBySlug(slug).isEmpty(),
+                "Ya existe un curso con ese identificador.");
+        String title = requireText(form.title(), "título");
+        String level = requireText(form.level(), "nivel");
+        String category = requireText(form.category(), "categoría");
+        String summary = requireText(form.summary(), "resumen");
+        Course course = new Course(slug, title, level, 0, form.free(), category,
+                summary, blankToNull(form.image()), form.position());
         courses.save(course);
-        audit.record(actor, "CREATE", "CURSO", course.getId(), form.title());
-        log.info("Curso creado id={} actor={}", course.getId(), actor);
+        audit.record(actor, "CREATE", "CURSO", course.getId(), title);
+        log.info("Curso creado id={} actor={} estado={}", course.getId(), actor,
+                course.getStatus());
         return course.getId();
     }
 
+    @Override
     @Transactional
     public void updateCourse(UUID id, AdminCourseForm form, UUID actor) {
         Course course = requireCourse(id);
-        courses.findBySlug(form.slug()).filter(other -> !other.getId().equals(id))
+        String slug = blankToNull(form.slug()) == null
+                ? slugFromTitle(form.title()) : form.slug().trim();
+        courses.findBySlug(slug).filter(other -> !other.getId().equals(id))
                 .ifPresent(other -> {
                     throw new IllegalArgumentException("Ya existe un curso con ese identificador.");
                 });
-        course.update(form.slug(), form.title(), form.level(), form.lessons(), form.free(),
-                form.category(), form.summary(), form.image(), form.position());
-        audit.record(actor, "UPDATE", "CURSO", id, form.title());
+        String title = requireText(form.title(), "título");
+        course.update(slug, title, requireText(form.level(), "nivel"), form.free(),
+                requireText(form.category(), "categoría"), requireText(form.summary(), "resumen"),
+                blankToNull(form.image()), form.position());
+        audit.record(actor, "UPDATE", "CURSO", id, title);
         log.info("Curso actualizado id={} actor={}", id, actor);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public PublishChecklist publishChecklist(UUID id) {
+        Course course = requireCourse(id);
+        List<String> missing = new ArrayList<>();
+        if (StringUtils.isBlank(course.getSummary())) missing.add("resumen");
+        if (StringUtils.isBlank(course.getImage())) missing.add("portada");
+        List<CourseModule> modulesOfCourse = modules.findByCourseIdOrderByPositionAsc(id);
+        if (modulesOfCourse.isEmpty()) {
+            missing.add("módulo");
+            missing.add("video");
+        } else {
+            boolean hasVideo = modulesOfCourse.stream().anyMatch(module ->
+                    !videos.findByModuleIdOrderByPositionAsc(module.getId()).isEmpty());
+            if (!hasVideo) missing.add("video");
+        }
+        return new PublishChecklist(List.copyOf(missing), missing.isEmpty());
+    }
+
+    @Override
+    @Transactional
+    public void setPublished(UUID id, boolean published, UUID actor) {
+        Course course = requireCourse(id);
+        if (published) {
+            PublishChecklist check = publishChecklist(id);
+            checkArgument(check.canPublish(), "Falta: " + String.join(", ", check.missing()));
+            course.publish();
+        } else {
+            course.unpublish();
+        }
+        audit.record(actor, "UPDATE", "CURSO", id,
+                published ? "PUBLICADO" : "BORRADOR");
+        log.info("Estado del curso id={} actor={} publicado={}", id, actor, published);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public DeletionImpact deletionImpact(UUID id) {
+        requireCourse(id);
+        List<CourseModule> modulesOfCourse = modules.findByCourseIdOrderByPositionAsc(id);
+        int videosCount = videos.countByCourseId(id);
+        int exercisesCount = modulesOfCourse.stream()
+                .mapToInt(module -> exercises.findByModuleIdOrderByPositionAsc(module.getId()).size())
+                .sum();
+        return new DeletionImpact(modulesOfCourse.size(), videosCount, exercisesCount,
+                enrollments.countByCourseId(id), certificates.countByCourseId(id));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public int lessonCount(UUID courseId) {
+        return videos.countByCourseId(courseId);
+    }
+
+    @Override
+    @Transactional
+    public void moveModule(UUID id, boolean up, UUID actor) {
+        CourseModule module = modules.findById(id).orElseThrow();
+        List<CourseModule> ordered = new ArrayList<>(
+                modules.findByCourseIdOrderByPositionAsc(module.getCourseId()));
+        int index = ordered.indexOf(module);
+        checkArgument(index >= 0, "El módulo no pertenece al curso.");
+        int target = up ? index - 1 : index + 1;
+        checkArgument(target >= 0 && target < ordered.size(), "No se puede mover más.");
+        CourseModule other = ordered.get(target);
+        int position = module.getPosition();
+        module.setPosition(other.getPosition());
+        other.setPosition(position);
+        audit.record(actor, "UPDATE", "MODULO", id, up ? "SUBIR" : "BAJAR");
+        log.info("Módulo reordenado id={} actor={}", id, actor);
+    }
+
+    @Override
+    @Transactional
+    public void moveVideo(UUID id, boolean up, UUID actor) {
+        Video video = videos.findById(id).orElseThrow();
+        List<Video> ordered = new ArrayList<>(
+                videos.findByModuleIdOrderByPositionAsc(video.getModuleId()));
+        int index = ordered.indexOf(video);
+        checkArgument(index >= 0, "El video no pertenece al módulo.");
+        int target = up ? index - 1 : index + 1;
+        checkArgument(target >= 0 && target < ordered.size(), "No se puede mover más.");
+        Video other = ordered.get(target);
+        int position = video.getPosition();
+        video.setPosition(other.getPosition());
+        other.setPosition(position);
+        audit.record(actor, "UPDATE", "VIDEO", id, up ? "SUBIR" : "BAJAR");
+        log.info("Video reordenado id={} actor={}", id, actor);
+    }
+
+    @Override
     @Transactional
     public void deleteCourse(UUID id, UUID actor) {
         Course course = requireCourse(id);
+        DeletionImpact impact = deletionImpact(id);
+        checkArgument(impact.enrollments() == 0,
+                "El curso tiene inscritos: despublicalo o archivalo en lugar de borrarlo.");
         String title = course.getTitle();
         courses.delete(course);
         audit.record(actor, "DELETE", "CURSO", id, title);
-        log.info("Curso eliminado id={} actor={}", id, actor);
+        log.info("Curso eliminado id={} actor={} impacto={}", id, actor, impact);
     }
 
     /* ------------------------------ módulos ------------------------------ */
@@ -235,6 +356,7 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
 
     /* ------------------------------- videos ------------------------------ */
 
+    @Override
     @Transactional(readOnly = true)
     public Page<VideoRow> videos(UUID moduleId, String term, Pageable pageable) {
         Map<UUID, CourseModule> moduleMap = moduleMap();
@@ -246,80 +368,84 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
                     module == null ? "Módulo eliminado" : module.getTitle(),
                     course == null ? "Curso eliminado" : course.getTitle(),
                     video.getTitle(),
-                    sourceLabel(video),
+                    youtubeLink(video),
                     video.getPosition());
         });
     }
 
+    @Override
     @Transactional(readOnly = true)
     public AdminVideoForm videoForm(UUID id) {
         Video video = videos.findById(id).orElseThrow();
-        return new AdminVideoForm(video.getModuleId(), video.getTitle(), video.getUrl(),
-                video.getPosition(), video.getObjectKey(), video.getSubtitleKey(),
-                video.getDurationSeconds(), video.getTranscript(),
+        return new AdminVideoForm(video.getModuleId(), video.getTitle(), video.getPosition(),
                 youtubeLink(video));
     }
 
+    @Override
     @Transactional
     public UUID createVideo(AdminVideoForm form, UUID actor) {
         requireModule(form.moduleId());
-        Video video = new Video(form.moduleId(), form.title().trim(),
-                AdminVideoForm.clean(form.url()), form.position(),
-                AdminVideoForm.clean(form.objectKey()),
-                AdminVideoForm.clean(form.subtitleKey()),
-                form.durationSeconds() == null ? 0 : form.durationSeconds(),
-                AdminVideoForm.clean(form.transcript()),
-                youtubeId(form.youtubeUrl()));
+        Video video = new Video(form.moduleId(), requireText(form.title(), "título"),
+                youtubeId(form.youtubeUrl()), form.position());
         videos.save(video);
+        refreshLessons(video.getModuleId());
         audit.record(actor, "CREATE", "VIDEO", video.getId(), form.title().trim());
-        log.info("Video creado id={} actor={}", video.getId(), actor);
+        log.info("Video creado id={} actor={} youtube={}", video.getId(), actor,
+                video.getYoutubeId());
         return video.getId();
     }
 
+    @Override
     @Transactional
     public void updateVideo(UUID id, AdminVideoForm form, UUID actor) {
         Video video = videos.findById(id).orElseThrow();
+        UUID previousModule = video.getModuleId();
         requireModule(form.moduleId());
-        video.update(form.title().trim(), AdminVideoForm.clean(form.url()), form.position(),
-                AdminVideoForm.clean(form.objectKey()),
-                AdminVideoForm.clean(form.subtitleKey()),
-                form.durationSeconds() == null ? 0 : form.durationSeconds(),
-                AdminVideoForm.clean(form.transcript()),
-                youtubeId(form.youtubeUrl()));
+        video.update(requireText(form.title(), "título"),
+                youtubeId(form.youtubeUrl()), form.position());
         video.moveTo(form.moduleId());
+        if (!previousModule.equals(form.moduleId())) {
+            refreshLessons(previousModule);
+        }
+        refreshLessons(form.moduleId());
         audit.record(actor, "UPDATE", "VIDEO", id, form.title().trim());
         log.info("Video actualizado id={} actor={}", id, actor);
     }
 
+    @Override
     @Transactional
     public void deleteVideo(UUID id, UUID actor) {
         Video video = videos.findById(id).orElseThrow();
+        UUID moduleId = video.getModuleId();
         String title = video.getTitle();
         videos.delete(video);
-        storage.deleteByKey(video.getObjectKey());
-        storage.deleteByKey(video.getSubtitleKey());
-        storage.deleteByUrl(video.getUrl());
+        refreshLessons(moduleId);
         audit.record(actor, "DELETE", "VIDEO", id, title);
         log.info("Video eliminado id={} actor={}", id, actor);
     }
 
     private String youtubeId(String youtubeUrl) {
         String link = AdminVideoForm.clean(youtubeUrl);
-        if (link == null) return null;
-        String id = YouTubeLink.id(link);
-        if (id == null) throw new IllegalArgumentException("El enlace de YouTube no es válido.");
+        String id = link == null ? null : YouTubeLink.id(link);
+        checkArgument(id != null, "El enlace de YouTube no es válido.");
         return id;
     }
 
     private String youtubeLink(Video video) {
-        String id = YouTubeLink.id(video.getYoutubeId());
-        return id == null ? null : "https://youtu.be/" + id;
+        return video.getYoutubeId() == null ? null : "https://youtu.be/" + video.getYoutubeId();
     }
 
-    private String sourceLabel(Video video) {
-        String link = youtubeLink(video);
-        if (link != null) return link;
-        return StringUtils.trimToNull(video.getUrl()) != null ? video.getUrl() : video.getObjectKey();
+    private void refreshLessons(UUID moduleId) {
+        modules.findById(moduleId).ifPresent(module -> {
+            Course course = courses.findById(module.getCourseId()).orElse(null);
+            if (course != null) course.refreshLessons(videos.countByCourseId(course.getId()));
+        });
+    }
+
+    private String requireText(String value, String field) {
+        String clean = StringUtils.trimToNull(value);
+        checkArgument(clean != null, "Ingresá el " + field + ".");
+        return clean;
     }
 
     /* ----------------------------- ejercicios ---------------------------- */

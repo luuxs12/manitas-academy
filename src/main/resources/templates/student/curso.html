@@ -43,34 +43,15 @@
                              th:if="${player != null}">
                         <h2 id="titulo-reproductor" th:text="${player.title()}">Clase 1</h2>
                         <div class="player-frame">
-                            <iframe th:if="${player.youtube()}" th:src="${player.url()}"
+                            <iframe th:src="${player.url()}"
                                     th:title="${player.title()}" title="Video de la clase"
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                     referrerpolicy="strict-origin-when-cross-origin"
                                     allowfullscreen loading="lazy"></iframe>
-                            <video th:unless="${player.youtube()}" controls preload="metadata"
-                                   th:poster="${course.image}">
-                                <source th:if="${player.available()}" th:src="${player.url()}"
-                                        type="video/mp4">
-                                <track th:if="${player.subtitleUrl() != null}" kind="subtitles"
-                                       srclang="es" label="Español" th:src="${player.subtitleUrl()}" default>
-                                Tu navegador no puede reproducir este video.
-                            </video>
                         </div>
-                        <p class="player-note" th:if="${player.youtube()}">
+                        <p class="player-note">
                             Este video se reproduce desde YouTube sin cookies de terceros.
                         </p>
-                        <p class="player-note" th:if="${!player.available()}">
-                            Este video todavía no tiene archivo cargado.
-                        </p>
-                        <p class="player-note" th:if="${player.legacy()}">
-                            Video histórico: se reproduce con su URL original.
-                        </p>
-                        <details class="player-transcript"
-                                 th:if="${player.transcript() != null and !player.transcript().isEmpty()}">
-                            <summary>Ver transcripción</summary>
-                            <p th:text="${player.transcript()}"></p>
-                        </details>
                         <form th:action="@{/panel/cursos/{slug}/videos/{videoId}(slug=${enrollment.course.slug},videoId=${selectedId})}"
                               method="post">
                             <button class="btn btn-dark" type="submit"
@@ -83,8 +64,8 @@
                     <section class="player-empty" th:if="${player == null}"
                              aria-labelledby="titulo-elegir">
                         <h2 id="titulo-elegir">Elegí un video para empezar</h2>
-                        <p>El temario está a la derecha. Al abrir una clase se arma su reproducción
-                           con subtítulos y transcripción cuando están disponibles.</p>
+                        <p>El temario está a la derecha. Al abrir una clase se arma su
+                           reproducción desde YouTube.</p>
                     </section>
                 </div>
 
@@ -107,9 +88,6 @@
                                 <span class="syllabus-module" th:text="${video.moduleTitle()}">Módulo 1</span>
                                 <span class="syllabus-title" th:text="${video.title()}">Clase 1</span>
                                 <span class="syllabus-meta">
-                                    <span class="syllabus-duration" th:text="${video.durationLabel()}">0:00</span>
-                                    <span class="syllabus-flag" th:if="${video.hasSubtitle()}">Subtítulos</span>
-                                    <span class="syllabus-flag" th:if="${video.hasTranscript()}">Transcripción</span>
                                     <span class="syllabus-state"
                                           th:text="${doneVideos.contains(video.id())} ? 'Visto' : 'Pendiente'">
                                         Pendiente

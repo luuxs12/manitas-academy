@@ -143,14 +143,14 @@ public class AdminExportService {
             case "videos" -> {
                 Map<String, String> modulesNames = moduleNames();
                 Map<String, String> courseNames = courseNames();
-                List<List<String>> rows = header("Curso", "Módulo", "Video", "URL", "Posición");
+                List<List<String>> rows = header("Curso", "Módulo", "Video", "YouTube", "Posición");
                 for (Video video : videos.findAll()) {
                     CourseModule moduleRow = modules.findById(video.getModuleId()).orElse(null);
                     rows.add(row(
                             moduleRow == null ? "Curso eliminado"
                                     : courseNames.getOrDefault(moduleRow.getCourseId().toString(), "Curso eliminado"),
                             modulesNames.getOrDefault(video.getModuleId().toString(), "Módulo eliminado"),
-                            video.getTitle(), video.getUrl(), video.getPosition()));
+                            video.getTitle(), video.getYoutubeId(), video.getPosition()));
                 }
                 yield rows;
             }

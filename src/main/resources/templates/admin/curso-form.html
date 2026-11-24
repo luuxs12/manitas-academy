@@ -14,7 +14,7 @@
             <p class="panel-flash panel-flash--error" th:if="${panelError}" th:text="${panelError}" role="alert"></p>
 
             <div class="admin-page-head">
-                <div><h1 th:text="${courseId != null} ? 'Editar curso' : 'Nuevo curso'">Curso</h1><p>Subí la imagen a R2 o usá una ruta real de <code>/img/cursos/</code>.</p></div>
+                <div><h1 th:text="${courseId != null} ? 'Editar curso' : 'Nuevo curso'">Curso</h1><p>Usá una portada local guardada en el servidor.</p></div>
                 <a class="admin-back" th:href="@{/admin/cursos}">← Volver a cursos</a>
             </div>
 
@@ -29,23 +29,11 @@
                         <small class="admin-error" th:if="${#fields.hasErrors('level')}" th:errors="*{level}"></small></label>
                     <label>Categoría<input type="text" th:field="*{category}" maxlength="80" required>
                         <small class="admin-error" th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></small></label>
-                    <label>Lecciones<input type="number" th:field="*{lessons}" min="1" max="999" required>
-                        <small class="admin-error" th:if="${#fields.hasErrors('lessons')}" th:errors="*{lessons}"></small></label>
                     <label>Posición<input type="number" th:field="*{position}" min="0" max="999"></label>
                     <label class="admin-span-2">Resumen<textarea th:field="*{summary}" rows="3" maxlength="400" required></textarea>
                         <small class="admin-error" th:if="${#fields.hasErrors('summary')}" th:errors="*{summary}"></small></label>
                     <label class="admin-span-2">Imagen (ruta real)<input id="course-image" type="text" th:field="*{image}" maxlength="300" required>
                         <small class="admin-error" th:if="${#fields.hasErrors('image')}" th:errors="*{image}"></small></label>
-                </div>
-                <div class="admin-upload" data-upload data-upload-target="#course-image"
-                     th:attr="data-upload-endpoint=@{/admin/archivos/imagenes}">
-                    <label>Subir imagen a R2
-                        <input type="file" accept="image/jpeg,image/png,image/webp" data-upload-file>
-                    </label>
-                    <input type="hidden" data-upload-csrf th:value="${_csrf != null} ? ${_csrf.token} : ''">
-                    <span class="admin-upload-status" data-upload-status>
-                        Sin R2 configurado, podés pegar una URL existente.
-                    </span>
                 </div>
                 <label class="admin-check"><input type="checkbox" th:field="*{free}"> Curso gratuito (sin plan Premium)</label>
                 <div class="admin-form-actions">

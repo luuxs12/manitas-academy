@@ -12,7 +12,7 @@
         <main id="panel-main" class="panel-main admin-main">
             <p class="panel-flash panel-flash--error" th:if="${panelError}" th:text="${panelError}" role="alert"></p>
             <div class="admin-page-head">
-                <div><h1 th:text="${itemId != null} ? 'Editar video' : 'Nuevo video'">Video</h1><p>Pegá el enlace público de YouTube. La duración se indica en segundos.</p></div>
+                <div><h1 th:text="${itemId != null} ? 'Editar video' : 'Nuevo video'">Video</h1><p>Pegá el enlace público de YouTube.</p></div>
                 <a class="admin-back" th:href="@{/admin/videos}">← Volver a videos</a>
             </div>
             <form class="panel-card admin-card admin-form" th:action="${itemId != null} ? @{/admin/videos/{id}(id=${itemId})} : @{/admin/videos}"
@@ -32,31 +32,8 @@
                                placeholder="https://www.youtube.com/watch?v=…">
                         <small class="admin-hint">Se reproduce desde YouTube en modo sin cookies.</small>
                         <small class="admin-error" th:if="${#fields.hasErrors('youtubeUrl')}" th:errors="*{youtubeUrl}"></small></label>
-                    <label>Duración (segundos)
-                        <input type="number" th:field="*{durationSeconds}" min="0" max="86400" required>
-                        <small class="admin-error" th:if="${#fields.hasErrors('durationSeconds')}" th:errors="*{durationSeconds}"></small></label>
                     <label>Posición<input type="number" th:field="*{position}" min="0" max="999"></label>
-                    <label class="admin-span-2">Transcripción
-                        <textarea th:field="*{transcript}" rows="4" maxlength="2000"
-                                  placeholder="Texto plano de lo que se dice en el video."></textarea>
-                        <small class="admin-error" th:if="${#fields.hasErrors('transcript')}" th:errors="*{transcript}"></small></label>
                 </div>
-                <details class="admin-legacy-source">
-                    <summary>Origen histórico (solo videos ya cargados)</summary>
-                    <div class="admin-form-grid">
-                        <label>URL anterior
-                            <input id="video-url" type="text" th:field="*{url}" maxlength="300">
-                            <small class="admin-error" th:if="${#fields.hasErrors('url')}" th:errors="*{url}"></small></label>
-                        <label>Clave del video en R2
-                            <input id="video-object-key" type="text" th:field="*{objectKey}" maxlength="300"
-                                   placeholder="videos/nombre.mp4">
-                            <small class="admin-error" th:if="${#fields.hasErrors('objectKey')}" th:errors="*{objectKey}"></small></label>
-                        <label>Clave del subtítulo VTT
-                            <input id="video-subtitle-key" type="text" th:field="*{subtitleKey}" maxlength="300"
-                                   placeholder="subtitles/nombre.vtt">
-                            <small class="admin-error" th:if="${#fields.hasErrors('subtitleKey')}" th:errors="*{subtitleKey}"></small></label>
-                    </div>
-                </details>
                 <div class="admin-form-actions">
                     <button class="btn btn-admin" type="submit" th:text="${itemId != null} ? 'Guardar cambios' : 'Crear video'">Guardar</button>
                     <a class="admin-back" th:href="@{/admin/videos}">Cancelar</a>

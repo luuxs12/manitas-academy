@@ -17,7 +17,11 @@ public interface CourseRepository extends JpaRepository<Course, UUID> {
 
     List<Course> findAllByOrderByPositionAsc();
 
+    List<Course> findAllByStatusOrderByPositionAsc(String status);
+
     Optional<Course> findBySlug(String slug);
+
+    Optional<Course> findBySlugAndStatus(String slug, String status);
 
     Page<Course> findAllByOrderByPositionAsc(Pageable pageable);
 

@@ -24,9 +24,9 @@ public class CourseCatalog {
         this.courses = courses;
     }
 
-    /** Todos los cursos, en el orden del catálogo. */
+    /** Solo los cursos publicados, en el orden del catálogo. */
     public List<Course> all() {
-        return courses.findAllByOrderByPositionAsc();
+        return courses.findAllByStatusOrderByPositionAsc("PUBLICADO");
     }
 
     /** Áreas temáticas en el orden en que aparecen en el catálogo. */
@@ -58,7 +58,7 @@ public class CourseCatalog {
 
     /** Busca un curso por su identificador de URL. */
     public Optional<Course> findBySlug(String slug) {
-        return courses.findBySlug(slug);
+        return courses.findBySlugAndStatus(slug, "PUBLICADO");
     }
 
     private static String haystack(Course course) {

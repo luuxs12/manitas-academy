@@ -37,6 +37,9 @@ public class Course {
     private int lessons;
 
     @Column(nullable = false)
+    private String status = "BORRADOR";
+
+    @Column(nullable = false)
     private boolean free;
 
     @Column(nullable = false)
@@ -78,6 +81,7 @@ public class Course {
         this.summary = summary;
         this.image = image;
         this.position = position;
+        this.status = "BORRADOR";
     }
 
     public UUID getId() {
@@ -98,6 +102,23 @@ public class Course {
 
     public int getLessons() {
         return lessons;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void publish() {
+        this.status = "PUBLICADO";
+    }
+
+    public void unpublish() {
+        this.status = "BORRADOR";
+    }
+
+    /** Actualiza el contador con el contenido real; nadie lo escribe a mano. */
+    public void refreshLessons(int count) {
+        this.lessons = Math.max(0, count);
     }
 
     public boolean isFree() {
@@ -130,7 +151,6 @@ public class Course {
             String slug,
             String title,
             String level,
-            int lessons,
             boolean free,
             String category,
             String summary,
@@ -140,7 +160,6 @@ public class Course {
         this.slug = slug;
         this.title = title;
         this.level = level;
-        this.lessons = lessons;
         this.free = free;
         this.category = category;
         this.summary = summary;

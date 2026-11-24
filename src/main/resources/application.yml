@@ -53,20 +53,8 @@ app:
   upload:
     avatars-dir: ${AVATARS_DIR:./uploads/avatars}
     max-avatar-bytes: ${MAX_AVATAR_BYTES:2097152}
-  r2:
-    # Sin endpoint/bucket/claves el almacenamiento remoto queda apagado.
-    # La URL pública es solo para imágenes; los videos no tienen acceso público.
-    endpoint: ${R2_ENDPOINT:}
-    bucket: ${R2_BUCKET:}
-    private-bucket: ${R2_PRIVATE_BUCKET:}
-    access-key: ${R2_ACCESS_KEY:}
-    secret-key: ${R2_SECRET_KEY:}
-    public-base-url: ${R2_PUBLIC_BASE_URL:}
-    region: ${R2_REGION:auto}
-    presign-seconds: ${R2_PRESIGN_SECONDS:300}
-    max-image-bytes: ${R2_MAX_IMAGE_BYTES:5242880}
-    max-video-bytes: ${R2_MAX_VIDEO_BYTES:524288000}
-    max-subtitle-bytes: ${R2_MAX_SUBTITLE_BYTES:1048576}
+    covers-dir: ${COVERS_DIR:./uploads/covers}
+    max-cover-bytes: ${MAX_COVER_BYTES:2097152}
 
 management:
   endpoints:

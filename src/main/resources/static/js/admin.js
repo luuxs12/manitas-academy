@@ -1,5 +1,5 @@
-/* Subida de archivos a R2: completa la URL del formulario con la respuesta real
-   del servidor. Si R2 no está configurado, el mensaje lo dice sin fingir éxito. */
+/* Subida de archivos al servidor local: completa el campo con la ruta real
+   devuelta por el servidor, sin fingir éxito. */
 (() => {
     for (const zone of document.querySelectorAll("[data-upload]")) {
         const input = zone.querySelector("[data-upload-file]");
@@ -30,7 +30,7 @@
                     target.value = data[field] || "";
                     target.dispatchEvent(new Event("change", { bubbles: true }));
                 }
-                if (status) status.textContent = "Archivo guardado en R2.";
+                if (status) status.textContent = "Archivo guardado en el servidor.";
             } catch (error) {
                 if (status) status.textContent = error.message || "No se pudo subir el archivo.";
             }

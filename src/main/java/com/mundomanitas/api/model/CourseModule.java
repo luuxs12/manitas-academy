@@ -68,4 +68,8 @@ public class CourseModule {
     public void moveTo(UUID courseId) {
         this.courseId = courseId;
     }
+
+    public void setPosition(int position) {
+        this.position = position;
+    }
 }

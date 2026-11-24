@@ -13,7 +13,9 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 @DisplayName("Catálogo de cursos")
@@ -27,9 +29,10 @@ class CourseCatalogTest {
     @BeforeEach
     void setUp() {
         List<Course> data = fixture();
-        lenient().when(courses.findAllByOrderByPositionAsc()).thenReturn(data);
-        lenient().when(courses.findBySlug(anyString())).thenAnswer(invocation ->
-                data.stream()
+        data.forEach(Course::publish);
+        lenient().when(courses.findAllByStatusOrderByPositionAsc("PUBLICADO")).thenReturn(data);
+        lenient().when(courses.findBySlugAndStatus(anyString(), eq("PUBLICADO")))
+                .thenAnswer(invocation -> data.stream()
                         .filter(course -> course.getSlug().equals(invocation.getArgument(0)))
                         .findFirst());
         catalog = new CourseCatalog(courses);
@@ -75,6 +78,15 @@ class CourseCatalogTest {
                 .isEqualTo("Python desde cero");
 
         assertThat(catalog.findBySlug("no-existe")).isEmpty();
+    }
+
+    @Test
+    @DisplayName("no muestra cursos en borrador")
+    void hidesDrafts() {
+        when(courses.findBySlugAndStatus("borrador", "PUBLICADO"))
+                .thenReturn(java.util.Optional.empty());
+
+        assertThat(catalog.findBySlug("borrador")).isEmpty();
     }
 
     @Test

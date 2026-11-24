@@ -39,6 +39,8 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, UUID> {
 
     long countByCompletedAtIsNotNull();
 
+    long countByCourseId(UUID courseId);
+
     @Query("select e.course.id as courseId, count(e) as total from Enrollment e group by e.course.id")
     List<Object[]> countByCourse();
 }

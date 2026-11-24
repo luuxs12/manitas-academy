@@ -20,6 +20,8 @@ public interface CertificateRepository extends JpaRepository<Certificate, UUID> 
 
     long countByRevokedAtIsNull();
 
+    long countByCourseId(UUID courseId);
+
     long countByIssuedAtBetween(OffsetDateTime from, OffsetDateTime to);
 
     @Query("""

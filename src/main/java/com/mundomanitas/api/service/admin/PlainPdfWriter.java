@@ -14,20 +14,22 @@ import java.util.zip.Deflater;
 import java.util.zip.DeflaterOutputStream;
 
 /**
- * Generador PDF sin dependencias nuevas: fuentes base de PDF, logo embebido
- * como XObject y tabla con cebra, bordes y cabecera repetida por página.
+ * Generador PDF artesanal con identidad visual oficial de Mundo Manitas.
+ * Reproduce fielmente la ficha ejecutiva, tarjetas KPI, tabla con cabecera oscura
+ * y pie de página institucional.
  */
 @Component
 public class PlainPdfWriter {
 
     private static final int PAGE_WIDTH = 595;
     private static final int MARGIN = 42;
-    private static final int LOGO_WIDTH = 160;
-    private static final int TABLE_TOP = 690;
-    private static final int TABLE_BOTTOM = 74;
+    private static final int CONTENT_WIDTH = PAGE_WIDTH - 2 * MARGIN; // 511
+    private static final int RIGHT_EDGE = MARGIN + CONTENT_WIDTH;     // 553
+    private static final int LOGO_WIDTH = 136;
+    private static final int TABLE_TOP = 660;
     private static final int HEADER_ROW = 22;
     private static final int BODY_ROW = 18;
-    private static final int ROWS_PER_PAGE = (TABLE_TOP - TABLE_BOTTOM - HEADER_ROW) / BODY_ROW;
+    private static final int ROWS_PER_PAGE = (TABLE_TOP - HEADER_ROW - 70) / BODY_ROW; // 31
 
     /** @param table primera fila = cabeceras; el resto = datos reales. */
     public byte[] write(String module, String generatedAt, List<List<String>> table) {
@@ -46,23 +48,39 @@ public class PlainPdfWriter {
         List<Long> offsets = new ArrayList<>(objectCount + 1);
         offsets.add(0L);
 
+        writeCatalogAndPages(output, offsets, pages.size(), firstPage);
+        writeFonts(output, offsets);
+        writeImageObject(output, offsets, logo, image);
+        writePageObjects(output, offsets, pages, module, generatedAt, headers, data.size(), firstPage);
+        writeTrailer(output, offsets, objectCount);
+
+        return output.toByteArray();
+    }
+
+    private void writeCatalogAndPages(ByteArrayOutputStream output, List<Long> offsets,
+                                      int pageCount, int firstPage) {
         offsets.add(position(output));
         writeAscii(output, "1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n");
 
         StringBuilder kids = new StringBuilder();
-        for (int index = 0; index < pages.size(); index++) {
+        for (int index = 0; index < pageCount; index++) {
             kids.append(firstPage + index * 2).append(" 0 R");
-            if (index < pages.size() - 1) kids.append(' ');
+            if (index < pageCount - 1) kids.append(' ');
         }
         offsets.add(position(output));
         writeAscii(output, "2 0 obj\n<< /Type /Pages /Kids [" + kids + "] /Count "
-                + pages.size() + " >>\nendobj\n");
+                + pageCount + " >>\nendobj\n");
+    }
 
+    private void writeFonts(ByteArrayOutputStream output, List<Long> offsets) {
         offsets.add(position(output));
         writeAscii(output, font(3, "Helvetica"));
         offsets.add(position(output));
         writeAscii(output, font(4, "Helvetica-Bold"));
+    }
 
+    private void writeImageObject(ByteArrayOutputStream output, List<Long> offsets,
+                                  BufferedImage logo, byte[] image) {
         offsets.add(position(output));
         writeAscii(output, "5 0 obj\n<< /Type /XObject /Subtype /Image /Width " + logo.getWidth()
                 + " /Height " + logo.getHeight()
@@ -70,12 +88,17 @@ public class PlainPdfWriter {
                 + image.length + " >>\nstream\n");
         output.writeBytes(image);
         writeAscii(output, "\nendstream\nendobj\n");
+    }
 
+    private void writePageObjects(ByteArrayOutputStream output, List<Long> offsets,
+                                  List<List<List<String>>> pages, String module,
+                                  String generatedAt, List<String> headers,
+                                  int dataSize, int firstPage) {
         for (int index = 0; index < pages.size(); index++) {
             int pageObject = firstPage + index * 2;
             int contentObject = pageObject + 1;
-            byte[] content = content(module, generatedAt, headers, pages.get(index), data.size(),
-                    index + 1, pages.size(), logo.getHeight());
+            byte[] content = content(module, generatedAt, headers, pages.get(index), dataSize,
+                    index + 1, pages.size());
 
             offsets.add(position(output));
             writeAscii(output, page(pageObject, contentObject));
@@ -85,7 +108,9 @@ public class PlainPdfWriter {
             output.writeBytes(content);
             writeAscii(output, "\nendstream\nendobj\n");
         }
+    }
 
+    private void writeTrailer(ByteArrayOutputStream output, List<Long> offsets, int objectCount) {
         long xref = position(output);
         writeAscii(output, "xref\n0 " + (objectCount + 1) + "\n");
         writeAscii(output, "0000000000 65535 f \n");
@@ -94,7 +119,6 @@ public class PlainPdfWriter {
         }
         writeAscii(output, "trailer\n<< /Size " + (objectCount + 1) + " /Root 1 0 R >>\n");
         writeAscii(output, "startxref\n" + xref + "\n%%EOF\n");
-        return output.toByteArray();
     }
 
     private String font(int object, String name) {
@@ -110,50 +134,80 @@ public class PlainPdfWriter {
     }
 
     private byte[] content(String module, String generatedAt, List<String> headers,
-                           List<List<String>> rows, int recordCount, int page, int total,
-                           int logoHeight) {
+                           List<List<String>> rows, int recordCount, int page, int total) {
         StringBuilder content = new StringBuilder();
-        content.append("q\n0 1 0 rg\n0 786 ").append(PAGE_WIDTH).append(" 56 re f\nQ\n");
-        text(content, "F2", 18, MARGIN, 818, "MUNDO MANITAS", "0 0 0");
-        String tag = "INFORME · " + module.toUpperCase(Locale.ROOT);
-        text(content, "F2", 9, PAGE_WIDTH - MARGIN - tag.length() * 5, 818, tag, "0 0 0");
+        drawTopBarAndCard(content, module);
+        drawKpiCards(content, module, generatedAt, recordCount);
+        drawTable(content, headers, rows);
+        drawFooter(content, page, total);
+        return content.toString().getBytes(StandardCharsets.ISO_8859_1);
+    }
 
-        content.append("q\n").append(LOGO_WIDTH).append(" 0 0 ").append(logoHeight)
-                .append(' ').append(MARGIN).append(" 716 cm\n/Im0 Do\nQ\n");
-        int detailX = MARGIN + LOGO_WIDTH + 20;
-        text(content, "F2", 16, detailX, 758, "Informe de " + module, "0 0 0");
-        text(content, "F1", 9, detailX, 738,
-                "Generado: " + generatedAt + " · " + recordCount
-                        + (recordCount == 1 ? " registro" : " registros"), "0.4 0.4 0.4");
-        content.append("q\n0 1 0 rg\n").append(MARGIN).append(" 706 511 2 re f\nQ\n");
+    private void drawTopBarAndCard(StringBuilder content, String module) {
+        content.append("q\n0 1 0 rg\n0 838 ").append(PAGE_WIDTH).append(" 4 re f\nQ\n");
+        content.append("q\n0.98 0.98 0.99 rg\n0.85 0.85 0.85 RG\n0.5 w\n")
+                .append(MARGIN).append(" 730 ").append(CONTENT_WIDTH).append(" 88 re B\nQ\n");
 
+        content.append("q\n0 0 0 rg\n48 736 148 76 re f\nQ\n");
+        content.append("q\n136 0 0 46 54 751 cm\n/Im0 Do\nQ\n");
+
+        text(content, "F2", 16, 210, 786, "Informe de " + module, "0 0 0");
+        text(content, "F1", 9, 210, 768, "Listado de " + module.toLowerCase(Locale.ROOT)
+                + " registrados en la plataforma", "0.4 0.4 0.4");
+        text(content, "F1", 8, 210, 752, "Mundo Manitas · Plataforma accesible LSP", "0.55 0.55 0.55");
+
+        content.append("q\n0 0 0 rg\n500 730 m 514 730 l 534 818 l 520 818 l f\nQ\n");
+        content.append("q\n0 1 0 rg\n516 730 m 534 730 l 553 790 l 553 818 l 535 818 l f\nQ\n");
+    }
+
+    private void drawKpiCards(StringBuilder content, String module, String generatedAt, int count) {
+        int cardWidth = (CONTENT_WIDTH - 16) / 3; // 165
+        int y = 678;
+
+        for (int i = 0; i < 3; i++) {
+            int x = MARGIN + i * (cardWidth + 8);
+            content.append("q\n0.98 0.98 0.99 rg\n0.85 0.85 0.85 RG\n0.5 w\n")
+                    .append(x).append(' ').append(y).append(' ').append(cardWidth).append(" 40 re B\nQ\n");
+        }
+
+        text(content, "F1", 7, MARGIN + 10, y + 24, "Fecha de generación:", "0.45 0.45 0.45");
+        text(content, "F2", 8, MARGIN + 10, y + 9, "Generado: " + generatedAt, "0.1 0.1 0.1");
+
+        text(content, "F1", 7, MARGIN + cardWidth + 18, y + 24, "Total de "
+                + module.toLowerCase(Locale.ROOT) + ":", "0.45 0.45 0.45");
+        text(content, "F2", 8, MARGIN + cardWidth + 18, y + 9, count
+                + (count == 1 ? " registro" : " registros"), "0.1 0.1 0.1");
+
+        text(content, "F1", 7, MARGIN + (cardWidth + 8) * 2 + 10, y + 24, "Estado:", "0.45 0.45 0.45");
+        text(content, "F2", 8, MARGIN + (cardWidth + 8) * 2 + 10, y + 9, "• Activo", "0 1 0");
+    }
+
+    private void drawTable(StringBuilder content, List<String> headers, List<List<String>> rows) {
         int[] widths = widths(headers, rows);
         drawHeader(content, headers, widths);
         if (rows.isEmpty()) {
+            int top = TABLE_TOP - HEADER_ROW - BODY_ROW;
             content.append("q\n0.96 0.96 0.95 rg\n").append(MARGIN).append(' ')
-                    .append(TABLE_TOP - HEADER_ROW - BODY_ROW).append(" 511 ").append(BODY_ROW)
+                    .append(top).append(' ').append(CONTENT_WIDTH).append(' ').append(BODY_ROW)
                     .append(" re f\nQ\n");
-            text(content, "F1", 10, MARGIN + 12, TABLE_TOP - HEADER_ROW - 13,
+            text(content, "F1", 9, MARGIN + 14, top + 5,
                     "No hay datos para este informe.", "0.4 0.4 0.4");
         } else {
             drawBody(content, rows, widths);
         }
-
-        content.append("q\n0.85 0.85 0.85 RG\n0.4 w\n").append(MARGIN).append(" 58 m 553 58 l S\nQ\n");
-        text(content, "F1", 8, MARGIN, 42, "Mundo Manitas · Informe de " + module, "0.4 0.4 0.4");
-        String footer = "Página " + page + " / " + total;
-        text(content, "F1", 8, 553 - footer.length() * 4, 42, footer, "0.4 0.4 0.4");
-        return content.toString().getBytes(StandardCharsets.ISO_8859_1);
     }
 
     private void drawHeader(StringBuilder content, List<String> headers, int[] widths) {
         int top = TABLE_TOP - HEADER_ROW;
-        content.append("q\n0 1 0 rg\n").append(MARGIN).append(' ').append(top)
-                .append(" 511 ").append(HEADER_ROW).append(" re f\nQ\n");
+        content.append("q\n0 0 0 rg\n").append(MARGIN).append(' ').append(top)
+                .append(' ').append(CONTENT_WIDTH).append(' ').append(HEADER_ROW).append(" re f\nQ\n");
+        content.append("q\n0 0 0 RG\n0.5 w\n").append(MARGIN).append(' ').append(top)
+                .append(' ').append(CONTENT_WIDTH).append(' ').append(HEADER_ROW).append(" re S\nQ\n");
+
         int x = MARGIN;
         for (int column = 0; column < widths.length; column++) {
             String value = column < headers.size() ? headers.get(column) : "";
-            text(content, "F2", 9, x + 5, top + 7, fit(value, widths[column]), "0 0 0");
+            text(content, "F2", 8, x + 8, top + 7, fit(value, widths[column]), "1 1 1");
             x += widths[column];
         }
     }
@@ -163,29 +217,42 @@ public class PlainPdfWriter {
             int top = TABLE_TOP - HEADER_ROW - (index + 1) * BODY_ROW;
             if (index % 2 == 0) {
                 content.append("q\n0.96 0.96 0.95 rg\n").append(MARGIN).append(' ').append(top)
-                        .append(" 511 ").append(BODY_ROW).append(" re f\nQ\n");
+                        .append(' ').append(CONTENT_WIDTH).append(' ').append(BODY_ROW).append(" re f\nQ\n");
             }
             int x = MARGIN;
             for (int column = 0; column < widths.length; column++) {
                 List<String> row = rows.get(index);
                 String value = column < row.size() ? row.get(column) : "";
-                text(content, "F1", 9, x + 5, top + 5, fit(value, widths[column]), "0 0 0");
+                text(content, "F1", 8, x + 8, top + 5, fit(value, widths[column]), "0.1 0.1 0.1");
                 x += widths[column];
             }
         }
         content.append("q\n0.85 0.85 0.85 RG\n0.4 w\n");
+        int currentX = MARGIN;
         for (int column = 0; column <= widths.length; column++) {
-            int x = MARGIN;
-            for (int previous = 0; previous < column; previous++) x += widths[previous];
-            content.append(x).append(' ').append(TABLE_TOP - HEADER_ROW).append(" m ")
-                    .append(x).append(' ').append(TABLE_TOP - HEADER_ROW - rows.size() * BODY_ROW)
+            content.append(currentX).append(' ').append(TABLE_TOP - HEADER_ROW).append(" m ")
+                    .append(currentX).append(' ').append(TABLE_TOP - HEADER_ROW - rows.size() * BODY_ROW)
                     .append(" l S\n");
+            if (column < widths.length) currentX += widths[column];
         }
         for (int index = 0; index <= rows.size(); index++) {
             int y = TABLE_TOP - HEADER_ROW - index * BODY_ROW;
-            content.append(MARGIN).append(' ').append(y).append(" m 553 ").append(y).append(" l S\n");
+            content.append(MARGIN).append(' ').append(y).append(" m ").append(RIGHT_EDGE).append(' ').append(y).append(" l S\n");
         }
         content.append("Q\n");
+    }
+
+    private void drawFooter(StringBuilder content, int page, int total) {
+        content.append("q\n0 1 0 rg\n42 44 24 2 re f\nQ\n");
+        text(content, "F2", 8, MARGIN, 49, "Aprende, crea y crece", "0.15 0.15 0.15");
+        String motto = "Manitas Academy • Educación sin barreras";
+        text(content, "F1", 8, RIGHT_EDGE - (int) Math.round(motto.length() * 4.6), 49, motto, "0.4 0.4 0.4");
+
+        content.append("q\n0.85 0.85 0.85 RG\n0.4 w\n").append(MARGIN).append(" 36 m ")
+                .append(RIGHT_EDGE).append(" 36 l S\nQ\n");
+        text(content, "F1", 7, MARGIN, 24, "Mundo Manitas · Documento administrativo oficial", "0.5 0.5 0.5");
+        String pageText = "Página " + page + " / " + total;
+        text(content, "F2", 8, RIGHT_EDGE - (int) Math.round(pageText.length() * 4.8), 24, pageText, "0.2 0.2 0.2");
     }
 
     private void text(StringBuilder content, String font, int size, int x, int y,
@@ -203,20 +270,31 @@ public class PlainPdfWriter {
             for (List<String> row : rows) {
                 if (column < row.size()) longest = Math.max(longest, row.get(column).length());
             }
-            widths[column] = Math.min(200, Math.max(70, longest * 6 + 16));
+            widths[column] = Math.min(220, Math.max(60, longest * 6 + 18));
         }
         int total = 0;
         for (int width : widths) total += width;
-        double factor = (PAGE_WIDTH - 2 * MARGIN) / (double) total;
+        int available = PAGE_WIDTH - 2 * MARGIN; // 511
+        double factor = available / (double) total;
+        int assigned = 0;
         for (int column = 0; column < columns; column++) {
-            widths[column] = Math.max(40, (int) (widths[column] * factor));
+            widths[column] = Math.max(35, (int) Math.round(widths[column] * factor));
+            assigned += widths[column];
+        }
+        int diff = available - assigned;
+        if (diff != 0) {
+            int widestIndex = 0;
+            for (int i = 1; i < columns; i++) {
+                if (widths[i] > widths[widestIndex]) widestIndex = i;
+            }
+            widths[widestIndex] += diff;
         }
         return widths;
     }
 
     private String fit(String value, int width) {
         String text = value == null ? "" : value;
-        int limit = Math.max(4, (width - 10) / 5);
+        int limit = Math.max(4, (width - 12) * 10 / 48);
         if (text.length() <= limit) return text;
         return text.substring(0, limit - 1) + '…';
     }
@@ -235,11 +313,13 @@ public class PlainPdfWriter {
 
     private byte[] flate(byte[] raw) {
         ByteArrayOutputStream output = new ByteArrayOutputStream(raw.length);
-        try (DeflaterOutputStream stream = new DeflaterOutputStream(output,
-                new Deflater(Deflater.DEFAULT_COMPRESSION, true))) {
+        Deflater deflater = new Deflater(Deflater.DEFAULT_COMPRESSION, false);
+        try (DeflaterOutputStream stream = new DeflaterOutputStream(output, deflater)) {
             stream.write(raw);
         } catch (IOException exception) {
             throw new UncheckedIOException(exception);
+        } finally {
+            deflater.end();
         }
         return output.toByteArray();
     }

@@ -41,11 +41,11 @@
                      width="960" height="600">
                 <div class="panel-continue-copy">
                     <p class="panel-eyebrow">Tu próximo curso</p>
-                    <h2 id="titulo-continuar" th:text="${course.title}">Python desde cero</h2>
+                    <h2 id="titulo-continuar" th:text="${course.title}"></h2>
                     <p class="panel-continue-meta">
-                        <span th:text="${course.level}">Nivel inicial</span>
+                        <span th:text="${course.level}"></span>
                         ·
-                        <span th:text="${course.lessons + ' lecciones'}">32 lecciones</span>
+                        <span th:text="${course.lessons + ' lecciones'}"></span>
                     </p>
                     <p class="panel-progress-label">Listo para continuar</p>
                 </div>
@@ -56,19 +56,19 @@
 
             <ul class="panel-kpis" aria-label="Resumen de aprendizaje">
                 <li class="panel-kpi">
-                    <strong th:text="${enrolled}">0</strong>
+                    <strong th:text="${enrolled}"></strong>
                     <span>Cursos inscriptos</span>
                 </li>
                 <li class="panel-kpi">
-                    <strong th:text="${videoTotals.completed()}">0</strong>
+                    <strong th:text="${videoTotals.completed()}"></strong>
                     <span>Videos terminados</span>
                 </li>
                 <li class="panel-kpi">
-                    <strong th:text="${completed}">0</strong>
+                    <strong th:text="${completed}"></strong>
                     <span>Cursos terminados</span>
                 </li>
                 <li class="panel-kpi">
-                    <strong th:text="${certificates}">0</strong>
+                    <strong th:text="${certificates}"></strong>
                     <span>Certificados disponibles</span>
                 </li>
             </ul>
@@ -86,9 +86,9 @@
                             <img th:src="${enrollment.course.image}" alt=""
                                  width="960" height="600" loading="lazy">
                             <div class="panel-course-body">
-                                <h3 th:text="${enrollment.course.title}">Python desde cero</h3>
+                                <h3 th:text="${enrollment.course.title}"></h3>
                                 <span class="panel-chip"
-                                      th:text="${enrollment.course.category}">Programación</span>
+                                      th:text="${enrollment.course.category}"></span>
                                 <span class="panel-course-status"
                                       th:classappend="${enrollment.completed} ? ' is-done' : ''"
                                       th:text="${enrollment.completed} ? 'Completado' : 'En curso'">
@@ -120,7 +120,7 @@
                     <h2 id="titulo-progreso">Tu progreso</h2>
                     <div class="panel-donut" th:style="${'--value: ' + progress}"
                          role="img" th:attr="aria-label=${'Cursos terminados: ' + progress + ' por ciento'}">
-                        <span th:text="${progress + '%'}">0%</span>
+                        <span th:text="${progress + '%'}"></span>
                     </div>
                     <p class="panel-progress-title" th:text="${enrolled == 0 ? 'Empezá con un curso' : 'Vas avanzando'}">
                         Empezá con un curso
@@ -147,10 +147,10 @@
                     <article class="panel-course" th:each="course : ${recommended}">
                         <img th:src="${course.image}" alt="" width="960" height="600" loading="lazy">
                         <div class="panel-course-body">
-                            <h3 th:text="${course.title}">Curso</h3>
-                            <span class="panel-chip" th:text="${course.category}">Área</span>
+                            <h3 th:text="${course.title}"></h3>
+                            <span class="panel-chip" th:text="${course.category}"></span>
                             <div class="panel-course-foot">
-                                <span class="panel-course-percent" th:text="${course.priceLabel()}">Gratis</span>
+                                <span class="panel-course-percent" th:text="${course.priceLabel()}"></span>
                                 <form th:action="@{/panel/cursos/{slug}/inscribir(slug=${course.slug})}"
                                       method="post" th:if="${course.free or currentUser.premium()}">
                                     <button class="panel-inline-btn" type="submit">Inscribirme</button>

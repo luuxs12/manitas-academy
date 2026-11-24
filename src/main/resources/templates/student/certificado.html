@@ -19,19 +19,19 @@
         </header>
 
         <p class="certificate-label">Certificado de finalización</p>
-        <h1 th:text="${account.fullName}">Nombre completo</h1>
+        <h1 th:text="${account.fullName}"></h1>
         <p class="certificate-text">Completó con éxito el curso</p>
-        <h2 th:text="${course.title}">Nombre del curso</h2>
+        <h2 th:text="${course.title}"></h2>
 
         <p class="certificate-detail">
-            <span th:text="${course.lessons} + ' lecciones'">32 lecciones</span>
+            <span th:text="${course.lessons} + ' lecciones'"></span>
             <span aria-hidden="true">·</span>
-            <span th:text="${#temporals.format(enrollment.completedAt, 'dd MMMM yyyy')}">20 noviembre 2026</span>
+            <span th:text="${#temporals.format(enrollment.completedAt, 'dd MMMM yyyy')}"></span>
         </p>
 
         <footer class="certificate-foot">
             <span>Emitido por Mundo Manitas</span>
-            <span class="certificate-code" th:text="${'MM-' + #strings.substring(enrollment.id.toString(), 0, 8)}">MM-00000000</span>
+            <span class="certificate-code" th:text="${'MM-' + #strings.substring(enrollment.id.toString(), 0, 8)}"></span>
         </footer>
     </article>
 </main>

@@ -41,10 +41,9 @@
                             </svg>
                         </span>
                         <div>
-                            <h3 th:text="${enrollment.course.title}">Curso terminado</h3>
+                            <h3 th:text="${enrollment.course.title}"></h3>
                             <p th:text="${enrollment.course.lessons + ' lecciones · ' +
                                 #temporals.format(enrollment.completedAt, 'dd/MM/yyyy')}">
-                                32 lecciones · 20/11/2026
                             </p>
                         </div>
                         <a class="btn btn-ghost"

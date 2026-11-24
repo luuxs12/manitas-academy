@@ -57,13 +57,17 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     @Override
     @Transactional(readOnly = true)
     public List<Enrollment> mine(User user) {
-        return enrollments.findByUserOrderByEnrolledAtDesc(user);
+        return enrollments.findByUserOrderByEnrolledAtDesc(user).stream()
+                .filter(EnrollmentServiceImpl::isPublished)
+                .toList();
     }
 
     @Override
     @Transactional(readOnly = true)
     public List<Enrollment> completed(User user) {
-        return enrollments.findByUserAndCompletedAtIsNotNullOrderByCompletedAtDesc(user);
+        return enrollments.findByUserAndCompletedAtIsNotNullOrderByCompletedAtDesc(user).stream()
+                .filter(EnrollmentServiceImpl::isPublished)
+                .toList();
     }
 
     @Override
@@ -77,9 +81,16 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     @Transactional(readOnly = true)
     public Enrollment findMine(User user, String slug) {
         checkNotNull(user, "user");
-        return enrollments.findByUserAndCourseSlug(user, requiredSlug(slug))
+        Enrollment enrollment = enrollments.findByUserAndCourseSlug(user, requiredSlug(slug))
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "No estás inscripto en ese curso"));
+        if (!isPublished(enrollment)) {
+            log.info("Acceso a curso en borrador denegado usuario={} curso={}",
+                    user.getId(), slug);
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "El curso no está disponible");
+        }
+        return enrollment;
     }
 
     /**
@@ -160,6 +171,12 @@ public class EnrollmentServiceImpl implements EnrollmentService {
                     user.getId(), slug);
         }
         return enrollment;
+    }
+
+    /** Un curso en borrador no se sirve al alumnado aunque exista la matrícula. */
+    private static boolean isPublished(Enrollment enrollment) {
+        return enrollment.getCourse() != null
+                && "PUBLICADO".equals(enrollment.getCourse().getStatus());
     }
 
     /** Primer curso inscripto todavía sin terminar, para "Continuar". */

@@ -219,6 +219,9 @@ perfil, cursos y panel de administración:
 | `.player-note` / `.player-transcript` | aviso de archivo pendiente o video histórico, y transcripción en `details` |
 | `.course-syllabus` / `.syllabus-list` / `.syllabus-item` | temario ordenado: módulo, título, duración, vistos y distintivos de subtítulos o transcripción |
 | `.syllabus-item.is-active` / `.syllabus-item.is-done` | clase abierta (borde verde) y clase marcada como terminada (estado verde) |
+| `.syllabus-groups` / `.syllabus-group` / `.syllabus-group-title` | temario agrupado por módulo, con el título real del módulo como encabezado |
+| `.syllabus-exercises` / `.syllabus-exercise` | consignas guardadas en PostgreSQL, debajo de las clases de cada módulo; no alteran el progreso |
+| `.syllabus-no-videos` | aviso accesible cuando un módulo aún no tiene clases cargadas |
 
 ### Componentes del panel administrativo
 

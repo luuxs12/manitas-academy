@@ -63,17 +63,17 @@
                     <article class="panel-course" th:each="course : ${courses}">
                         <img th:src="${course.image}" alt="" width="960" height="600" loading="lazy">
                         <div class="panel-course-body">
-                            <h3 th:text="${course.title}">Curso</h3>
-                            <span class="panel-chip" th:text="${course.category}">Área</span>
-                            <p class="panel-course-summary" th:text="${course.summary}">Resumen.</p>
+                            <h3 th:text="${course.title}"></h3>
+                            <span class="panel-chip" th:text="${course.category}"></span>
+                            <p class="panel-course-summary" th:text="${course.summary}"></p>
                             <p class="panel-course-meta">
-                                <span th:text="${course.level}">Nivel</span>
+                                <span th:text="${course.level}"></span>
                                 ·
-                                <span th:text="${course.lessons} + ' lecciones'">20 lecciones</span>
+                                <span th:text="${course.lessons} + ' lecciones'"></span>
                             </p>
 
                             <div class="panel-course-foot">
-                                <span class="panel-course-percent" th:text="${course.priceLabel()}">Gratis</span>
+                                <span class="panel-course-percent" th:text="${course.priceLabel()}"></span>
                                 <span class="panel-course-status is-done"
                                       th:if="${enrolledSlugs.contains(course.slug)}">Ya inscripto</span>
                             </div>

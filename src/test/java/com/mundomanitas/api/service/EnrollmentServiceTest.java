@@ -15,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -22,6 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -142,6 +144,7 @@ class EnrollmentServiceTest {
                 .thenReturn(Optional.of(enrollment));
         when(enrollment.isCompleted()).thenReturn(false);
         when(enrollment.getCourse()).thenReturn(course);
+        when(course.getStatus()).thenReturn("PUBLICADO");
         when(course.getTitle()).thenReturn("Python desde cero");
 
         Enrollment result = service.complete(user, "python");
@@ -163,6 +166,7 @@ class EnrollmentServiceTest {
         when(lessons.toggle(user, "python", videoId)).thenReturn(true);
         when(enrollment.isCompleted()).thenReturn(false);
         when(enrollment.getCourse()).thenReturn(course);
+        when(course.getStatus()).thenReturn("PUBLICADO");
         when(course.getTitle()).thenReturn("Python desde cero");
 
         Enrollment result = service.toggleVideo(user, "python", videoId);
@@ -171,5 +175,51 @@ class EnrollmentServiceTest {
         verify(enrollment).complete();
         verify(enrollments).save(enrollment);
         verify(certificates).issueFor(enrollment);
+    }
+
+    @Test
+    @DisplayName("no sirve una matrícula cuyo curso pasó a borrador")
+    void findMineRejectsDraft() {
+        when(enrollments.findByUserAndCourseSlug(user, "python"))
+                .thenReturn(Optional.of(enrollment));
+        when(enrollment.getCourse()).thenReturn(course);
+        when(course.getStatus()).thenReturn("BORRADOR");
+
+        assertThatThrownBy(() -> service.findMine(user, "python"))
+                .isInstanceOfSatisfying(ResponseStatusException.class,
+                        exception -> assertThat(exception.getStatusCode())
+                                .isEqualTo(HttpStatus.NOT_FOUND));
+    }
+
+    @Test
+    @DisplayName("mis cursos deja afuera los borradores")
+    void mineOnlyPublished() {
+        Enrollment published = mock(Enrollment.class);
+        Enrollment draft = mock(Enrollment.class);
+        Course draftCourse = mock(Course.class);
+        when(published.getCourse()).thenReturn(course);
+        when(course.getStatus()).thenReturn("PUBLICADO");
+        when(draft.getCourse()).thenReturn(draftCourse);
+        when(draftCourse.getStatus()).thenReturn("BORRADOR");
+        when(enrollments.findByUserOrderByEnrolledAtDesc(user))
+                .thenReturn(List.of(published, draft));
+
+        assertThat(service.mine(user)).containsExactly(published);
+    }
+
+    @Test
+    @DisplayName("los certificados tampoco incluyen borradores")
+    void completedOnlyPublished() {
+        Enrollment published = mock(Enrollment.class);
+        Enrollment draft = mock(Enrollment.class);
+        Course draftCourse = mock(Course.class);
+        when(published.getCourse()).thenReturn(course);
+        when(course.getStatus()).thenReturn("PUBLICADO");
+        when(draft.getCourse()).thenReturn(draftCourse);
+        when(draftCourse.getStatus()).thenReturn("BORRADOR");
+        when(enrollments.findByUserAndCompletedAtIsNotNullOrderByCompletedAtDesc(user))
+                .thenReturn(List.of(published, draft));
+
+        assertThat(service.completed(user)).containsExactly(published);
     }
 }

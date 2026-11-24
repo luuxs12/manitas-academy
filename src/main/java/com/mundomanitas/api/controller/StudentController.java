@@ -8,6 +8,7 @@ import com.mundomanitas.api.service.AccountService;
 import com.mundomanitas.api.service.CourseCatalog;
 import com.mundomanitas.api.service.EnrollmentService;
 import com.mundomanitas.api.service.LessonProgressService;
+import com.mundomanitas.api.service.StudentContentService;
 import com.mundomanitas.api.service.VideoPlaybackService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -44,19 +45,22 @@ public class StudentController {
     private final EnrollmentService enrollments;
     private final LessonProgressService lessons;
     private final VideoPlaybackService playback;
+    private final StudentContentService content;
 
     public StudentController(
             AccountService accounts,
             CourseCatalog catalog,
             EnrollmentService enrollments,
             LessonProgressService lessons,
-            VideoPlaybackService playback
+            VideoPlaybackService playback,
+            StudentContentService content
     ) {
         this.accounts = accounts;
         this.catalog = catalog;
         this.enrollments = enrollments;
         this.lessons = lessons;
         this.playback = playback;
+        this.content = content;
     }
 
     @GetMapping
@@ -81,7 +85,7 @@ public class StudentController {
         model.addAttribute("enrolled", mine.size());
         model.addAttribute("completed", completed);
         model.addAttribute("progress", progress);
-        model.addAttribute("videoTotals", lessons.totals(mine));
+        model.addAttribute("videoTotals", lessonTotals(mine));
         model.addAttribute("certificates", user.isPremium() ? completed : 0);
         model.addAttribute("recommended", catalog.all().stream()
                 .filter(course -> !enrolledSlugs.contains(course.getSlug()))
@@ -98,30 +102,20 @@ public class StudentController {
     ) {
         User user = accounts.require(principal.getId());
         List<Enrollment> mine = enrollments.mine(user);
-        Map<UUID, Set<UUID>> doneVideos = new HashMap<>();
+        Map<UUID, Integer> doneCounts = new HashMap<>();
         Map<UUID, Integer> videoCounts = new HashMap<>();
         Map<UUID, Integer> videoProgress = new HashMap<>();
-        int totalVideos = 0;
-        int completedVideos = 0;
         for (Enrollment enrollment : mine) {
-            int total = playback.videoCount(enrollment.getCourse().getId());
-            int done = lessons.completed(enrollment.getId());
-            Set<UUID> doneIds = lessons.completedVideos(enrollment.getId());
-            doneVideos.put(enrollment.getId(), doneIds);
-            videoCounts.put(enrollment.getId(), total);
-            videoProgress.put(enrollment.getId(),
-                    total == 0 ? 0 : (int) Math.round(done * 100.0 / total));
-            totalVideos += total;
-            completedVideos += done;
+            StudentContentService.Progress progress =
+                    content.progress(enrollment.getId(), enrollment.getCourse().getId());
+            doneCounts.put(enrollment.getId(), progress.done());
+            videoCounts.put(enrollment.getId(), progress.total());
+            videoProgress.put(enrollment.getId(), progress.percent());
         }
-        int percent = totalVideos == 0
-                ? 0
-                : (int) Math.round(completedVideos * 100.0 / totalVideos);
         model.addAttribute("enrollments", mine);
         model.addAttribute("completed", enrollments.completed(user).size());
-        model.addAttribute("videoTotals",
-                new LessonProgressService.LessonTotals(completedVideos, totalVideos, percent));
-        model.addAttribute("doneVideos", doneVideos);
+        model.addAttribute("videoTotals", lessonTotals(mine));
+        model.addAttribute("doneCounts", doneCounts);
         model.addAttribute("videoCounts", videoCounts);
         model.addAttribute("videoProgress", videoProgress);
         return "student/cursos";
@@ -137,8 +131,10 @@ public class StudentController {
     ) {
         User user = accounts.require(principal.getId());
         Enrollment enrollment = enrollments.findMine(user, slug);
-        List<VideoPlaybackService.CourseVideo> courseVideos =
-                playback.courseVideos(enrollment.getCourse().getId());
+        UUID courseId = enrollment.getCourse().getId();
+        StudentContentService.Outline outline = content.outline(courseId);
+        StudentContentService.Progress progress =
+                content.progress(enrollment.getId(), courseId);
         Set<UUID> doneVideos = lessons.completedVideos(enrollment.getId());
 
         VideoPlaybackService.Playback player = null;
@@ -150,18 +146,15 @@ public class StudentController {
             }
         }
 
-        int total = courseVideos.size();
-        int done = doneVideos.size();
         model.addAttribute("enrollment", enrollment);
         model.addAttribute("course", enrollment.getCourse());
-        model.addAttribute("videos", courseVideos);
+        model.addAttribute("modules", outline.modules());
         model.addAttribute("doneVideos", doneVideos);
         model.addAttribute("selectedId", player == null ? null : videoId);
         model.addAttribute("player", player);
-        model.addAttribute("videoCount", total);
-        model.addAttribute("doneCount", done);
-        model.addAttribute("videoPercent",
-                total == 0 ? 0 : (int) Math.round(done * 100.0 / total));
+        model.addAttribute("videoCount", progress.total());
+        model.addAttribute("doneCount", progress.done());
+        model.addAttribute("videoPercent", progress.percent());
         return "student/curso";
     }
 
@@ -284,5 +277,12 @@ public class StudentController {
                 "El curso «" + exception.getCourseTitle() + "» requiere un plan Premium."
         );
         return "redirect:/panel/explorar";
+    }
+
+    /** El modelo de las plantillas de cursos sigue usando el total histórico. */
+    private LessonProgressService.LessonTotals lessonTotals(List<Enrollment> mine) {
+        StudentContentService.Progress total = content.totals(mine);
+        return new LessonProgressService.LessonTotals(
+                total.done(), total.total(), total.percent());
     }
 }

@@ -16,16 +16,14 @@
             <nav class="panel-breadcrumb" aria-label="Ruta de navegación">
                 <a th:href="@{/panel/cursos}">Mis cursos</a>
                 <span aria-hidden="true">/</span>
-                <span th:text="${course.title}">Curso</span>
+                <span th:text="${course.title}"></span>
             </nav>
 
             <div class="panel-page-head">
                 <div>
                     <p class="panel-eyebrow">Tu aprendizaje</p>
-                    <h1 th:text="${course.title}">Python desde cero</h1>
-                    <p th:text="${doneCount + ' de ' + videoCount + ' videos terminados'}">
-                        0 de 0 videos terminados
-                    </p>
+                    <h1 th:text="${course.title}"></h1>
+                    <p th:text="${doneCount + ' de ' + videoCount + ' videos terminados'}"></p>
                     <div class="panel-lesson-track" role="img"
                          th:attr="aria-label=${doneCount + ' de ' + videoCount + ' videos terminados'}">
                         <span th:style="${'width: ' + videoPercent + '%'}"></span>
@@ -41,10 +39,10 @@
                 <div>
                     <section class="player-card" aria-labelledby="titulo-reproductor"
                              th:if="${player != null}">
-                        <h2 id="titulo-reproductor" th:text="${player.title()}">Clase 1</h2>
+                        <h2 id="titulo-reproductor" th:text="${player.title()}"></h2>
                         <div class="player-frame">
                             <iframe th:src="${player.url()}"
-                                    th:title="${player.title()}" title="Video de la clase"
+                                    th:title="${player.title()}"
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                     referrerpolicy="strict-origin-when-cross-origin"
                                     allowfullscreen loading="lazy"></iframe>
@@ -56,7 +54,6 @@
                               method="post">
                             <button class="btn btn-dark" type="submit"
                                     th:text="${doneVideos.contains(selectedId)} ? 'Marcar como pendiente' : 'Marcar como terminado'">
-                                Marcar como terminado
                             </button>
                         </form>
                     </section>
@@ -75,27 +72,45 @@
                         <span class="panel-rule" aria-hidden="true"></span>
                     </div>
 
-                    <p class="panel-empty" th:if="${#lists.isEmpty(videos)}">
-                        Este curso todavía no tiene videos cargados.
+                    <p class="panel-empty" th:if="${#lists.isEmpty(modules)}">
+                        Este curso todavía no tiene contenido cargado.
                     </p>
 
-                    <ol class="syllabus-list" th:if="${!#lists.isEmpty(videos)}">
-                        <li th:each="video : ${videos}">
-                            <a class="syllabus-item"
-                               th:href="@{/panel/cursos/{slug}(slug=${enrollment.course.slug},video=${video.id()})}"
-                               th:classappend="${(selectedId != null and selectedId == video.id() ? ' is-active' : '') + (doneVideos.contains(video.id()) ? ' is-done' : '')}"
-                               th:attr="aria-current=${selectedId != null and selectedId == video.id() ? 'true' : null}">
-                                <span class="syllabus-module" th:text="${video.moduleTitle()}">Módulo 1</span>
-                                <span class="syllabus-title" th:text="${video.title()}">Clase 1</span>
-                                <span class="syllabus-meta">
-                                    <span class="syllabus-state"
-                                          th:text="${doneVideos.contains(video.id())} ? 'Visto' : 'Pendiente'">
-                                        Pendiente
-                                    </span>
-                                </span>
-                            </a>
-                        </li>
-                    </ol>
+                    <div class="syllabus-groups" th:if="${!#lists.isEmpty(modules)}">
+                        <section class="syllabus-group" th:each="module : ${modules}"
+                                 th:attr="aria-labelledby='modulo-' + ${module.id()}">
+                            <h3 class="syllabus-group-title" th:id="'modulo-' + ${module.id()}"
+                                th:text="${module.title()}"></h3>
+
+                            <ol class="syllabus-list">
+                                <li th:each="video : ${module.videos()}">
+                                    <a class="syllabus-item"
+                                       th:href="@{/panel/cursos/{slug}(slug=${enrollment.course.slug},video=${video.id()})}"
+                                       th:classappend="${(selectedId != null and selectedId == video.id() ? ' is-active' : '') + (doneVideos.contains(video.id()) ? ' is-done' : '')}"
+                                       th:attr="aria-current=${selectedId != null and selectedId == video.id() ? 'true' : null}">
+                                        <span class="syllabus-title" th:text="${video.title()}"></span>
+                                        <span class="syllabus-meta">
+                                            <span class="syllabus-state"
+                                                  th:text="${doneVideos.contains(video.id())} ? 'Visto' : 'Pendiente'">
+                                            </span>
+                                        </span>
+                                    </a>
+                                </li>
+                                <li class="syllabus-no-videos" th:if="${#lists.isEmpty(module.videos())}">
+                                    Este módulo todavía no tiene clases.
+                                </li>
+                            </ol>
+
+                            <div class="syllabus-exercises"
+                                 th:if="${!#lists.isEmpty(module.exercises())}">
+                                <article class="syllabus-exercise"
+                                         th:each="exercise : ${module.exercises()}">
+                                    <h4 th:text="${exercise.title()}"></h4>
+                                    <p th:text="${exercise.prompt()}"></p>
+                                </article>
+                            </div>
+                        </section>
+                    </div>
                 </section>
             </div>
 

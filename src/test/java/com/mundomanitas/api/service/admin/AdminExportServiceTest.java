@@ -11,6 +11,7 @@ import com.mundomanitas.api.repository.PaymentRepository;
 import com.mundomanitas.api.repository.UserRepository;
 import com.mundomanitas.api.repository.VideoRepository;
 import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.BeforeEach;
@@ -116,6 +117,31 @@ class AdminExportServiceTest {
             assertThat(filter.getFirstRow()).isEqualTo(3);
             assertThat(filter.getLastColumn()).isEqualTo(6);
             assertThat(sheet.getPrintSetup().getLandscape()).isTrue();
+        }
+    }
+
+    @Test
+    @DisplayName("el Excel detalla la marca, alinea los valores y firma el pie")
+    void xlsxDetallaMarcaYAlineaValores() throws Exception {
+        Course course = mock(Course.class);
+        when(course.getTitle()).thenReturn("Python desde cero");
+        when(course.getPosition()).thenReturn(7);
+        when(courses.findAllByOrderByPositionAsc()).thenReturn(List.of(course));
+
+        ExportResult result = service.export("cursos", "xlsx");
+
+        try (XSSFWorkbook workbook = new XSSFWorkbook(new ByteArrayInputStream(result.bytes()))) {
+            var sheet = workbook.getSheet("Datos");
+            assertThat(sheet.getRow(1).getCell(3).getStringCellValue())
+                    .contains("1 registro").contains("Plataforma LSP");
+            assertThat(sheet.getRow(2).getCell(0).getCellStyle().getFillForegroundColorColor().getARGB())
+                    .containsExactly((byte) 0xFF, (byte) 0x00, (byte) 0xFF, (byte) 0x00);
+            assertThat(sheet.getNumMergedRegions()).isEqualTo(2);
+            assertThat(sheet.getRow(3).getCell(0).getCellStyle().getAlignment())
+                    .isEqualTo(HorizontalAlignment.LEFT);
+            assertThat(sheet.getRow(4).getCell(6).getCellStyle().getAlignment())
+                    .isEqualTo(HorizontalAlignment.RIGHT);
+            assertThat(sheet.getFooter().getCenter()).contains("Plataforma Accesible LSP");
         }
     }
 

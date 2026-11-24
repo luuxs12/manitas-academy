@@ -35,6 +35,29 @@ class PlainPdfWriterTest {
     }
 
     @Test
+    @DisplayName("muestra la ficha ejecutiva, las tarjetas KPI y el pie institucional")
+    void dibujaFichaEjecutiva() {
+        String text = new String(writer.write("cursos", "24/11/2026", List.of(
+                List.of("Curso", "Estado"),
+                List.of("Python desde cero", "publicado"))), StandardCharsets.ISO_8859_1);
+
+        assertThat(text).contains("0 1 0 rg\n0 838 595 4 re f");
+        assertThat(text).contains("0 0 0 rg\n48 736 148 76 re f");
+        assertThat(text).contains("136 0 0 46 54 751 cm\n/Im0 Do");
+        assertThat(text).contains("Mundo Manitas · Plataforma accesible LSP");
+        assertThat(text).contains("Fecha de generación:");
+        assertThat(text).contains("Total de cursos:");
+        assertThat(text).contains("1 registro");
+        assertThat(text).contains("Estado:");
+        assertThat(text).contains((char) 149 + " Activo");
+        assertThat(text).contains("0 0 0 rg\n42 638 511 22 re f");
+        assertThat(text).contains("1 1 1 rg");
+        assertThat(text).contains("Aprende, crea y crece");
+        assertThat(text).contains("Manitas Academy " + (char) 149 + " Educación sin barreras");
+        assertThat(text).contains("Mundo Manitas · Documento administrativo oficial");
+    }
+
+    @Test
     @DisplayName("repite la cabecera y numera cada página")
     void repiteCabeceraYNumeraPaginas() {
         List<List<String>> rows = new ArrayList<>();

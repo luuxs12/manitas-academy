@@ -153,7 +153,7 @@ public class ProfileController {
         model.addAttribute("paymentEnabled", payments.isEnabled());
         model.addAttribute("enrolled", mine.size());
         model.addAttribute("completed", enrollments.completed(user).size());
-        model.addAttribute("lessonTotals", lessons.totals(mine));
+        model.addAttribute("videoTotals", lessons.totals(mine));
         Locale spanish = Locale.forLanguageTag("es");
         model.addAttribute("memberSinceLabel", user.getCreatedAt() == null ? "" :
                 user.getCreatedAt().format(DateTimeFormatter.ofPattern("MMMM yyyy", spanish)));

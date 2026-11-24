@@ -1,7 +1,6 @@
 package com.mundomanitas.api.controller;
 
 import com.mundomanitas.api.exception.PremiumRequiredException;
-import com.mundomanitas.api.model.Course;
 import com.mundomanitas.api.model.Enrollment;
 import com.mundomanitas.api.model.User;
 import com.mundomanitas.api.security.AuthenticatedUser;
@@ -9,6 +8,7 @@ import com.mundomanitas.api.service.AccountService;
 import com.mundomanitas.api.service.CourseCatalog;
 import com.mundomanitas.api.service.EnrollmentService;
 import com.mundomanitas.api.service.LessonProgressService;
+import com.mundomanitas.api.service.VideoPlaybackService;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
@@ -22,9 +22,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 /**
@@ -41,17 +43,20 @@ public class StudentController {
     private final CourseCatalog catalog;
     private final EnrollmentService enrollments;
     private final LessonProgressService lessons;
+    private final VideoPlaybackService playback;
 
     public StudentController(
             AccountService accounts,
             CourseCatalog catalog,
             EnrollmentService enrollments,
-            LessonProgressService lessons
+            LessonProgressService lessons,
+            VideoPlaybackService playback
     ) {
         this.accounts = accounts;
         this.catalog = catalog;
         this.enrollments = enrollments;
         this.lessons = lessons;
+        this.playback = playback;
     }
 
     @GetMapping
@@ -71,14 +76,12 @@ public class StudentController {
                 .map(enrollment -> enrollment.getCourse().getSlug())
                 .collect(Collectors.toSet());
 
-        LessonProgressService.LessonTotals lessonTotals = lessons.totals(mine);
-
         model.addAttribute("enrollments", mine);
         model.addAttribute("next", enrollments.next(user));
         model.addAttribute("enrolled", mine.size());
         model.addAttribute("completed", completed);
         model.addAttribute("progress", progress);
-        model.addAttribute("lessonTotals", lessonTotals);
+        model.addAttribute("videoTotals", lessons.totals(mine));
         model.addAttribute("certificates", user.isPremium() ? completed : 0);
         model.addAttribute("recommended", catalog.all().stream()
                 .filter(course -> !enrolledSlugs.contains(course.getSlug()))
@@ -95,18 +98,71 @@ public class StudentController {
     ) {
         User user = accounts.require(principal.getId());
         List<Enrollment> mine = enrollments.mine(user);
-        Map<java.util.UUID, Set<Integer>> doneLessons = new java.util.HashMap<>();
-        Map<java.util.UUID, Integer> lessonCounts = new java.util.HashMap<>();
+        Map<UUID, Set<UUID>> doneVideos = new HashMap<>();
+        Map<UUID, Integer> videoCounts = new HashMap<>();
+        Map<UUID, Integer> videoProgress = new HashMap<>();
+        int totalVideos = 0;
+        int completedVideos = 0;
         for (Enrollment enrollment : mine) {
-            doneLessons.put(enrollment.getId(), lessons.completedLessons(enrollment.getId()));
-            lessonCounts.put(enrollment.getId(), lessons.completed(enrollment.getId()));
+            int total = playback.videoCount(enrollment.getCourse().getId());
+            int done = lessons.completed(enrollment.getId());
+            Set<UUID> doneIds = lessons.completedVideos(enrollment.getId());
+            doneVideos.put(enrollment.getId(), doneIds);
+            videoCounts.put(enrollment.getId(), total);
+            videoProgress.put(enrollment.getId(),
+                    total == 0 ? 0 : (int) Math.round(done * 100.0 / total));
+            totalVideos += total;
+            completedVideos += done;
         }
+        int percent = totalVideos == 0
+                ? 0
+                : (int) Math.round(completedVideos * 100.0 / totalVideos);
         model.addAttribute("enrollments", mine);
         model.addAttribute("completed", enrollments.completed(user).size());
-        model.addAttribute("lessonTotals", lessons.totals(mine));
-        model.addAttribute("doneLessons", doneLessons);
-        model.addAttribute("lessonCounts", lessonCounts);
+        model.addAttribute("videoTotals",
+                new LessonProgressService.LessonTotals(completedVideos, totalVideos, percent));
+        model.addAttribute("doneVideos", doneVideos);
+        model.addAttribute("videoCounts", videoCounts);
+        model.addAttribute("videoProgress", videoProgress);
         return "student/cursos";
+    }
+
+    /** Temario y reproductor de un curso inscripto. */
+    @GetMapping("/cursos/{slug}")
+    public String course(
+            @AuthenticationPrincipal AuthenticatedUser principal,
+            @PathVariable String slug,
+            @RequestParam(name = "video", required = false) UUID videoId,
+            Model model
+    ) {
+        User user = accounts.require(principal.getId());
+        Enrollment enrollment = enrollments.findMine(user, slug);
+        List<VideoPlaybackService.CourseVideo> courseVideos =
+                playback.courseVideos(enrollment.getCourse().getId());
+        Set<UUID> doneVideos = lessons.completedVideos(enrollment.getId());
+
+        VideoPlaybackService.Playback player = null;
+        if (videoId != null) {
+            try {
+                player = playback.play(videoId, enrollment);
+            } catch (ResponseStatusException exception) {
+                model.addAttribute("panelError", "Ese video no está disponible en este momento.");
+            }
+        }
+
+        int total = courseVideos.size();
+        int done = doneVideos.size();
+        model.addAttribute("enrollment", enrollment);
+        model.addAttribute("course", enrollment.getCourse());
+        model.addAttribute("videos", courseVideos);
+        model.addAttribute("doneVideos", doneVideos);
+        model.addAttribute("selectedId", player == null ? null : videoId);
+        model.addAttribute("player", player);
+        model.addAttribute("videoCount", total);
+        model.addAttribute("doneCount", done);
+        model.addAttribute("videoPercent",
+                total == 0 ? 0 : (int) Math.round(done * 100.0 / total));
+        return "student/curso";
     }
 
     /** Catálogo dentro del panel: la búsqueda no sale del área de estudiante. */
@@ -158,21 +214,21 @@ public class StudentController {
         return "redirect:/panel/cursos";
     }
 
-    /** Guarda el avance de una lección real del curso inscripto. */
-    @PostMapping("/cursos/{slug}/lecciones/{lesson}")
-    public String toggleLesson(
+    /** Guarda el avance de un video real del curso inscripto. */
+    @PostMapping("/cursos/{slug}/videos/{videoId}")
+    public String toggleVideo(
             @AuthenticationPrincipal AuthenticatedUser principal,
             @PathVariable String slug,
-            @PathVariable int lesson,
+            @PathVariable UUID videoId,
             RedirectAttributes redirect
     ) {
         User user = accounts.require(principal.getId());
-        Enrollment enrollment = enrollments.toggleLesson(user, slug, lesson);
+        Enrollment enrollment = enrollments.toggleVideo(user, slug, videoId);
         redirect.addFlashAttribute(
                 "panelOk",
                 "Avance guardado en «" + enrollment.getCourse().getTitle() + "»."
         );
-        return "redirect:/panel/cursos#" + slug;
+        return "redirect:/panel/cursos/" + slug + "?video=" + videoId;
     }
 
     @GetMapping("/certificados")

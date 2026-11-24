@@ -1,8 +1,10 @@
 package com.mundomanitas.api.service;
 
 import com.mundomanitas.api.model.Course;
+import com.mundomanitas.api.model.CourseModule;
 import com.mundomanitas.api.model.Enrollment;
 import com.mundomanitas.api.model.Video;
+import com.mundomanitas.api.repository.CourseModuleRepository;
 import com.mundomanitas.api.repository.VideoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -13,6 +15,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -32,6 +35,9 @@ class VideoPlaybackServiceTest {
     @Mock
     private R2StorageService storage;
 
+    @Mock
+    private CourseModuleRepository modules;
+
     private VideoPlaybackService service;
     private UUID videoId;
     private UUID courseId;
@@ -39,13 +45,13 @@ class VideoPlaybackServiceTest {
 
     @BeforeEach
     void setUp() {
-        service = new VideoPlaybackService(videos, storage);
+        service = new VideoPlaybackService(videos, storage, modules);
         videoId = UUID.randomUUID();
         courseId = UUID.randomUUID();
         Course course = mock(Course.class);
         lenient().when(course.getId()).thenReturn(courseId);
         enrollment = mock(Enrollment.class);
-        when(enrollment.getCourse()).thenReturn(course);
+        lenient().when(enrollment.getCourse()).thenReturn(course);
     }
 
     @Test
@@ -115,6 +121,33 @@ class VideoPlaybackServiceTest {
         assertThat(playback.available()).isFalse();
         assertThat(playback.url()).isNull();
         verifyNoInteractions(storage);
+    }
+
+    @Test
+    @DisplayName("lista los videos del curso agrupados por módulo")
+    void listsCourseVideos() {
+        UUID moduleId = UUID.randomUUID();
+        CourseModule module = mock(CourseModule.class);
+        when(modules.findByCourseIdOrderByPositionAsc(courseId)).thenReturn(List.of(module));
+        when(module.getId()).thenReturn(moduleId);
+        when(module.getTitle()).thenReturn("Módulo 1");
+        when(videos.findByModuleIdOrderByPositionAsc(moduleId)).thenReturn(List.of(
+                new Video(moduleId, "Clase 1", null, 1, "videos/clase.mp4", null, 300, null)));
+
+        var cards = service.courseVideos(courseId);
+
+        assertThat(cards).hasSize(1);
+        assertThat(cards.get(0).moduleTitle()).isEqualTo("Módulo 1");
+        assertThat(cards.get(0).title()).isEqualTo("Clase 1");
+        assertThat(cards.get(0).durationSeconds()).isEqualTo(300);
+    }
+
+    @Test
+    @DisplayName("cuenta los videos del curso sin listarlos")
+    void countsCourseVideos() {
+        when(videos.countByCourseId(courseId)).thenReturn(4);
+
+        assertThat(service.videoCount(courseId)).isEqualTo(4);
     }
 
     @Test

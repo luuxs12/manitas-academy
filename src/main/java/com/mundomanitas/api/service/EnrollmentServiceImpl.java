@@ -141,9 +141,9 @@ public class EnrollmentServiceImpl implements EnrollmentService {
 
     @Override
     @Transactional
-    public Enrollment toggleLesson(User user, String slug, int lessonNumber) {
+    public Enrollment toggleVideo(User user, String slug, UUID videoId) {
         Enrollment enrollment = findMine(user, slug);
-        boolean justFinished = lessons.toggle(user, slug, lessonNumber);
+        boolean justFinished = lessons.toggle(user, slug, videoId);
         if (justFinished && !enrollment.isCompleted()) {
             enrollment.complete();
             enrollments.save(enrollment);
@@ -156,7 +156,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
                     "/panel/certificados"
             );
             certificates.issueFor(enrollment);
-            log.info("Curso completado por lecciones usuario={} curso={}",
+            log.info("Curso completado por videos usuario={} curso={}",
                     user.getId(), slug);
         }
         return enrollment;

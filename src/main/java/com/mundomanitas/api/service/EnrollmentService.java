@@ -23,7 +23,7 @@ public interface EnrollmentService {
 
     Enrollment complete(User user, String slug);
 
-    Enrollment toggleLesson(User user, String slug, int lessonNumber);
+    Enrollment toggleVideo(User user, String slug, UUID videoId);
 
     Enrollment next(User user);
 }

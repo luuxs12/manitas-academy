@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -154,16 +155,17 @@ class EnrollmentServiceTest {
     }
 
     @Test
-    @DisplayName("marcar la última lección cierra el curso una sola vez")
-    void lastLessonCompletesCourse() {
+    @DisplayName("marcar el último video cierra el curso una sola vez")
+    void lastVideoCompletesCourse() {
+        UUID videoId = UUID.randomUUID();
         when(enrollments.findByUserAndCourseSlug(user, "python"))
                 .thenReturn(Optional.of(enrollment));
-        when(lessons.toggle(user, "python", 8)).thenReturn(true);
+        when(lessons.toggle(user, "python", videoId)).thenReturn(true);
         when(enrollment.isCompleted()).thenReturn(false);
         when(enrollment.getCourse()).thenReturn(course);
         when(course.getTitle()).thenReturn("Python desde cero");
 
-        Enrollment result = service.toggleLesson(user, "python", 8);
+        Enrollment result = service.toggleVideo(user, "python", videoId);
 
         assertThat(result).isSameAs(enrollment);
         verify(enrollment).complete();

@@ -12,10 +12,10 @@ import java.util.Objects;
 import java.util.UUID;
 
 /**
- * Una lección terminada dentro de una matrícula.
+ * Un video terminado dentro de una matrícula.
  *
- * <p>El número de lección se valida contra {@code courses.lessons}; no hay
- * temario duplicado ni filas inventadas.</p>
+ * <p>El avance se apoya en videos reales del curso: nunca se guarda progreso
+ * sobre una lección inventada ni sobre contenido de otro curso.</p>
  */
 @Entity
 @Table(name = "lesson_progress")
@@ -27,8 +27,8 @@ public class LessonProgress {
     private UUID enrollmentId;
 
     @Id
-    @Column(name = "lesson_number", nullable = false)
-    private int lessonNumber;
+    @Column(name = "video_id", nullable = false)
+    private UUID videoId;
 
     @Column(name = "completed_at", nullable = false)
     private OffsetDateTime completedAt;
@@ -36,9 +36,9 @@ public class LessonProgress {
     protected LessonProgress() {
     }
 
-    public LessonProgress(UUID enrollmentId, int lessonNumber) {
+    public LessonProgress(UUID enrollmentId, UUID videoId) {
         this.enrollmentId = enrollmentId;
-        this.lessonNumber = lessonNumber;
+        this.videoId = videoId;
         this.completedAt = OffsetDateTime.now();
     }
 
@@ -46,8 +46,8 @@ public class LessonProgress {
         return enrollmentId;
     }
 
-    public int getLessonNumber() {
-        return lessonNumber;
+    public UUID getVideoId() {
+        return videoId;
     }
 
     public OffsetDateTime getCompletedAt() {
@@ -57,27 +57,27 @@ public class LessonProgress {
     /** Clave compuesta, necesaria para que Hibernate valide la tabla. */
     public static class Key implements Serializable {
         private UUID enrollmentId;
-        private int lessonNumber;
+        private UUID videoId;
 
         public Key() {
         }
 
-        public Key(UUID enrollmentId, int lessonNumber) {
+        public Key(UUID enrollmentId, UUID videoId) {
             this.enrollmentId = enrollmentId;
-            this.lessonNumber = lessonNumber;
+            this.videoId = videoId;
         }
 
         @Override
         public boolean equals(Object other) {
             if (this == other) return true;
             if (!(other instanceof Key key)) return false;
-            return lessonNumber == key.lessonNumber
+            return Objects.equals(videoId, key.videoId)
                     && Objects.equals(enrollmentId, key.enrollmentId);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(enrollmentId, lessonNumber);
+            return Objects.hash(enrollmentId, videoId);
         }
     }
 }

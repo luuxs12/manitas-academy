@@ -10,7 +10,7 @@ import java.util.UUID;
 public interface LessonProgressRepository
         extends JpaRepository<LessonProgress, LessonProgress.Key> {
 
-    List<LessonProgress> findByEnrollmentIdOrderByLessonNumberAsc(UUID enrollmentId);
+    List<LessonProgress> findByEnrollmentIdOrderByCompletedAtAsc(UUID enrollmentId);
 
     long countByEnrollmentId(UUID enrollmentId);
 

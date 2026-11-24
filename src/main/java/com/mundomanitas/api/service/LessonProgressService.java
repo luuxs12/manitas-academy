@@ -9,7 +9,7 @@ import java.util.Set;
 import java.util.UUID;
 
 /**
- * Avance real por lección dentro de una matrícula.
+ * Avance real por video dentro de una matrícula.
  */
 public interface LessonProgressService {
 
@@ -17,9 +17,9 @@ public interface LessonProgressService {
 
     int completed(UUID enrollmentId);
 
-    Set<Integer> completedLessons(UUID enrollmentId);
+    Set<UUID> completedVideos(UUID enrollmentId);
 
-    boolean toggle(User user, String slug, int lessonNumber);
+    boolean toggle(User user, String slug, UUID videoId);
 
     void completeAll(Enrollment enrollment);
 

@@ -22,6 +22,21 @@ public interface VideoRepository extends JpaRepository<Video, UUID> {
             """)
     boolean existsInCourse(@Param("videoId") UUID videoId, @Param("courseId") UUID courseId);
 
+    /** Total real de videos del curso, para calcular el avance. */
+    @Query("""
+            select count(v) from Video v, CourseModule m
+            where v.moduleId = m.id and m.courseId = :courseId
+            """)
+    int countByCourseId(@Param("courseId") UUID courseId);
+
+    /** Videos del curso en orden de reproducción, sin depender del número de lección. */
+    @Query("""
+            select v.id from Video v, CourseModule m
+            where v.moduleId = m.id and m.courseId = :courseId
+            order by m.position, v.position, v.title
+            """)
+    List<UUID> findIdsByCourseId(@Param("courseId") UUID courseId);
+
     @Query("""
             select v from Video v
             where (:moduleId is null or v.moduleId = :moduleId)

@@ -37,7 +37,7 @@ import java.util.regex.Pattern;
  * un archivo fue subido.</p>
  */
 @Service
-public class R2StorageService {
+public class R2StorageService implements AutoCloseable {
 
     public static final Map<String, String> IMAGE_EXTENSIONS = Map.of(
             "image/jpeg", "jpg",
@@ -232,5 +232,15 @@ public class R2StorageService {
                         .pathStyleAccessEnabled(true)
                         .build())
                 .build();
+    }
+
+    @Override
+    public void close() {
+        if (client != null) {
+            client.close();
+        }
+        if (presigner != null) {
+            presigner.close();
+        }
     }
 }

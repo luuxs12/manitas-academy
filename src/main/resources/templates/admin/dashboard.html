@@ -132,7 +132,7 @@
                                     <small th:text="${user.email()}">correo</small>
                                 </span>
                                 <span class="admin-recent-meta">
-                                    <small th:text="${user.role() == 'ADMIN' ? 'Admin' : user.role() == 'TEACHER' ? 'Docente' : 'Estudiante'}">Rol</small>
+                                    <small th:text="${user.role() == 'ADMIN' ? 'Admin' : 'Estudiante'}">Rol</small>
                                     <small th:text="${user.when()}">hace 1 día</small>
                                 </span>
                             </li>

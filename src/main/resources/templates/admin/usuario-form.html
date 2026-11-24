@@ -34,7 +34,7 @@
                     </label>
                     <label>Rol
                         <select th:field="*{role}">
-                            <option th:each="r : ${roles}" th:value="${r}" th:text="${r == 'ADMIN' ? 'Administrador' : r == 'TEACHER' ? 'Docente' : 'Estudiante'}">Rol</option>
+                            <option th:each="r : ${roles}" th:value="${r}" th:text="${r == 'ADMIN' ? 'Administrador' : 'Estudiante'}">Rol</option>
                         </select>
                     </label>
                     <label>Contraseña <span class="admin-muted">(dejar vacía para mantenerla; escribí una nueva para el reseteo por soporte)</span>

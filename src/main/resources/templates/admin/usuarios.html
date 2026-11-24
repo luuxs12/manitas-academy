@@ -35,7 +35,6 @@
                 <select id="filtro-rol" name="rol">
                     <option value="">Todos los roles</option>
                     <option value="STUDENT" th:selected="${role == 'STUDENT'}">Estudiante</option>
-                    <option value="TEACHER" th:selected="${role == 'TEACHER'}">Docente</option>
                     <option value="ADMIN" th:selected="${role == 'ADMIN'}">Administrador</option>
                 </select>
                 <button class="btn btn-admin" type="submit">Filtrar</button>
@@ -48,7 +47,7 @@
                     <tr th:each="user : ${page.content}">
                         <td><strong th:text="${user.fullName()}">Nombre</strong></td>
                         <td th:text="${user.email()}">correo</td>
-                        <td th:text="${user.role() == 'ADMIN' ? 'Admin' : user.role() == 'TEACHER' ? 'Docente' : 'Estudiante'}">Rol</td>
+                        <td th:text="${user.role() == 'ADMIN' ? 'Admin' : 'Estudiante'}">Rol</td>
                         <td th:text="${user.plan()}">Plan</td>
                         <td><span class="admin-status" th:classappend="${user.active()} ? ' is-ok' : ' is-bad'"
                                   th:text="${user.active()} ? 'Activo' : 'Inactivo'">Activo</span></td>

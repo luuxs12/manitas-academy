@@ -45,7 +45,7 @@ public class AdminUserController extends AdminBaseController {
                 principal.getId()));
         model.addAttribute("query", query);
         model.addAttribute("role", role);
-        model.addAttribute("roles", List.of("STUDENT", "TEACHER", "ADMIN"));
+        model.addAttribute("roles", List.of("STUDENT", "ADMIN"));
         return "admin/usuarios";
     }
 
@@ -55,7 +55,7 @@ public class AdminUserController extends AdminBaseController {
             common(model, "usuarios", "Editar usuario");
             model.addAttribute("adminUserForm", catalog.userForm(id));
             model.addAttribute("userId", id);
-            model.addAttribute("roles", List.of("STUDENT", "TEACHER", "ADMIN"));
+            model.addAttribute("roles", List.of("STUDENT", "ADMIN"));
             return "admin/usuario-form";
         } catch (IllegalArgumentException exception) {
             redirect.addFlashAttribute("panelError", exception.getMessage());
@@ -74,7 +74,7 @@ public class AdminUserController extends AdminBaseController {
             common(model, "usuarios", "Editar usuario");
             model.addAttribute("adminUserForm", form);
             model.addAttribute("userId", id);
-            model.addAttribute("roles", List.of("STUDENT", "TEACHER", "ADMIN"));
+            model.addAttribute("roles", List.of("STUDENT", "ADMIN"));
             return "admin/usuario-form";
         }
         try {

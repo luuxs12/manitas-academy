@@ -47,7 +47,6 @@ public record CurrentUser(String fullName, String email, Plan plan, String avata
     public String roleLabel() {
         return switch (role == null ? "" : role) {
             case "ADMIN" -> "Administrador";
-            case "TEACHER" -> "Docente";
             default -> "Estudiante";
         };
     }

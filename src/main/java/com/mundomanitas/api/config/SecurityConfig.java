@@ -64,7 +64,7 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/**").hasRole("ADMIN")
                         .requestMatchers("/admin", "/admin/**").hasRole("ADMIN")
                         // Paneles aislados: ADMIN nunca entra al área de estudiante.
-                        .requestMatchers("/panel", "/panel/**").hasAnyRole("STUDENT", "TEACHER")
+                        .requestMatchers("/panel", "/panel/**").hasRole("STUDENT")
                         .anyRequest().permitAll())
                 .formLogin(form -> form
                         .loginPage("/login")

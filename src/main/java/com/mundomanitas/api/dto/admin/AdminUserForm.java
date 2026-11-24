@@ -16,7 +16,7 @@ public record AdminUserForm(
         String email,
 
         @NotBlank(message = "Elegí un rol.")
-        @Pattern(regexp = "STUDENT|TEACHER|ADMIN", message = "El rol no es válido.")
+        @Pattern(regexp = "STUDENT|ADMIN", message = "El rol no es válido.")
         String role,
 
         boolean active,

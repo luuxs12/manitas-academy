@@ -1,9 +1,12 @@
 package com.mundomanitas.api.service.admin;
 
 import com.mundomanitas.api.dto.admin.AdminCourseForm;
+import com.mundomanitas.api.dto.admin.AdminExerciseForm;
+import com.mundomanitas.api.dto.admin.AdminModuleForm;
 import com.mundomanitas.api.dto.admin.AdminVideoForm;
 import com.mundomanitas.api.model.Course;
 import com.mundomanitas.api.model.CourseModule;
+import com.mundomanitas.api.model.Exercise;
 import com.mundomanitas.api.model.Video;
 import com.mundomanitas.api.repository.CertificateRepository;
 import com.mundomanitas.api.repository.CourseModuleRepository;
@@ -28,6 +31,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -228,6 +232,87 @@ class AdminCatalogServiceTest {
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("YouTube");
         verify(videos, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("crea un módulo apoyado en un curso real y registra la auditoría")
+    void createsModule() {
+        UUID courseId = UUID.randomUUID();
+        UUID actor = UUID.randomUUID();
+        when(courses.findById(courseId)).thenReturn(Optional.of(course()));
+
+        service.createModule(new AdminModuleForm(courseId, "  Unidad 1  ", 2), actor);
+
+        ArgumentCaptor<CourseModule> captor = ArgumentCaptor.forClass(CourseModule.class);
+        verify(modules).save(captor.capture());
+        assertThat(captor.getValue().getCourseId()).isEqualTo(courseId);
+        assertThat(captor.getValue().getTitle()).isEqualTo("Unidad 1");
+        assertThat(captor.getValue().getPosition()).isEqualTo(2);
+        verify(audit).record(actor, "CREATE", "MODULO", captor.getValue().getId(), "Unidad 1");
+    }
+
+    @Test
+    @DisplayName("crea un ejercicio con su consigna sin contarlo como lección")
+    void createsExercise() {
+        UUID moduleId = UUID.randomUUID();
+        UUID actor = UUID.randomUUID();
+        when(modules.findById(moduleId))
+                .thenReturn(Optional.of(new CourseModule(UUID.randomUUID(), "Unidad 1", 0)));
+
+        service.createExercise(new AdminExerciseForm(
+                moduleId, " Práctica 1 ", " Contá las señas ", 1), actor);
+
+        ArgumentCaptor<Exercise> captor = ArgumentCaptor.forClass(Exercise.class);
+        verify(exercises).save(captor.capture());
+        assertThat(captor.getValue().getModuleId()).isEqualTo(moduleId);
+        assertThat(captor.getValue().getTitle()).isEqualTo("Práctica 1");
+        assertThat(captor.getValue().getPrompt()).isEqualTo("Contá las señas");
+        verify(audit).record(actor, "CREATE", "EJERCICIO", captor.getValue().getId(), "Práctica 1");
+        verify(videos, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("publica y despublica un curso completo con auditoría")
+    void publishesAndUnpublishesCompleteCourse() {
+        UUID courseId = UUID.randomUUID();
+        UUID moduleId = UUID.randomUUID();
+        UUID actor = UUID.randomUUID();
+        Course course = new Course("taller-lsp", "Taller de LSP", "Inicial", 1, true,
+                "Comunicación", "Resumen real", "/uploads/covers/aaaa.jpg", 1);
+        CourseModule module = new CourseModule(courseId, "Unidad 1", 0);
+        when(courses.findById(courseId)).thenReturn(Optional.of(course));
+        when(modules.findByCourseIdOrderByPositionAsc(courseId)).thenReturn(List.of(module));
+        when(videos.findByModuleIdOrderByPositionAsc(any())).thenReturn(List.of(
+                new Video(moduleId, "Clase 1", "dQw4w9WgXcQ", 0)));
+
+        service.setPublished(courseId, true, actor);
+
+        assertThat(course.getStatus()).isEqualTo("PUBLICADO");
+        verify(audit).record(actor, "UPDATE", "CURSO", courseId, "PUBLICADO");
+
+        service.setPublished(courseId, false, actor);
+
+        assertThat(course.getStatus()).isEqualTo("BORRADOR");
+        verify(audit).record(actor, "UPDATE", "CURSO", courseId, "BORRADOR");
+    }
+
+    @Test
+    @DisplayName("el contador de lecciones se recalcula desde los videos al crear uno")
+    void refreshesLessonsWhenVideoIsCreated() {
+        UUID courseId = UUID.randomUUID();
+        UUID moduleId = UUID.randomUUID();
+        UUID actor = UUID.randomUUID();
+        Course course = course();
+        when(modules.findById(moduleId))
+                .thenReturn(Optional.of(new CourseModule(courseId, "Unidad 1", 0)));
+        when(courses.findById(courseId)).thenReturn(Optional.of(course));
+        when(videos.countByCourseId(any())).thenReturn(3);
+
+        service.createVideo(new AdminVideoForm(moduleId, "Clase 1", 0,
+                "https://youtu.be/dQw4w9WgXcQ"), actor);
+
+        assertThat(course.getLessons()).isEqualTo(3);
+        verify(audit).record(eq(actor), eq("CREATE"), eq("VIDEO"), any(), eq("Clase 1"));
     }
 
     private static CourseModule mockModule() {

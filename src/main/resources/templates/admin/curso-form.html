@@ -67,6 +67,7 @@
                         <small id="error-resumen" class="admin-error" th:if="${#fields.hasErrors('summary')}" th:errors="*{summary}"></small>
                     </div>
                 </div>
+                <input type="hidden" name="_free" value="false">
                 <label class="admin-check"><input type="checkbox" th:field="*{free}"> Curso gratuito (sin plan Premium)</label>
                 <div class="admin-form-actions">
                     <button class="btn btn-admin" type="submit" th:text="${courseId != null} ? 'Guardar cambios' : 'Crear curso'">Guardar</button>

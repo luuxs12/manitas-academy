@@ -42,6 +42,7 @@
                         <small class="admin-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></small>
                     </label>
                 </div>
+                <input type="hidden" name="_active" value="false">
                 <label class="admin-check"><input type="checkbox" th:field="*{active}"> Cuenta activa</label>
                 <div class="admin-form-actions">
                     <button class="btn btn-admin" type="submit" th:text="${userId != null} ? 'Guardar cambios' : 'Crear cuenta'">Guardar</button>

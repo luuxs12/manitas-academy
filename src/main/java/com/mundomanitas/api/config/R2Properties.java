@@ -4,8 +4,9 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
 /**
- * Configuración de Cloudflare R2. El bucket y las claves llegan por entorno;
+ * Configuración de Cloudflare R2. Los buckets y las claves llegan por entorno;
  * sin ellos el almacenamiento remoto queda apagado y la interfaz lo indica.
+ * El bucket privado guarda videos y subtítulos; el público, imágenes y avatares.
  */
 @Component
 @ConfigurationProperties(prefix = "app.r2")
@@ -13,17 +14,29 @@ public class R2Properties {
 
     private String endpoint = "";
     private String bucket = "";
+    private String privateBucket = "";
     private String accessKey = "";
     private String secretKey = "";
     private String publicBaseUrl = "";
     private String region = "auto";
+    private int presignSeconds = 300;
     private long maxImageBytes = 5L * 1024 * 1024;
     private long maxVideoBytes = 500L * 1024 * 1024;
+    private long maxSubtitleBytes = 1024 * 1024;
 
     public boolean isEnabled() {
         return !endpoint.isBlank() && !bucket.isBlank()
                 && !accessKey.isBlank() && !secretKey.isBlank()
                 && !publicBaseUrl.isBlank();
+    }
+
+    /** El bucket privado guarda videos y subtítulos; no tiene URL pública. */
+    public boolean isVideosEnabled() {
+        return hasCredentials() && !privateBucket.isBlank();
+    }
+
+    public boolean hasCredentials() {
+        return !endpoint.isBlank() && !accessKey.isBlank() && !secretKey.isBlank();
     }
 
     public String getEndpoint() {
@@ -40,6 +53,30 @@ public class R2Properties {
 
     public void setBucket(String bucket) {
         this.bucket = bucket;
+    }
+
+    public String getPrivateBucket() {
+        return privateBucket;
+    }
+
+    public void setPrivateBucket(String privateBucket) {
+        this.privateBucket = privateBucket;
+    }
+
+    public int getPresignSeconds() {
+        return presignSeconds;
+    }
+
+    public void setPresignSeconds(int presignSeconds) {
+        this.presignSeconds = presignSeconds;
+    }
+
+    public long getMaxSubtitleBytes() {
+        return maxSubtitleBytes;
+    }
+
+    public void setMaxSubtitleBytes(long maxSubtitleBytes) {
+        this.maxSubtitleBytes = maxSubtitleBytes;
     }
 
     public String getAccessKey() {

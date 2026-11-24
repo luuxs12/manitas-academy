@@ -144,7 +144,7 @@
         });
 
         if (loginSucceeded(response)) {
-            window.location.assign(response.url);
+            window.location.replace(response.url);
             return;
         }
 
@@ -167,7 +167,7 @@
         });
 
         if (loginSucceeded(response)) {
-            window.location.assign(response.url);
+            window.location.replace(response.url);
             return;
         }
 
@@ -209,7 +209,7 @@
 
         // El servidor ya abrió la sesión: se entra al panel según el rol.
         if (loginSucceeded(response)) {
-            window.location.assign(response.url);
+            window.location.replace(response.url);
             return;
         }
 

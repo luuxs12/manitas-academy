@@ -47,12 +47,18 @@ class PanelIsolationTest {
         String header = html(resolver.getResource("classpath:templates/fragments/layout.html"));
 
         assertThat(header).contains("currentUser.admin()")
+                .contains("panel-navigation.js")
                 .doesNotContain("th:href=\"@{/panel}\" aria-label=\"Ir a mi panel\"");
 
         String authModal = html(resolver.getResource("classpath:static/js/auth-modal.js"));
 
-        assertThat(authModal).doesNotContain("assign(\"/panel\")")
-                .contains("assign(response.url)");
+        assertThat(authModal).doesNotContain("location.assign(")
+                .contains("replace(response.url)");
+
+        String history = html(resolver.getResource("classpath:static/js/panel-navigation.js"));
+
+        assertThat(history).contains("back_forward")
+                .contains("location.replace(");
 
         String detalle = html(resolver.getResource("classpath:templates/cursos/detalle.html"));
 

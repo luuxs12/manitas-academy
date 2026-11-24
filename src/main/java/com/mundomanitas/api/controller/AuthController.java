@@ -60,7 +60,7 @@ public class AuthController {
             Model model
     ) {
         if (isSignedIn(authentication)) {
-            return "redirect:/panel";
+            return panelFor(authentication);
         }
 
         model.addAttribute("loginError", error != null);
@@ -72,7 +72,7 @@ public class AuthController {
     @GetMapping("/registro")
     public String register(Authentication authentication, Model model) {
         if (isSignedIn(authentication)) {
-            return "redirect:/panel";
+            return panelFor(authentication);
         }
 
         if (!model.containsAttribute("form")) {
@@ -136,5 +136,11 @@ public class AuthController {
         return authentication != null
                 && authentication.isAuthenticated()
                 && !(authentication instanceof AnonymousAuthenticationToken);
+    }
+
+    private String panelFor(Authentication authentication) {
+        boolean admin = authentication.getAuthorities().stream()
+                .anyMatch(authority -> "ROLE_ADMIN".equals(authority.getAuthority()));
+        return admin ? "redirect:/admin" : "redirect:/panel";
     }
 }

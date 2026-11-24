@@ -11,6 +11,7 @@ import com.mundomanitas.api.repository.PaymentRepository;
 import com.mundomanitas.api.repository.UserRepository;
 import com.mundomanitas.api.repository.VideoRepository;
 import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -20,6 +21,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
@@ -65,21 +67,45 @@ class AdminExportServiceTest {
     }
 
     @Test
-    @DisplayName("el Excel tiene cabecera de marca, columnas con estilo y filas fijas")
-    void xlsxHasStyledBrandHeader() throws Exception {
+    @DisplayName("el Excel lleva el logo, banda de marca y tabla con cebra y filtro completo")
+    void xlsxHasBrandedTable() throws Exception {
         ExportResult result = service.export("cursos", "xlsx");
 
+        assertThat(hasImage(result.bytes())).isTrue();
         try (XSSFWorkbook workbook = new XSSFWorkbook(new ByteArrayInputStream(result.bytes()))) {
             var sheet = workbook.getSheet("Datos");
-            assertThat(sheet.getRow(0).getCell(0).getStringCellValue()).isEqualTo("Mundo Manitas");
-            assertThat(sheet.getRow(1).getCell(0).getStringCellValue()).contains("Informe de cursos");
-            assertThat(sheet.getRow(2).getCell(0).getStringCellValue()).isEqualTo("Título");
-            var style = sheet.getRow(2).getCell(0).getCellStyle();
-            assertThat(style.getFillPattern()).isEqualTo(FillPatternType.SOLID_FOREGROUND);
-            assertThat(workbook.getFontAt(style.getFontIndex()).getBold()).isTrue();
+            assertThat(sheet.getRow(0).getCell(3).getStringCellValue()).isEqualTo("Mundo Manitas");
+            assertThat(sheet.getRow(1).getCell(3).getStringCellValue()).contains("Informe de cursos");
+            assertThat(sheet.getRow(0).getHeightInPoints()).isGreaterThan(40);
+            assertThat(sheet.getRow(3).getCell(0).getStringCellValue()).isEqualTo("Título");
+            assertThat(sheet.getRow(4).getCell(0).getStringCellValue()).isEqualTo("Python desde cero");
+
+            var header = sheet.getRow(3).getCell(0).getCellStyle();
+            assertThat(header.getFillPattern()).isEqualTo(FillPatternType.SOLID_FOREGROUND);
+            assertThat(workbook.getFontAt(header.getFontIndex()).getBold()).isTrue();
+            assertThat(header.getBorderBottom()).isNotNull();
+
+            var body = sheet.getRow(4).getCell(0).getCellStyle();
+            assertThat(body.getFillPattern()).isEqualTo(FillPatternType.SOLID_FOREGROUND);
+            assertThat(body.getFillForegroundColorColor().getARGB())
+                    .containsExactly((byte) 0xFF, (byte) 0xF5, (byte) 0xF5, (byte) 0xF3);
+
             assertThat(sheet.getPaneInformation()).isNotNull();
-            assertThat(sheet.getCTWorksheet().isSetAutoFilter()).isTrue();
+            var filter = CellRangeAddress.valueOf(sheet.getCTWorksheet().getAutoFilter().getRef());
+            assertThat(filter.getFirstRow()).isEqualTo(3);
+            assertThat(filter.getLastColumn()).isEqualTo(6);
+            assertThat(sheet.getPrintSetup().getLandscape()).isTrue();
         }
+    }
+
+    private boolean hasImage(byte[] file) throws IOException {
+        try (var zip = new java.util.zip.ZipInputStream(new ByteArrayInputStream(file))) {
+            java.util.zip.ZipEntry entry;
+            while ((entry = zip.getNextEntry()) != null) {
+                if (entry.getName().startsWith("xl/media/")) return true;
+            }
+        }
+        return false;
     }
 
     @Test

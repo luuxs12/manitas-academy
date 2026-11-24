@@ -19,13 +19,23 @@ import com.mundomanitas.api.repository.ExerciseRepository;
 import com.mundomanitas.api.repository.PaymentRepository;
 import com.mundomanitas.api.repository.UserRepository;
 import com.mundomanitas.api.repository.VideoRepository;
+import org.apache.poi.ss.usermodel.BorderStyle;
 import org.apache.poi.ss.usermodel.Cell;
 import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.ClientAnchor;
 import org.apache.poi.ss.usermodel.FillPatternType;
 import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.HorizontalAlignment;
 import org.apache.poi.ss.usermodel.IndexedColors;
+import org.apache.poi.ss.usermodel.PageMargin;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.VerticalAlignment;
+import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.XSSFClientAnchor;
+import org.apache.poi.xssf.usermodel.XSSFColor;
+import org.apache.poi.xssf.usermodel.XSSFDrawing;
+import org.apache.poi.xssf.usermodel.XSSFPicture;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -90,14 +100,13 @@ public class AdminExportService {
         String extension = "pdf".equalsIgnoreCase(requestedFormat) ? "pdf"
                 : "xlsx".equalsIgnoreCase(requestedFormat) ? "xlsx" : "csv";
         List<List<String>> data = rows(name);
-        List<List<String>> rows = decorated(data, name);
         String file = "mundo-manitas-" + name + "-" + LocalDate.now() + "." + extension;
         String generatedAt = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
         return switch (extension) {
-            case "xlsx" -> new ExportResult(xlsx(rows), file,
+            case "xlsx" -> new ExportResult(xlsx(name, generatedAt, data), file,
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
             case "pdf" -> new ExportResult(pdf.write(name, generatedAt, data), file, "application/pdf");
-            default -> new ExportResult(csv(rows), file, "text/csv; charset=UTF-8");
+            default -> new ExportResult(csv(decorated(data, name)), file, "text/csv; charset=UTF-8");
         };
     }
 
@@ -229,51 +238,103 @@ public class AdminExportService {
         return text.toString().getBytes(StandardCharsets.UTF_8);
     }
 
-    private byte[] xlsx(List<List<String>> rows) {
+    private byte[] xlsx(String module, String generatedAt, List<List<String>> table) {
         try (XSSFWorkbook workbook = new XSSFWorkbook();
              ByteArrayOutputStream output = new ByteArrayOutputStream()) {
             var sheet = workbook.createSheet("Datos");
-            int columnCount = rows.isEmpty() ? 0 : rows.getFirst().size();
+            List<String> headers = table.isEmpty() ? List.of() : table.getFirst();
+            List<List<String>> data = table.size() > 1
+                    ? table.subList(1, table.size()) : List.of();
+            int columnCount = Math.max(1, headers.size());
+            int bandColumns = Math.max(columnCount + 2, 6);
 
-            Font brandFont = workbook.createFont();
-            brandFont.setBold(true);
-            brandFont.setColor(IndexedColors.BLACK.getIndex());
-            brandFont.setFontHeightInPoints((short) 16);
-            CellStyle brandStyle = greenStyle(workbook, brandFont);
+            Font brandFont = font(workbook, "Tanker", 18, true);
+            CellStyle brand = style(workbook, brandFont, "00FF00", true);
+            brand.setVerticalAlignment(VerticalAlignment.CENTER);
 
-            Font titleFont = workbook.createFont();
-            titleFont.setBold(true);
-            titleFont.setColor(IndexedColors.BLACK.getIndex());
-            CellStyle titleStyle = workbook.createCellStyle();
-            titleStyle.setFont(titleFont);
+            Font subtitleFont = font(workbook, "Open Sans", 10, false);
+            CellStyle subtitle = style(workbook, subtitleFont, "F5F5F3", false);
+            subtitle.setVerticalAlignment(VerticalAlignment.CENTER);
 
-            Font headerFont = workbook.createFont();
-            headerFont.setBold(true);
-            headerFont.setColor(IndexedColors.BLACK.getIndex());
-            CellStyle headerStyle = greenStyle(workbook, headerFont);
+            Font headerFont = font(workbook, "Open Sans", 10, true);
+            CellStyle header = style(workbook, headerFont, "00FF00", true);
+            header.setAlignment(HorizontalAlignment.CENTER);
+            header.setVerticalAlignment(VerticalAlignment.CENTER);
 
-            Font bodyFont = workbook.createFont();
-            bodyFont.setColor(IndexedColors.BLACK.getIndex());
-            CellStyle bodyStyle = workbook.createCellStyle();
-            bodyStyle.setFont(bodyFont);
+            Font bodyFont = font(workbook, "Open Sans", 10, false);
+            CellStyle shaded = style(workbook, bodyFont, "F5F5F3", true);
+            CellStyle plain = style(workbook, bodyFont, "FFFFFF", true);
+            shaded.setVerticalAlignment(VerticalAlignment.CENTER);
+            plain.setVerticalAlignment(VerticalAlignment.CENTER);
 
-            for (int index = 0; index < rows.size(); index++) {
-                Row excelRow = sheet.createRow(index);
-                CellStyle style = index == 0 ? brandStyle
-                        : index == 1 ? titleStyle
-                        : index == 2 ? headerStyle : bodyStyle;
-                List<String> values = rows.get(index);
-                for (int column = 0; column < values.size(); column++) {
-                    Cell cell = excelRow.createCell(column);
-                    cell.setCellValue(values.get(column));
-                    cell.setCellStyle(style);
+            Row brandRow = sheet.createRow(0);
+            brandRow.setHeightInPoints(54);
+            Row subtitleRow = sheet.createRow(1);
+            subtitleRow.setHeightInPoints(26);
+            for (int column = 0; column < bandColumns; column++) {
+                Cell brandCell = brandRow.createCell(column);
+                brandCell.setCellStyle(brand);
+                if (column == 3) brandCell.setCellValue("Mundo Manitas");
+                Cell subtitleCell = subtitleRow.createCell(column);
+                subtitleCell.setCellStyle(subtitle);
+                if (column == 3) {
+                    subtitleCell.setCellValue("Informe de " + module + " · Generado: " + generatedAt
+                            + " · " + data.size() + (data.size() == 1 ? " registro" : " registros"));
                 }
             }
-            sheet.createFreezePane(0, 3);
-            if (rows.size() > 2 && columnCount > 0) {
-                sheet.setAutoFilter(new CellRangeAddress(2, rows.size() - 1, 0, columnCount - 1));
+            sheet.createRow(2).setHeightInPoints(8);
+
+            Row headerRow = sheet.createRow(3);
+            headerRow.setHeightInPoints(26);
+            for (int column = 0; column < columnCount; column++) {
+                Cell cell = headerRow.createCell(column);
+                cell.setCellValue(column < headers.size() ? headers.get(column) : "");
+                cell.setCellStyle(header);
             }
-            for (int column = 0; column < columnCount; column++) sheet.autoSizeColumn(column);
+
+            for (int index = 0; index < data.size(); index++) {
+                Row excelRow = sheet.createRow(4 + index);
+                excelRow.setHeightInPoints(19);
+                List<String> values = data.get(index);
+                for (int column = 0; column < columnCount; column++) {
+                    Cell cell = excelRow.createCell(column);
+                    cell.setCellValue(column < values.size() ? values.get(column) : "");
+                    cell.setCellStyle(index % 2 == 0 ? shaded : plain);
+                }
+            }
+            if (data.isEmpty()) {
+                Row emptyRow = sheet.createRow(4);
+                emptyRow.setHeightInPoints(22);
+                Cell cell = emptyRow.createCell(0);
+                cell.setCellValue("No hay datos para este informe.");
+                cell.setCellStyle(shaded);
+            }
+
+            for (int column = 0; column < columnCount; column++) {
+                int longest = column < headers.size() ? headers.get(column).length() : 8;
+                for (List<String> values : data) {
+                    if (column < values.size()) longest = Math.max(longest, values.get(column).length());
+                }
+                sheet.setColumnWidth(column,
+                        Math.min(9000, Math.max(column < 2 ? 3400 : 2200, (longest + 3) * 256)));
+            }
+
+            XSSFDrawing drawing = sheet.createDrawingPatriarch();
+            XSSFClientAnchor anchor = new XSSFClientAnchor(0, 0, 0, 0, 0, 0, 2, 1);
+            anchor.setAnchorType(ClientAnchor.AnchorType.MOVE_AND_RESIZE);
+            XSSFPicture picture = drawing.createPicture(anchor,
+                    workbook.addPicture(ExportBrand.logoPng(), Workbook.PICTURE_TYPE_PNG));
+            picture.resize(0.055);
+
+            sheet.createFreezePane(0, 4);
+            sheet.setAutoFilter(new CellRangeAddress(3, Math.max(4, 3 + data.size()), 0, columnCount - 1));
+            sheet.setRepeatingRows(CellRangeAddress.valueOf("$4:$4"));
+            sheet.getPrintSetup().setLandscape(true);
+            sheet.getPrintSetup().setScale((short) 90);
+            sheet.setMargin(PageMargin.LEFT, 0.3);
+            sheet.setMargin(PageMargin.RIGHT, 0.3);
+            sheet.getFooter().setCenter("Mundo Manitas · Página &P de &N");
+
             workbook.write(output);
             return output.toByteArray();
         } catch (IOException exception) {
@@ -281,11 +342,24 @@ public class AdminExportService {
         }
     }
 
-    private CellStyle greenStyle(XSSFWorkbook workbook, Font font) {
+    private Font font(XSSFWorkbook workbook, String name, int size, boolean bold) {
+        Font font = workbook.createFont();
+        font.setFontName(name);
+        font.setFontHeightInPoints((short) size);
+        font.setBold(bold);
+        font.setColor(IndexedColors.BLACK.getIndex());
+        return font;
+    }
+
+    private CellStyle style(XSSFWorkbook workbook, Font font, String rgb, boolean border) {
         CellStyle style = workbook.createCellStyle();
         style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
-        style.setFillForegroundColor(IndexedColors.BRIGHT_GREEN.getIndex());
+        style.setFillForegroundColor(new XSSFColor(java.util.HexFormat.of().parseHex(rgb), null));
         style.setFont(font);
+        if (border) {
+            style.setBorderBottom(BorderStyle.THIN);
+            style.setBottomBorderColor(IndexedColors.GREY_25_PERCENT.getIndex());
+        }
         return style;
     }
 

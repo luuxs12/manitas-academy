@@ -6,6 +6,7 @@ import com.mundomanitas.api.model.LessonProgress;
 import com.mundomanitas.api.model.User;
 import com.mundomanitas.api.repository.EnrollmentRepository;
 import com.mundomanitas.api.repository.LessonProgressRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -16,6 +17,8 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Avance real por lección.
@@ -68,7 +71,8 @@ public class LessonProgressServiceImpl implements LessonProgressService {
     @Override
     @Transactional
     public boolean toggle(User user, String slug, int lessonNumber) {
-        Enrollment enrollment = enrollments.findByUserAndCourseSlug(user, slug)
+        checkNotNull(user, "user");
+        Enrollment enrollment = enrollments.findByUserAndCourseSlug(user, requiredSlug(slug))
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "No estás inscripto en ese curso"));
 
@@ -84,7 +88,7 @@ public class LessonProgressServiceImpl implements LessonProgressService {
         );
 
         boolean completed = progress.countByEnrollmentId(enrollment.getId()) == total;
-        log.debug("Lección {} actualizada en matrícula {}; curso completo={}",
+        log.info("Lección {} actualizada en matrícula {}; curso completo={}",
                 lessonNumber, enrollment.getId(), completed);
         return completed;
     }
@@ -93,6 +97,7 @@ public class LessonProgressServiceImpl implements LessonProgressService {
     @Override
     @Transactional
     public void completeAll(Enrollment enrollment) {
+        checkNotNull(enrollment, "enrollment");
         Set<Integer> existing = completedLessons(enrollment.getId());
         for (int lesson = 1; lesson <= enrollment.getCourse().getLessons(); lesson++) {
             if (!existing.contains(lesson)) {
@@ -117,5 +122,13 @@ public class LessonProgressServiceImpl implements LessonProgressService {
                 ? 0
                 : (int) Math.round(completedLessons * 100.0 / totalLessons);
         return new LessonTotals(completedLessons, totalLessons, percent);
+    }
+
+    private static String requiredSlug(String slug) {
+        String clean = StringUtils.trimToNull(slug);
+        if (clean == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Curso no encontrado");
+        }
+        return clean;
     }
 }

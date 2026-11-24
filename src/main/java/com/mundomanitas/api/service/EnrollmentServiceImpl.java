@@ -6,6 +6,7 @@ import com.mundomanitas.api.model.Course;
 import com.mundomanitas.api.model.Enrollment;
 import com.mundomanitas.api.model.User;
 import com.mundomanitas.api.repository.EnrollmentRepository;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,8 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.UUID;
+
+import static com.google.common.base.Preconditions.checkNotNull;
 
 /**
  * Reglas de inscripción y avance de los cursos de una cuenta.
@@ -66,13 +69,15 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     @Override
     @Transactional(readOnly = true)
     public boolean isEnrolled(UUID userId, String slug) {
-        return enrollments.existsByUserIdAndCourseSlug(userId, slug);
+        checkNotNull(userId, "userId");
+        return enrollments.existsByUserIdAndCourseSlug(userId, requiredSlug(slug));
     }
 
     @Override
     @Transactional(readOnly = true)
     public Enrollment findMine(User user, String slug) {
-        return enrollments.findByUserAndCourseSlug(user, slug)
+        checkNotNull(user, "user");
+        return enrollments.findByUserAndCourseSlug(user, requiredSlug(slug))
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "No estás inscripto en ese curso"));
     }
@@ -84,7 +89,9 @@ public class EnrollmentServiceImpl implements EnrollmentService {
     @Override
     @Transactional
     public Enrollment enroll(User user, String slug) {
-        Course course = catalog.findBySlug(slug)
+        checkNotNull(user, "user");
+        String cleanSlug = requiredSlug(slug);
+        Course course = catalog.findBySlug(cleanSlug)
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "Curso no encontrado"));
 
@@ -92,7 +99,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
             throw new PremiumRequiredException(course.getTitle());
         }
 
-        var existing = enrollments.findByUserAndCourseSlug(user, slug);
+        var existing = enrollments.findByUserAndCourseSlug(user, cleanSlug);
         if (existing.isPresent()) {
             return existing.get();
         }
@@ -106,7 +113,7 @@ public class EnrollmentServiceImpl implements EnrollmentService {
                 "«" + course.getTitle() + "» ya está en Mis cursos.",
                 "/panel/cursos"
         );
-        log.info("Inscripción creada usuario={} curso={}", user.getId(), slug);
+        log.info("Inscripción creada usuario={} curso={}", user.getId(), cleanSlug);
         return enrollment;
     }
 
@@ -163,5 +170,13 @@ public class EnrollmentServiceImpl implements EnrollmentService {
                 .filter(enrollment -> !enrollment.isCompleted())
                 .findFirst()
                 .orElse(null);
+    }
+
+    private static String requiredSlug(String slug) {
+        String clean = StringUtils.trimToNull(slug);
+        if (clean == null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Curso no encontrado");
+        }
+        return clean;
     }
 }

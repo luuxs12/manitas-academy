@@ -12,6 +12,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Optional;
 
@@ -77,6 +79,30 @@ class EnrollmentServiceTest {
         assertThat(created.getCourse()).isSameAs(course);
         verify(enrollments).save(created);
         verify(notifications).notify(any(User.class), anyString(), anyString(), anyString(), anyString());
+    }
+
+    @Test
+    @DisplayName("recorta espacios del identificador antes de inscribir")
+    void enrollTrimsSlug() {
+        when(catalog.findBySlug("python")).thenReturn(Optional.of(course));
+        when(course.isFree()).thenReturn(true);
+        when(course.getTitle()).thenReturn("Python desde cero");
+        when(enrollments.findByUserAndCourseSlug(user, "python")).thenReturn(Optional.empty());
+        when(enrollments.save(any(Enrollment.class)))
+                .thenAnswer(invocation -> invocation.getArgument(0));
+
+        Enrollment created = service.enroll(user, "  python  ");
+
+        assertThat(created.getCourse()).isSameAs(course);
+    }
+
+    @Test
+    @DisplayName("rechaza un identificador vacío con error de solicitud")
+    void rejectsBlankSlug() {
+        assertThatThrownBy(() -> service.enroll(user, "   "))
+                .isInstanceOfSatisfying(ResponseStatusException.class,
+                        exception -> assertThat(exception.getStatusCode())
+                                .isEqualTo(HttpStatus.BAD_REQUEST));
     }
 
     @Test

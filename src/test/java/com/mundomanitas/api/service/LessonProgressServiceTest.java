@@ -69,6 +69,31 @@ class LessonProgressServiceTest {
     }
 
     @Test
+    @DisplayName("recorta espacios del identificador antes de marcar")
+    void toggleTrimsSlug() {
+        UUID enrollmentId = UUID.randomUUID();
+        when(enrollments.findByUserAndCourseSlug(user, "python")).thenReturn(Optional.of(enrollment));
+        when(enrollment.getId()).thenReturn(enrollmentId);
+        when(enrollment.getCourse()).thenReturn(course);
+        when(course.getLessons()).thenReturn(3);
+        when(progress.findById(any(LessonProgress.Key.class))).thenReturn(Optional.empty());
+        when(progress.countByEnrollmentId(enrollmentId)).thenReturn(1L);
+
+        assertThat(service.toggle(user, "  python  ", 1)).isFalse();
+
+        verify(progress).save(any(LessonProgress.class));
+    }
+
+    @Test
+    @DisplayName("rechaza un identificador vacío con error de solicitud")
+    void toggleRejectsBlankSlug() {
+        assertThatThrownBy(() -> service.toggle(user, "   ", 1))
+                .isInstanceOfSatisfying(ResponseStatusException.class,
+                        exception -> assertThat(exception.getStatusCode())
+                                .isEqualTo(HttpStatus.BAD_REQUEST));
+    }
+
+    @Test
     @DisplayName("desmarca una lección ya completada")
     void unmarksCompletedLesson() {
         UUID enrollmentId = UUID.randomUUID();

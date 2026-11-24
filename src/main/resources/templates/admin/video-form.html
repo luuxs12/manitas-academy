@@ -12,7 +12,7 @@
         <main id="panel-main" class="panel-main admin-main">
             <p class="panel-flash panel-flash--error" th:if="${panelError}" th:text="${panelError}" role="alert"></p>
             <div class="admin-page-head">
-                <div><h1 th:text="${itemId != null} ? 'Editar video' : 'Nuevo video'">Video</h1><p>Subí el video a R2 o indicá su clave privada. La URL queda solo para videos históricos.</p></div>
+                <div><h1 th:text="${itemId != null} ? 'Editar video' : 'Nuevo video'">Video</h1><p>Pegá el enlace público de YouTube. La duración se indica en segundos.</p></div>
                 <a class="admin-back" th:href="@{/admin/videos}">← Volver a videos</a>
             </div>
             <form class="panel-card admin-card admin-form" th:action="${itemId != null} ? @{/admin/videos/{id}(id=${itemId})} : @{/admin/videos}"
@@ -27,17 +27,11 @@
                     </label>
                     <label>Título<input type="text" th:field="*{title}" maxlength="140" required>
                         <small class="admin-error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></small></label>
-                    <label class="admin-span-2">URL histórica (solo videos viejos)
-                        <input id="video-url" type="text" th:field="*{url}" maxlength="300">
-                        <small class="admin-error" th:if="${#fields.hasErrors('url')}" th:errors="*{url}"></small></label>
-                    <label>Clave del video en R2
-                        <input id="video-object-key" type="text" th:field="*{objectKey}" maxlength="300"
-                               placeholder="videos/nombre.mp4">
-                        <small class="admin-error" th:if="${#fields.hasErrors('objectKey')}" th:errors="*{objectKey}"></small></label>
-                    <label>Clave del subtítulo VTT
-                        <input id="video-subtitle-key" type="text" th:field="*{subtitleKey}" maxlength="300"
-                               placeholder="subtitles/nombre.vtt">
-                        <small class="admin-error" th:if="${#fields.hasErrors('subtitleKey')}" th:errors="*{subtitleKey}"></small></label>
+                    <label class="admin-span-2">Enlace de YouTube
+                        <input id="video-youtube-url" type="url" th:field="*{youtubeUrl}" maxlength="300"
+                               placeholder="https://www.youtube.com/watch?v=…">
+                        <small class="admin-hint">Se reproduce desde YouTube en modo sin cookies.</small>
+                        <small class="admin-error" th:if="${#fields.hasErrors('youtubeUrl')}" th:errors="*{youtubeUrl}"></small></label>
                     <label>Duración (segundos)
                         <input type="number" th:field="*{durationSeconds}" min="0" max="86400" required>
                         <small class="admin-error" th:if="${#fields.hasErrors('durationSeconds')}" th:errors="*{durationSeconds}"></small></label>
@@ -47,26 +41,22 @@
                                   placeholder="Texto plano de lo que se dice en el video."></textarea>
                         <small class="admin-error" th:if="${#fields.hasErrors('transcript')}" th:errors="*{transcript}"></small></label>
                 </div>
-                <div class="admin-upload" data-upload data-upload-target="#video-object-key" data-upload-field="key"
-                     th:attr="data-upload-endpoint=@{/admin/archivos/videos}">
-                    <label>Subir video al bucket privado
-                        <input type="file" accept="video/mp4,video/webm,video/quicktime" data-upload-file>
-                    </label>
-                    <input type="hidden" data-upload-csrf th:value="${_csrf != null} ? ${_csrf.token} : ''">
-                    <span class="admin-upload-status" data-upload-status>
-                        Sin R2 configurado, podés pegar una clave o una URL existente.
-                    </span>
-                </div>
-                <div class="admin-upload" data-upload data-upload-target="#video-subtitle-key" data-upload-field="key"
-                     th:attr="data-upload-endpoint=@{/admin/archivos/subtitulos}">
-                    <label>Subir subtítulo VTT en español
-                        <input type="file" accept="text/vtt,.vtt" data-upload-file>
-                    </label>
-                    <input type="hidden" data-upload-csrf th:value="${_csrf != null} ? ${_csrf.token} : ''">
-                    <span class="admin-upload-status" data-upload-status>
-                        Opcional; un solo subtítulo en español por video.
-                    </span>
-                </div>
+                <details class="admin-legacy-source">
+                    <summary>Origen histórico (solo videos ya cargados)</summary>
+                    <div class="admin-form-grid">
+                        <label>URL anterior
+                            <input id="video-url" type="text" th:field="*{url}" maxlength="300">
+                            <small class="admin-error" th:if="${#fields.hasErrors('url')}" th:errors="*{url}"></small></label>
+                        <label>Clave del video en R2
+                            <input id="video-object-key" type="text" th:field="*{objectKey}" maxlength="300"
+                                   placeholder="videos/nombre.mp4">
+                            <small class="admin-error" th:if="${#fields.hasErrors('objectKey')}" th:errors="*{objectKey}"></small></label>
+                        <label>Clave del subtítulo VTT
+                            <input id="video-subtitle-key" type="text" th:field="*{subtitleKey}" maxlength="300"
+                                   placeholder="subtitles/nombre.vtt">
+                            <small class="admin-error" th:if="${#fields.hasErrors('subtitleKey')}" th:errors="*{subtitleKey}"></small></label>
+                    </div>
+                </details>
                 <div class="admin-form-actions">
                     <button class="btn btn-admin" type="submit" th:text="${itemId != null} ? 'Guardar cambios' : 'Crear video'">Guardar</button>
                     <a class="admin-back" th:href="@{/admin/videos}">Cancelar</a>

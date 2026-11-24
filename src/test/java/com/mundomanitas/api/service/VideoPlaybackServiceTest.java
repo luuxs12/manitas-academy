@@ -74,7 +74,28 @@ class VideoPlaybackServiceTest {
         assertThat(playback.durationSeconds()).isEqualTo(620);
         assertThat(playback.transcript()).isEqualTo("Texto de la clase");
         assertThat(playback.legacy()).isFalse();
+        assertThat(playback.youtube()).isFalse();
         assertThat(playback.available()).isTrue();
+    }
+
+    @Test
+    @DisplayName("reproduce un video de YouTube sin firmar URLs ni usar el bucket")
+    void playsYouTubeVideo() {
+        Video video = new Video(UUID.randomUUID(), "Clase de YouTube", null, 1,
+                null, null, 480, "Texto de la clase", "dQw4w9WgXcQ");
+        when(videos.findById(videoId)).thenReturn(Optional.of(video));
+        when(videos.existsInCourse(videoId, courseId)).thenReturn(true);
+
+        VideoPlaybackService.Playback playback = service.play(videoId, enrollment);
+
+        assertThat(playback.title()).isEqualTo("Clase de YouTube");
+        assertThat(playback.youtube()).isTrue();
+        assertThat(playback.url())
+                .isEqualTo("https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ");
+        assertThat(playback.durationSeconds()).isEqualTo(480);
+        assertThat(playback.transcript()).isEqualTo("Texto de la clase");
+        assertThat(playback.available()).isTrue();
+        verifyNoInteractions(storage);
     }
 
     @Test
@@ -90,6 +111,7 @@ class VideoPlaybackServiceTest {
         assertThat(playback.url()).isEqualTo("https://antiguo.example/clase.mp4");
         assertThat(playback.subtitleUrl()).isNull();
         assertThat(playback.legacy()).isTrue();
+        assertThat(playback.youtube()).isFalse();
         verifyNoInteractions(storage);
     }
 

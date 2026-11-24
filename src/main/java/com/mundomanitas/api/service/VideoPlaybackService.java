@@ -18,9 +18,9 @@ import java.util.UUID;
 /**
  * Entrega de videos al área de estudiante.
  *
- * <p>Un video solo se reproduce dentro de la matrícula de su curso. Las claves
- * privadas se firman al momento; las URLs históricas se respetan para no dejar
- * videos antiguos sin reproducir. Nunca se registran URLs firmadas en logs.</p>
+ * <p>Un video solo se reproduce dentro de la matrícula de su curso. Los videos
+ * nuevos se embeben desde YouTube; las claves privadas y las URLs históricas se
+ * respetan para no dejar videos antiguos sin reproducir.</p>
  */
 @Service
 public class VideoPlaybackService {
@@ -38,7 +38,7 @@ public class VideoPlaybackService {
 
     /** Datos mínimos para el reproductor; {@code available} es falso si aún no hay archivo. */
     public record Playback(String title, String url, String subtitleUrl, int durationSeconds,
-                           String transcript, boolean legacy, boolean available) {
+                           String transcript, boolean legacy, boolean available, boolean youtube) {
     }
 
     /** Tarjeta del temario: no incluye URLs firmadas para no firmar todo el curso. */
@@ -60,19 +60,25 @@ public class VideoPlaybackService {
                     HttpStatus.NOT_FOUND, "El video no pertenece a este curso");
         }
 
+        String youtubeId = YouTubeLink.id(video.getYoutubeId());
+        if (youtubeId != null) {
+            return new Playback(video.getTitle(), YouTubeLink.embedUrl(youtubeId), null,
+                    video.getDurationSeconds(), video.getTranscript(), false, true, true);
+        }
+
         if (StringUtils.hasText(video.getObjectKey())) {
             String subtitle = StringUtils.hasText(video.getSubtitleKey())
                     ? storage.presignedUrl(video.getSubtitleKey())
                     : null;
             String url = storage.presignedUrl(video.getObjectKey());
             return new Playback(video.getTitle(), url, subtitle, video.getDurationSeconds(),
-                    video.getTranscript(), false, true);
+                    video.getTranscript(), false, true, false);
         }
 
         String legacyUrl = video.getUrl();
         boolean available = StringUtils.hasText(legacyUrl);
         return new Playback(video.getTitle(), available ? legacyUrl : null, null,
-                video.getDurationSeconds(), video.getTranscript(), true, available);
+                video.getDurationSeconds(), video.getTranscript(), true, available, false);
     }
 
     /** Temario del curso en orden de módulos, sin exponer claves privadas. */

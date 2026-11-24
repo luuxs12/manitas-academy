@@ -23,6 +23,7 @@ import com.mundomanitas.api.repository.ExerciseRepository;
 import com.mundomanitas.api.repository.UserRepository;
 import com.mundomanitas.api.repository.VideoRepository;
 import com.mundomanitas.api.service.R2StorageService;
+import com.mundomanitas.api.service.YouTubeLink;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -245,8 +246,7 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
                     module == null ? "Módulo eliminado" : module.getTitle(),
                     course == null ? "Curso eliminado" : course.getTitle(),
                     video.getTitle(),
-                    StringUtils.trimToNull(video.getUrl()) != null
-                            ? video.getUrl() : video.getObjectKey(),
+                    sourceLabel(video),
                     video.getPosition());
         });
     }
@@ -256,7 +256,8 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
         Video video = videos.findById(id).orElseThrow();
         return new AdminVideoForm(video.getModuleId(), video.getTitle(), video.getUrl(),
                 video.getPosition(), video.getObjectKey(), video.getSubtitleKey(),
-                video.getDurationSeconds(), video.getTranscript());
+                video.getDurationSeconds(), video.getTranscript(),
+                youtubeLink(video));
     }
 
     @Transactional
@@ -267,7 +268,8 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
                 AdminVideoForm.clean(form.objectKey()),
                 AdminVideoForm.clean(form.subtitleKey()),
                 form.durationSeconds() == null ? 0 : form.durationSeconds(),
-                AdminVideoForm.clean(form.transcript()));
+                AdminVideoForm.clean(form.transcript()),
+                youtubeId(form.youtubeUrl()));
         videos.save(video);
         audit.record(actor, "CREATE", "VIDEO", video.getId(), form.title().trim());
         log.info("Video creado id={} actor={}", video.getId(), actor);
@@ -282,7 +284,8 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
                 AdminVideoForm.clean(form.objectKey()),
                 AdminVideoForm.clean(form.subtitleKey()),
                 form.durationSeconds() == null ? 0 : form.durationSeconds(),
-                AdminVideoForm.clean(form.transcript()));
+                AdminVideoForm.clean(form.transcript()),
+                youtubeId(form.youtubeUrl()));
         video.moveTo(form.moduleId());
         audit.record(actor, "UPDATE", "VIDEO", id, form.title().trim());
         log.info("Video actualizado id={} actor={}", id, actor);
@@ -298,6 +301,25 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
         storage.deleteByUrl(video.getUrl());
         audit.record(actor, "DELETE", "VIDEO", id, title);
         log.info("Video eliminado id={} actor={}", id, actor);
+    }
+
+    private String youtubeId(String youtubeUrl) {
+        String link = AdminVideoForm.clean(youtubeUrl);
+        if (link == null) return null;
+        String id = YouTubeLink.id(link);
+        if (id == null) throw new IllegalArgumentException("El enlace de YouTube no es válido.");
+        return id;
+    }
+
+    private String youtubeLink(Video video) {
+        String id = YouTubeLink.id(video.getYoutubeId());
+        return id == null ? null : "https://youtu.be/" + id;
+    }
+
+    private String sourceLabel(Video video) {
+        String link = youtubeLink(video);
+        if (link != null) return link;
+        return StringUtils.trimToNull(video.getUrl()) != null ? video.getUrl() : video.getObjectKey();
     }
 
     /* ----------------------------- ejercicios ---------------------------- */

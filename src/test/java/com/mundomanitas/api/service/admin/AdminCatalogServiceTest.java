@@ -162,6 +162,36 @@ class AdminCatalogServiceTest {
     }
 
     @Test
+    @DisplayName("guarda el ID de YouTube al crear un video desde un enlace")
+    void createsYouTubeVideo() {
+        UUID moduleId = UUID.randomUUID();
+        when(modules.findById(moduleId)).thenReturn(Optional.of(mock(CourseModule.class)));
+        AdminVideoForm form = new AdminVideoForm(moduleId, "Clase en YouTube", null, 1,
+                null, null, 420, null, "https://youtu.be/dQw4w9WgXcQ?t=15");
+
+        service.createVideo(form, UUID.randomUUID());
+
+        ArgumentCaptor<Video> captor = ArgumentCaptor.forClass(Video.class);
+        verify(videos).save(captor.capture());
+        assertThat(captor.getValue().getYoutubeId()).isEqualTo("dQw4w9WgXcQ");
+        assertThat(captor.getValue().getObjectKey()).isNull();
+    }
+
+    @Test
+    @DisplayName("rechaza un enlace de YouTube que no pertenece a YouTube")
+    void rejectsForeignYouTubeLink() {
+        UUID moduleId = UUID.randomUUID();
+        when(modules.findById(moduleId)).thenReturn(Optional.of(mock(CourseModule.class)));
+        AdminVideoForm form = new AdminVideoForm(moduleId, "Clase", null, 1,
+                null, null, 60, null, "https://ejemplo.com/watch?v=dQw4w9WgXcQ");
+
+        assertThatThrownBy(() -> service.createVideo(form, UUID.randomUUID()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("YouTube");
+        verify(videos, never()).save(any());
+    }
+
+    @Test
     @DisplayName("limpia los objetos privados al eliminar un video")
     void deletesPrivateVideoObjects() {
         UUID id = UUID.randomUUID();

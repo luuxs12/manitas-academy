@@ -12,8 +12,8 @@ import java.util.UUID;
 /**
  * Alta y edición de un video.
  *
- * <p>La URL queda como respaldo de los videos históricos; las claves de R2 y
- * la duración son los datos del video privado.</p>
+ * <p>El enlace de YouTube es el origen de los videos nuevos. La URL y las
+ * claves de R2 quedan como respaldo de los videos históricos.</p>
  */
 public record AdminVideoForm(
         @NotNull(message = "Elegí un módulo.") UUID moduleId,
@@ -34,8 +34,21 @@ public record AdminVideoForm(
         @Max(value = 86400, message = "La duración no puede superar un día.")
         Integer durationSeconds,
         @Size(max = 2000, message = "La transcripción no puede superar los 2000 caracteres.")
-        String transcript
+        String transcript,
+        @Size(max = 300, message = "El enlace de YouTube no puede superar los 300 caracteres.")
+        @Pattern(regexp = "^$|^[A-Za-z0-9_-]{11}$"
+                        + "|^https?://(?:www\\.)?(?:youtube\\.com|youtu\\.be|youtube-nocookie\\.com)/.+$",
+                message = "Pegá un enlace válido de YouTube.")
+        String youtubeUrl
 ) {
+    /** Firma anterior, conservada para los videos históricos sin YouTube. */
+    public AdminVideoForm(UUID moduleId, String title, String url, int position,
+                          String objectKey, String subtitleKey, Integer durationSeconds,
+                          String transcript) {
+        this(moduleId, title, url, position, objectKey, subtitleKey,
+                durationSeconds, transcript, null);
+    }
+
     /** Normaliza los campos opcionales para no guardar cadenas vacías. */
     public static String clean(String value) {
         return value == null || value.isBlank() ? null : value.trim();

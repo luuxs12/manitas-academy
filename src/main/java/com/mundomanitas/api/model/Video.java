@@ -11,8 +11,8 @@ import java.time.OffsetDateTime;
 import java.util.UUID;
 
 /**
- * Video de un módulo. Los videos nuevos viven en un bucket privado y se sirven
- * por clave; {@code url} se conserva solo para los videos históricos.
+ * Video de un módulo. Los videos nuevos se identifican por su ID de YouTube;
+ * la clave privada y {@code url} se conservan solo para los videos históricos.
  */
 @Entity
 @Table(name = "videos")
@@ -28,9 +28,12 @@ public class Video {
     @Column(nullable = false)
     private String title;
 
-    /** URL histórica; los videos privados usan {@code objectKey}. */
+    /** URL histórica; los videos nuevos usan {@code youtubeId}. */
     @Column
     private String url;
+
+    @Column(name = "youtube_id", length = 32)
+    private String youtubeId;
 
     @Column(nullable = false)
     private int position;
@@ -59,6 +62,13 @@ public class Video {
 
     public Video(UUID moduleId, String title, String url, int position,
                  String objectKey, String subtitleKey, int durationSeconds, String transcript) {
+        this(moduleId, title, url, position, objectKey, subtitleKey,
+                durationSeconds, transcript, null);
+    }
+
+    public Video(UUID moduleId, String title, String url, int position,
+                 String objectKey, String subtitleKey, int durationSeconds, String transcript,
+                 String youtubeId) {
         this.moduleId = moduleId;
         this.title = title;
         this.url = url;
@@ -67,6 +77,7 @@ public class Video {
         this.subtitleKey = subtitleKey;
         this.durationSeconds = durationSeconds;
         this.transcript = transcript;
+        this.youtubeId = youtubeId;
     }
 
     public UUID getId() {
@@ -83,6 +94,10 @@ public class Video {
 
     public String getUrl() {
         return url;
+    }
+
+    public String getYoutubeId() {
+        return youtubeId;
     }
 
     public String getObjectKey() {
@@ -115,6 +130,11 @@ public class Video {
 
     public void update(String title, String url, int position, String objectKey,
                        String subtitleKey, int durationSeconds, String transcript) {
+        update(title, url, position, objectKey, subtitleKey, durationSeconds, transcript, youtubeId);
+    }
+
+    public void update(String title, String url, int position, String objectKey,
+                       String subtitleKey, int durationSeconds, String transcript, String youtubeId) {
         this.title = title;
         this.url = url;
         this.position = position;
@@ -122,6 +142,7 @@ public class Video {
         this.subtitleKey = subtitleKey;
         this.durationSeconds = durationSeconds;
         this.transcript = transcript;
+        this.youtubeId = youtubeId;
     }
 
     public void moveTo(UUID moduleId) {

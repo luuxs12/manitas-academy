@@ -43,7 +43,13 @@
                              th:if="${player != null}">
                         <h2 id="titulo-reproductor" th:text="${player.title()}">Clase 1</h2>
                         <div class="player-frame">
-                            <video controls preload="metadata" th:poster="${course.image}">
+                            <iframe th:if="${player.youtube()}" th:src="${player.url()}"
+                                    th:title="${player.title()}" title="Video de la clase"
+                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                    referrerpolicy="strict-origin-when-cross-origin"
+                                    allowfullscreen loading="lazy"></iframe>
+                            <video th:unless="${player.youtube()}" controls preload="metadata"
+                                   th:poster="${course.image}">
                                 <source th:if="${player.available()}" th:src="${player.url()}"
                                         type="video/mp4">
                                 <track th:if="${player.subtitleUrl() != null}" kind="subtitles"
@@ -51,6 +57,9 @@
                                 Tu navegador no puede reproducir este video.
                             </video>
                         </div>
+                        <p class="player-note" th:if="${player.youtube()}">
+                            Este video se reproduce desde YouTube sin cookies de terceros.
+                        </p>
                         <p class="player-note" th:if="${!player.available()}">
                             Este video todavía no tiene archivo cargado.
                         </p>

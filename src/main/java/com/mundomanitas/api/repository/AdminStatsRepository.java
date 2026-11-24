@@ -22,15 +22,6 @@ public class AdminStatsRepository {
     private static final String COURSES =
             "select cast(date_trunc('day', created_at) as date) as day, count(*) as total "
                     + "from courses where created_at >= :from group by 1 order by 1";
-    private static final String LESSONS =
-            "select cast(date_trunc('day', completed_at) as date) as day, count(*) as total "
-                    + "from lesson_progress where completed_at >= :from group by 1 order by 1";
-    private static final String CERTIFICATES =
-            "select cast(date_trunc('day', issued_at) as date) as day, count(*) as total "
-                    + "from certificates where issued_at >= :from group by 1 order by 1";
-    private static final String ENROLLMENTS =
-            "select cast(date_trunc('day', enrolled_at) as date) as day, count(*) as total "
-                    + "from enrollments where enrolled_at >= :from group by 1 order by 1";
 
     private final EntityManager entityManager;
 
@@ -44,18 +35,6 @@ public class AdminStatsRepository {
 
     public List<DayCount> coursesByDay(OffsetDateTime from) {
         return daily(COURSES, from);
-    }
-
-    public List<DayCount> lessonsByDay(OffsetDateTime from) {
-        return daily(LESSONS, from);
-    }
-
-    public List<DayCount> certificatesByDay(OffsetDateTime from) {
-        return daily(CERTIFICATES, from);
-    }
-
-    public List<DayCount> enrollmentsByDay(OffsetDateTime from) {
-        return daily(ENROLLMENTS, from);
     }
 
     public List<DayCount> revenueByDay(OffsetDateTime from) {

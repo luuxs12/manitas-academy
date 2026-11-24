@@ -4,7 +4,6 @@ import com.mundomanitas.api.model.Payment;
 import com.mundomanitas.api.model.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
 import java.time.OffsetDateTime;
 import java.util.List;
@@ -23,12 +22,6 @@ public interface PaymentRepository extends JpaRepository<Payment, UUID> {
 
     @Query("select coalesce(sum(p.amountCents), 0) from Payment p where p.status = 'PAID'")
     long paidTotalCents();
-
-    @Query("""
-            select coalesce(sum(p.amountCents), 0) from Payment p
-            where p.status = 'PAID' and p.paidAt between :from and :to
-            """)
-    long paidCentsBetween(@Param("from") OffsetDateTime from, @Param("to") OffsetDateTime to);
 
     long countByStatusAndPaidAtBetween(String status, OffsetDateTime from, OffsetDateTime to);
 

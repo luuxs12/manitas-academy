@@ -27,8 +27,6 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, UUID> {
     @EntityGraph(attributePaths = "course")
     Optional<Enrollment> findByUserAndCourseSlug(User user, String slug);
 
-    boolean existsByUserAndCourseSlug(User user, String slug);
-
     boolean existsByUserIdAndCourseSlug(UUID userId, String slug);
 
     @EntityGraph(attributePaths = "course")
@@ -36,11 +34,6 @@ public interface EnrollmentRepository extends JpaRepository<Enrollment, UUID> {
 
     @EntityGraph(attributePaths = "course")
     List<Enrollment> findByUserAndCompletedAtIsNotNullOrderByCompletedAtDesc(User user);
-
-    @EntityGraph(attributePaths = {"user", "course"})
-    List<Enrollment> findTop5ByOrderByEnrolledAtDesc();
-
-    long countByEnrolledAtBetween(OffsetDateTime from, OffsetDateTime to);
 
     long countByCompletedAtBetween(OffsetDateTime from, OffsetDateTime to);
 

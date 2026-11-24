@@ -15,8 +15,6 @@ public interface AuditLogRepository extends JpaRepository<AuditLog, UUID> {
 
     List<AuditLog> findAllByOrderByCreatedAtDesc();
 
-    List<AuditLog> findTop8ByOrderByCreatedAtDesc();
-
     List<AuditLog> findTop8ByCreatedAtAfterOrderByCreatedAtDesc(OffsetDateTime since);
 
     long countByCreatedAtAfter(OffsetDateTime since);

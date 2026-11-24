@@ -22,6 +22,7 @@ import com.mundomanitas.api.repository.EnrollmentRepository;
 import com.mundomanitas.api.repository.ExerciseRepository;
 import com.mundomanitas.api.repository.UserRepository;
 import com.mundomanitas.api.repository.VideoRepository;
+import com.mundomanitas.api.service.R2StorageService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +55,7 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
     private final PasswordEncoder encoder;
     private final AdminAuditService audit;
     private final AdminFormat format;
+    private final R2StorageService storage;
 
     public AdminCatalogServiceImpl(
             UserRepository users,
@@ -64,7 +66,8 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
             EnrollmentRepository enrollments,
             PasswordEncoder encoder,
             AdminAuditService audit,
-            AdminFormat format
+            AdminFormat format,
+            R2StorageService storage
     ) {
         this.users = users;
         this.courses = courses;
@@ -75,6 +78,7 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
         this.encoder = encoder;
         this.audit = audit;
         this.format = format;
+        this.storage = storage;
     }
 
     /* ------------------------------ cuentas ------------------------------ */
@@ -240,7 +244,10 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
             return new VideoRow(video.getId(),
                     module == null ? "Módulo eliminado" : module.getTitle(),
                     course == null ? "Curso eliminado" : course.getTitle(),
-                    video.getTitle(), video.getUrl(), video.getPosition());
+                    video.getTitle(),
+                    StringUtils.trimToNull(video.getUrl()) != null
+                            ? video.getUrl() : video.getObjectKey(),
+                    video.getPosition());
         });
     }
 
@@ -248,13 +255,19 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
     public AdminVideoForm videoForm(UUID id) {
         Video video = videos.findById(id).orElseThrow();
         return new AdminVideoForm(video.getModuleId(), video.getTitle(), video.getUrl(),
-                video.getPosition());
+                video.getPosition(), video.getObjectKey(), video.getSubtitleKey(),
+                video.getDurationSeconds(), video.getTranscript());
     }
 
     @Transactional
     public UUID createVideo(AdminVideoForm form, UUID actor) {
         requireModule(form.moduleId());
-        Video video = new Video(form.moduleId(), form.title().trim(), form.url().trim(), form.position());
+        Video video = new Video(form.moduleId(), form.title().trim(),
+                AdminVideoForm.clean(form.url()), form.position(),
+                AdminVideoForm.clean(form.objectKey()),
+                AdminVideoForm.clean(form.subtitleKey()),
+                form.durationSeconds() == null ? 0 : form.durationSeconds(),
+                AdminVideoForm.clean(form.transcript()));
         videos.save(video);
         audit.record(actor, "CREATE", "VIDEO", video.getId(), form.title().trim());
         log.info("Video creado id={} actor={}", video.getId(), actor);
@@ -265,7 +278,11 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
     public void updateVideo(UUID id, AdminVideoForm form, UUID actor) {
         Video video = videos.findById(id).orElseThrow();
         requireModule(form.moduleId());
-        video.update(form.title().trim(), form.url().trim(), form.position());
+        video.update(form.title().trim(), AdminVideoForm.clean(form.url()), form.position(),
+                AdminVideoForm.clean(form.objectKey()),
+                AdminVideoForm.clean(form.subtitleKey()),
+                form.durationSeconds() == null ? 0 : form.durationSeconds(),
+                AdminVideoForm.clean(form.transcript()));
         video.moveTo(form.moduleId());
         audit.record(actor, "UPDATE", "VIDEO", id, form.title().trim());
         log.info("Video actualizado id={} actor={}", id, actor);
@@ -276,6 +293,9 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
         Video video = videos.findById(id).orElseThrow();
         String title = video.getTitle();
         videos.delete(video);
+        storage.deleteByKey(video.getObjectKey());
+        storage.deleteByKey(video.getSubtitleKey());
+        storage.deleteByUrl(video.getUrl());
         audit.record(actor, "DELETE", "VIDEO", id, title);
         log.info("Video eliminado id={} actor={}", id, actor);
     }

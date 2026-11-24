@@ -29,18 +29,24 @@ public class AdminUploadController {
 
     @PostMapping(value = "/imagenes", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> image(@RequestParam("archivo") MultipartFile file) {
-        return store(() -> storage.storeImage(file));
+        return store(() -> storage.storeImage(file), "url");
     }
 
+    /** El video queda en el bucket privado: se devuelve su clave, no una URL. */
     @PostMapping(value = "/videos", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> video(@RequestParam("archivo") MultipartFile file) {
-        return store(() -> storage.storeVideo(file));
+        return store(() -> storage.storeVideo(file), "key");
     }
 
-    private ResponseEntity<?> store(Supplier<String> upload) {
+    @PostMapping(value = "/subtitulos", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> subtitle(@RequestParam("archivo") MultipartFile file) {
+        return store(() -> storage.storeSubtitle(file), "key");
+    }
+
+    private ResponseEntity<?> store(Supplier<String> upload, String field) {
         try {
             return ResponseEntity.ok(Map.of(
-                    "url", upload.get(),
+                    field, upload.get(),
                     "provider", "r2"
             ));
         } catch (ResponseStatusException exception) {

@@ -140,7 +140,8 @@ public class AdminContentController extends AdminBaseController {
     @GetMapping("/videos/nuevo")
     public String newVideo(Model model) {
         common(model, "videos", "Nuevo video");
-        model.addAttribute("adminVideoForm", new AdminVideoForm(null, "", "", 0));
+        model.addAttribute("adminVideoForm",
+                new AdminVideoForm(null, "", "", 0, null, null, 0, null));
         model.addAttribute("options", catalog.moduleOptions());
         return "admin/video-form";
     }

@@ -5,6 +5,7 @@
         const input = zone.querySelector("[data-upload-file]");
         const status = zone.querySelector("[data-upload-status]");
         const target = document.querySelector(zone.dataset.uploadTarget);
+        const field = zone.dataset.uploadField || "url";
         const csrf = zone.querySelector("[data-upload-csrf]")?.value || "";
         if (!input || !zone.dataset.uploadEndpoint) continue;
 
@@ -26,7 +27,7 @@
                     throw new Error(data.error || "No se pudo subir el archivo.");
                 }
                 if (target) {
-                    target.value = data.url;
+                    target.value = data[field] || "";
                     target.dispatchEvent(new Event("change", { bubbles: true }));
                 }
                 if (status) status.textContent = "Archivo guardado en R2.";

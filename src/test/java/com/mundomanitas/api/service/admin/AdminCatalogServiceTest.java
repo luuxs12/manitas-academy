@@ -2,8 +2,12 @@ package com.mundomanitas.api.service.admin;
 
 import com.mundomanitas.api.dto.admin.AdminCourseForm;
 import com.mundomanitas.api.dto.admin.AdminUserForm;
+import com.mundomanitas.api.dto.admin.AdminVideoForm;
 import com.mundomanitas.api.model.Course;
+import com.mundomanitas.api.model.CourseModule;
 import com.mundomanitas.api.model.User;
+import com.mundomanitas.api.model.Video;
+import com.mundomanitas.api.service.R2StorageService;
 import com.mundomanitas.api.repository.CourseModuleRepository;
 import com.mundomanitas.api.repository.CourseRepository;
 import com.mundomanitas.api.repository.EnrollmentRepository;
@@ -22,6 +26,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -62,12 +67,16 @@ class AdminCatalogServiceTest {
     @Mock
     private AdminFormat format;
 
+    @Mock
+    private R2StorageService storage;
+
     private AdminCatalogService service;
 
     @BeforeEach
     void setUp() {
         service = new AdminCatalogServiceImpl(
-                users, courses, modules, videos, exercises, enrollments, encoder, audit, format);
+                users, courses, modules, videos, exercises, enrollments, encoder, audit, format,
+                storage);
     }
 
     @Test
@@ -132,6 +141,40 @@ class AdminCatalogServiceTest {
 
         verify(courses).delete(course);
         verify(audit).record(actor, "DELETE", "CURSO", id, "Python");
+    }
+
+    @Test
+    @DisplayName("guarda las claves privadas y la duración del video")
+    void createsPrivateVideo() {
+        UUID moduleId = UUID.randomUUID();
+        when(modules.findById(moduleId)).thenReturn(Optional.of(mock(CourseModule.class)));
+        AdminVideoForm form = new AdminVideoForm(moduleId, "Clase 1", null, 1,
+                "videos/clase.mp4", "subtitles/clase.vtt", 300, "Texto de la clase");
+
+        service.createVideo(form, UUID.randomUUID());
+
+        ArgumentCaptor<Video> captor = ArgumentCaptor.forClass(Video.class);
+        verify(videos).save(captor.capture());
+        assertThat(captor.getValue().getObjectKey()).isEqualTo("videos/clase.mp4");
+        assertThat(captor.getValue().getSubtitleKey()).isEqualTo("subtitles/clase.vtt");
+        assertThat(captor.getValue().getDurationSeconds()).isEqualTo(300);
+        assertThat(captor.getValue().getUrl()).isNull();
+    }
+
+    @Test
+    @DisplayName("limpia los objetos privados al eliminar un video")
+    void deletesPrivateVideoObjects() {
+        UUID id = UUID.randomUUID();
+        Video video = new Video(UUID.randomUUID(), "Clase", "https://viejo.example/clase.mp4", 1,
+                "videos/clase.mp4", "subtitles/clase.vtt", 300, null);
+        when(videos.findById(id)).thenReturn(Optional.of(video));
+
+        service.deleteVideo(id, UUID.randomUUID());
+
+        verify(videos).delete(video);
+        verify(storage).deleteByKey("videos/clase.mp4");
+        verify(storage).deleteByKey("subtitles/clase.vtt");
+        verify(storage).deleteByUrl("https://viejo.example/clase.mp4");
     }
 
     private AdminCourseForm form() {

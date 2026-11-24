@@ -14,7 +14,7 @@ import java.util.List;
 @Component
 public class PlainPdfWriter {
 
-    private static final int LINES_PER_PAGE = 44;
+    private static final int LINES_PER_PAGE = 42;
     private static final int PAGE_WIDTH = 595;
     private static final int PAGE_HEIGHT = 842;
 
@@ -86,10 +86,12 @@ public class PlainPdfWriter {
     }
 
     private byte[] content(String title, List<String> lines, int page, int total) {
-        StringBuilder content = new StringBuilder("BT\n/F2 16 Tf\n50 792 Td\n(");
+        StringBuilder content = new StringBuilder("q\n0 1 0 rg\n0 790 "
+                + PAGE_WIDTH + " 52 re f\nQ\n");
+        content.append("BT\n1 1 1 rg\n/F2 16 Tf\n50 808 Td\n(");
         content.append(escape(title));
         if (total > 1) content.append(" - ").append(page).append('/').append(total);
-        content.append(") Tj\n/F1 10 Tf\n0 -34 Td\n");
+        content.append(") Tj\n0 0 0 rg\n/F1 10 Tf\n0 -34 Td\n");
         for (String line : lines) {
             content.append('(').append(escape(line)).append(") Tj\n0 -16 Td\n");
         }

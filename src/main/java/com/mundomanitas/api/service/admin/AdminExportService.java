@@ -19,7 +19,13 @@ import com.mundomanitas.api.repository.ExerciseRepository;
 import com.mundomanitas.api.repository.PaymentRepository;
 import com.mundomanitas.api.repository.UserRepository;
 import com.mundomanitas.api.repository.VideoRepository;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.CellStyle;
+import org.apache.poi.ss.usermodel.FillPatternType;
+import org.apache.poi.ss.usermodel.Font;
+import org.apache.poi.ss.usermodel.IndexedColors;
 import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -82,15 +88,25 @@ public class AdminExportService {
         String name = module == null ? "" : module.toLowerCase();
         String extension = "pdf".equalsIgnoreCase(requestedFormat) ? "pdf"
                 : "xlsx".equalsIgnoreCase(requestedFormat) ? "xlsx" : "csv";
-        List<List<String>> rows = rows(name);
+        List<List<String>> rows = decorated(rows(name), name);
         String file = "mundo-manitas-" + name + "-" + LocalDate.now() + "." + extension;
         return switch (extension) {
             case "xlsx" -> new ExportResult(xlsx(rows), file,
                     "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            case "pdf" -> new ExportResult(pdf.write("Mundo Manitas · " + name, flatten(rows)),
+            case "pdf" -> new ExportResult(
+                    pdf.write("Mundo Manitas · Informe de " + name, flatten(rows)),
                     file, "application/pdf");
             default -> new ExportResult(csv(rows), file, "text/csv; charset=UTF-8");
         };
+    }
+
+    /** Antepone la marca y el nombre del informe sin alterar los datos exportados. */
+    private List<List<String>> decorated(List<List<String>> rows, String module) {
+        List<List<String>> result = new ArrayList<>();
+        result.add(row("Mundo Manitas"));
+        result.add(row("Informe de " + module));
+        result.addAll(rows);
+        return result;
     }
 
     private List<List<String>> rows(String module) {
@@ -217,12 +233,44 @@ public class AdminExportService {
              ByteArrayOutputStream output = new ByteArrayOutputStream()) {
             var sheet = workbook.createSheet("Datos");
             int columnCount = rows.isEmpty() ? 0 : rows.getFirst().size();
+
+            Font brandFont = workbook.createFont();
+            brandFont.setBold(true);
+            brandFont.setColor(IndexedColors.BLACK.getIndex());
+            brandFont.setFontHeightInPoints((short) 16);
+            CellStyle brandStyle = greenStyle(workbook, brandFont);
+
+            Font titleFont = workbook.createFont();
+            titleFont.setBold(true);
+            titleFont.setColor(IndexedColors.BLACK.getIndex());
+            CellStyle titleStyle = workbook.createCellStyle();
+            titleStyle.setFont(titleFont);
+
+            Font headerFont = workbook.createFont();
+            headerFont.setBold(true);
+            headerFont.setColor(IndexedColors.BLACK.getIndex());
+            CellStyle headerStyle = greenStyle(workbook, headerFont);
+
+            Font bodyFont = workbook.createFont();
+            bodyFont.setColor(IndexedColors.BLACK.getIndex());
+            CellStyle bodyStyle = workbook.createCellStyle();
+            bodyStyle.setFont(bodyFont);
+
             for (int index = 0; index < rows.size(); index++) {
                 Row excelRow = sheet.createRow(index);
+                CellStyle style = index == 0 ? brandStyle
+                        : index == 1 ? titleStyle
+                        : index == 2 ? headerStyle : bodyStyle;
                 List<String> values = rows.get(index);
                 for (int column = 0; column < values.size(); column++) {
-                    excelRow.createCell(column).setCellValue(values.get(column));
+                    Cell cell = excelRow.createCell(column);
+                    cell.setCellValue(values.get(column));
+                    cell.setCellStyle(style);
                 }
+            }
+            sheet.createFreezePane(0, 3);
+            if (rows.size() > 2 && columnCount > 0) {
+                sheet.setAutoFilter(new CellRangeAddress(2, rows.size() - 1, 0, columnCount - 1));
             }
             for (int column = 0; column < columnCount; column++) sheet.autoSizeColumn(column);
             workbook.write(output);
@@ -230,6 +278,14 @@ public class AdminExportService {
         } catch (IOException exception) {
             throw new UncheckedIOException(exception);
         }
+    }
+
+    private CellStyle greenStyle(XSSFWorkbook workbook, Font font) {
+        CellStyle style = workbook.createCellStyle();
+        style.setFillPattern(FillPatternType.SOLID_FOREGROUND);
+        style.setFillForegroundColor(IndexedColors.BRIGHT_GREEN.getIndex());
+        style.setFont(font);
+        return style;
     }
 
     private List<String> flatten(List<List<String>> rows) {

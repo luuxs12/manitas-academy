@@ -227,8 +227,9 @@ perfil, cursos y panel de administración:
 | `.syllabus-progress` | porcentaje real del módulo, calculado sobre sus ítems visibles |
 | `.syllabus-section` / `.syllabus-section-title` | agrupación por sección del módulo; los ítems sin sección se muestran bajo “Sin sección” |
 | `fragments/syllabus-item.html` | fila compartida por ítems con sección y sueltos: tipo y estado, título, descripción, duración o “Sin fecha límite” y acciones |
+| `.syllabus-kind` / `.syllabus-kind-title` | rótulo del primer ítem de cada tipo dentro de la sección: “Clase en video”, “Material de estudio” o “Práctica” |
 | `.syllabus-item-top` / `.syllabus-item-type` | primera línea de la fila, con el tipo (VIDEO, MATERIAL o EJERCICIO) y el estado a los extremos |
-| `.syllabus-item-actions` / `.syllabus-mark-form` / `.syllabus-action` | acciones en botones del mismo tamaño: abrir la clase, abrir el material o marcarlo como visto; se apilan bajo 620 px |
+| `.syllabus-item-actions` / `.syllabus-mark-form` / `.syllabus-action` | acciones en botones del mismo tamaño: abrir la clase, abrir el material externo, descargar el documento subido o marcarlo como visto; se apilan bajo 620 px |
 | `.syllabus-description` | texto de apoyo del ítem; se limita a dos líneas y deja el valor completo en `title`, sin reemplazar al título ni inventar fechas |
 | `.syllabus-title` / `.admin-content-copy strong` | títulos que pueden romperse con `overflow-wrap: anywhere` cuando el nombre no tiene espacios |
 | `.player-hint` | región `aria-live="polite"` presente desde el inicio y vacía hasta que YouTube informa por `postMessage` que el video terminó; solo acepta mensajes del iframe y el botón sigue siendo la acción confirmada |
@@ -244,7 +245,7 @@ perfil, cursos y panel de administración:
 | `.panel-cert` / `.panel-cert-code` | certificados vigentes: título real, cantidad real de videos, fecha de emisión y código debajo del texto; “Ver certificado” solo aparece si el certificado existe |
 | `fragments/certificate-document` | documento imprimible compartido por la ficha del alumno y la vista previa del admin: persona, curso, videos, fecha y código emitidos; una sola plantilla para que ambas vistas muestren lo mismo |
 | `.admin-certificate-page` / `.admin-cert-status` | vista previa admin del certificado: distintivo “Vigente” o “Revocado” con `.admin-status`, acciones de volver e imprimir y el documento compartido; disponible también para certificados revocados |
-| `.panel-avatar-current` / `.panel-avatar-preview` | foto actual o iniciales junto al texto de formatos, antes de cualquier control |
+| `.panel-avatar-current` / `.panel-avatar-compact` | foto actual o iniciales en un círculo compacto junto al texto de formatos, antes de cualquier control |
 | `.panel-avatar-editor` / `.panel-avatar-actions` | campo de carga y grupo de acciones “Subir foto” / “Quitar foto”, en ese orden; “Quitar foto” usa `th:formaction` dentro del mismo formulario |
 
 ### Componentes del panel administrativo

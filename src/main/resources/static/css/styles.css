@@ -5800,17 +5800,19 @@ html[data-theme="dark"] .panel-stats li {
     margin-top: .8rem;
 }
 
-.panel-avatar-preview {
-    width: 72px;
-    height: 72px;
+.panel-avatar-compact {
+    width: 48px;
+    height: 48px;
     flex: 0 0 auto;
     border: 1px solid var(--line);
+    border-radius: 50%;
+    overflow: hidden;
 }
 
-.panel-avatar-preview .panel-avatar {
-    width: 72px;
-    height: 72px;
-    font-size: 1.1rem;
+.panel-avatar-compact .panel-avatar {
+    width: 48px;
+    height: 48px;
+    font-size: .9rem;
 }
 
 .panel-account-links {
@@ -7078,6 +7080,23 @@ html[data-theme="dark"] .panel-stats li {
     margin: 0;
     padding: 0;
     list-style: none;
+}
+
+.syllabus-kind {
+    margin-top: .45rem;
+    list-style: none;
+}
+
+.syllabus-kind:first-child { margin-top: 0; }
+
+.syllabus-kind-title {
+    margin: 0 0 .35rem;
+    color: var(--muted, #666);
+    font-family: var(--nav);
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
 }
 
 .syllabus-item {

@@ -30,6 +30,8 @@ import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -156,6 +158,7 @@ public class StudentController {
         model.addAttribute("enrollment", enrollment);
         model.addAttribute("course", enrollment.getCourse());
         model.addAttribute("modules", outline.modules());
+        model.addAttribute("itemHeadings", syllabusHeadings(outline));
         model.addAttribute("doneVideos", doneVideos);
         model.addAttribute("selectedId", player == null ? null : videoId);
         model.addAttribute("player", player);
@@ -308,6 +311,38 @@ public class StudentController {
                 "El curso «" + exception.getCourseTitle() + "» requiere un plan Premium."
         );
         return "redirect:/panel/explorar";
+    }
+
+    /**
+     * Primer ítem de cada tipo dentro de cada sección. La vista lo usa para
+     * rotular "Clase en video", "Material de estudio" y "Práctica" sin
+     * duplicar etiquetas ni perder el orden real del temario.
+     */
+    private Map<UUID, String> syllabusHeadings(CourseContentService.Outline outline) {
+        Map<UUID, String> headings = new LinkedHashMap<>();
+        for (CourseContentService.ModuleView module : outline.modules()) {
+            for (CourseContentService.SectionView section : module.sections()) {
+                markFirstOfEachKind(headings, section.items());
+            }
+            markFirstOfEachKind(headings, module.items());
+        }
+        return headings;
+    }
+
+    private void markFirstOfEachKind(Map<UUID, String> headings,
+                                     List<CourseContentService.ItemView> items) {
+        Set<String> seen = new HashSet<>();
+        for (CourseContentService.ItemView item : items) {
+            String label = switch (item.type()) {
+                case "VIDEO" -> "Clase en video";
+                case "MATERIAL" -> "Material de estudio";
+                case "EJERCICIO" -> "Práctica";
+                default -> null;
+            };
+            if (label != null && seen.add(label)) {
+                headings.put(item.id(), label);
+            }
+        }
     }
 
     /** Slugs con certificado vigente, para no ofrecer links que dan 404. */

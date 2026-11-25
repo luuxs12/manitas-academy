@@ -48,7 +48,7 @@ public class Course {
     @Column(nullable = false)
     private String summary;
 
-    @Column(nullable = false)
+    @Column
     private String image;
 
     @Column(nullable = false)

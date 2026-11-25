@@ -60,7 +60,7 @@
             }
         }
         if (data && data.event === "onStateChange" && data.info === 0) {
-            hint.hidden = false;
+            hint.textContent = "El video terminó. Si lo viste, marcá la clase como vista.";
         }
     });
 })();

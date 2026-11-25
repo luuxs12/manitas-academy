@@ -10,8 +10,10 @@
     <div class="panel-shell">
         <header th:replace="~{admin/fragments/admin-nav :: topbar('Cursos', 'Catálogo, acceso y contenido', ${query})}"></header>
         <main id="panel-main" class="panel-main admin-main">
-            <p class="panel-flash panel-flash--ok" th:if="${panelOk}" th:text="${panelOk}" role="status"></p>
-            <p class="panel-flash panel-flash--error" th:if="${panelError}" th:text="${panelError}" role="alert"></p>
+            <p class="panel-flash panel-flash--ok" th:if="${panelOk}" th:text="${panelOk}"
+               role="status" aria-live="polite"></p>
+            <p class="panel-flash panel-flash--error" th:if="${panelError}" th:text="${panelError}"
+               role="alert" aria-live="assertive"></p>
 
             <div class="admin-page-head">
                 <div><h1>Gestión de cursos</h1><p th:text="${page.totalElements + ' cursos'}">0 cursos</p></div>

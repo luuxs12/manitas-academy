@@ -31,8 +31,10 @@
                 <a class="btn btn-ghost" th:href="@{/panel/cursos}">← Volver a mis cursos</a>
             </div>
 
-            <p class="panel-flash panel-flash--ok" th:if="${panelOk}" th:text="${panelOk}" role="status"></p>
-            <p class="panel-flash panel-flash--error" th:if="${panelError}" th:text="${panelError}" role="alert"></p>
+            <p class="panel-flash panel-flash--ok" th:if="${panelOk}" th:text="${panelOk}"
+               role="status" aria-live="polite"></p>
+            <p class="panel-flash panel-flash--error" th:if="${panelError}" th:text="${panelError}"
+               role="alert" aria-live="assertive"></p>
 
             <div class="course-lesson-layout">
                 <div class="course-stage">
@@ -49,9 +51,7 @@
                         <p class="player-note">
                             Este video se reproduce desde YouTube sin cookies de terceros.
                         </p>
-                        <p class="player-hint" data-video-end-hint hidden role="status">
-                            El video terminó. Si lo viste, marcá la clase como vista.
-                        </p>
+                        <p class="player-hint" data-video-end-hint aria-live="polite"></p>
                         <form class="player-actions"
                               th:action="@{/panel/cursos/{slug}/videos/{videoId}(slug=${enrollment.course.slug},videoId=${selectedId})}"
                               method="post">

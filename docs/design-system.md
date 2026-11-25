@@ -231,7 +231,9 @@ perfil, cursos y panel de administración:
 | `.syllabus-item-actions` / `.syllabus-mark-form` / `.syllabus-action` | acciones en botones del mismo tamaño: abrir la clase, abrir el material o marcarlo como visto; se apilan bajo 620 px |
 | `.syllabus-description` | texto de apoyo del ítem; se limita a dos líneas y deja el valor completo en `title`, sin reemplazar al título ni inventar fechas |
 | `.syllabus-title` / `.admin-content-copy strong` | títulos que pueden romperse con `overflow-wrap: anywhere` cuando el nombre no tiene espacios |
-| `.player-hint` | aviso `role="status"` que aparece si YouTube informa por `postMessage` que el video terminó; solo acepta mensajes del iframe del reproductor y el botón sigue siendo la acción confirmada |
+| `.player-hint` | región `aria-live="polite"` presente desde el inicio y vacía hasta que YouTube informa por `postMessage` que el video terminó; solo acepta mensajes del iframe y el botón sigue siendo la acción confirmada |
+| `.panel-flash` | avisos del panel con `aria-live` explícito: `polite` para el estado y `assertive` para el error, además de su `role` |
+| `.field-hint` / `.field-error` en el perfil | pistas y errores con `id` propio, enlazados al campo con `aria-describedby`; los campos con error también marcan `aria-invalid="true"` |
 | `.panel-avatar-current` / `.panel-avatar-preview` | foto actual o iniciales junto al texto de formatos, antes de cualquier control |
 | `.panel-avatar-editor` / `.panel-avatar-actions` | campo de carga y grupo de acciones “Subir foto” / “Quitar foto”, en ese orden; “Quitar foto” usa `th:formaction` dentro del mismo formulario |
 

@@ -23,8 +23,10 @@
                       th:text="${'Plan ' + currentUser.planLabel()}">Plan gratis</span>
             </div>
 
-            <p class="panel-flash panel-flash--ok" th:if="${panelOk}" th:text="${panelOk}" role="status"></p>
-            <p class="panel-flash panel-flash--error" th:if="${panelError}" th:text="${panelError}" role="alert"></p>
+            <p class="panel-flash panel-flash--ok" th:if="${panelOk}" th:text="${panelOk}"
+               role="status" aria-live="polite"></p>
+            <p class="panel-flash panel-flash--error" th:if="${panelError}" th:text="${panelError}"
+               role="alert" aria-live="assertive"></p>
 
             <ul class="panel-kpis" aria-label="Resumen de la cuenta">
                 <li class="panel-kpi">
@@ -71,8 +73,9 @@
                             <div class="field">
                                 <label for="avatar">Elegir una imagen</label>
                                 <input id="avatar" name="avatar" type="file"
-                                       accept="image/jpeg,image/png,image/webp">
-                                <p class="field-hint">La imagen se guarda solo en tu cuenta.</p>
+                                       accept="image/jpeg,image/png,image/webp"
+                                       aria-describedby="hint-avatar">
+                                <p class="field-hint" id="hint-avatar">La imagen se guarda solo en tu cuenta.</p>
                             </div>
 
                             <div class="panel-avatar-actions">
@@ -96,8 +99,11 @@
                             <label for="fullName">Nombre completo</label>
                             <input id="fullName" type="text" th:field="*{fullName}"
                                    autocomplete="name" maxlength="120"
-                                   th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid' : ''">
-                            <p class="field-error" th:if="${#fields.hasErrors('fullName')}"
+                                   th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid' : ''"
+                                   th:attr="aria-invalid=${#fields.hasErrors('fullName')} ? 'true' : null,
+                                            aria-describedby=${#fields.hasErrors('fullName')} ? 'error-fullName' : null">
+                            <p class="field-error" id="error-fullName"
+                               th:if="${#fields.hasErrors('fullName')}"
                                th:errors="*{fullName}">Revisá este dato.</p>
                         </div>
 
@@ -105,8 +111,11 @@
                             <label for="email">Correo electrónico</label>
                             <input id="email" type="email" th:field="*{email}"
                                    autocomplete="email" maxlength="254"
-                                   th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''">
-                            <p class="field-error" th:if="${#fields.hasErrors('email')}"
+                                   th:classappend="${#fields.hasErrors('email')} ? 'is-invalid' : ''"
+                                   th:attr="aria-invalid=${#fields.hasErrors('email')} ? 'true' : null,
+                                            aria-describedby=${#fields.hasErrors('email')} ? 'error-email' : null">
+                            <p class="field-error" id="error-email"
+                               th:if="${#fields.hasErrors('email')}"
                                th:errors="*{email}">Revisá este dato.</p>
                         </div>
 
@@ -135,8 +144,11 @@
                             <label for="currentPassword">Contraseña actual</label>
                             <input id="currentPassword" name="currentPassword" type="password"
                                    autocomplete="current-password"
-                                   th:classappend="${#fields.hasErrors('currentPassword')} ? 'is-invalid' : ''">
-                            <p class="field-error" th:if="${#fields.hasErrors('currentPassword')}"
+                                   th:classappend="${#fields.hasErrors('currentPassword')} ? 'is-invalid' : ''"
+                                   th:attr="aria-invalid=${#fields.hasErrors('currentPassword')} ? 'true' : null,
+                                            aria-describedby=${#fields.hasErrors('currentPassword')} ? 'error-currentPassword' : null">
+                            <p class="field-error" id="error-currentPassword"
+                               th:if="${#fields.hasErrors('currentPassword')}"
                                th:errors="*{currentPassword}">Revisá este dato.</p>
                         </div>
 
@@ -144,9 +156,12 @@
                             <label for="newPassword">Contraseña nueva</label>
                             <input id="newPassword" name="newPassword" type="password"
                                    autocomplete="new-password"
-                                   th:classappend="${#fields.hasErrors('newPassword')} ? 'is-invalid' : ''">
-                            <p class="field-hint">Entre 8 y 72 caracteres.</p>
-                            <p class="field-error" th:if="${#fields.hasErrors('newPassword')}"
+                                   th:classappend="${#fields.hasErrors('newPassword')} ? 'is-invalid' : ''"
+                                   th:attr="aria-invalid=${#fields.hasErrors('newPassword')} ? 'true' : null,
+                                            aria-describedby=${#fields.hasErrors('newPassword')} ? 'hint-newPassword error-newPassword' : 'hint-newPassword'">
+                            <p class="field-hint" id="hint-newPassword">Entre 8 y 72 caracteres.</p>
+                            <p class="field-error" id="error-newPassword"
+                               th:if="${#fields.hasErrors('newPassword')}"
                                th:errors="*{newPassword}">Revisá este dato.</p>
                         </div>
 
@@ -154,8 +169,11 @@
                             <label for="confirmPassword">Repetí la contraseña nueva</label>
                             <input id="confirmPassword" name="confirmPassword" type="password"
                                    autocomplete="new-password"
-                                   th:classappend="${#fields.hasErrors('confirmPassword')} ? 'is-invalid' : ''">
-                            <p class="field-error" th:if="${#fields.hasErrors('confirmPassword')}"
+                                   th:classappend="${#fields.hasErrors('confirmPassword')} ? 'is-invalid' : ''"
+                                   th:attr="aria-invalid=${#fields.hasErrors('confirmPassword')} ? 'true' : null,
+                                            aria-describedby=${#fields.hasErrors('confirmPassword')} ? 'error-confirmPassword' : null">
+                            <p class="field-error" id="error-confirmPassword"
+                               th:if="${#fields.hasErrors('confirmPassword')}"
                                th:errors="*{confirmPassword}">Revisá este dato.</p>
                         </div>
 

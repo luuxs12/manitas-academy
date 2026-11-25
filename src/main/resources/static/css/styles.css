@@ -7087,6 +7087,9 @@ html[data-theme="dark"] .panel-stats li {
     font-size: .82rem;
 }
 
+/* La región vive en el DOM desde el inicio; solo se pinta cuando tiene texto. */
+.player-hint:empty { display: none; }
+
 @media (max-width: 620px) {
     .syllabus-item-actions { align-items: stretch; flex-direction: column; }
     .syllabus-mark-form,

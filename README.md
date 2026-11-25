@@ -13,7 +13,7 @@ Aprendé a tu ritmo, con intérprete y subtítulos en cada clase.
 ![Thymeleaf](https://img.shields.io/badge/Thymeleaf-3-0d0d0d)
 ![PostgreSQL 18](https://img.shields.io/badge/PostgreSQL-18-0d0d0d)
 ![Flyway](https://img.shields.io/badge/Flyway-migraciones-0d0d0d)
-![Tests](https://img.shields.io/badge/tests-198_en_verde-00a63e)
+![Tests](https://img.shields.io/badge/tests-201_en_verde-00a63e)
 
 </div>
 
@@ -106,7 +106,7 @@ mantiene al navegar entre la portada, las páginas internas y el panel.
 | Base de datos | PostgreSQL 18 |
 | Migraciones | Flyway (`ddl-auto: validate`) |
 | Build | Maven con wrapper incluido |
-| Pruebas | JUnit 5 + AssertJ + Mockito (198 pruebas) |
+| Pruebas | JUnit 5 + AssertJ + Mockito (201 pruebas) |
 | Métricas | Spring Boot Actuator + Micrometer/Prometheus |
 
 ## Requisitos
@@ -185,7 +185,7 @@ Compilar y probar:
 
 ```powershell
 .\mvnw.cmd clean package      # jar en target\api-0.0.1-SNAPSHOT.jar
-.\mvnw.cmd test               # 198 pruebas
+.\mvnw.cmd test               # 201 pruebas
 java -jar target\api-0.0.1-SNAPSHOT.jar
 ```
 
@@ -364,13 +364,14 @@ no aparezca un destello blanco. Los tokens y las reglas están en
 | `CourseContentServiceTest`, `CourseContentDatabaseTest` | Temario estructurado, edición, orden, borrado, sílabo y progreso sin perder datos |
 | `AdminCourseStructureFlowTest`, `AdminContentTemplateTest` | Rutas del panel de contenido y render con datos reales de PostgreSQL |
 | `AdminDesignViewTest` | Jerarquía y espaciado del temario admin y del listado de cursos |
+| `AccessibilityViewTest` | Avisos con `aria-live`, ayuda y errores enlazados en el perfil, y región viva del fin de video |
 | `StudentContentFlowTest`, `StudentCourseViewTest`, `StudentCourseTemplateTest` | Vista del alumno, avance por ítem y render contra la matrícula real |
 | `PasswordResetServiceTest` | Hash del token, vencimiento, un solo uso y correo |
 | `RequestIdFilterTest` | `X-Request-Id`, validación y limpieza del MDC |
 | `ActuatorSecurityTest`, `BusinessMetricsTest` | Acceso a Actuator y contadores `mundomanitas_*` |
 | `R2HealthIndicatorTest`, `PaymentHealthIndicatorTest` | Estado de R2 y de la pasarela |
 
-Resultado actual: **198 de 198 en verde**. El detalle de monitoreo está en
+Resultado actual: **201 de 201 en verde**. El detalle de monitoreo está en
 [`docs/plan-de-monitoreo.md`](docs/plan-de-monitoreo.md).
 
 ## Estado

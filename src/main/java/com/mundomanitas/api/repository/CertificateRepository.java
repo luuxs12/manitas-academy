@@ -75,4 +75,32 @@ public interface CertificateRepository extends JpaRepository<Certificate, UUID> 
 
         int getVideoCount();
     }
+
+    /** Vista previa del admin: incluye revocados y trae los datos reales de persona y curso. */
+    @Query("""
+            select c.id as certificateId, c.code as code, c.issuedAt as issuedAt,
+                   u.fullName as person, co.title as courseTitle,
+                   (select count(v) from Video v, CourseModule m
+                     where v.moduleId = m.id and m.courseId = co.id) as videoCount,
+                   case when c.revokedAt is null then true else false end as active
+            from Certificate c, User u, Course co
+            where c.id = :id and c.userId = u.id and c.courseId = co.id
+            """)
+    Optional<PreviewRow> findPreviewById(@Param("id") UUID id);
+
+    interface PreviewRow {
+        UUID getCertificateId();
+
+        String getCode();
+
+        OffsetDateTime getIssuedAt();
+
+        String getPerson();
+
+        String getCourseTitle();
+
+        int getVideoCount();
+
+        boolean isActive();
+    }
 }

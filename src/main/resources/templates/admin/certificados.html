@@ -72,10 +72,12 @@
                         <td><span class="admin-status" th:classappend="${item.active()} ? ' is-ok' : ' is-bad'"
                                   th:text="${item.active()} ? 'Vigente' : 'Revocado'">Vigente</span></td>
                         <td class="admin-row-actions">
+                            <a class="admin-confirm-link"
+                               th:href="@{/admin/certificados/{id}/ver(id=${item.id()})}"
+                               th:attr="aria-label='Ver certificado ' + ${item.code()}">Ver</a>
                             <a th:if="${item.active()}" class="admin-confirm-link"
                                th:href="@{/admin/certificados/{id}/revocar(id=${item.id()}, code=${item.code()})}"
                                th:attr="aria-label='Revocar ' + ${item.code()}">Revocar</a>
-                            <span th:unless="${item.active()}" class="admin-muted">Sin acciones</span>
                         </td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(page.content)}"><td colspan="6" class="admin-empty">Todavía no se emitieron certificados.</td></tr>

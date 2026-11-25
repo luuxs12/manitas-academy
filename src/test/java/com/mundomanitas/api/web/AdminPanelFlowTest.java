@@ -27,6 +27,7 @@ import com.mundomanitas.api.service.MailService;
 import com.mundomanitas.api.service.PaymentService;
 import com.mundomanitas.api.service.admin.AdminAuditService;
 import com.mundomanitas.api.service.admin.AdminCatalogService;
+import com.mundomanitas.api.service.admin.AdminCertificatePreviewService;
 import com.mundomanitas.api.service.admin.AdminCertificateService;
 import com.mundomanitas.api.service.admin.AdminDashboardService;
 import com.mundomanitas.api.service.admin.AdminExportService;
@@ -50,8 +51,10 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -86,6 +89,7 @@ class AdminPanelFlowTest {
     private MailService mail;
     private PaymentService payments;
     private AdminCertificateService certificates;
+    private AdminCertificatePreviewService preview;
     private AdminAuditService audit;
     private AdminExportService exporter;
     private MockMvc mvc;
@@ -113,6 +117,7 @@ class AdminPanelFlowTest {
         mail = mock(MailService.class);
         payments = mock(PaymentService.class);
         certificates = mock(AdminCertificateService.class);
+        preview = mock(AdminCertificatePreviewService.class);
         audit = mock(AdminAuditService.class);
         exporter = mock(AdminExportService.class);
 
@@ -127,7 +132,7 @@ class AdminPanelFlowTest {
                         new AdminCourseController(notifications, catalog, covers),
                         new AdminContentController(notifications, catalog),
                         new AdminUserController(notifications, catalog),
-                        new AdminCertificateController(notifications, certificates, catalog),
+                        new AdminCertificateController(notifications, certificates, catalog, preview),
                         new AdminAuditController(notifications, audit),
                         new AdminReportController(notifications, dashboard),
                         new AdminExportController(exporter),
@@ -599,6 +604,35 @@ class AdminPanelFlowTest {
         assertThat(security).contains(".csrf(csrf ->");
         assertThat(security).contains("ignoringRequestMatchers(\"/pagos/stripe/webhook\")");
         assertThat(security).doesNotContain("csrf(AbstractHttpConfigurer::disable)");
+    }
+
+    @Test
+    @DisplayName("el admin abre la vista previa del certificado por su id real")
+    void opensCertificatePreview() throws Exception {
+        UUID id = UUID.randomUUID();
+        AdminCertificatePreviewService.Preview view = new AdminCertificatePreviewService.Preview(
+                id, "MM-RED-ABCD1234", OffsetDateTime.parse("2026-11-20T10:15:00Z"),
+                "Ana Quispe", "Redes", 3, true);
+        when(preview.preview(id)).thenReturn(Optional.of(view));
+
+        mvc.perform(get("/admin/certificados/{id}/ver", id))
+                .andExpect(status().isOk())
+                .andExpect(view().name("admin/certificado"))
+                .andExpect(model().attribute("preview", view))
+                .andExpect(model().attribute("active", "certificados"))
+                .andExpect(model().attribute("title", "Certificado"));
+
+        verify(preview).preview(id);
+    }
+
+    @Test
+    @DisplayName("un certificado que no existe no abre vista previa")
+    void missingCertificatePreviewIsNotFound() throws Exception {
+        UUID id = UUID.randomUUID();
+        when(preview.preview(id)).thenReturn(Optional.empty());
+
+        mvc.perform(get("/admin/certificados/{id}/ver", id))
+                .andExpect(status().isNotFound());
     }
 
     private ActivityChart activityChart(int days) {

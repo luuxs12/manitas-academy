@@ -3,12 +3,14 @@ package com.mundomanitas.api.controller.admin;
 import com.mundomanitas.api.dto.admin.AdminCertificateForm;
 import com.mundomanitas.api.security.AuthenticatedUser;
 import com.mundomanitas.api.service.admin.AdminCatalogService;
+import com.mundomanitas.api.service.admin.AdminCertificatePreviewService;
 import com.mundomanitas.api.service.admin.AdminCertificateService;
 import com.mundomanitas.api.service.admin.AdminNotificationService;
 import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.List;
@@ -29,14 +32,17 @@ import java.util.UUID;
 public class AdminCertificateController extends AdminBaseController {
 
     private final AdminCertificateService certificates;
+    private final AdminCertificatePreviewService preview;
     private final AdminCatalogService catalog;
 
     public AdminCertificateController(AdminNotificationService notifications,
                                       AdminCertificateService certificates,
-                                      AdminCatalogService catalog) {
+                                      AdminCatalogService catalog,
+                                      AdminCertificatePreviewService preview) {
         super(notifications);
         this.certificates = certificates;
         this.catalog = catalog;
+        this.preview = preview;
     }
 
     @GetMapping
@@ -79,6 +85,16 @@ public class AdminCertificateController extends AdminBaseController {
             redirect.addFlashAttribute("panelError", exception.getMessage());
         }
         return "redirect:/admin/certificados";
+    }
+
+    @GetMapping("/{id}/ver")
+    public String view(@PathVariable UUID id, Model model) {
+        AdminCertificatePreviewService.Preview certificate = preview.preview(id)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "No existe ese certificado."));
+        common(model, "certificados", "Certificado");
+        model.addAttribute("preview", certificate);
+        return "admin/certificado";
     }
 
     @GetMapping("/{id}/revocar")

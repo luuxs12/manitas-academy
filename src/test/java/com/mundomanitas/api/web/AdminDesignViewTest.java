@@ -66,6 +66,38 @@ class AdminDesignViewTest {
                 .contains(".admin-page-head > div {");
     }
 
+    @Test
+    @DisplayName("el admin puede ver el certificado con el mismo documento que ve el alumno")
+    void adminCanPreviewTheCertificate() throws IOException {
+        String list = read("templates/admin/certificados.html");
+        String adminDetail = read("templates/admin/certificado.html");
+        String studentDetail = read("templates/student/certificado.html");
+        String document = read(Path.of("src", "main", "resources", "templates",
+                "fragments", "certificate-document.html"));
+        String css = read("static/css/styles.css");
+
+        assertThat(list).contains("@{/admin/certificados/{id}/ver(id=${item.id()})}")
+                .contains("aria-label='Ver certificado ' + ${item.code()}");
+
+        assertThat(adminDetail).contains("~{fragments/certificate-document :: document(")
+                .contains("admin-certificate-page")
+                .contains("admin-cert-status")
+                .doesNotContain("<article id=\"certificado\"");
+        assertThat(studentDetail).contains("~{fragments/certificate-document :: document(")
+                .doesNotContain("<article id=\"certificado\"");
+
+        assertThat(document)
+                .contains("th:fragment=\"document(person, courseTitle, videoCount, issuedAt, code)\"")
+                .contains("<article id=\"certificado\" class=\"certificate\"")
+                .contains("th:text=\"${person}\"")
+                .contains("th:text=\"${courseTitle}\"")
+                .contains("th:text=\"${videoCount} + ' videos'\"")
+                .contains("th:text=\"${#temporals.format(issuedAt, 'dd MMMM yyyy')}\"")
+                .contains("th:text=\"${code}\"");
+        assertThat(css).contains(".admin-certificate-page {")
+                .contains(".admin-cert-status {");
+    }
+
     private static int indexOf(String text, String needle) {
         int position = text.indexOf(needle);
         assertThat(position).as("fragmento %s", needle).isNotNegative();

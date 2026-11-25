@@ -5482,6 +5482,9 @@ html[data-theme="dark"] .panel-stats li {
 
 .certificate-code { font-family: monospace; }
 
+.admin-certificate-page { max-width: 960px; margin: 0 auto; }
+.admin-cert-status { margin: 0 0 1rem; }
+
 @media (max-width: 900px) {
     .panel-cert-grid,
     .panel-profile-grid,

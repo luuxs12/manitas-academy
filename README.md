@@ -13,7 +13,7 @@ Aprendé a tu ritmo, con intérprete y subtítulos en cada clase.
 ![Thymeleaf](https://img.shields.io/badge/Thymeleaf-3-0d0d0d)
 ![PostgreSQL 18](https://img.shields.io/badge/PostgreSQL-18-0d0d0d)
 ![Flyway](https://img.shields.io/badge/Flyway-migraciones-0d0d0d)
-![Tests](https://img.shields.io/badge/tests-220_en_verde-00a63e)
+![Tests](https://img.shields.io/badge/tests-229_en_verde-00a63e)
 
 </div>
 
@@ -106,7 +106,7 @@ mantiene al navegar entre la portada, las páginas internas y el panel.
 | Base de datos | PostgreSQL 18 |
 | Migraciones | Flyway (`ddl-auto: validate`) |
 | Build | Maven con wrapper incluido |
-| Pruebas | JUnit 5 + AssertJ + Mockito (220 pruebas) |
+| Pruebas | JUnit 5 + AssertJ + Mockito (229 pruebas) |
 | Métricas | Spring Boot Actuator + Micrometer/Prometheus |
 
 ## Requisitos
@@ -185,7 +185,7 @@ Compilar y probar:
 
 ```powershell
 .\mvnw.cmd clean package      # jar en target\api-0.0.1-SNAPSHOT.jar
-.\mvnw.cmd test               # 220 pruebas
+.\mvnw.cmd test               # 229 pruebas
 java -jar target\api-0.0.1-SNAPSHOT.jar
 ```
 
@@ -371,12 +371,15 @@ no aparezca un destello blanco. Los tokens y las reglas están en
 | `DashboardPerformanceTest` | Avance del panel en consultas constantes, medido con estadísticas de Hibernate contra PostgreSQL |
 | `StudentCertificateServiceTest`, `StudentCertificateDatabaseTest` | Certificados vigentes reales, código emitido y respeto de revocaciones |
 | `StudentCertificateViewTest` | Diseño del listado y la ficha de certificados, con enlaces solo a certificados existentes |
+| `AdminCertificatePreviewServiceTest`, `AdminCertificatePreviewDatabaseTest` | Vista previa admin con datos reales de persona, curso y videos, incluidos los revocados |
+| `AdminPanelFlowTest`, `AdminDesignViewTest` | Apertura de la vista previa por id, documento compartido entre alumno y admin |
+| `CertificateTemplateTest` | Render real del documento compartido para la vista previa admin y la ficha del alumno |
 | `PasswordResetServiceTest` | Hash del token, vencimiento, un solo uso y correo |
 | `RequestIdFilterTest` | `X-Request-Id`, validación y limpieza del MDC |
 | `ActuatorSecurityTest`, `BusinessMetricsTest` | Acceso a Actuator y contadores `mundomanitas_*` |
 | `R2HealthIndicatorTest`, `PaymentHealthIndicatorTest` | Estado de R2 y de la pasarela |
 
-Resultado actual: **220 de 220 en verde**. El detalle de monitoreo está en
+Resultado actual: **229 de 229 en verde**. El detalle de monitoreo está en
 [`docs/plan-de-monitoreo.md`](docs/plan-de-monitoreo.md).
 
 ## Estado

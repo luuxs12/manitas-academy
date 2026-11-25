@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{admin/fragments/admin-head :: adminHead('Certificado')}"></head>
+
+<body class="panel-body admin-body">
+<a class="skip-link" href="#panel-main">Saltar al contenido</a>
+
+<div class="panel admin">
+    <aside th:replace="~{admin/fragments/admin-nav :: sidebar('certificados')}"></aside>
+    <div class="panel-shell">
+        <header th:replace="~{admin/fragments/admin-nav :: topbar('Certificado', 'Vista previa del certificado', '')}"></header>
+
+        <main id="panel-main" class="panel-main admin-main">
+            <div class="admin-certificate-page">
+                <p class="admin-status admin-cert-status" role="status"
+                   th:classappend="${preview.active()} ? ' is-ok' : ' is-bad'"
+                   th:text="${preview.active()} ? 'Vigente' : 'Revocado'">Vigente</p>
+
+                <nav class="certificate-actions" aria-label="Acciones del certificado">
+                    <a th:href="@{/admin/certificados}">← Volver a certificados</a>
+                    <button type="button" class="btn btn-dark" data-print>Imprimir o guardar en PDF</button>
+                </nav>
+
+                <div th:replace="~{fragments/certificate-document :: document(${preview.person()}, ${preview.courseTitle()}, ${preview.videoCount()}, ${preview.issuedAt()}, ${preview.code()})}"></div>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script defer th:src="@{/js/panel.js}"></script>
+<script defer th:src="@{/js/admin.js}"></script>
+</body>
+</html>

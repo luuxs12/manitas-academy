@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- Documento imprimible compartido: el alumno y el admin ven exactamente lo mismo. -->
+<article id="certificado" class="certificate"
+         th:fragment="document(person, courseTitle, videoCount, issuedAt, code)">
+    <header class="certificate-head">
+        <img th:src="@{/img/brand/logo-claro.png}" alt="Mundo Manitas" width="143" height="48">
+        <p class="certificate-kicker">Mundo Manitas · Formación en Lengua de Señas Peruana</p>
+    </header>
+
+    <p class="certificate-label">Certificado de finalización</p>
+    <h1 th:text="${person}"></h1>
+    <p class="certificate-text">Completó con éxito el curso</p>
+    <h2 th:text="${courseTitle}"></h2>
+
+    <p class="certificate-detail">
+        <span th:text="${videoCount} + ' videos'"></span>
+        <span aria-hidden="true">·</span>
+        <span th:text="${#temporals.format(issuedAt, 'dd MMMM yyyy')}"></span>
+    </p>
+
+    <footer class="certificate-foot">
+        <span>Emitido por Mundo Manitas</span>
+        <span class="certificate-code" th:text="${code}"></span>
+    </footer>
+</article>
+
+</body>
+</html>

@@ -51,6 +51,12 @@ public class Course {
     @Column
     private String image;
 
+    @Column
+    private String objectives;
+
+    @Column
+    private String requirements;
+
     @Column(nullable = false)
     private int position;
 
@@ -135,6 +141,20 @@ public class Course {
 
     public String getImage() {
         return image;
+    }
+
+    public String getObjectives() {
+        return objectives;
+    }
+
+    public String getRequirements() {
+        return requirements;
+    }
+
+    /** Datos del sílabo cargados desde el panel administrativo. */
+    public void updateSyllabus(String objectives, String requirements) {
+        this.objectives = objectives;
+        this.requirements = requirements;
     }
 
     /** Cambia la portada sin reescribir el resto de la ficha. */

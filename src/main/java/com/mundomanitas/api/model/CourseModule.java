@@ -28,6 +28,9 @@ public class CourseModule {
     @Column(nullable = false)
     private int position;
 
+    @Column(nullable = false)
+    private boolean visible = true;
+
     @Column(name = "created_at", insertable = false, updatable = false)
     private OffsetDateTime createdAt;
 
@@ -54,6 +57,14 @@ public class CourseModule {
 
     public int getPosition() {
         return position;
+    }
+
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
     }
 
     public OffsetDateTime getCreatedAt() {

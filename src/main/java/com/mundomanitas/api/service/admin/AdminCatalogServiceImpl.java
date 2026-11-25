@@ -406,6 +406,7 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
         Video video = new Video(form.moduleId(), requireText(form.title(), "título"),
                 youtubeId(form.youtubeUrl()), form.position());
         videos.save(video);
+        videos.flush();
         refreshLessons(video.getModuleId());
         audit.record(actor, "CREATE", "VIDEO", video.getId(), form.title().trim());
         log.info("Video creado id={} actor={} youtube={}", video.getId(), actor,
@@ -495,6 +496,7 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
         Exercise exercise = new Exercise(form.moduleId(), form.title().trim(),
                 form.prompt().trim(), form.position());
         exercises.save(exercise);
+        exercises.flush();
         audit.record(actor, "CREATE", "EJERCICIO", exercise.getId(), form.title().trim());
         log.info("Ejercicio creado id={} actor={}", exercise.getId(), actor);
         return exercise.getId();

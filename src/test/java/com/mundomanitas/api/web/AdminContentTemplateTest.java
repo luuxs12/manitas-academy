@@ -97,6 +97,8 @@ class AdminContentTemplateTest {
                 .andExpect(content().string(containsString("Módulo")))
                 .andExpect(content().string(containsString("Nueva sección")))
                 .andExpect(content().string(containsString("Nuevo ítem")))
+                .andExpect(content().string(containsString("Nuevo documento")))
+                .andExpect(content().string(containsString("type=\"file\"")))
                 .andExpect(content().string(containsString("Sílabo")))
                 .andExpect(content().string(containsString("Saltar al contenido")));
     }

@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -80,7 +81,7 @@ class StudentCourseTemplateTest {
     }
 
     @Test
-    @DisplayName("muestra el módulo, el ítem suelto y sus acciones con datos reales")
+    @DisplayName("muestra las tres sesiones reales, sus temas y prácticas con datos de PostgreSQL")
     void rendersEnrolledCourse() throws Exception {
         mvc.perform(get("/panel/cursos/{slug}", "redes"))
                 .andExpect(status().isOk())
@@ -88,11 +89,18 @@ class StudentCourseTemplateTest {
                 .andExpect(content().string(containsString("Temario")))
                 .andExpect(content().string(containsString("Módulo")))
                 .andExpect(content().string(containsString("Sesion 01")))
-                .andExpect(content().string(containsString("Sin sección")))
+                .andExpect(content().string(containsString("Sesion 02")))
+                .andExpect(content().string(containsString("Sesion 03")))
+                .andExpect(content().string(containsString("Temas de la sesion")))
+                .andExpect(content().string(containsString("Tema 01")))
+                .andExpect(content().string(containsString("Practica 01")))
+                .andExpect(content().string(containsString("MATERIAL")))
+                .andExpect(content().string(containsString("VIDEO")))
                 .andExpect(content().string(containsString("EJERCICIO")))
-                .andExpect(content().string(containsString("Redes Neuronales")))
-                .andExpect(content().string(containsString("Sin fecha límite")))
+                .andExpect(content().string(containsString("0 de 7 ítems terminados")))
                 .andExpect(content().string(containsString("Marcar como visto")))
-                .andExpect(content().string(containsString("Saltar al contenido")));
+                .andExpect(content().string(containsString("Saltar al contenido")))
+                .andExpect(content().string(not(containsString("Sin sección"))))
+                .andExpect(content().string(not(containsString("Redes Neuronales"))));
     }
 }

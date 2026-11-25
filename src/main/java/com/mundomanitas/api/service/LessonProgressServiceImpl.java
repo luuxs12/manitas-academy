@@ -1,9 +1,11 @@
 package com.mundomanitas.api.service;
 
 import com.google.common.collect.ImmutableSet;
+import com.mundomanitas.api.model.ContentItem;
 import com.mundomanitas.api.model.Enrollment;
 import com.mundomanitas.api.model.LessonProgress;
 import com.mundomanitas.api.model.User;
+import com.mundomanitas.api.repository.ContentItemRepository;
 import com.mundomanitas.api.repository.EnrollmentRepository;
 import com.mundomanitas.api.repository.LessonProgressRepository;
 import com.mundomanitas.api.repository.VideoRepository;
@@ -36,15 +38,18 @@ public class LessonProgressServiceImpl implements LessonProgressService {
     private final LessonProgressRepository progress;
     private final EnrollmentRepository enrollments;
     private final VideoRepository videos;
+    private final ContentItemRepository items;
 
     public LessonProgressServiceImpl(
             LessonProgressRepository progress,
             EnrollmentRepository enrollments,
-            VideoRepository videos
+            VideoRepository videos,
+            ContentItemRepository items
     ) {
         this.progress = progress;
         this.enrollments = enrollments;
         this.videos = videos;
+        this.items = items;
     }
 
     @Override
@@ -87,6 +92,11 @@ public class LessonProgressServiceImpl implements LessonProgressService {
                 || !videos.existsInCourse(videoId, courseId)) {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "El video no pertenece a este curso");
+        }
+        ContentItem source = items.findBySourceTypeAndSourceId("VIDEO", videoId);
+        if (source != null && !source.isVisible()) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "El video no está disponible");
         }
         int total = videos.countByCourseId(courseId);
         if (total == 0) {

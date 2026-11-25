@@ -99,6 +99,7 @@ public class CourseContentServiceImpl implements CourseContentService {
         List<ModuleView> moduleViews = new ArrayList<>();
         List<ItemView> orderedItems = new ArrayList<>();
         for (CourseModule module : modules.findByCourseIdOrderByPositionAsc(courseId)) {
+            if (!includeHidden && !module.isVisible()) continue;
             List<CourseSection> moduleSections = sections.findByModuleIdOrderByPositionAsc(module.getId())
                     .stream().filter(section -> includeHidden || section.isVisible()).toList();
             Set<UUID> visibleSections = moduleSections.stream()
@@ -165,6 +166,9 @@ public class CourseContentServiceImpl implements CourseContentService {
         }
         ContentItem item = items.findById(itemId)
                 .orElseThrow(() -> missing("El ítem no existe"));
+        if (!item.isVisible()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "El ítem no está disponible");
+        }
         CourseModule module = modules.findById(item.getModuleId())
                 .orElseThrow(() -> missing("El módulo no existe"));
         if (!course.getId().equals(module.getCourseId())) {

@@ -1,9 +1,11 @@
 package com.mundomanitas.api.service;
 
+import com.mundomanitas.api.model.ContentItem;
 import com.mundomanitas.api.model.Course;
 import com.mundomanitas.api.model.CourseModule;
 import com.mundomanitas.api.model.Enrollment;
 import com.mundomanitas.api.model.Video;
+import com.mundomanitas.api.repository.ContentItemRepository;
 import com.mundomanitas.api.repository.CourseModuleRepository;
 import com.mundomanitas.api.repository.VideoRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -30,6 +32,7 @@ class VideoPlaybackServiceTest {
 
     @Mock private VideoRepository videos;
     @Mock private CourseModuleRepository modules;
+    @Mock private ContentItemRepository items;
 
     private VideoPlaybackService service;
     private UUID videoId;
@@ -38,7 +41,7 @@ class VideoPlaybackServiceTest {
 
     @BeforeEach
     void setUp() {
-        service = new VideoPlaybackService(videos, modules);
+        service = new VideoPlaybackService(videos, modules, items);
         videoId = UUID.randomUUID();
         courseId = UUID.randomUUID();
         Course course = mock(Course.class);
@@ -66,6 +69,20 @@ class VideoPlaybackServiceTest {
         Video video = new Video(UUID.randomUUID(), "Clase 1", null, 1);
         when(videos.findById(videoId)).thenReturn(Optional.of(video));
         when(videos.existsInCourse(videoId, courseId)).thenReturn(true);
+
+        assertThatThrownBy(() -> service.play(videoId, enrollment))
+                .isInstanceOf(ResponseStatusException.class);
+    }
+
+    @Test
+    @DisplayName("no reproduce un video cuyo ítem está oculto")
+    void hiddenVideoIsNotPlayable() {
+        Video video = new Video(UUID.randomUUID(), "Clase oculta", "dQw4w9WgXcQ", 1);
+        ContentItem hidden = new ContentItem(UUID.randomUUID(), null, "VIDEO", videoId,
+                "Clase oculta", "Borrador", null, "dQw4w9WgXcQ", 600, 0, false);
+        when(videos.findById(videoId)).thenReturn(Optional.of(video));
+        when(videos.existsInCourse(videoId, courseId)).thenReturn(true);
+        when(items.findBySourceTypeAndSourceId("VIDEO", videoId)).thenReturn(hidden);
 
         assertThatThrownBy(() -> service.play(videoId, enrollment))
                 .isInstanceOf(ResponseStatusException.class);

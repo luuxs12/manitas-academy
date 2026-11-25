@@ -1,10 +1,12 @@
 package com.mundomanitas.api.service;
 
+import com.mundomanitas.api.model.ContentItem;
 import com.mundomanitas.api.model.Course;
 import com.mundomanitas.api.model.Enrollment;
 import com.mundomanitas.api.model.LessonProgress;
 import com.mundomanitas.api.model.User;
 import com.mundomanitas.api.model.Video;
+import com.mundomanitas.api.repository.ContentItemRepository;
 import com.mundomanitas.api.repository.EnrollmentRepository;
 import com.mundomanitas.api.repository.LessonProgressRepository;
 import com.mundomanitas.api.repository.VideoRepository;
@@ -45,6 +47,9 @@ class LessonProgressServiceTest {
     private VideoRepository videos;
 
     @Mock
+    private ContentItemRepository items;
+
+    @Mock
     private User user;
 
     @Mock
@@ -59,7 +64,7 @@ class LessonProgressServiceTest {
 
     @BeforeEach
     void setUp() {
-        service = new LessonProgressServiceImpl(progress, enrollments, videos);
+        service = new LessonProgressServiceImpl(progress, enrollments, videos, items);
         courseId = UUID.randomUUID();
         videoId = UUID.randomUUID();
         lenient().when(course.getId()).thenReturn(courseId);
@@ -81,6 +86,24 @@ class LessonProgressServiceTest {
         assertThat(service.toggle(user, "python", videoId)).isTrue();
 
         verify(progress).save(any(LessonProgress.class));
+    }
+
+    @Test
+    @DisplayName("no guarda avance de un video oculto")
+    void hiddenVideoCannotBeToggled() {
+        ContentItem hidden = new ContentItem(UUID.randomUUID(), null, "VIDEO", videoId,
+                "Clase oculta", "Borrador", null, "dQw4w9WgXcQ", 600, 0, false);
+        when(enrollments.findByUserAndCourseSlug(user, "python")).thenReturn(Optional.of(enrollment));
+        when(enrollment.getCourse()).thenReturn(course);
+        when(videos.findById(videoId)).thenReturn(Optional.of(mock(Video.class)));
+        when(videos.existsInCourse(videoId, courseId)).thenReturn(true);
+        when(items.findBySourceTypeAndSourceId("VIDEO", videoId)).thenReturn(hidden);
+
+        assertThatThrownBy(() -> service.toggle(user, "python", videoId))
+                .isInstanceOf(ResponseStatusException.class)
+                .extracting("statusCode").isEqualTo(HttpStatus.NOT_FOUND);
+
+        verify(progress, never()).save(any(LessonProgress.class));
     }
 
     @Test

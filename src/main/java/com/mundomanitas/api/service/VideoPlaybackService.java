@@ -1,8 +1,10 @@
 package com.mundomanitas.api.service;
 
+import com.mundomanitas.api.model.ContentItem;
 import com.mundomanitas.api.model.CourseModule;
 import com.mundomanitas.api.model.Enrollment;
 import com.mundomanitas.api.model.Video;
+import com.mundomanitas.api.repository.ContentItemRepository;
 import com.mundomanitas.api.repository.CourseModuleRepository;
 import com.mundomanitas.api.repository.VideoRepository;
 import org.springframework.http.HttpStatus;
@@ -20,10 +22,13 @@ public class VideoPlaybackService {
 
     private final VideoRepository videos;
     private final CourseModuleRepository modules;
+    private final ContentItemRepository items;
 
-    public VideoPlaybackService(VideoRepository videos, CourseModuleRepository modules) {
+    public VideoPlaybackService(VideoRepository videos, CourseModuleRepository modules,
+                                ContentItemRepository items) {
         this.videos = videos;
         this.modules = modules;
+        this.items = items;
     }
 
     /** Dirección de incrustación construida en el servidor desde el ID guardado. */
@@ -45,6 +50,11 @@ public class VideoPlaybackService {
         if (!videos.existsInCourse(videoId, enrollment.getCourse().getId())) {
             throw new ResponseStatusException(
                     HttpStatus.NOT_FOUND, "El video no pertenece a este curso");
+        }
+        ContentItem source = items.findBySourceTypeAndSourceId("VIDEO", videoId);
+        if (source != null && !source.isVisible()) {
+            throw new ResponseStatusException(
+                    HttpStatus.NOT_FOUND, "La clase no está disponible");
         }
         String url = YouTubeLink.embedUrl(video.getYoutubeId());
         if (url == null) {

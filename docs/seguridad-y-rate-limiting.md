@@ -13,6 +13,11 @@
 - **Webhook de Stripe:** es público porque Stripe no puede enviar el token CSRF,
   pero exige la firma `Stripe-Signature` calculada sobre el cuerpo crudo. Sin
   firma válida responde `400` y no toca el plan de nadie.
+- **Contenido oculto:** los módulos, secciones, ítems y videos marcados como no
+  visibles no aparecen en el temario del alumno. Tampoco se pueden marcar como
+  vistos ni reproducir aunque se conozca su identificador: los tres servicios
+  (`CourseContentService`, `VideoPlaybackService` y `LessonProgressService`)
+  devuelven `404`. La vista previa de administración sí los incluye.
 
 ## Límite de intentos
 

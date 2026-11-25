@@ -1,6 +1,7 @@
 package com.mundomanitas.api.controller.admin;
 
 import com.mundomanitas.api.dto.admin.AdminCourseForm;
+import com.mundomanitas.api.dto.admin.AdminDocumentForm;
 import com.mundomanitas.api.dto.admin.AdminItemForm;
 import com.mundomanitas.api.dto.admin.AdminOption;
 import com.mundomanitas.api.dto.admin.AdminResourceForm;
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.util.ArrayList;
@@ -126,6 +128,25 @@ public class AdminCourseStructureController extends AdminBaseController {
                     actorId(principal));
             redirect.addFlashAttribute("panelOk", "El ítem se creó correctamente.");
         } catch (IllegalArgumentException exception) {
+            redirect.addFlashAttribute("panelError", exception.getMessage());
+        }
+        return "redirect:" + structureUrl(courseId) + "#modulo-" + form.moduleId();
+    }
+
+    @PostMapping("/documentos")
+    public String createDocument(@PathVariable UUID courseId,
+                                 @Valid @ModelAttribute AdminDocumentForm form,
+                                 BindingResult result,
+                                 @AuthenticationPrincipal AuthenticatedUser principal,
+                                 Model model,
+                                 RedirectAttributes redirect) {
+        if (result.hasErrors()) return invalid(courseId, model);
+        try {
+            adminContent.createDocument(new AdminCourseContentService.DocumentForm(
+                    form.moduleId(), form.sectionId(), form.title(), form.description(),
+                    form.file(), null, form.position(), form.visible()), actorId(principal));
+            redirect.addFlashAttribute("panelOk", "El documento se subió correctamente.");
+        } catch (IllegalArgumentException | ResponseStatusException exception) {
             redirect.addFlashAttribute("panelError", exception.getMessage());
         }
         return "redirect:" + structureUrl(courseId) + "#modulo-" + form.moduleId();
@@ -265,6 +286,8 @@ public class AdminCourseStructureController extends AdminBaseController {
                 new AdminSectionForm(null, "", 0, true));
         addIfMissing(model, "itemForm", "adminItemForm",
                 new AdminItemForm(null, null, "MATERIAL", "", "", "", null, null, 0, true));
+        addIfMissing(model, "documentForm", "adminDocumentForm",
+                new AdminDocumentForm(null, null, "", "", null, 0, true));
         addIfMissing(model, "syllabusForm", "adminSyllabusForm",
                 new AdminSyllabusForm(syllabus.objectives(), syllabus.requirements()));
         addIfMissing(model, "resourceForm", "adminResourceForm",

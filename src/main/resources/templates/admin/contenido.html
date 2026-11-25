@@ -52,7 +52,7 @@
                         </div>
                         <ul class="admin-content-list">
                             <th:block th:each="item : ${section.items()}">
-                                <li th:replace="~{fragments/admin-content-item :: row(item, section)}"></li>
+                                <li th:replace="~{fragments/admin-content-item :: row(${item}, ${section})}"></li>
                             </th:block>
                         </ul>
                         <div class="admin-row-actions admin-section-actions">
@@ -71,7 +71,7 @@
 
                     <ul class="admin-content-list" th:if="${!#lists.isEmpty(module.items())}">
                         <th:block th:each="item : ${module.items()}" th:with="section=${null}">
-                            <li th:replace="~{fragments/admin-content-item :: row(item, section)}"></li>
+                            <li th:replace="~{fragments/admin-content-item :: row(${item}, ${section})}"></li>
                         </th:block>
                     </ul>
                 </article>
@@ -194,6 +194,64 @@
                         </div>
                         <div class="admin-form-actions">
                             <button class="btn btn-admin" type="submit">Crear ítem</button>
+                        </div>
+                    </form>
+                </details>
+
+                <details class="admin-inline-form">
+                    <summary>Nuevo documento</summary>
+                    <form class="admin-form" method="post" enctype="multipart/form-data" novalidate
+                          th:action="@{/admin/cursos/{c}/contenido/documentos(c=${courseId})}"
+                          th:object="${adminDocumentForm}">
+                        <div class="admin-form-grid">
+                            <div class="admin-field">
+                                <label for="documento-modulo">Módulo</label>
+                                <select id="documento-modulo" th:field="*{moduleId}" required
+                                        th:attr="aria-invalid=${#fields.hasErrors('moduleId')} ? 'true' : null,
+                                                 aria-describedby=${#fields.hasErrors('moduleId')} ? 'error-documento-modulo' : null">
+                                    <option value="">Elegí un módulo</option>
+                                    <option th:each="o : ${moduleOptions}" th:value="${o.id()}" th:text="${o.label()}"></option>
+                                </select>
+                                <small id="error-documento-modulo" class="admin-error" th:if="${#fields.hasErrors('moduleId')}" th:errors="*{moduleId}"></small>
+                            </div>
+                            <div class="admin-field">
+                                <label for="documento-seccion">Sección</label>
+                                <select id="documento-seccion" th:field="*{sectionId}">
+                                    <option th:each="o : ${sectionOptions}" th:value="${o.id()}" th:text="${o.label()}"></option>
+                                </select>
+                                <small class="admin-hint">Si no elegís una, queda como “Sin sección”.</small>
+                            </div>
+                            <div class="admin-field">
+                                <label for="documento-titulo">Título</label>
+                                <input id="documento-titulo" type="text" th:field="*{title}" maxlength="140" required
+                                       th:attr="aria-invalid=${#fields.hasErrors('title')} ? 'true' : null,
+                                                aria-describedby=${#fields.hasErrors('title')} ? 'error-documento-titulo' : null">
+                                <small id="error-documento-titulo" class="admin-error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></small>
+                            </div>
+                            <div class="admin-field admin-span-2">
+                                <label for="documento-descripcion">Descripción</label>
+                                <textarea id="documento-descripcion" th:field="*{description}" maxlength="4000"></textarea>
+                                <small class="admin-hint">Se muestra debajo del botón de descarga.</small>
+                            </div>
+                            <div class="admin-field admin-span-2">
+                                <label for="documento-archivo">Archivo</label>
+                                <input id="documento-archivo" type="file" th:field="*{file}"
+                                       accept=".pdf,.doc,.docx,.ppt,.pptx,.txt" required
+                                       th:attr="aria-invalid=${#fields.hasErrors('file')} ? 'true' : null,
+                                                aria-describedby=${#fields.hasErrors('file')} ? 'error-documento-archivo' : null">
+                                <small class="admin-hint">PDF, DOC, DOCX, PPT, PPTX o TXT. Hasta 10 MB.</small>
+                                <small id="error-documento-archivo" class="admin-error" th:if="${#fields.hasErrors('file')}" th:errors="*{file}"></small>
+                            </div>
+                            <div class="admin-field">
+                                <label for="documento-posicion">Posición</label>
+                                <input id="documento-posicion" type="number" th:field="*{position}" min="0" max="9999">
+                            </div>
+                            <label class="admin-check admin-check--inline" for="documento-visible">
+                                <input id="documento-visible" type="checkbox" th:field="*{visible}"> Visible
+                            </label>
+                        </div>
+                        <div class="admin-form-actions">
+                            <button class="btn btn-admin" type="submit">Subir documento</button>
                         </div>
                     </form>
                 </details>

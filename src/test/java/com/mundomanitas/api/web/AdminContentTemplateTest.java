@@ -1,8 +1,16 @@
 package com.mundomanitas.api.web;
 
+import com.mundomanitas.api.dto.admin.AdminCourseForm;
+import com.mundomanitas.api.dto.admin.AdminExerciseForm;
+import com.mundomanitas.api.dto.admin.AdminModuleForm;
+import com.mundomanitas.api.dto.admin.AdminVideoForm;
+import com.mundomanitas.api.model.User;
 import com.mundomanitas.api.repository.CourseRepository;
 import com.mundomanitas.api.repository.UserRepository;
 import com.mundomanitas.api.security.AuthenticatedUser;
+import com.mundomanitas.api.service.admin.AdminCatalogService;
+import com.mundomanitas.api.service.admin.AdminCourseContentService;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -21,6 +29,7 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerAdapter;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,7 +57,16 @@ class AdminContentTemplateTest {
     private UserRepository users;
 
     @Autowired
+    private AdminCatalogService catalog;
+
+    @Autowired
+    private AdminCourseContentService adminContent;
+
+    @Autowired
     private WebApplicationContext context;
+
+    @Autowired
+    private EntityManager entityManager;
 
     private RequestMappingHandlerAdapter adapter;
     private List<HandlerMethodArgumentResolver> originalResolvers;
@@ -101,5 +119,42 @@ class AdminContentTemplateTest {
                 .andExpect(content().string(containsString("type=\"file\"")))
                 .andExpect(content().string(containsString("Sílabo")))
                 .andExpect(content().string(containsString("Saltar al contenido")));
+    }
+
+    @Test
+    @Transactional
+    @DisplayName("renderiza los ítems reales con su tipo y su sección")
+    void rendersItems() throws Exception {
+        UUID actor = tempAdmin();
+        String slug = "render-items-" + UUID.randomUUID();
+        UUID courseId = catalog.createCourse(new AdminCourseForm(slug, "Contenido render",
+                "Nivel inicial", true, "Pruebas", "Curso para verificar las filas del temario.",
+                "", 0), actor);
+        UUID moduleId = catalog.createModule(
+                new AdminModuleForm(courseId, "Unidad render", 0), actor);
+        catalog.createVideo(new AdminVideoForm(moduleId, "Clase render", 0,
+                "https://youtu.be/dQw4w9WgXcQ"), actor);
+        catalog.createExercise(new AdminExerciseForm(moduleId, "Ejercicio render",
+                "Consigna render.", 0), actor);
+        adminContent.createSection(moduleId,
+                new AdminCourseContentService.SectionForm("Lecturas render", 0, true), actor);
+        entityManager.flush();
+        entityManager.clear();
+
+        mvc.perform(get("/admin/cursos/{id}/contenido", courseId))
+                .andExpect(status().isOk())
+                .andExpect(view().name("admin/contenido"))
+                .andExpect(content().string(containsString("Clase render")))
+                .andExpect(content().string(containsString("Ejercicio render")))
+                .andExpect(content().string(containsString("Lecturas render")))
+                .andExpect(content().string(containsString("VIDEO")))
+                .andExpect(content().string(containsString("EJERCICIO")));
+    }
+
+    private UUID tempAdmin() {
+        User admin = new User("admin-render-" + UUID.randomUUID() + "@test.local",
+                "hash", "Administrador de render");
+        admin.changeRole("ADMIN");
+        return users.save(admin).getId();
     }
 }

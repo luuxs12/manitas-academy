@@ -23,7 +23,7 @@ class AdminDesignViewTest {
         String css = read("static/css/styles.css");
 
         assertThat(content.split(java.util.regex.Pattern.quote(
-                "~{fragments/admin-content-item :: row(item, section)}"), -1)).hasSize(3);
+                "~{fragments/admin-content-item :: row(${item}, ${section})}"), -1)).hasSize(3);
         assertThat(content).doesNotContain("class=\"admin-content-item\" th:each=\"item")
                 .contains("class=\"admin-module-number\"")
                 .contains("class=\"admin-module-name\"")

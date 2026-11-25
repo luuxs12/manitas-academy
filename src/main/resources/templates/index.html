@@ -91,7 +91,7 @@
                    th:href="@{/cursos/{slug}(slug=${course.slug})}">
 
                     <figure class="course-media">
-                        <img th:src="${course.image}" alt="" width="960" height="600"
+                        <img th:src="${!#strings.isEmpty(course.image) ? course.image : '/img/course-placeholder.svg'}" alt="" width="960" height="600"
                              loading="lazy" decoding="async">
                         <span class="course-badge" th:text="${course.category}"></span>
                         <span class="course-price-tag"

@@ -175,6 +175,9 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
         String summary = requireText(form.summary(), "resumen");
         Course course = new Course(slug, title, level, 0, form.free(), category,
                 summary, blankToNull(form.image()), form.position());
+        // El panel da por publicada la ficha apenas se crea: el alumnado debe
+        // poder verla y matricularse sin un paso de publicación escondido.
+        course.publish();
         courses.save(course);
         audit.record(actor, "CREATE", "CURSO", course.getId(), title);
         log.info("Curso creado id={} actor={} estado={}", course.getId(), actor,
@@ -218,19 +221,16 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
     @Transactional(readOnly = true)
     public PublishChecklist publishChecklist(UUID id) {
         Course course = requireCourse(id);
-        List<String> missing = new ArrayList<>();
-        if (StringUtils.isBlank(course.getSummary())) missing.add("resumen");
-        if (StringUtils.isBlank(course.getImage())) missing.add("portada");
+        List<String> pending = new ArrayList<>();
+        if (StringUtils.isBlank(course.getSummary())) pending.add("resumen");
+        if (StringUtils.isBlank(course.getImage())) pending.add("portada");
         List<CourseModule> modulesOfCourse = modules.findByCourseIdOrderByPositionAsc(id);
-        if (modulesOfCourse.isEmpty()) {
-            missing.add("módulo");
-            missing.add("video");
-        } else {
-            boolean hasVideo = modulesOfCourse.stream().anyMatch(module ->
-                    !videos.findByModuleIdOrderByPositionAsc(module.getId()).isEmpty());
-            if (!hasVideo) missing.add("video");
+        if (modulesOfCourse.isEmpty() || modulesOfCourse.stream().noneMatch(module ->
+                !videos.findByModuleIdOrderByPositionAsc(module.getId()).isEmpty())) {
+            pending.add("video");
         }
-        return new PublishChecklist(List.copyOf(missing), missing.isEmpty());
+        // Publicar ya no depende de estas mejoras: solo se informan en la ficha.
+        return new PublishChecklist(List.copyOf(pending), true);
     }
 
     @Override
@@ -244,8 +244,6 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
     public void setPublished(UUID id, boolean published, UUID actor) {
         Course course = requireCourse(id);
         if (published) {
-            PublishChecklist check = publishChecklist(id);
-            checkArgument(check.canPublish(), "Falta: " + String.join(", ", check.missing()));
             course.publish();
         } else {
             course.unpublish();

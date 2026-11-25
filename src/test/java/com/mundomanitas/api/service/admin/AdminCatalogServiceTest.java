@@ -72,20 +72,20 @@ class AdminCatalogServiceTest {
     }
 
     @Test
-    @DisplayName("crea el curso en borrador sin lecciones escritas a mano")
-    void createsDraftCourse() {
+    @DisplayName("crea el curso publicado sin lecciones escritas a mano")
+    void createsPublishedCourse() {
         when(courses.findBySlug("python-desde-cero")).thenReturn(Optional.empty());
 
         service.createCourse(form(), UUID.randomUUID());
 
         ArgumentCaptor<Course> captor = ArgumentCaptor.forClass(Course.class);
         verify(courses).save(captor.capture());
-        assertThat(captor.getValue().getStatus()).isEqualTo("BORRADOR");
+        assertThat(captor.getValue().getStatus()).isEqualTo("PUBLICADO");
         assertThat(captor.getValue().getLessons()).isZero();
     }
 
     @Test
-    @DisplayName("el checklist lista lo que falta para publicar")
+    @DisplayName("el checklist informa mejoras sin bloquear la publicación")
     void publishChecklist() {
         UUID id = UUID.randomUUID();
         Course course = course();
@@ -96,19 +96,19 @@ class AdminCatalogServiceTest {
         AdminCatalogService.PublishChecklist check = service.publishChecklist(id);
 
         assertThat(check.missing()).contains("resumen", "portada", "video");
-        assertThat(check.canPublish()).isFalse();
+        assertThat(check.canPublish()).isTrue();
     }
 
     @Test
-    @DisplayName("no publica un curso incompleto")
-    void rejectsPublishingIncompleteCourse() {
+    @DisplayName("publica un curso aunque todavía no tenga portada ni videos")
+    void publishesCourseWithoutExtras() {
         UUID id = UUID.randomUUID();
-        when(courses.findById(id)).thenReturn(Optional.of(course()));
-        when(modules.findByCourseIdOrderByPositionAsc(id)).thenReturn(List.of());
+        Course course = course();
+        when(courses.findById(id)).thenReturn(Optional.of(course));
 
-        assertThatThrownBy(() -> service.setPublished(id, true, UUID.randomUUID()))
-                .isInstanceOf(IllegalArgumentException.class)
-                .hasMessageContaining("Falta");
+        service.setPublished(id, true, UUID.randomUUID());
+
+        assertThat(course.getStatus()).isEqualTo("PUBLICADO");
     }
 
     @Test
@@ -279,11 +279,7 @@ class AdminCatalogServiceTest {
         UUID actor = UUID.randomUUID();
         Course course = new Course("taller-lsp", "Taller de LSP", "Inicial", 1, true,
                 "Comunicación", "Resumen real", "/uploads/covers/aaaa.jpg", 1);
-        CourseModule module = new CourseModule(courseId, "Unidad 1", 0);
         when(courses.findById(courseId)).thenReturn(Optional.of(course));
-        when(modules.findByCourseIdOrderByPositionAsc(courseId)).thenReturn(List.of(module));
-        when(videos.findByModuleIdOrderByPositionAsc(any())).thenReturn(List.of(
-                new Video(moduleId, "Clase 1", "dQw4w9WgXcQ", 0)));
 
         service.setPublished(courseId, true, actor);
 

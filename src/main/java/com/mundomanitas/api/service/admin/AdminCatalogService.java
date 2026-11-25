@@ -21,7 +21,7 @@ import java.util.UUID;
 /** CRUD administrativo de cuentas, cursos y contenido, con auditoría. */
 public interface AdminCatalogService {
 
-    /** Requisitos reales para publicar un curso. */
+    /** Mejoras pendientes de un curso ya visible; nunca bloquean la publicación. */
     record PublishChecklist(List<String> missing, boolean canPublish) {
     }
 

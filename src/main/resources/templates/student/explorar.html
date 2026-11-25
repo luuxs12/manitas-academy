@@ -61,7 +61,7 @@
 
                 <div class="panel-course-grid" th:if="${!#lists.isEmpty(courses)}">
                     <article class="panel-course" th:each="course : ${courses}">
-                        <img th:src="${course.image}" alt="" width="960" height="600" loading="lazy">
+                        <img th:src="${!#strings.isEmpty(course.image) ? course.image : '/img/course-placeholder.svg'}" alt="" width="960" height="600" loading="lazy">
                         <div class="panel-course-body">
                             <h3 th:text="${course.title}"></h3>
                             <span class="panel-chip" th:text="${course.category}"></span>

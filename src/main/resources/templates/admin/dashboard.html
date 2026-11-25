@@ -101,7 +101,7 @@
                         </div>
                         <ul class="admin-popular" th:if="${!#lists.isEmpty(popular)}">
                             <li class="admin-popular-item" th:each="course, iter : ${popular}">
-                                <img th:src="${course.image()}" alt="" width="960" height="600" loading="lazy">
+                                <img th:src="${!#strings.isEmpty(course.image()) ? course.image() : '/img/course-placeholder.svg'}" alt="" width="960" height="600" loading="lazy">
                                 <div class="admin-popular-body">
                                     <strong th:text="${course.title()}">Curso</strong>
                                     <span th:text="${course.enrolled() + ' inscriptos'}">0 inscriptos</span>

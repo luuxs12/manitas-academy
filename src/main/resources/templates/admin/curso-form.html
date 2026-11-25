@@ -99,10 +99,10 @@
                     <span class="admin-status" th:classappend="${courseStatus == 'PUBLICADO'} ? ' is-ok' : ' is-bad'"
                           th:text="${courseStatus == 'PUBLICADO'} ? 'Publicado' : 'Borrador'">Borrador</span>
                 </p>
-                <p id="checklist-help" class="admin-muted">Requisitos calculados desde la base.</p>
+                <p id="checklist-help" class="admin-muted">El curso se publica al crearse. Estas mejoras son opcionales y se calculan desde la base.</p>
                 <ul id="checklist" class="admin-checklist">
-                    <li th:each="missing : ${checklist.missing()}" th:text="'Falta ' + ${missing}"></li>
-                    <li th:if="${checklist.canPublish()}">El curso está listo para publicarse.</li>
+                    <li th:each="missing : ${checklist.missing()}" th:text="'Podés agregar ' + ${missing}"></li>
+                    <li th:if="${checklist.canPublish() and #lists.isEmpty(checklist.missing())}">Sin mejoras pendientes.</li>
                 </ul>
                 <div class="admin-form-actions">
                     <form th:if="${courseStatus != 'PUBLICADO'}"

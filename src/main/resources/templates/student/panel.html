@@ -37,7 +37,7 @@
 
             <section class="panel-continue" th:if="${next != null}"
                      th:with="course=${next.course}" aria-labelledby="titulo-continuar">
-                <img class="panel-continue-media" th:src="${course.image}" alt=""
+                <img class="panel-continue-media" th:src="${!#strings.isEmpty(course.image) ? course.image : '/img/course-placeholder.svg'}" alt=""
                      width="960" height="600">
                 <div class="panel-continue-copy">
                     <p class="panel-eyebrow">Tu próximo curso</p>
@@ -83,7 +83,7 @@
 
                     <div class="panel-course-grid" th:if="${!#lists.isEmpty(enrollments)}">
                         <article class="panel-course" th:each="enrollment : ${enrollments}">
-                            <img th:src="${enrollment.course.image}" alt=""
+                            <img th:src="${!#strings.isEmpty(enrollment.course.image) ? enrollment.course.image : '/img/course-placeholder.svg'}" alt=""
                                  width="960" height="600" loading="lazy">
                             <div class="panel-course-body">
                                 <h3 th:text="${enrollment.course.title}"></h3>
@@ -145,7 +145,7 @@
                 </div>
                 <div class="panel-course-grid panel-course-grid--compact">
                     <article class="panel-course" th:each="course : ${recommended}">
-                        <img th:src="${course.image}" alt="" width="960" height="600" loading="lazy">
+                        <img th:src="${!#strings.isEmpty(course.image) ? course.image : '/img/course-placeholder.svg'}" alt="" width="960" height="600" loading="lazy">
                         <div class="panel-course-body">
                             <h3 th:text="${course.title}"></h3>
                             <span class="panel-chip" th:text="${course.category}"></span>

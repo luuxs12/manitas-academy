@@ -220,14 +220,14 @@ perfil, cursos y panel de administración:
 | `.course-syllabus` / `.syllabus-list` / `.syllabus-item` | temario ordenado: módulo, título, duración, vistos y distintivos de subtítulos o transcripción |
 | `.syllabus-item.is-active` / `.syllabus-item.is-done` | clase abierta (borde verde) y clase marcada como terminada (estado verde) |
 | `.syllabus-groups` / `.syllabus-group` / `.syllabus-group-title` | temario agrupado por módulo, con el título real del módulo como encabezado |
-| `.syllabus-exercises` / `.syllabus-exercise` | consignas guardadas en PostgreSQL, debajo de las clases de cada módulo; no alteran el progreso |
 | `.syllabus-no-videos` | aviso accesible cuando un módulo aún no tiene clases cargadas |
 | `.syllabus-progress` | porcentaje real del módulo, calculado sobre sus ítems visibles |
 | `.syllabus-section` / `.syllabus-section-title` | agrupación por sección del módulo; los ítems sin sección se muestran bajo “Sin sección” |
 | `.syllabus-item-copy` / `.syllabus-item-type` | bloque del ítem con su tipo (VIDEO, MATERIAL o EJERCICIO), título y descripción de PostgreSQL |
 | `.syllabus-item-actions` / `.syllabus-link` | acciones del ítem: abrir la clase, abrir el material o marcarlo como visto; se apilan bajo 620 px |
-| `.syllabus-description` | texto de apoyo del ítem; nunca reemplaza al título ni inventa fechas |
-| `.player-hint` | aviso `role="status"` que aparece si YouTube informa por `postMessage` que el video terminó; el botón sigue siendo la acción confirmada |
+| `.syllabus-description` | texto de apoyo del ítem; se limita a tres líneas y deja el valor completo en `title`, sin reemplazar al título ni inventar fechas |
+| `.syllabus-title` / `.admin-content-copy strong` | títulos que pueden romperse con `overflow-wrap: anywhere` cuando el nombre no tiene espacios |
+| `.player-hint` | aviso `role="status"` que aparece si YouTube informa por `postMessage` que el video terminó; solo acepta mensajes del iframe del reproductor y el botón sigue siendo la acción confirmada |
 
 ### Componentes del panel administrativo
 
@@ -248,6 +248,19 @@ perfil, cursos y panel de administración:
 | `.admin-type` | distintivo textual del tipo de ítem; no sustituye al nombre del tipo |
 | `.admin-move` | botón de reordenar con flecha y `aria-label` que nombra el ítem |
 | `.admin-inline-form` | formulario desplegable dentro de la página; no es un modal ni un overlay |
+| `.admin-card > h2` / `.admin-module-head h3` / `.admin-section-head h4` | jerarquía 2.1 → 1.5 → 1.2 → 1 rem en el panel; el título del módulo nunca queda más chico que el de la sección |
+| `.admin-row-actions a` / `.admin-row-actions button` | acciones de fila con `min-height: 2rem` para que se puedan tocar con el dedo |
+
+La misma regla de jerarquía se aplica al alumno: `h1` 2.1 rem, `h2` de la clase y del
+temario 1.5–1.25 rem, título del módulo 1.35 rem y título de la sección 1.0625 rem.
+Los encabezados llevan su tamaño explícito (sin `clamp`) para que el orden se
+verifique también con el detector automático.
+
+Los conteos concordan en singular y plural (“1 ítem terminado”, “1 ítem · 1 visto”) y
+la duración de un video se muestra con `durationLabel()`: `0 s`, `1 min 30 s`,
+`10 min`, `1 h`, `1 h 2 min`. Así un video de dos horas no aparece como “7200 s”.
+Los enlaces que abren otra pestaña lo dicen en su `aria-label`, y la barra de
+progreso no anima `width`: el valor viene del servidor y no cambia en el cliente.
 
 Si cambiás el nombre de alguna, decime y actualizo las plantillas nuevas.
 

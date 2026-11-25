@@ -194,6 +194,22 @@ class CourseContentServiceTest {
         verify(itemProgress).save(any(ItemProgress.class));
     }
 
+    @Test
+    @DisplayName("la duración se expresa en minutos y horas, no en segundos crudos")
+    void durationLabel() {
+        assertThat(withDuration(null).durationLabel()).isEqualTo("Sin duración");
+        assertThat(withDuration(0).durationLabel()).isEqualTo("0 s");
+        assertThat(withDuration(90).durationLabel()).isEqualTo("1 min 30 s");
+        assertThat(withDuration(600).durationLabel()).isEqualTo("10 min");
+        assertThat(withDuration(3600).durationLabel()).isEqualTo("1 h");
+        assertThat(withDuration(3725).durationLabel()).isEqualTo("1 h 2 min");
+    }
+
+    private CourseContentService.ItemView withDuration(Integer seconds) {
+        return new CourseContentService.ItemView(UUID.randomUUID(), "VIDEO", "Clase", null,
+                null, "abc", seconds, true, false, false);
+    }
+
     private Course course(boolean free) {
         Course course = new Course("python", "Python", "Inicial", 1, free,
                 "Programación", "Resumen real", null, 0);

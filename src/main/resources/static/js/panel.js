@@ -50,6 +50,7 @@
     const allowed = ["https://www.youtube-nocookie.com", "https://www.youtube.com"];
     window.addEventListener("message", (event) => {
         if (!allowed.includes(event.origin)) return;
+        if (event.source !== frame.contentWindow) return;
         let data = event.data;
         if (typeof data === "string") {
             try {

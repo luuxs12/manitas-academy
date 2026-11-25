@@ -21,12 +21,11 @@
 
             <div class="panel-page-head">
                 <div>
-                    <p class="panel-eyebrow">Tu aprendizaje</p>
                     <h1 th:text="${course.title}"></h1>
-                    <p th:text="${doneCount + ' de ' + itemCount + ' ítems terminados'}"></p>
+                    <p th:text="${doneCount} + ' de ' + ${itemCount} + ' ' + (${itemCount} == 1 ? 'ítem terminado' : 'ítems terminados')"></p>
                     <div class="panel-lesson-track" role="img"
-                         th:attr="aria-label=${doneCount + ' de ' + itemCount + ' ítems terminados'}">
-                        <span th:style="${'width: ' + itemPercent + '%'}"></span>
+                         th:attr="aria-label=${doneCount} + ' de ' + ${itemCount} + ' ' + (${itemCount} == 1 ? 'ítem terminado' : 'ítems terminados')">
+                        <span aria-hidden="true" th:style="${'width: ' + itemPercent + '%'}"></span>
                     </div>
                 </div>
                 <a class="btn btn-ghost" th:href="@{/panel/cursos}">← Volver a mis cursos</a>
@@ -99,14 +98,14 @@
                                                 <span class="syllabus-title" th:text="${item.title()}"></span>
                                                 <span class="syllabus-meta">
                                                     <span th:if="${item.type() == 'VIDEO'}"
-                                                          th:text="${item.durationSeconds() != null ? item.durationSeconds() + ' s' : 'Sin duración'}"></span>
+                                                          th:text="${item.durationLabel()}"></span>
                                                     <span th:unless="${item.type() == 'VIDEO'}">Sin fecha límite</span>
                                                     <span class="syllabus-state"
                                                           th:text="${item.locked() ? 'Requiere Premium' : (item.seen() ? 'Visto' : 'Pendiente')}"></span>
                                                 </span>
                                                 <span class="syllabus-description"
                                                       th:if="${item.description() != null}"
-                                                      th:text="${item.description()}"></span>
+                                                      th:attr="title=${item.description()}" th:text="${item.description()}"></span>
                                             </div>
                                             <div class="syllabus-item-actions">
                                                 <a class="syllabus-link"
@@ -117,7 +116,7 @@
                                                    th:if="${item.type() == 'MATERIAL' and !item.locked() and item.url() != null}"
                                                    th:href="${item.url()}" target="_blank"
                                                    rel="noopener noreferrer"
-                                                   th:attr="aria-label='Abrir el material ' + ${item.title()}">Abrir material</a>
+                                                   th:attr="aria-label='Abrir el material ' + ${item.title()} + ' (abre en pestaña nueva)'">Abrir material</a>
                                                 <form th:if="${!item.locked()}"
                                                       th:action="@{/panel/cursos/{slug}/items/{itemId}/visto(slug=${enrollment.course.slug},itemId=${item.id()})}"
                                                       method="post">
@@ -136,20 +135,21 @@
                                 <h4 class="syllabus-section-title">Sin sección</h4>
                                 <ul class="syllabus-list">
                                     <li class="syllabus-item-row" th:each="item : ${module.items()}">
-                                        <div class="syllabus-item" th:classappend="${item.seen() ? ' is-done' : ''}">
+                                        <div class="syllabus-item"
+                                             th:classappend="${(selectedId != null and item.sourceId() != null and selectedId == item.sourceId() ? ' is-active' : '') + (item.seen() ? ' is-done' : '')}">
                                             <div class="syllabus-item-copy">
                                                 <span class="syllabus-item-type" th:text="${item.type()}"></span>
                                                 <span class="syllabus-title" th:text="${item.title()}"></span>
                                                 <span class="syllabus-meta">
                                                     <span th:if="${item.type() == 'VIDEO'}"
-                                                          th:text="${item.durationSeconds() != null ? item.durationSeconds() + ' s' : 'Sin duración'}"></span>
+                                                          th:text="${item.durationLabel()}"></span>
                                                     <span th:unless="${item.type() == 'VIDEO'}">Sin fecha límite</span>
                                                     <span class="syllabus-state"
                                                           th:text="${item.locked() ? 'Requiere Premium' : (item.seen() ? 'Visto' : 'Pendiente')}"></span>
                                                 </span>
                                                 <span class="syllabus-description"
                                                       th:if="${item.description() != null}"
-                                                      th:text="${item.description()}"></span>
+                                                      th:attr="title=${item.description()}" th:text="${item.description()}"></span>
                                             </div>
                                             <div class="syllabus-item-actions">
                                                 <a class="syllabus-link"
@@ -160,7 +160,7 @@
                                                    th:if="${item.type() == 'MATERIAL' and !item.locked() and item.url() != null}"
                                                    th:href="${item.url()}" target="_blank"
                                                    rel="noopener noreferrer"
-                                                   th:attr="aria-label='Abrir el material ' + ${item.title()}">Abrir material</a>
+                                                   th:attr="aria-label='Abrir el material ' + ${item.title()} + ' (abre en pestaña nueva)'">Abrir material</a>
                                                 <form th:if="${!item.locked()}"
                                                       th:action="@{/panel/cursos/{slug}/items/{itemId}/visto(slug=${enrollment.course.slug},itemId=${item.id()})}"
                                                       method="post">

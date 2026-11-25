@@ -18,7 +18,9 @@
             <div class="admin-page-head">
                 <div>
                     <h1 th:text="'Contenido de ' + ${courseTitle}">Contenido del curso</h1>
-                    <p th:text="${outline.totalItems()} + ' ítems · ' + ${outline.doneItems()} + ' vistos · vista previa con ocultos'">0 ítems</p>
+                    <p th:text="${outline.totalItems()} + (${outline.totalItems()} == 1 ? ' ítem' : ' ítems') + ' · '
+                                + ${outline.doneItems()} + (${outline.doneItems()} == 1 ? ' visto' : ' vistos')
+                                + ' · vista previa con ocultos'">0 ítems</p>
                 </div>
                 <a class="admin-back" th:href="@{/admin/cursos}">← Volver a cursos</a>
             </div>
@@ -60,10 +62,11 @@
                                     <small th:if="${item.description() != null}" th:text="${item.description()}">Descripción</small>
                                     <small th:if="${item.type() == 'MATERIAL' and item.url() != null}">
                                         <a th:href="${item.url()}" target="_blank" rel="noopener noreferrer"
+                                           th:attr="aria-label='Abrir el enlace de ' + ${item.title()} + ' en pestaña nueva'"
                                            th:text="${item.url()}">Enlace</a>
                                     </small>
                                     <small th:if="${item.type() == 'VIDEO'}"
-                                           th:text="${item.durationSeconds() != null} ? item.durationSeconds() + ' s' : 'Sin duración'">Sin duración</small>
+                                           th:text="${item.durationLabel()}">Sin duración</small>
                                     <small th:unless="${section.visible() and item.visible()}">Oculto en el temario del estudiante</small>
                                 </div>
                                 <div class="admin-row-actions">
@@ -274,6 +277,7 @@
                         <div class="admin-content-copy">
                             <strong th:text="${resource.title()}">Recurso</strong>
                             <small><a th:href="${resource.url()}" target="_blank" rel="noopener noreferrer"
+                                      th:attr="aria-label='Abrir el enlace de ' + ${resource.title()} + ' en pestaña nueva'"
                                       th:text="${resource.url()}">Enlace</a></small>
                         </div>
                         <div class="admin-row-actions">

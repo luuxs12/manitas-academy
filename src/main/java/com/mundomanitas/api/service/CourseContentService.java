@@ -32,6 +32,24 @@ public interface CourseContentService {
             this(id, type, title, description, url, youtubeId, durationSeconds, visible, seen,
                     locked, null);
         }
+
+        /** Duración legible en el temario: segundos, minutos u horas según corresponda. */
+        public String durationLabel() {
+            if (durationSeconds == null) {
+                return "Sin duración";
+            }
+            int total = Math.max(0, durationSeconds);
+            int hours = total / 3600;
+            int minutes = (total % 3600) / 60;
+            int seconds = total % 60;
+            if (hours > 0) {
+                return minutes > 0 ? hours + " h " + minutes + " min" : hours + " h";
+            }
+            if (minutes > 0) {
+                return seconds > 0 ? minutes + " min " + seconds + " s" : minutes + " min";
+            }
+            return seconds + " s";
+        }
     }
 
     record SectionView(UUID id, String title, boolean visible, List<ItemView> items) {

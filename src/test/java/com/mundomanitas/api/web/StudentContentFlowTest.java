@@ -23,6 +23,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -48,6 +49,9 @@ class StudentContentFlowTest {
     private Enrollment enrollment;
     private CourseContentService content;
     private VideoPlaybackService playback;
+    private CourseCatalog catalog;
+    private EnrollmentService enrollments;
+    private StudentContentService oldContent;
     private MockMvc mvc;
 
     @BeforeEach
@@ -64,10 +68,10 @@ class StudentContentFlowTest {
                 principal, "sin-clave", principal.getAuthorities()));
 
         AccountService accounts = mock(AccountService.class);
-        CourseCatalog catalog = mock(CourseCatalog.class);
-        EnrollmentService enrollments = mock(EnrollmentService.class);
+        catalog = mock(CourseCatalog.class);
+        enrollments = mock(EnrollmentService.class);
         LessonProgressService lessons = mock(LessonProgressService.class);
-        StudentContentService oldContent = mock(StudentContentService.class);
+        oldContent = mock(StudentContentService.class);
         content = mock(CourseContentService.class);
         playback = mock(VideoPlaybackService.class);
 
@@ -95,6 +99,35 @@ class StudentContentFlowTest {
     @AfterEach
     void tearDown() {
         SecurityContextHolder.clearContext();
+    }
+
+    @Test
+    @DisplayName("el panel entrega a cada tarjeta el avance real de su matrícula")
+    void dashboardUsesEachEnrollmentProgress() throws Exception {
+        UUID dashboardEnrollmentId = UUID.randomUUID();
+        Course dashboardCourse = mock(Course.class);
+        when(dashboardCourse.getId()).thenReturn(courseId);
+        when(dashboardCourse.getSlug()).thenReturn(slug);
+        when(dashboardCourse.getTitle()).thenReturn("Python");
+        Enrollment dashboardEnrollment = mock(Enrollment.class);
+        when(dashboardEnrollment.getId()).thenReturn(dashboardEnrollmentId);
+        when(dashboardEnrollment.getCourse()).thenReturn(dashboardCourse);
+
+        when(enrollments.mine(student)).thenReturn(List.of(dashboardEnrollment));
+        when(enrollments.next(student)).thenReturn(dashboardEnrollment);
+        when(oldContent.progress(dashboardEnrollmentId, courseId))
+                .thenReturn(new StudentContentService.Progress(3, 10, 30));
+        when(oldContent.totals(List.of(dashboardEnrollment)))
+                .thenReturn(new StudentContentService.Progress(3, 10, 30));
+        when(catalog.all()).thenReturn(List.of());
+
+        mvc.perform(get("/panel"))
+                .andExpect(view().name("student/panel"))
+                .andExpect(model().attribute("doneCounts", Map.of(dashboardEnrollmentId, 3)))
+                .andExpect(model().attribute("videoCounts", Map.of(dashboardEnrollmentId, 10)))
+                .andExpect(model().attribute("videoProgress", Map.of(dashboardEnrollmentId, 30)));
+
+        verify(oldContent).progress(dashboardEnrollmentId, courseId);
     }
 
     @Test

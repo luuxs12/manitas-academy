@@ -49,8 +49,9 @@
                     </p>
                     <p class="panel-progress-label">Listo para continuar</p>
                 </div>
-                <a class="btn btn-dark panel-continue-cta" th:href="@{/panel/cursos}">
-                    Ver mis cursos <span aria-hidden="true">→</span>
+                <a class="btn btn-dark panel-continue-cta"
+                   th:href="@{/panel/cursos/{slug}(slug=${next.course.slug})}">
+                    Continuar curso <span aria-hidden="true">→</span>
                 </a>
             </section>
 
@@ -94,8 +95,16 @@
                                       th:text="${enrollment.completed} ? 'Completado' : 'En curso'">
                                     En curso
                                 </span>
-                                <a class="panel-course-cta" th:href="@{/panel/cursos}">
-                                    Ver detalle <span aria-hidden="true">→</span>
+                                <p class="panel-lesson-label"
+                                    th:text="${doneCounts[enrollment.id] + ' de ' + videoCounts[enrollment.id] + ' videos terminados'}">
+                                </p>
+                                <div class="panel-lesson-track" role="img"
+                                     th:attr="aria-label=${doneCounts[enrollment.id] + ' de ' + videoCounts[enrollment.id] + ' videos terminados'}">
+                                    <span th:style="${'width: ' + videoProgress[enrollment.id] + '%'}"></span>
+                                </div>
+                                <a class="panel-course-cta"
+                                   th:href="@{/panel/cursos/{slug}(slug=${enrollment.course.slug})}">
+                                    Ver clases <span aria-hidden="true">→</span>
                                 </a>
                             </div>
                         </article>

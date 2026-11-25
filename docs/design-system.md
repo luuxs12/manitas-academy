@@ -234,6 +234,8 @@ perfil, cursos y panel de administración:
 | `.player-hint` | región `aria-live="polite"` presente desde el inicio y vacía hasta que YouTube informa por `postMessage` que el video terminó; solo acepta mensajes del iframe y el botón sigue siendo la acción confirmada |
 | `.panel-flash` | avisos del panel con `aria-live` explícito: `polite` para el estado y `assertive` para el error, además de su `role` |
 | `.field-hint` / `.field-error` en el perfil | pistas y errores con `id` propio, enlazados al campo con `aria-describedby`; los campos con error también marcan `aria-invalid="true"` |
+| `.panel-lesson-label` / `.panel-lesson-track` | avance real de videos en las tarjetas del panel: texto “X de Y videos terminados” y barra con la misma cifra en `aria-label` |
+| `.panel-course-cta` / `.panel-continue-cta` | accesos directos a la ficha del curso por `slug`; “Ver clases” en cada tarjeta y “Continuar curso” en el próximo curso, nunca al listado genérico |
 | `.panel-avatar-current` / `.panel-avatar-preview` | foto actual o iniciales junto al texto de formatos, antes de cualquier control |
 | `.panel-avatar-editor` / `.panel-avatar-actions` | campo de carga y grupo de acciones “Subir foto” / “Quitar foto”, en ese orden; “Quitar foto” usa `th:formaction` dentro del mismo formulario |
 

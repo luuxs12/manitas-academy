@@ -19,6 +19,22 @@
   (`CourseContentService`, `VideoPlaybackService` y `LessonProgressService`)
   devuelven `404`. La vista previa de administración sí los incluye.
 
+## Cabeceras y cookie
+
+Todas las respuestas de la app llevan `X-Content-Type-Options: nosniff` y
+`X-Frame-Options: DENY` desde la configuración por defecto de Spring Security.
+Además se fijan de forma explícita:
+
+| Cabecera | Valor | Para qué sirve |
+|---|---|---|
+| `Referrer-Policy` | `strict-origin-when-cross-origin` | no filtra la ruta completa al salir a otro sitio |
+| `Permissions-Policy` | `camera=(), geolocation=(), microphone=(), payment=()` | el panel no pide permisos de dispositivo ni de pago al navegador |
+
+La cookie de sesión mantiene `HttpOnly` y se crea con `SameSite=Lax`, configurable
+en `server.servlet.session.cookie.same-site`. No se marca `Secure` porque el
+desarrollo local corre por `http://localhost:8080`; al publicar con HTTPS, el
+proxy debe terminar TLS y conservar el atributo `Secure` en la respuesta.
+
 ## Límite de intentos
 
 Hay un filtro propio, sin dependencias nuevas, sobre los POST de `/login`,
@@ -48,5 +64,6 @@ proyecto llega a correr varias instancias, el siguiente paso sería un store
 compartido. Hoy hay una sola instancia y el reinicio limpia las cuentas.
 
 La cobertura está en `DataExposureAndRateLimitTest`: componentes del limitador,
-rutas públicas y privadas, catálogo sin filtrados, Actuator, firma del webhook y
-bloqueo por IP con otra IP no afectada.
+rutas públicas y privadas, cabeceras de seguridad, cookie `SameSite`, catálogo
+sin filtrados, Actuator, firma del webhook y bloqueo por IP con otra IP no
+afectada.

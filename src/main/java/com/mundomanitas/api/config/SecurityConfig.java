@@ -18,6 +18,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter.ReferrerPolicy;
 
 import java.time.Duration;
 
@@ -98,6 +99,10 @@ public class SecurityConfig {
                         .key(rememberMeKey)
                         .tokenValiditySeconds(60 * 60 * 24 * 14)
                         .userDetailsService(userDetailsService))
+                .headers(headers -> headers
+                        .referrerPolicy(policy -> policy.policy(ReferrerPolicy.STRICT_ORIGIN_WHEN_CROSS_ORIGIN))
+                        .permissionsPolicy(policy -> policy.policy(
+                                "camera=(), geolocation=(), microphone=(), payment=()")))
                 // Stripe firma el cuerpo: no puede enviar el token CSRF del sitio.
                 .csrf(csrf -> csrf.ignoringRequestMatchers("/pagos/stripe/webhook"));
 

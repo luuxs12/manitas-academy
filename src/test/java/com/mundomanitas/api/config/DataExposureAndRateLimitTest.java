@@ -8,6 +8,8 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.web.server.Cookie;
+import org.springframework.boot.web.server.autoconfigure.ServerProperties;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpSession;
@@ -40,6 +42,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class DataExposureAndRateLimitTest {
 
     @Autowired private MockMvc mvc;
+    @Autowired private ServerProperties serverProperties;
 
     @Nested
     @DisplayName("prueba de componentes")
@@ -79,6 +82,27 @@ class DataExposureAndRateLimitTest {
             assertThat(redirectOf(get("/panel/perfil"))).contains("login");
             assertThat(redirectOf(get("/admin"))).contains("login");
             assertThat(redirectOf(get("/admin/usuarios"))).contains("login");
+        }
+
+        @Test
+        @DisplayName("las respuestas públicas llevan cabeceras que reducen filtraciones")
+        void securityHeadersArePresent() throws Exception {
+            var response = mvc.perform(get("/")).andReturn().getResponse();
+
+            assertThat(response.getHeader("X-Content-Type-Options")).isEqualTo("nosniff");
+            assertThat(response.getHeader("X-Frame-Options")).isEqualTo("DENY");
+            assertThat(response.getHeader("Referrer-Policy"))
+                    .isEqualTo("strict-origin-when-cross-origin");
+            assertThat(response.getHeader("Permissions-Policy"))
+                    .contains("camera=()", "microphone=()", "geolocation=()", "payment=()");
+        }
+
+        @Test
+        @DisplayName("la cookie de sesión pide SameSite=Lax y sigue siendo HttpOnly")
+        void sessionCookieIsHardened() {
+            var cookie = serverProperties.getServlet().getSession().getCookie();
+
+            assertThat(cookie.getSameSite()).isEqualTo(Cookie.SameSite.LAX);
         }
 
         @Test

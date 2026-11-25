@@ -13,7 +13,7 @@ Aprendé a tu ritmo, con intérprete y subtítulos en cada clase.
 ![Thymeleaf](https://img.shields.io/badge/Thymeleaf-3-0d0d0d)
 ![PostgreSQL 18](https://img.shields.io/badge/PostgreSQL-18-0d0d0d)
 ![Flyway](https://img.shields.io/badge/Flyway-migraciones-0d0d0d)
-![Tests](https://img.shields.io/badge/tests-201_en_verde-00a63e)
+![Tests](https://img.shields.io/badge/tests-203_en_verde-00a63e)
 
 </div>
 
@@ -106,7 +106,7 @@ mantiene al navegar entre la portada, las páginas internas y el panel.
 | Base de datos | PostgreSQL 18 |
 | Migraciones | Flyway (`ddl-auto: validate`) |
 | Build | Maven con wrapper incluido |
-| Pruebas | JUnit 5 + AssertJ + Mockito (201 pruebas) |
+| Pruebas | JUnit 5 + AssertJ + Mockito (203 pruebas) |
 | Métricas | Spring Boot Actuator + Micrometer/Prometheus |
 
 ## Requisitos
@@ -185,7 +185,7 @@ Compilar y probar:
 
 ```powershell
 .\mvnw.cmd clean package      # jar en target\api-0.0.1-SNAPSHOT.jar
-.\mvnw.cmd test               # 201 pruebas
+.\mvnw.cmd test               # 203 pruebas
 java -jar target\api-0.0.1-SNAPSHOT.jar
 ```
 
@@ -276,6 +276,8 @@ y las entidades no llegan a las vistas: se convierten en `dto`.
 - Al crear la cuenta la sesión queda abierta y se entra al panel; al iniciar
   sesión también se va directo a `/panel`.
 - **CSRF** activo en todos los formularios, incluido el modal.
+- Cabeceras `Referrer-Policy` y `Permissions-Policy`; la cookie de sesión es
+  `HttpOnly` y se envía con `SameSite=Lax`.
 - Validación en el servidor con Bean Validation y errores por campo.
 - Límite de intentos por IP en formularios sensibles (`429` con `Retry-After`);
   el detalle está en
@@ -359,7 +361,7 @@ no aparezca un destello blanco. Los tokens y las reglas están en
 | `AdminCatalogServiceTest`, `AdminMethodSecurityTest` | CRUD admin y exigencia de `ROLE_ADMIN` |
 | `SecurityAccessTest` | Autenticación, autorización por roles, CSRF y `UserDetailsService` contra PostgreSQL |
 | `InputValidationTest` | Bean Validation, enlaces `https`/YouTube, escape de markup y errores sin 500 |
-| `DataExposureAndRateLimitTest` | Rutas públicas y privadas, Actuator, firma del webhook y límite de intentos por IP |
+| `DataExposureAndRateLimitTest` | Rutas públicas y privadas, cabeceras de seguridad, cookie `SameSite`, Actuator, firma del webhook y límite de intentos por IP |
 | `SoftwareFlowTest` | Calidad de software: componentes, integración y autenticación de un flujo real de alta, curso y avance |
 | `CourseContentServiceTest`, `CourseContentDatabaseTest` | Temario estructurado, edición, orden, borrado, sílabo y progreso sin perder datos |
 | `AdminCourseStructureFlowTest`, `AdminContentTemplateTest` | Rutas del panel de contenido y render con datos reales de PostgreSQL |
@@ -371,7 +373,7 @@ no aparezca un destello blanco. Los tokens y las reglas están en
 | `ActuatorSecurityTest`, `BusinessMetricsTest` | Acceso a Actuator y contadores `mundomanitas_*` |
 | `R2HealthIndicatorTest`, `PaymentHealthIndicatorTest` | Estado de R2 y de la pasarela |
 
-Resultado actual: **201 de 201 en verde**. El detalle de monitoreo está en
+Resultado actual: **203 de 203 en verde**. El detalle de monitoreo está en
 [`docs/plan-de-monitoreo.md`](docs/plan-de-monitoreo.md).
 
 ## Estado

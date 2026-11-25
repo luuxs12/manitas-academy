@@ -25,6 +25,10 @@ spring:
 
 server:
   port: 8080
+  servlet:
+    session:
+      cookie:
+        same-site: lax
 
 app:
   security:

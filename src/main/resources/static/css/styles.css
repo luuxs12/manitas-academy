@@ -6334,9 +6334,27 @@ html[data-theme="dark"] .panel-stats li {
     margin: 1rem 0 1.2rem;
 }
 
+.admin-page-head > div { min-width: 0; }
 .admin-page-head h1 { margin: 0; font-size: 2.1rem; }
 .admin-page-head p { margin: .3rem 0 0; color: var(--muted); font-family: var(--nav); font-size: .84rem; }
 .admin-actions { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; }
+
+.admin-course-copy {
+    display: grid;
+    gap: .15rem;
+    min-width: 0;
+}
+
+.admin-course-copy strong {
+    font-weight: 700;
+    overflow-wrap: anywhere;
+}
+
+.admin-course-copy small {
+    color: var(--muted);
+    font-size: .74rem;
+    overflow-wrap: anywhere;
+}
 
 .admin-back {
     color: var(--muted);
@@ -6586,6 +6604,16 @@ html[data-theme="dark"] .panel-stats li {
 .admin-module-head h3 { display: grid; gap: .1rem; margin: 0; font-size: 1.2rem; }
 .admin-module-head h3 span:first-child { color: var(--muted); font-family: var(--nav); font-size: .72rem; font-weight: 700; letter-spacing: .04em; text-transform: uppercase; }
 .admin-module-head p { margin: .2rem 0 0; }
+.admin-module-number {
+    color: var(--muted);
+    font-family: var(--nav);
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+.admin-module-name { font-size: 1.2rem; }
+.admin-module-head .admin-status { align-self: flex-start; }
 .admin-section { margin-top: 1rem; }
 .admin-section-head { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; margin-bottom: .6rem; }
 .admin-section-head h4 { margin: 0; font-size: 1rem; }
@@ -6595,13 +6623,20 @@ html[data-theme="dark"] .panel-stats li {
     flex-wrap: wrap;
     align-items: center;
     justify-content: space-between;
-    gap: .7rem;
-    padding: .6rem .7rem;
+    gap: .8rem;
+    padding: .75rem .85rem;
     border: 1px solid var(--line);
     border-radius: 10px;
     background: var(--surface-2);
 }
-.admin-content-copy { display: grid; gap: .18rem; min-width: 0; }
+.admin-content-copy { display: grid; gap: .22rem; min-width: 0; }
+.admin-content-top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: .35rem .6rem;
+}
 .admin-content-copy strong { font-family: var(--nav); font-size: .84rem; overflow-wrap: anywhere; }
 .admin-content-copy small { color: var(--muted); font-size: .74rem; overflow-wrap: anywhere; }
 .admin-content-copy a { color: inherit; text-decoration: underline; }

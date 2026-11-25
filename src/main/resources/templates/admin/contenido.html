@@ -35,14 +35,14 @@
                          th:id="'modulo-' + ${module.id()}"
                          th:attr="aria-labelledby='titulo-' + ${module.id()}">
                     <div class="admin-module-head">
-                        <div>
-                            <h3 th:id="'titulo-' + ${module.id()}">
-                                <span th:text="'Módulo ' + ${i.count}">Módulo 1</span>
-                                <span th:text="${module.title()}">Nombre del módulo</span>
-                            </h3>
-                            <p class="admin-muted" th:text="${!module.visible()} ? 'Oculto para el estudiante' : 'Visible para el estudiante'">Visible</p>
-                        </div>
+                        <h3 th:id="'titulo-' + ${module.id()}">
+                            <span class="admin-module-number" th:text="'Módulo ' + ${i.count}">Módulo 1</span>
+                            <span class="admin-module-name" th:text="${module.title()}">Nombre del módulo</span>
+                        </h3>
+                        <span class="admin-status" th:classappend="${module.visible()} ? ' is-ok' : ' is-bad'"
+                              th:text="${module.visible()} ? 'Visible' : 'Oculta'">Visible</span>
                     </div>
+                    <p class="admin-muted" th:text="${!module.visible()} ? 'Oculto para el estudiante' : 'Visible para el estudiante'">Visible</p>
 
                     <p class="admin-empty" th:if="${#lists.isEmpty(module.sections()) and #lists.isEmpty(module.items())}">
                         Este módulo todavía no tiene secciones ni ítems.
@@ -55,34 +55,9 @@
                                   th:text="${section.visible()} ? 'Visible' : 'Oculta'">Visible</span>
                         </div>
                         <ul class="admin-content-list">
-                            <li class="admin-content-item" th:each="item : ${section.items()}">
-                                <div class="admin-content-copy">
-                                    <span class="admin-type" th:text="${item.type()}">VIDEO</span>
-                                    <strong th:text="${item.title()}">Ítem</strong>
-                                    <small th:if="${item.description() != null}" th:text="${item.description()}">Descripción</small>
-                                    <small th:if="${item.type() == 'MATERIAL' and item.url() != null}">
-                                        <a th:href="${item.url()}" target="_blank" rel="noopener noreferrer"
-                                           th:attr="aria-label='Abrir el enlace de ' + ${item.title()} + ' en pestaña nueva'"
-                                           th:text="${item.url()}">Enlace</a>
-                                    </small>
-                                    <small th:if="${item.type() == 'VIDEO'}"
-                                           th:text="${item.durationLabel()}">Sin duración</small>
-                                    <small th:unless="${section.visible() and item.visible()}">Oculto en el temario del estudiante</small>
-                                </div>
-                                <div class="admin-row-actions">
-                                    <form method="post" th:action="@{/admin/cursos/{c}/contenido/items/{i}/mover(c=${courseId},i=${item.id()})}">
-                                        <input type="hidden" name="up" value="true">
-                                        <button class="admin-move" type="submit" th:attr="aria-label='Subir ' + ${item.title()}">↑</button>
-                                    </form>
-                                    <form method="post" th:action="@{/admin/cursos/{c}/contenido/items/{i}/mover(c=${courseId},i=${item.id()})}">
-                                        <input type="hidden" name="up" value="false">
-                                        <button class="admin-move" type="submit" th:attr="aria-label='Bajar ' + ${item.title()}">↓</button>
-                                    </form>
-                                    <a class="admin-confirm-link"
-                                       th:href="@{/admin/cursos/{c}/contenido/items/{i}/eliminar(c=${courseId},i=${item.id()})}"
-                                       th:attr="aria-label='Eliminar ' + ${item.title()}">Eliminar</a>
-                                </div>
-                            </li>
+                            <th:block th:each="item : ${section.items()}">
+                                <li th:replace="~{fragments/admin-content-item :: row(item, section)}"></li>
+                            </th:block>
                         </ul>
                         <div class="admin-row-actions admin-section-actions">
                             <form method="post" th:action="@{/admin/cursos/{c}/contenido/secciones/{s}/mover(c=${courseId},s=${section.id()})}">
@@ -100,26 +75,9 @@
                     </div>
 
                     <ul class="admin-content-list" th:if="${!#lists.isEmpty(module.items())}">
-                        <li class="admin-content-item" th:each="item : ${module.items()}">
-                            <div class="admin-content-copy">
-                                <span class="admin-type" th:text="${item.type()}">VIDEO</span>
-                                <strong th:text="${item.title()}">Ítem</strong>
-                                <small>Sin sección</small>
-                            </div>
-                            <div class="admin-row-actions">
-                                <form method="post" th:action="@{/admin/cursos/{c}/contenido/items/{i}/mover(c=${courseId},i=${item.id()})}">
-                                    <input type="hidden" name="up" value="true">
-                                    <button class="admin-move" type="submit" th:attr="aria-label='Subir ' + ${item.title()}">↑</button>
-                                </form>
-                                <form method="post" th:action="@{/admin/cursos/{c}/contenido/items/{i}/mover(c=${courseId},i=${item.id()})}">
-                                    <input type="hidden" name="up" value="false">
-                                    <button class="admin-move" type="submit" th:attr="aria-label='Bajar ' + ${item.title()}">↓</button>
-                                </form>
-                                <a class="admin-confirm-link"
-                                   th:href="@{/admin/cursos/{c}/contenido/items/{i}/eliminar(c=${courseId},i=${item.id()})}"
-                                   th:attr="aria-label='Eliminar ' + ${item.title()}">Eliminar</a>
-                            </div>
-                        </li>
+                        <th:block th:each="item : ${module.items()}" th:with="section=${null}">
+                            <li th:replace="~{fragments/admin-content-item :: row(item, section)}"></li>
+                        </th:block>
                     </ul>
                 </article>
 

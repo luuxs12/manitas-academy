@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+<!-- Fila compartida por los ítems con sección y los sueltos del temario admin. -->
+<li class="admin-content-item" th:fragment="row(item, section)">
+    <div class="admin-content-copy">
+        <div class="admin-content-top">
+            <span class="admin-type" th:text="${item.type()}">VIDEO</span>
+            <span class="admin-status"
+                  th:classappend="${item.visible() and (section == null or section.visible())} ? ' is-ok' : ' is-bad'"
+                  th:text="${item.visible() and (section == null or section.visible())} ? 'Visible' : 'Oculto'">Visible</span>
+        </div>
+
+        <strong th:text="${item.title()}">Ítem</strong>
+
+        <small th:if="${item.description() != null}" th:text="${item.description()}">Descripción</small>
+        <small th:if="${item.type() == 'MATERIAL' and item.url() != null}">
+            <a th:href="${item.url()}" target="_blank" rel="noopener noreferrer"
+               th:attr="aria-label='Abrir el enlace de ' + ${item.title()} + ' en pestaña nueva'"
+               th:text="${item.url()}">Enlace</a>
+        </small>
+        <small th:if="${item.type() == 'VIDEO'}" th:text="${item.durationLabel()}">Sin duración</small>
+        <small th:if="${section == null}">Sin sección</small>
+        <small th:if="${!item.visible() or (section != null and !section.visible())}">
+            Oculto en el temario del estudiante
+        </small>
+    </div>
+
+    <div class="admin-row-actions">
+        <form method="post"
+              th:action="@{/admin/cursos/{c}/contenido/items/{i}/mover(c=${courseId},i=${item.id()})}">
+            <input type="hidden" name="up" value="true">
+            <button class="admin-move" type="submit"
+                    th:attr="aria-label='Subir ' + ${item.title()}">↑</button>
+        </form>
+        <form method="post"
+              th:action="@{/admin/cursos/{c}/contenido/items/{i}/mover(c=${courseId},i=${item.id()})}">
+            <input type="hidden" name="up" value="false">
+            <button class="admin-move" type="submit"
+                    th:attr="aria-label='Bajar ' + ${item.title()}">↓</button>
+        </form>
+        <a class="admin-confirm-link"
+           th:href="@{/admin/cursos/{c}/contenido/items/{i}/eliminar(c=${courseId},i=${item.id()})}"
+           th:attr="aria-label='Eliminar ' + ${item.title()}">Eliminar</a>
+    </div>
+</li>
+
+</body>
+</html>

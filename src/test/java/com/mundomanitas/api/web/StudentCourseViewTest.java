@@ -100,6 +100,8 @@ class StudentCourseViewTest {
         String student = read("templates/student/curso.html");
         String item = readSyllabusItem();
         String admin = read("templates/admin/contenido.html");
+        String adminRow = read(Path.of("src", "main", "resources", "templates", "fragments",
+                "admin-content-item.html"));
         String css = read("static/css/styles.css");
 
         assertThat(student).contains("(${itemCount} == 1 ? 'ítem terminado' : 'ítems terminados')");
@@ -107,9 +109,9 @@ class StudentCourseViewTest {
         assertThat(admin).contains("(${outline.doneItems()} == 1 ? ' visto' : ' vistos')");
 
         assertThat(item).contains("th:text=\"${item.durationLabel()}\"");
-        assertThat(admin).contains("th:text=\"${item.durationLabel()}\"");
+        assertThat(adminRow).contains("th:text=\"${item.durationLabel()}\"");
         assertThat(item).doesNotContain("item.durationSeconds() + ' s'");
-        assertThat(admin).doesNotContain("item.durationSeconds() + ' s'");
+        assertThat(adminRow).doesNotContain("item.durationSeconds() + ' s'");
 
         // Un ítem suelto también debe resaltarse cuando es la clase abierta.
         // La fila vive en un fragmento compartido por los dos caminos.
@@ -118,7 +120,7 @@ class StudentCourseViewTest {
 
         assertThat(student).contains("<span aria-hidden=\"true\" th:style=");
         assertThat(item).contains("(abre en pestaña nueva)");
-        assertThat(admin).contains("en pestaña nueva");
+        assertThat(adminRow).contains("en pestaña nueva");
 
         assertThat(css).contains(".syllabus-title {\n    font-weight: 700;\n    overflow-wrap: anywhere;\n}");
         assertThat(css).contains(".admin-content-copy strong { font-family: var(--nav); font-size: .84rem; overflow-wrap: anywhere; }");
@@ -206,5 +208,10 @@ class StudentCourseViewTest {
         try (var stream = new ClassPathResource(path).getInputStream()) {
             return new String(stream.readAllBytes(), StandardCharsets.UTF_8);
         }
+    }
+
+    private String read(Path path) throws IOException {
+        assertThat(path).exists();
+        return Files.readString(path, StandardCharsets.UTF_8);
     }
 }

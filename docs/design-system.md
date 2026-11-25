@@ -247,11 +247,14 @@ perfil, cursos y panel de administración:
 | `.admin-publication` / `.admin-checklist` | estado `PUBLICADO`/`BORRADOR` y requisitos calculados desde la base antes de publicar |
 | `.admin-field` | envoltorio de etiqueta, control, ayuda y error; el error se enlaza con `aria-describedby` y `aria-invalid` |
 | `.admin-table caption` | título accesible de las tablas del panel, con encabezados `scope="col"` |
+| `.admin-page-head > div` / `.admin-course-copy` | encabezado y celda de curso con el título arriba y el slug debajo; ambos pueden romperse sin desbordar |
 | `.admin-structure` / `.admin-structure-head` | página de contenido del curso: temario, alta de ítems y sílabo en secciones apiladas |
 | `.admin-module` / `.admin-module-head` | módulo real con rótulo “Módulo N”, estado visible/oculto y ancla propia |
+| `.admin-module-number` / `.admin-module-name` / `.admin-module-head .admin-status` | número y nombre del módulo alineados, con el estado a la derecha |
 | `.admin-section` / `.admin-section-head` | sección del módulo con su estado y acciones de orden y borrado |
-| `.admin-content-list` / `.admin-content-item` | lista de ítems (video, material, ejercicio) con tipo, título, descripción y enlace |
-| `.admin-type` | distintivo textual del tipo de ítem; no sustituye al nombre del tipo |
+| `.admin-content-list` / `.admin-content-item` | lista de ítems (video, material, ejercicio) con más espacio entre filas |
+| `fragments/admin-content-item.html` | fila compartida por ítems con sección y sueltos: tipo y estado, título, detalles y acciones |
+| `.admin-content-top` / `.admin-type` | primera línea de la fila, con el tipo a la izquierda y el estado a la derecha |
 | `.admin-move` | botón de reordenar con flecha y `aria-label` que nombra el ítem |
 | `.admin-inline-form` | formulario desplegable dentro de la página; no es un modal ni un overlay |
 | `.admin-card > h2` / `.admin-module-head h3` / `.admin-section-head h4` | jerarquía 2.1 → 1.5 → 1.2 → 1 rem en el panel; el título del módulo nunca queda más chico que el de la sección |

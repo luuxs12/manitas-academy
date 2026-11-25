@@ -48,10 +48,17 @@ public final class YouTubeLink {
         return found != null && ID.matcher(found).matches() ? found : null;
     }
 
-    /** Embed sin cookies para el ID indicado; {@code null} si no es válido. */
+    /**
+     * Embed sin cookies para el ID indicado; {@code null} si no es válido.
+     *
+     * <p>{@code rel=0} evita videos relacionados ajenos al curso y
+     * {@code enablejsapi=1} permite detectar el fin de la clase por
+     * {@code postMessage} sin cambiar tema, contraste ni velocidad.</p>
+     */
     public static String embedUrl(String youtubeId) {
         String id = id(youtubeId);
-        return id == null ? null : "https://www.youtube-nocookie.com/embed/" + id;
+        return id == null ? null
+                : "https://www.youtube-nocookie.com/embed/" + id + "?rel=0&enablejsapi=1";
     }
 
     private static String queryValue(String query, String key) {

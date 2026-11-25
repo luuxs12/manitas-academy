@@ -39,3 +39,27 @@
         button.addEventListener("click", () => window.print());
     }
 })();
+
+/* YouTube informa el fin de la clase por postMessage. Es una pista, no una
+   acción: marcar como visto sigue siendo una decisión confirmada con el botón. */
+(() => {
+    const hint = document.querySelector("[data-video-end-hint]");
+    const frame = document.querySelector("[data-video-frame]");
+    if (!hint || !frame) return;
+
+    const allowed = ["https://www.youtube-nocookie.com", "https://www.youtube.com"];
+    window.addEventListener("message", (event) => {
+        if (!allowed.includes(event.origin)) return;
+        let data = event.data;
+        if (typeof data === "string") {
+            try {
+                data = JSON.parse(data);
+            } catch (error) {
+                return;
+            }
+        }
+        if (data && data.event === "onStateChange" && data.info === 0) {
+            hint.hidden = false;
+        }
+    });
+})();

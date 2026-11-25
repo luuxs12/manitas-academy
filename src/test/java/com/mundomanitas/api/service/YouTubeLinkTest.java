@@ -47,6 +47,6 @@ class YouTubeLinkTest {
     @DisplayName("arma el embed sin cookies con un ID validado")
     void buildsPrivateEmbed() {
         assertThat(YouTubeLink.embedUrl("dQw4w9WgXcQ"))
-                .isEqualTo("https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ");
+                .isEqualTo("https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?rel=0&enablejsapi=1");
     }
 }

@@ -57,7 +57,7 @@ class VideoPlaybackServiceTest {
         VideoPlaybackService.Playback playback = service.play(videoId, enrollment);
 
         assertThat(playback.url())
-                .isEqualTo("https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ");
+                .isEqualTo("https://www.youtube-nocookie.com/embed/dQw4w9WgXcQ?rel=0&enablejsapi=1");
     }
 
     @Test

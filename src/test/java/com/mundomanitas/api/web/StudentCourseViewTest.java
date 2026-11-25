@@ -24,14 +24,21 @@ class StudentCourseViewTest {
             "templates/student/certificado.html");
 
     @Test
-    @DisplayName("el temario sale de los módulos con clases y ejercicios reales")
+    @DisplayName("el temario sale de módulos, secciones e ítems reales de PostgreSQL")
     void syllabusUsesDatabaseContent() throws IOException {
         String html = read("templates/student/curso.html");
 
-        assertThat(html).contains("th:each=\"module : ${modules}\"");
-        assertThat(html).contains("th:each=\"video : ${module.videos()}\"");
-        assertThat(html).contains("th:each=\"exercise : ${module.exercises()}\"");
-        assertThat(html).contains("th:text=\"${exercise.prompt()}\"");
+        assertThat(html).contains("th:each=\"module, i : ${modules}\"");
+        assertThat(html).contains("th:text=\"'Módulo ' + ${i.count}\"");
+        assertThat(html).contains("th:each=\"section : ${module.sections()}\"");
+        assertThat(html).contains("th:each=\"item : ${section.items()}\"");
+        assertThat(html).contains("th:each=\"item : ${module.items()}\"");
+        assertThat(html).contains("th:text=\"${item.type()}\"");
+        assertThat(html).contains("th:text=\"${item.title()}\"");
+        assertThat(html).contains("video=${item.sourceId()}");
+        assertThat(html).contains("/items/{itemId}/visto");
+        assertThat(html).contains("Sin sección");
+        assertThat(html).contains("Sin fecha límite");
         assertThat(html).contains("th:title=\"${player.title()}\"");
     }
 
@@ -62,8 +69,10 @@ class StudentCourseViewTest {
         String docs = Files.readString(Path.of("docs", "design-system.md"), StandardCharsets.UTF_8);
 
         assertThat(css).contains(".syllabus-group {");
-        assertThat(css).contains(".syllabus-exercise {");
-        assertThat(docs).contains("`.syllabus-exercises` / `.syllabus-exercise`");
+        assertThat(css).contains(".syllabus-section {");
+        assertThat(css).contains(".syllabus-item-actions {");
+        assertThat(docs).contains("`.syllabus-section`");
+        assertThat(docs).contains("`.syllabus-item-actions`");
     }
 
     private String read(String path) throws IOException {

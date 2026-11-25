@@ -155,6 +155,28 @@ class CourseContentServiceTest {
     }
 
     @Test
+    @DisplayName("expone el id del video para abrir la clase desde el temario")
+    void exposesVideoSource() {
+        UUID enrollmentId = UUID.randomUUID();
+        UUID moduleId = UUID.randomUUID();
+        UUID videoId = UUID.randomUUID();
+        UUID itemId = UUID.randomUUID();
+        ContentItem video = item(itemId, moduleId, null, "VIDEO", videoId,
+                "Clase 1", "dQw4w9WgXcQ", 0);
+
+        when(courses.findById(courseId)).thenReturn(Optional.of(course(true)));
+        when(modules.findByCourseIdOrderByPositionAsc(courseId)).thenReturn(List.of(module(moduleId)));
+        when(sections.findByModuleIdOrderByPositionAsc(moduleId)).thenReturn(List.of());
+        when(items.findByModuleIdOrderByPositionAsc(moduleId)).thenReturn(List.of(video));
+        when(lessonProgress.findByEnrollmentIdOrderByCompletedAtAsc(enrollmentId)).thenReturn(List.of());
+        when(itemProgress.findByEnrollmentIdOrderByCompletedAtAsc(enrollmentId)).thenReturn(List.of());
+
+        CourseContentService.Outline outline = service.outline(courseId, enrollmentId, null, false);
+
+        assertThat(outline.modules().get(0).items().get(0).sourceId()).isEqualTo(videoId);
+    }
+
+    @Test
     @DisplayName("marca como visto un material sin tocar el progreso de videos")
     void marksMaterialAsSeen() {
         User student = new User("alumno@test.local", "hash", "Alumno");

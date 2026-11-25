@@ -23,7 +23,15 @@ public interface CourseContentService {
 
     record ItemView(UUID id, String type, String title, String description, String url,
                     String youtubeId, Integer durationSeconds, boolean visible, boolean seen,
-                    boolean locked) {
+                    boolean locked, UUID sourceId) {
+
+        /** Conserva la firma anterior para vistas que no necesitan la referencia al video. */
+        public ItemView(UUID id, String type, String title, String description, String url,
+                        String youtubeId, Integer durationSeconds, boolean visible, boolean seen,
+                        boolean locked) {
+            this(id, type, title, description, url, youtubeId, durationSeconds, visible, seen,
+                    locked, null);
+        }
     }
 
     record SectionView(UUID id, String title, boolean visible, List<ItemView> items) {

@@ -202,7 +202,7 @@ public class CourseContentServiceImpl implements CourseContentService {
         return new ItemView(item.getId(), item.getSourceType(), item.getTitle(),
                 item.getDescription(), item.getUrl(), item.getYoutubeId(),
                 item.getDurationSeconds(), item.isVisible(),
-                isSeen(item, seenVideos, seenItems), locked);
+                isSeen(item, seenVideos, seenItems), locked, item.getSourceId());
     }
 
     private boolean isSeen(ContentItem item, Set<UUID> seenVideos, Set<UUID> seenItems) {

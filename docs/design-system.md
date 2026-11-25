@@ -222,6 +222,12 @@ perfil, cursos y panel de administración:
 | `.syllabus-groups` / `.syllabus-group` / `.syllabus-group-title` | temario agrupado por módulo, con el título real del módulo como encabezado |
 | `.syllabus-exercises` / `.syllabus-exercise` | consignas guardadas en PostgreSQL, debajo de las clases de cada módulo; no alteran el progreso |
 | `.syllabus-no-videos` | aviso accesible cuando un módulo aún no tiene clases cargadas |
+| `.syllabus-progress` | porcentaje real del módulo, calculado sobre sus ítems visibles |
+| `.syllabus-section` / `.syllabus-section-title` | agrupación por sección del módulo; los ítems sin sección se muestran bajo “Sin sección” |
+| `.syllabus-item-copy` / `.syllabus-item-type` | bloque del ítem con su tipo (VIDEO, MATERIAL o EJERCICIO), título y descripción de PostgreSQL |
+| `.syllabus-item-actions` / `.syllabus-link` | acciones del ítem: abrir la clase, abrir el material o marcarlo como visto; se apilan bajo 620 px |
+| `.syllabus-description` | texto de apoyo del ítem; nunca reemplaza al título ni inventa fechas |
+| `.player-hint` | aviso `role="status"` que aparece si YouTube informa por `postMessage` que el video terminó; el botón sigue siendo la acción confirmada |
 
 ### Componentes del panel administrativo
 

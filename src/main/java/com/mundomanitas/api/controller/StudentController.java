@@ -6,6 +6,7 @@ import com.mundomanitas.api.model.User;
 import com.mundomanitas.api.security.AuthenticatedUser;
 import com.mundomanitas.api.service.AccountService;
 import com.mundomanitas.api.service.CourseCatalog;
+import com.mundomanitas.api.service.CourseContentService;
 import com.mundomanitas.api.service.EnrollmentService;
 import com.mundomanitas.api.service.LessonProgressService;
 import com.mundomanitas.api.service.StudentContentService;
@@ -46,6 +47,7 @@ public class StudentController {
     private final LessonProgressService lessons;
     private final VideoPlaybackService playback;
     private final StudentContentService content;
+    private final CourseContentService structure;
 
     public StudentController(
             AccountService accounts,
@@ -53,7 +55,8 @@ public class StudentController {
             EnrollmentService enrollments,
             LessonProgressService lessons,
             VideoPlaybackService playback,
-            StudentContentService content
+            StudentContentService content,
+            CourseContentService structure
     ) {
         this.accounts = accounts;
         this.catalog = catalog;
@@ -61,6 +64,7 @@ public class StudentController {
         this.lessons = lessons;
         this.playback = playback;
         this.content = content;
+        this.structure = structure;
     }
 
     @GetMapping
@@ -132,9 +136,8 @@ public class StudentController {
         User user = accounts.require(principal.getId());
         Enrollment enrollment = enrollments.findMine(user, slug);
         UUID courseId = enrollment.getCourse().getId();
-        StudentContentService.Outline outline = content.outline(courseId);
-        StudentContentService.Progress progress =
-                content.progress(enrollment.getId(), courseId);
+        CourseContentService.Outline outline =
+                structure.outline(courseId, enrollment.getId(), user, false);
         Set<UUID> doneVideos = lessons.completedVideos(enrollment.getId());
 
         VideoPlaybackService.Playback player = null;
@@ -152,9 +155,9 @@ public class StudentController {
         model.addAttribute("doneVideos", doneVideos);
         model.addAttribute("selectedId", player == null ? null : videoId);
         model.addAttribute("player", player);
-        model.addAttribute("videoCount", progress.total());
-        model.addAttribute("doneCount", progress.done());
-        model.addAttribute("videoPercent", progress.percent());
+        model.addAttribute("itemCount", outline.totalItems());
+        model.addAttribute("doneCount", outline.doneItems());
+        model.addAttribute("itemPercent", outline.percent());
         return "student/curso";
     }
 
@@ -222,6 +225,22 @@ public class StudentController {
                 "Avance guardado en «" + enrollment.getCourse().getTitle() + "»."
         );
         return "redirect:/panel/cursos/" + slug + "?video=" + videoId;
+    }
+
+    /** Guarda el avance de materiales y ejercicios del temario estructurado. */
+    @PostMapping("/cursos/{slug}/items/{itemId}/visto")
+    public String markItem(
+            @AuthenticationPrincipal AuthenticatedUser principal,
+            @PathVariable String slug,
+            @PathVariable UUID itemId,
+            @RequestParam(name = "seen", defaultValue = "true") boolean seen,
+            RedirectAttributes redirect
+    ) {
+        User user = accounts.require(principal.getId());
+        String title = enrollments.findMine(user, slug).getCourse().getTitle();
+        structure.markSeen(user, slug, itemId, seen);
+        redirect.addFlashAttribute("panelOk", "Avance guardado en «" + title + "».");
+        return "redirect:/panel/cursos/" + slug;
     }
 
     @GetMapping("/certificados")

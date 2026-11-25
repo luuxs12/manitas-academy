@@ -16,11 +16,15 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -97,6 +101,49 @@ class StudentContentServiceTest {
     }
 
     @Test
+    @DisplayName("el avance en lote consulta una sola vez videos y progreso de todas las matrículas")
+    void progressForUsesOneBatchPerSource() {
+        UUID firstCourse = UUID.randomUUID();
+        UUID secondCourse = UUID.randomUUID();
+        UUID firstEnrollment = UUID.randomUUID();
+        UUID secondEnrollment = UUID.randomUUID();
+        UUID watched = UUID.randomUUID();
+        UUID other = UUID.randomUUID();
+        UUID extra = UUID.randomUUID();
+
+        Enrollment one = mock(Enrollment.class);
+        Enrollment two = mock(Enrollment.class);
+        Course first = mock(Course.class);
+        Course second = mock(Course.class);
+        when(one.getId()).thenReturn(firstEnrollment);
+        when(two.getId()).thenReturn(secondEnrollment);
+        when(one.getCourse()).thenReturn(first);
+        when(two.getCourse()).thenReturn(second);
+        when(first.getId()).thenReturn(firstCourse);
+        when(second.getId()).thenReturn(secondCourse);
+
+        List<VideoRepository.CourseVideo> courseVideos = List.of(
+                courseVideo(firstCourse, watched),
+                courseVideo(secondCourse, other),
+                courseVideo(secondCourse, extra));
+        when(videos.findCourseVideos(Set.of(firstCourse, secondCourse))).thenReturn(courseVideos);
+        when(lessons.completedVideosFor(Set.of(firstEnrollment, secondEnrollment)))
+                .thenReturn(Map.of(
+                        firstEnrollment, Set.of(watched),
+                        secondEnrollment, Set.of(other)));
+
+        Map<UUID, StudentContentService.Progress> result = service.progressFor(List.of(one, two));
+
+        assertThat(result).containsOnlyKeys(firstEnrollment, secondEnrollment);
+        assertThat(result.get(firstEnrollment))
+                .isEqualTo(new StudentContentService.Progress(1, 1, 100));
+        assertThat(result.get(secondEnrollment))
+                .isEqualTo(new StudentContentService.Progress(1, 2, 50));
+        verify(videos, times(1)).findCourseVideos(any());
+        verify(lessons, times(1)).completedVideosFor(any());
+    }
+
+    @Test
     @DisplayName("el total general suma el avance vigente de cada matrícula")
     void totalsAcrossEnrollments() {
         UUID firstCourse = UUID.randomUUID();
@@ -115,17 +162,26 @@ class StudentContentServiceTest {
         when(two.getCourse()).thenReturn(second);
         when(first.getId()).thenReturn(firstCourse);
         when(second.getId()).thenReturn(secondCourse);
-        when(videos.findIdsByCourseId(firstCourse)).thenReturn(List.of(watched));
-        when(videos.findIdsByCourseId(secondCourse))
-                .thenReturn(List.of(UUID.randomUUID(), UUID.randomUUID()));
-        when(lessons.completedVideos(firstEnrollment)).thenReturn(Set.of(watched));
-        when(lessons.completedVideos(secondEnrollment)).thenReturn(Set.of());
+        List<VideoRepository.CourseVideo> courseVideos = List.of(
+                courseVideo(firstCourse, watched),
+                courseVideo(secondCourse, UUID.randomUUID()),
+                courseVideo(secondCourse, UUID.randomUUID()));
+        when(videos.findCourseVideos(Set.of(firstCourse, secondCourse))).thenReturn(courseVideos);
+        when(lessons.completedVideosFor(Set.of(firstEnrollment, secondEnrollment)))
+                .thenReturn(Map.of(firstEnrollment, Set.of(watched), secondEnrollment, Set.of()));
 
         StudentContentService.Progress totals = service.totals(List.of(one, two));
 
         assertThat(totals.done()).isEqualTo(1);
         assertThat(totals.total()).isEqualTo(3);
         assertThat(totals.percent()).isEqualTo(33);
+    }
+
+    private VideoRepository.CourseVideo courseVideo(UUID courseId, UUID videoId) {
+        var row = mock(VideoRepository.CourseVideo.class);
+        when(row.getCourseId()).thenReturn(courseId);
+        when(row.getVideoId()).thenReturn(videoId);
+        return row;
     }
 
     @Test

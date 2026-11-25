@@ -114,20 +114,20 @@ class StudentContentFlowTest {
         when(dashboardEnrollment.getCourse()).thenReturn(dashboardCourse);
 
         when(enrollments.mine(student)).thenReturn(List.of(dashboardEnrollment));
-        when(enrollments.next(student)).thenReturn(dashboardEnrollment);
-        when(oldContent.progress(dashboardEnrollmentId, courseId))
-                .thenReturn(new StudentContentService.Progress(3, 10, 30));
-        when(oldContent.totals(List.of(dashboardEnrollment)))
-                .thenReturn(new StudentContentService.Progress(3, 10, 30));
+        when(oldContent.progressFor(List.of(dashboardEnrollment)))
+                .thenReturn(Map.of(dashboardEnrollmentId,
+                        new StudentContentService.Progress(3, 10, 30)));
         when(catalog.all()).thenReturn(List.of());
 
         mvc.perform(get("/panel"))
                 .andExpect(view().name("student/panel"))
                 .andExpect(model().attribute("doneCounts", Map.of(dashboardEnrollmentId, 3)))
                 .andExpect(model().attribute("videoCounts", Map.of(dashboardEnrollmentId, 10)))
-                .andExpect(model().attribute("videoProgress", Map.of(dashboardEnrollmentId, 30)));
+                .andExpect(model().attribute("videoProgress", Map.of(dashboardEnrollmentId, 30)))
+                .andExpect(model().attribute("videoTotals",
+                        new LessonProgressService.LessonTotals(3, 10, 30)));
 
-        verify(oldContent).progress(dashboardEnrollmentId, courseId);
+        verify(oldContent).progressFor(List.of(dashboardEnrollment));
     }
 
     @Test

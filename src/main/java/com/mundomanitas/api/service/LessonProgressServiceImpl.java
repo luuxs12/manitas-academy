@@ -17,7 +17,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -72,6 +75,27 @@ public class LessonProgressServiceImpl implements LessonProgressService {
             result.add(item.getVideoId());
         }
         return result.build();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Map<UUID, Set<UUID>> completedVideosFor(Set<UUID> enrollmentIds) {
+        if (enrollmentIds.isEmpty()) {
+            return Map.of();
+        }
+        Map<UUID, Set<UUID>> found = new HashMap<>();
+        for (UUID enrollmentId : enrollmentIds) {
+            found.put(enrollmentId, new HashSet<>());
+        }
+        for (LessonProgress item : progress.findByEnrollmentIdIn(enrollmentIds)) {
+            found.computeIfAbsent(item.getEnrollmentId(), ignored -> new HashSet<>())
+                    .add(item.getVideoId());
+        }
+        Map<UUID, Set<UUID>> result = new HashMap<>();
+        found.forEach((enrollmentId, videos) ->
+                result.put(enrollmentId, Set.copyOf(videos)));
+        log.info("Videos terminados recuperados en lote para {} matrículas", enrollmentIds.size());
+        return result;
     }
 
     /**

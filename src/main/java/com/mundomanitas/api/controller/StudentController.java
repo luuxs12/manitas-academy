@@ -93,7 +93,7 @@ public class StudentController {
         model.addAttribute("doneCounts", courseProgress.done());
         model.addAttribute("videoCounts", courseProgress.total());
         model.addAttribute("videoProgress", courseProgress.percent());
-        model.addAttribute("videoTotals", lessonTotals(mine));
+        model.addAttribute("videoTotals", courseProgress.totals());
         model.addAttribute("certificates", user.isPremium() ? completed : 0);
         model.addAttribute("recommended", catalog.all().stream()
                 .filter(course -> !enrolledSlugs.contains(course.getSlug()))
@@ -113,7 +113,7 @@ public class StudentController {
         CourseProgress courseProgress = progressOf(mine);
         model.addAttribute("enrollments", mine);
         model.addAttribute("completed", enrollments.completed(user).size());
-        model.addAttribute("videoTotals", lessonTotals(mine));
+        model.addAttribute("videoTotals", courseProgress.totals());
         model.addAttribute("doneCounts", courseProgress.done());
         model.addAttribute("videoCounts", courseProgress.total());
         model.addAttribute("videoProgress", courseProgress.percent());
@@ -293,30 +293,34 @@ public class StudentController {
         return "redirect:/panel/explorar";
     }
 
-    /** Avance por matrícula: el panel y el listado muestran las mismas cifras. */
+    /** Avance por matrícula: el panel y el listado comparten una sola consulta. */
     private CourseProgress progressOf(List<Enrollment> mine) {
         Map<UUID, Integer> done = new HashMap<>();
         Map<UUID, Integer> total = new HashMap<>();
         Map<UUID, Integer> percent = new HashMap<>();
-        for (Enrollment enrollment : mine) {
-            StudentContentService.Progress progress =
-                    content.progress(enrollment.getId(), enrollment.getCourse().getId());
-            done.put(enrollment.getId(), progress.done());
-            total.put(enrollment.getId(), progress.total());
-            percent.put(enrollment.getId(), progress.percent());
+        int completedVideos = 0;
+        int allVideos = 0;
+        for (Map.Entry<UUID, StudentContentService.Progress> entry
+                : content.progressFor(mine).entrySet()) {
+            UUID enrollmentId = entry.getKey();
+            StudentContentService.Progress progress = entry.getValue();
+            done.put(enrollmentId, progress.done());
+            total.put(enrollmentId, progress.total());
+            percent.put(enrollmentId, progress.percent());
+            completedVideos += progress.done();
+            allVideos += progress.total();
         }
-        return new CourseProgress(done, total, percent);
+        int overall = allVideos == 0
+                ? 0
+                : (int) Math.round(completedVideos * 100.0 / allVideos);
+        LessonProgressService.LessonTotals totals =
+                new LessonProgressService.LessonTotals(completedVideos, allVideos, overall);
+        return new CourseProgress(done, total, percent, totals);
     }
 
     private record CourseProgress(
             Map<UUID, Integer> done,
             Map<UUID, Integer> total,
-            Map<UUID, Integer> percent) {}
-
-    /** El modelo de las plantillas de cursos sigue usando el total histórico. */
-    private LessonProgressService.LessonTotals lessonTotals(List<Enrollment> mine) {
-        StudentContentService.Progress total = content.totals(mine);
-        return new LessonProgressService.LessonTotals(
-                total.done(), total.total(), total.percent());
-    }
+            Map<UUID, Integer> percent,
+            LessonProgressService.LessonTotals totals) {}
 }

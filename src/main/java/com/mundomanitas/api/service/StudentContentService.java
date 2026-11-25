@@ -3,6 +3,7 @@ package com.mundomanitas.api.service;
 import com.mundomanitas.api.model.Enrollment;
 
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -34,6 +35,9 @@ public interface StudentContentService {
 
     /** Avance sobre los videos que siguen perteneciendo al curso. */
     Progress progress(UUID enrollmentId, UUID courseId);
+
+    /** Avance de todas las matrículas en una sola pasada por los datos. */
+    Map<UUID, Progress> progressFor(List<Enrollment> mine);
 
     /** Avance general de una cuenta, sobre sus matrículas vigentes. */
     Progress totals(List<Enrollment> mine);

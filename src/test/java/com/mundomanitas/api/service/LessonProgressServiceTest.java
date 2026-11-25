@@ -20,7 +20,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -131,6 +133,24 @@ class LessonProgressServiceTest {
                 .isInstanceOfSatisfying(ResponseStatusException.class,
                         exception -> assertThat(exception.getStatusCode())
                                 .isEqualTo(HttpStatus.BAD_REQUEST));
+    }
+
+    @Test
+    @DisplayName("trae los videos vistos de varias matrículas en una sola consulta")
+    void completedVideosForSeveralEnrollments() {
+        UUID first = UUID.randomUUID();
+        UUID second = UUID.randomUUID();
+        UUID watched = UUID.randomUUID();
+        when(progress.findByEnrollmentIdIn(Set.of(first, second))).thenReturn(List.of(
+                new LessonProgress(first, watched),
+                new LessonProgress(second, watched)));
+
+        Map<UUID, Set<UUID>> result = service.completedVideosFor(Set.of(first, second));
+
+        assertThat(result).containsOnlyKeys(first, second);
+        assertThat(result.get(first)).containsExactly(watched);
+        assertThat(result.get(second)).containsExactly(watched);
+        verify(progress, times(1)).findByEnrollmentIdIn(any());
     }
 
     @Test

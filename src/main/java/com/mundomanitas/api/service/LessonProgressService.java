@@ -5,6 +5,7 @@ import com.mundomanitas.api.model.LessonProgress;
 import com.mundomanitas.api.model.User;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
@@ -18,6 +19,9 @@ public interface LessonProgressService {
     int completed(UUID enrollmentId);
 
     Set<UUID> completedVideos(UUID enrollmentId);
+
+    /** Videos vistos de varias matrículas, agrupados por matrícula. */
+    Map<UUID, Set<UUID>> completedVideosFor(Set<UUID> enrollmentIds);
 
     boolean toggle(User user, String slug, UUID videoId);
 

@@ -13,7 +13,7 @@ Aprendé a tu ritmo, con intérprete y subtítulos en cada clase.
 ![Thymeleaf](https://img.shields.io/badge/Thymeleaf-3-0d0d0d)
 ![PostgreSQL 18](https://img.shields.io/badge/PostgreSQL-18-0d0d0d)
 ![Flyway](https://img.shields.io/badge/Flyway-migraciones-0d0d0d)
-![Tests](https://img.shields.io/badge/tests-57_en_verde-00a63e)
+![Tests](https://img.shields.io/badge/tests-162_en_verde-00a63e)
 
 </div>
 
@@ -33,7 +33,7 @@ pública todavía.
 
 - **Portada** con video, curso destacado y llamadas a la acción que abren el
   modal de cuenta.
-- **Catálogo** de seis cursos con búsqueda por texto y filtros por área.
+- **Catálogo** de cursos reales de PostgreSQL con búsqueda por texto y filtros por área.
 - **Cuentas** con registro, inicio y cierre de sesión, BCrypt y CSRF.
 - **Panel del estudiante** con sus cursos, progreso y datos de la cuenta; al
   entrar, la sesión aterriza ahí.
@@ -106,7 +106,7 @@ mantiene al navegar entre la portada, las páginas internas y el panel.
 | Base de datos | PostgreSQL 18 |
 | Migraciones | Flyway (`ddl-auto: validate`) |
 | Build | Maven con wrapper incluido |
-| Pruebas | JUnit 5 + AssertJ + Mockito (57 pruebas) |
+| Pruebas | JUnit 5 + AssertJ + Mockito (162 pruebas) |
 | Métricas | Spring Boot Actuator + Micrometer/Prometheus |
 
 ## Requisitos
@@ -145,10 +145,14 @@ La base se crea una sola vez; las tablas las crea Flyway al arrancar.
 Se pueden pisar con variables de entorno: `DATABASE_URL`, `DB_USER`,
 `DB_PASSWORD` y `REMEMBER_ME_KEY`.
 
-Las migraciones van de `V1__accounts.sql` a `V6__audit_actor_foreign_key.sql`:
-cuentas, recuperación de contraseña, cursos e inscripciones, módulos de cuenta,
-administración y la llave foránea de auditoría. Una migración ya ejecutada
-**no se edita** (Flyway guarda su checksum); el cambio va en `V7` o posterior.
+Las migraciones van de `V1__accounts.sql` a
+`V14__estructura_contenido.sql`: cuentas, recuperación, cursos e inscripciones,
+módulos de cuenta, administración, videos privados, progreso, publicación y la
+estructura de contenido (módulos, secciones, ítems y sílabo). `V14` no borra las
+tablas anteriores: crea `content_items` con `source_type`/`source_id` y los
+triggers que conservan videos, ejercicios y progreso ya cargados. Una migración
+ya ejecutada **no se edita** (Flyway guarda su checksum); el cambio va en `V15`
+o posterior.
 
 ### Backup y restauración
 
@@ -181,7 +185,7 @@ Compilar y probar:
 
 ```powershell
 .\mvnw.cmd clean package      # jar en target\api-0.0.1-SNAPSHOT.jar
-.\mvnw.cmd test               # 57 pruebas
+.\mvnw.cmd test               # 162 pruebas
 java -jar target\api-0.0.1-SNAPSHOT.jar
 ```
 
@@ -195,6 +199,11 @@ java -jar target\api-0.0.1-SNAPSHOT.jar
 | `/cursos/{slug}` | Ficha del curso, "Qué incluye" y cursos relacionados |
 | `/nosotros` | El proyecto, la misión y el equipo |
 | `/panel` | Panel del estudiante (requiere sesión) |
+| `/panel/cursos` · `/panel/cursos/{slug}` | Mis cursos y temario del curso (módulos, secciones e ítems) |
+| `/panel/cursos/{slug}/items/{itemId}/visto` | Solo POST: guarda el avance de un ítem (token CSRF) |
+| `/panel/certificados` · `/panel/certificados/{slug}` | Certificados obtenidos y descarga del curso |
+| `/admin` | Panel administrativo (requiere `ROLE_ADMIN`) |
+| `/admin/cursos/{id}/contenido` | Temario, sílabo y recursos del curso |
 | `/terminos` | Términos de uso |
 | `/privacidad` | Política de privacidad |
 | `/login` | Solo POST: procesa el acceso; la vista es el modal en `/?login` |
@@ -226,6 +235,7 @@ api/
 ├── docs/
 │   ├── design-system.md             contrato visual y reglas de detalle
 │   ├── git-conventions.md           ramas y mensajes de commit
+│   ├── guia-administrador-contenido.md  cómo cargar temario, sílabo y recursos
 │   └── img/                         logo y capturas del README
 └── src/
     ├── main/
@@ -247,6 +257,7 @@ api/
     │           ├── fragments/           cabecera, pie y modal de cuenta
     │           ├── auth/                login y registro
     │           ├── cursos/              catálogo y detalle
+    │           ├── admin/               panel de administración y contenido
     │           ├── student/             panel del estudiante
     │           ├── legal/               términos y privacidad
     │           └── error/               páginas de error
@@ -343,25 +354,36 @@ no aparezca un destello blanco. Los tokens y las reglas están en
 | `LessonProgressServiceTest`, `EnrollmentServiceTest`, `CertificateIssuerServiceTest` | Progreso, matrículas y certificados |
 | `PaymentServiceTest` | Checkout, webhook y confirmación de pago |
 | `AdminCatalogServiceTest`, `AdminMethodSecurityTest` | CRUD admin y exigencia de `ROLE_ADMIN` |
+| `CourseContentServiceTest`, `CourseContentDatabaseTest` | Temario estructurado, edición, orden, borrado, sílabo y progreso sin perder datos |
+| `AdminCourseStructureFlowTest`, `AdminContentTemplateTest` | Rutas del panel de contenido y render con datos reales de PostgreSQL |
+| `StudentContentFlowTest`, `StudentCourseViewTest`, `StudentCourseTemplateTest` | Vista del alumno, avance por ítem y render contra la matrícula real |
 | `PasswordResetServiceTest` | Hash del token, vencimiento, un solo uso y correo |
 | `RequestIdFilterTest` | `X-Request-Id`, validación y limpieza del MDC |
 | `ActuatorSecurityTest`, `BusinessMetricsTest` | Acceso a Actuator y contadores `mundomanitas_*` |
 | `R2HealthIndicatorTest`, `PaymentHealthIndicatorTest` | Estado de R2 y de la pasarela |
 
-Resultado actual: **57 de 57 en verde**. El detalle de monitoreo está en
+Resultado actual: **162 de 162 en verde**. El detalle de monitoreo está en
 [`docs/plan-de-monitoreo.md`](docs/plan-de-monitoreo.md).
 
 ## Estado
 
-Funciona hoy: portada con video, catálogo de seis cursos con búsqueda y filtros,
-fichas de curso, páginas de nosotros, términos y privacidad, cuentas reales con
-sesión, remember-me y cierre de sesión, la sección de membresías con los tres
-planes, el panel del estudiante, el modo claro/oscuro en todo el sitio y los
-correos de bienvenida y restablecimiento con Resend.
+Funciona hoy: portada con video, catálogo de cursos reales con búsqueda y
+filtros, fichas de curso, páginas de nosotros, términos y privacidad, cuentas con
+sesión, remember-me y cierre de sesión, membresías con checkout y webhook de
+Stripe, panel del estudiante con inscripción, temario de módulos, secciones e
+ítems, avance por clase y certificados, panel administrativo con alta, edición,
+orden y borrado de contenido, sílabo y recursos, preferencias de accesibilidad,
+modo claro/oscuro y correos con Resend.
 
-Falta: preferencias de accesibilidad editables, inscripción y lecciones,
-reproductor con video en LSP y subtítulos, progreso, cobro real de la membresía y
-panel de administración. El reparto de tareas está en
+El contenido se arma en `/admin/cursos/{id}/contenido` y se ve en
+`/panel/cursos/{slug}` sin datos de ejemplo: los videos salen de YouTube sin
+cookies, los materiales son enlaces `https` y los ejercicios muestran su
+consigna. La guía de carga está en
+[`docs/guia-administrador-contenido.md`](docs/guia-administrador-contenido.md).
+
+Falta: intérprete en LSP y subtítulos propios sincronizados dentro del
+reproductor; la velocidad y el tamaño de subtítulos son preferencias guardadas,
+pero YouTube controla su presentación. El reparto de tareas está en
 [`REGLAS-EQUIPO.txt`](REGLAS-EQUIPO.txt).
 
 ## Para contribuir

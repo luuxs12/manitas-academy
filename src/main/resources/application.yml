@@ -29,6 +29,9 @@ server:
 app:
   security:
     remember-me-key: ${REMEMBER_ME_KEY:mundo-manitas-dev-key}
+  rate-limit:
+    max-attempts: ${RATE_LIMIT_MAX_ATTEMPTS:10}
+    window-seconds: ${RATE_LIMIT_WINDOW_SECONDS:60}
   monitoring:
     # Sin contraseña, Actuator queda protegido con la cuenta ADMIN del sitio.
     username: ${MONITOR_USER:monitor}

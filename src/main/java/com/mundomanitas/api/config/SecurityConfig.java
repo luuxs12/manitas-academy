@@ -2,6 +2,8 @@ package com.mundomanitas.api.config;
 
 import com.mundomanitas.api.repository.UserRepository;
 import com.mundomanitas.api.security.AuthenticatedUser;
+import com.mundomanitas.api.security.InMemoryRateLimiter;
+import com.mundomanitas.api.security.RateLimiter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,6 +18,8 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+
+import java.time.Duration;
 
 /**
  * Seguridad de las cuentas.
@@ -39,6 +43,14 @@ public class SecurityConfig {
                 .map(AuthenticatedUser::new)
                 .orElseThrow(() -> new UsernameNotFoundException(
                         "No existe una cuenta con ese correo"));
+    }
+
+    @Bean
+    RateLimiter rateLimiter(
+            @Value("${app.rate-limit.max-attempts:10}") int maxAttempts,
+            @Value("${app.rate-limit.window-seconds:60}") int windowSeconds
+    ) {
+        return new InMemoryRateLimiter(maxAttempts, Duration.ofSeconds(windowSeconds));
     }
 
     @Bean

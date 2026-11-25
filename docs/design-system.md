@@ -235,6 +235,13 @@ perfil, cursos y panel de administración:
 | `.admin-publication` / `.admin-checklist` | estado `PUBLICADO`/`BORRADOR` y requisitos calculados desde la base antes de publicar |
 | `.admin-field` | envoltorio de etiqueta, control, ayuda y error; el error se enlaza con `aria-describedby` y `aria-invalid` |
 | `.admin-table caption` | título accesible de las tablas del panel, con encabezados `scope="col"` |
+| `.admin-structure` / `.admin-structure-head` | página de contenido del curso: temario, alta de ítems y sílabo en secciones apiladas |
+| `.admin-module` / `.admin-module-head` | módulo real con rótulo “Módulo N”, estado visible/oculto y ancla propia |
+| `.admin-section` / `.admin-section-head` | sección del módulo con su estado y acciones de orden y borrado |
+| `.admin-content-list` / `.admin-content-item` | lista de ítems (video, material, ejercicio) con tipo, título, descripción y enlace |
+| `.admin-type` | distintivo textual del tipo de ítem; no sustituye al nombre del tipo |
+| `.admin-move` | botón de reordenar con flecha y `aria-label` que nombra el ítem |
+| `.admin-inline-form` | formulario desplegable dentro de la página; no es un modal ni un overlay |
 
 Si cambiás el nombre de alguna, decime y actualizo las plantillas nuevas.
 

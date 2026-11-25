@@ -47,6 +47,7 @@
                         <td th:text="${course.position()}">0</td>
                         <td class="admin-row-actions">
                             <a th:href="@{/admin/cursos/{id}/editar(id=${course.id()})}">Editar</a>
+                            <a th:href="@{/admin/cursos/{id}/contenido(id=${course.id()})}">Contenido</a>
                             <a class="admin-confirm-link" th:href="@{/admin/cursos/{id}/eliminar(id=${course.id()})}"
                                th:attr="aria-label='Eliminar ' + ${course.title()}">Eliminar</a>
                         </td>

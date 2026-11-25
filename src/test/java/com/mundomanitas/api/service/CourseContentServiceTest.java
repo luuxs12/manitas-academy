@@ -54,6 +54,7 @@ class CourseContentServiceTest {
     @Mock private LessonProgressRepository lessonProgress;
     @Mock private ItemProgressRepository itemProgress;
     @Mock private VideoRepository videos;
+    @Mock private CourseMaterialStorage materials;
 
     @InjectMocks private CourseContentServiceImpl service;
 
@@ -254,6 +255,54 @@ class CourseContentServiceTest {
         assertThat(withDuration(600).durationLabel()).isEqualTo("10 min");
         assertThat(withDuration(3600).durationLabel()).isEqualTo("1 h");
         assertThat(withDuration(3725).durationLabel()).isEqualTo("1 h 2 min");
+    }
+
+    @Test
+    @DisplayName("descarga un documento subido para una cuenta inscripta en el curso")
+    void downloadsUploadedMaterial() {
+        User student = new User("alumno@test.local", "hash", "Alumno");
+        Enrollment enrollment = enrollment(student);
+        UUID itemId = UUID.randomUUID();
+        UUID moduleId = UUID.randomUUID();
+        ContentItem document = item(itemId, moduleId, null, "MATERIAL", null,
+                "Guía descargable", null, 0);
+        ReflectionTestUtils.setField(document, "url", "/uploads/materials/abc.pdf");
+        ReflectionTestUtils.setField(document, "fileName", "guia-de-redes.pdf");
+        byte[] bytes = "contenido".getBytes(java.nio.charset.StandardCharsets.UTF_8);
+
+        when(enrollments.findByUserAndCourseSlug(student, "python")).thenReturn(Optional.of(enrollment));
+        when(items.findById(itemId)).thenReturn(Optional.of(document));
+        when(modules.findById(moduleId)).thenReturn(Optional.of(module(moduleId)));
+        when(materials.read("/uploads/materials/abc.pdf")).thenReturn(bytes);
+        when(materials.contentType("/uploads/materials/abc.pdf")).thenReturn("application/pdf");
+
+        CourseContentService.MaterialDownload download =
+                service.downloadMaterial(student, "python", itemId);
+
+        assertThat(download.fileName()).isEqualTo("guia-de-redes.pdf");
+        assertThat(download.contentType()).isEqualTo("application/pdf");
+        assertThat(download.bytes()).isEqualTo(bytes);
+    }
+
+    @Test
+    @DisplayName("no descarga documentos ocultos ni de otro curso")
+    void refusesHiddenMaterial() {
+        User student = new User("alumno@test.local", "hash", "Alumno");
+        Enrollment enrollment = enrollment(student);
+        UUID itemId = UUID.randomUUID();
+        UUID moduleId = UUID.randomUUID();
+        ContentItem document = item(itemId, moduleId, null, "MATERIAL", null,
+                "Borrador", null, 0);
+        ReflectionTestUtils.setField(document, "visible", false);
+        ReflectionTestUtils.setField(document, "url", "/uploads/materials/abc.pdf");
+
+        when(enrollments.findByUserAndCourseSlug(student, "python")).thenReturn(Optional.of(enrollment));
+        when(items.findById(itemId)).thenReturn(Optional.of(document));
+
+        assertThatThrownBy(() -> service.downloadMaterial(student, "python", itemId))
+                .isInstanceOf(ResponseStatusException.class)
+                .extracting("statusCode").isEqualTo(HttpStatus.NOT_FOUND);
+        verify(materials, never()).read(any());
     }
 
     private CourseContentService.ItemView withDuration(Integer seconds) {

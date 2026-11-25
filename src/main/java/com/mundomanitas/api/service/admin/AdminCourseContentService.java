@@ -1,5 +1,7 @@
 package com.mundomanitas.api.service.admin;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import java.util.List;
 import java.util.UUID;
 
@@ -12,6 +14,10 @@ public interface AdminCourseContentService {
     record ItemForm(UUID moduleId, UUID sectionId, String type, String title, String description,
                     String url, String youtubeUrl, Integer durationSeconds, int position,
                     boolean visible) {
+    }
+
+    record DocumentForm(UUID moduleId, UUID sectionId, String title, String description,
+                        MultipartFile file, Integer durationSeconds, int position, boolean visible) {
     }
 
     record ResourceForm(UUID id, String title, String url, int position) {
@@ -27,6 +33,8 @@ public interface AdminCourseContentService {
     void deleteSection(UUID sectionId, UUID actor);
 
     UUID createItem(ItemForm form, UUID actor);
+
+    UUID createDocument(DocumentForm form, UUID actor);
 
     void updateItem(UUID itemId, ItemForm form, UUID actor);
 

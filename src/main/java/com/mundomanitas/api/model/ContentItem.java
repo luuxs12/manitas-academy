@@ -45,6 +45,9 @@ public class ContentItem {
     @Column
     private String url;
 
+    @Column(name = "file_name")
+    private String fileName;
+
     @Column(name = "youtube_id", length = 11)
     private String youtubeId;
 
@@ -66,6 +69,13 @@ public class ContentItem {
     public ContentItem(UUID moduleId, UUID sectionId, String sourceType, UUID sourceId,
                        String title, String description, String url, String youtubeId,
                        Integer durationSeconds, int position, boolean visible) {
+        this(moduleId, sectionId, sourceType, sourceId, title, description, url, null,
+                youtubeId, durationSeconds, position, visible);
+    }
+
+    public ContentItem(UUID moduleId, UUID sectionId, String sourceType, UUID sourceId,
+                       String title, String description, String url, String fileName,
+                       String youtubeId, Integer durationSeconds, int position, boolean visible) {
         this.moduleId = moduleId;
         this.sectionId = sectionId;
         this.sourceType = sourceType;
@@ -73,6 +83,7 @@ public class ContentItem {
         this.title = title;
         this.description = description;
         this.url = url;
+        this.fileName = fileName;
         this.youtubeId = youtubeId;
         this.durationSeconds = durationSeconds;
         this.position = position;
@@ -111,6 +122,10 @@ public class ContentItem {
         return url;
     }
 
+    public String getFileName() {
+        return fileName;
+    }
+
     public String getYoutubeId() {
         return youtubeId;
     }
@@ -135,6 +150,11 @@ public class ContentItem {
         this.title = title;
         this.description = description;
         this.url = url;
+    }
+
+    public void updateDocument(String title, String description, String url, String fileName) {
+        updateMaterial(title, description, url);
+        this.fileName = fileName;
     }
 
     public void moveTo(UUID moduleId, UUID sectionId) {

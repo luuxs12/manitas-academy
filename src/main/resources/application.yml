@@ -23,6 +23,11 @@ spring:
   thymeleaf:
     cache: false
 
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 11MB
+
 server:
   port: 8080
   servlet:
@@ -62,6 +67,8 @@ app:
     max-avatar-bytes: ${MAX_AVATAR_BYTES:2097152}
     covers-dir: ${COVERS_DIR:./uploads/covers}
     max-cover-bytes: ${MAX_COVER_BYTES:2097152}
+    materials-dir: ${MATERIALS_DIR:./uploads/materials}
+    max-material-bytes: ${MAX_MATERIAL_BYTES:10485760}
 
 management:
   endpoints:

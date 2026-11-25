@@ -48,6 +48,7 @@ public class CourseContentServiceImpl implements CourseContentService {
     private final LessonProgressRepository lessonProgress;
     private final ItemProgressRepository itemProgress;
     private final VideoRepository videos;
+    private final CourseMaterialStorage materials;
 
     public CourseContentServiceImpl(
             CourseRepository courses,
@@ -58,7 +59,8 @@ public class CourseContentServiceImpl implements CourseContentService {
             EnrollmentRepository enrollments,
             LessonProgressRepository lessonProgress,
             ItemProgressRepository itemProgress,
-            VideoRepository videos
+            VideoRepository videos,
+            CourseMaterialStorage materials
     ) {
         this.courses = courses;
         this.modules = modules;
@@ -69,6 +71,7 @@ public class CourseContentServiceImpl implements CourseContentService {
         this.lessonProgress = lessonProgress;
         this.itemProgress = itemProgress;
         this.videos = videos;
+        this.materials = materials;
     }
 
     @Override
@@ -155,26 +158,10 @@ public class CourseContentServiceImpl implements CourseContentService {
     @Override
     @Transactional
     public void markSeen(User user, String slug, UUID itemId, boolean seen) {
-        checkNotNull(user, "user");
-        checkNotNull(itemId, "itemId");
-        Enrollment enrollment = enrollments.findByUserAndCourseSlug(user, requiredSlug(slug))
-                .orElseThrow(() -> missing("No estás inscripto en ese curso"));
+        ItemAccess access = requireAccessibleItem(user, slug, itemId);
+        Enrollment enrollment = access.enrollment();
+        ContentItem item = access.item();
         Course course = enrollment.getCourse();
-        if (!course.isFree() && !user.isPremium()) {
-            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                    "Este curso requiere plan Premium");
-        }
-        ContentItem item = items.findById(itemId)
-                .orElseThrow(() -> missing("El ítem no existe"));
-        if (!item.isVisible()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "El ítem no está disponible");
-        }
-        CourseModule module = modules.findById(item.getModuleId())
-                .orElseThrow(() -> missing("El módulo no existe"));
-        if (!course.getId().equals(module.getCourseId())) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
-                    "El ítem no pertenece a este curso");
-        }
 
         if ("VIDEO".equals(item.getSourceType())) {
             UUID videoId = item.getSourceId();
@@ -201,12 +188,59 @@ public class CourseContentServiceImpl implements CourseContentService {
         log.info("Ítem actualizado item={} matrícula={} visto={}", itemId, enrollment.getId(), seen);
     }
 
+    @Override
+    @Transactional(readOnly = true)
+    public MaterialDownload downloadMaterial(User user, String slug, UUID itemId) {
+        ItemAccess access = requireAccessibleItem(user, slug, itemId);
+        ContentItem item = access.item();
+        if (!"MATERIAL".equals(item.getSourceType())
+                || item.getUrl() == null
+                || !item.getUrl().startsWith(CourseMaterialStorage.URL_PREFIX)) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "El ítem no tiene un documento descargable");
+        }
+        String url = item.getUrl();
+        String fileName = item.getFileName() == null
+                ? url.substring(url.lastIndexOf('/') + 1)
+                : item.getFileName();
+        MaterialDownload download = new MaterialDownload(
+                fileName, materials.contentType(url), materials.read(url));
+        log.info("Documento descargado item={} matrícula={} actor={}",
+                itemId, access.enrollment().getId(), user.getId());
+        return download;
+    }
+
+    private ItemAccess requireAccessibleItem(User user, String slug, UUID itemId) {
+        checkNotNull(user, "user");
+        checkNotNull(itemId, "itemId");
+        Enrollment enrollment = enrollments.findByUserAndCourseSlug(user, requiredSlug(slug))
+                .orElseThrow(() -> missing("No estás inscripto en ese curso"));
+        Course course = enrollment.getCourse();
+        if (!course.isFree() && !user.isPremium()) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Este curso requiere plan Premium");
+        }
+        ContentItem item = items.findById(itemId)
+                .orElseThrow(() -> missing("El ítem no existe"));
+        if (!item.isVisible()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "El ítem no está disponible");
+        }
+        CourseModule module = modules.findById(item.getModuleId())
+                .orElseThrow(() -> missing("El módulo no existe"));
+        if (!course.getId().equals(module.getCourseId())) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "El ítem no pertenece a este curso");
+        }
+        return new ItemAccess(enrollment, item);
+    }
+
     private ItemView view(ContentItem item, Set<UUID> seenVideos, Set<UUID> seenItems,
                           boolean locked) {
         return new ItemView(item.getId(), item.getSourceType(), item.getTitle(),
                 item.getDescription(), item.getUrl(), item.getYoutubeId(),
                 item.getDurationSeconds(), item.isVisible(),
-                isSeen(item, seenVideos, seenItems), locked, item.getSourceId());
+                isSeen(item, seenVideos, seenItems), locked, item.getSourceId(),
+                item.getFileName());
     }
 
     private boolean isSeen(ContentItem item, Set<UUID> seenVideos, Set<UUID> seenItems) {
@@ -234,5 +268,8 @@ public class CourseContentServiceImpl implements CourseContentService {
 
     private ResponseStatusException missing(String message) {
         return new ResponseStatusException(HttpStatus.NOT_FOUND, message);
+    }
+
+    private record ItemAccess(Enrollment enrollment, ContentItem item) {
     }
 }

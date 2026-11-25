@@ -12,7 +12,11 @@ import com.mundomanitas.api.service.LessonProgressService;
 import com.mundomanitas.api.service.StudentCertificateService;
 import com.mundomanitas.api.service.StudentContentService;
 import com.mundomanitas.api.service.VideoPlaybackService;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -242,6 +246,24 @@ public class StudentController {
         structure.markSeen(user, slug, itemId, seen);
         redirect.addFlashAttribute("panelOk", "Avance guardado en «" + title + "».");
         return "redirect:/panel/cursos/" + slug;
+    }
+
+    /** Descarga privada de un documento subido al temario del curso inscripto. */
+    @GetMapping("/cursos/{slug}/materiales/{itemId}/descargar")
+    @PreAuthorize("hasRole('STUDENT')")
+    public ResponseEntity<byte[]> downloadMaterial(
+            @AuthenticationPrincipal AuthenticatedUser principal,
+            @PathVariable String slug,
+            @PathVariable UUID itemId
+    ) {
+        User user = accounts.require(principal.getId());
+        CourseContentService.MaterialDownload download =
+                structure.downloadMaterial(user, slug, itemId);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "attachment; filename=\"" + download.safeFileName() + "\"")
+                .contentType(MediaType.parseMediaType(download.contentType()))
+                .body(download.bytes());
     }
 
     @GetMapping("/certificados")

@@ -15,6 +15,7 @@ import com.mundomanitas.api.repository.CourseSectionRepository;
 import com.mundomanitas.api.repository.ExerciseRepository;
 import com.mundomanitas.api.repository.VideoRepository;
 import com.mundomanitas.api.service.ContentLinks;
+import com.mundomanitas.api.service.CourseMaterialStorage;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +23,8 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.nio.file.InvalidPathException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.UUID;
 
@@ -43,6 +46,7 @@ public class AdminCourseContentServiceImpl implements AdminCourseContentService 
     private final VideoRepository videos;
     private final ExerciseRepository exercises;
     private final AdminAuditService audit;
+    private final CourseMaterialStorage materials;
 
     public AdminCourseContentServiceImpl(
             CourseRepository courses,
@@ -52,7 +56,8 @@ public class AdminCourseContentServiceImpl implements AdminCourseContentService 
             CourseResourceRepository resources,
             VideoRepository videos,
             ExerciseRepository exercises,
-            AdminAuditService audit
+            AdminAuditService audit,
+            CourseMaterialStorage materials
     ) {
         this.courses = courses;
         this.modules = modules;
@@ -62,6 +67,7 @@ public class AdminCourseContentServiceImpl implements AdminCourseContentService 
         this.videos = videos;
         this.exercises = exercises;
         this.audit = audit;
+        this.materials = materials;
     }
 
     @Override
@@ -141,6 +147,25 @@ public class AdminCourseContentServiceImpl implements AdminCourseContentService 
 
     @Override
     @Transactional
+    public UUID createDocument(DocumentForm form, UUID actor) {
+        checkNotNull(form, "form");
+        String title = requireText(form.title(), "título");
+        requireModule(form.moduleId());
+        requireSectionInModule(form.sectionId(), form.moduleId());
+
+        String url = materials.store(form.file());
+        String originalName = originalName(form);
+        ContentItem item = new ContentItem(form.moduleId(), form.sectionId(), "MATERIAL", null,
+                title, StringUtils.trimToNull(form.description()), url, originalName, null,
+                form.durationSeconds(), form.position(), form.visible());
+        items.save(item);
+        audit.record(actor, "CREATE", "ITEM", item.getId(), title);
+        log.info("Documento creado id={} archivo={} actor={}", item.getId(), originalName, actor);
+        return item.getId();
+    }
+
+    @Override
+    @Transactional
     public void updateItem(UUID itemId, ItemForm form, UUID actor) {
         checkNotNull(form, "form");
         ContentItem item = items.findById(itemId)
@@ -151,8 +176,18 @@ public class AdminCourseContentServiceImpl implements AdminCourseContentService 
         requireSectionInModule(form.sectionId(), form.moduleId());
 
         if ("MATERIAL".equals(type)) {
-            item.updateMaterial(title, StringUtils.trimToNull(form.description()),
-                    ContentLinks.https(form.url(), "enlace"));
+            String description = StringUtils.trimToNull(form.description());
+            String newUrl = StringUtils.trimToNull(form.url());
+            if (newUrl == null && item.getUrl() != null
+                    && item.getUrl().startsWith(CourseMaterialStorage.URL_PREFIX)) {
+                item.updateDocument(title, description, item.getUrl(), item.getFileName());
+            } else {
+                if (item.getUrl() != null
+                        && item.getUrl().startsWith(CourseMaterialStorage.URL_PREFIX)) {
+                    materials.delete(item.getUrl());
+                }
+                item.updateDocument(title, description, ContentLinks.https(newUrl, "enlace"), null);
+            }
         } else if ("VIDEO".equals(type)) {
             Video video = videos.findById(item.getSourceId())
                     .orElseThrow(() -> new IllegalArgumentException("Video no encontrado"));
@@ -182,6 +217,9 @@ public class AdminCourseContentServiceImpl implements AdminCourseContentService 
         ContentItem item = items.findById(itemId)
                 .orElseThrow(() -> new IllegalArgumentException("Ítem no encontrado"));
         String title = item.getTitle();
+        if ("MATERIAL".equals(item.getSourceType())) {
+            materials.delete(item.getUrl());
+        }
         if ("VIDEO".equals(item.getSourceType()) && item.getSourceId() != null) {
             videos.findById(item.getSourceId()).ifPresent(videos::delete);
         } else if ("EJERCICIO".equals(item.getSourceType()) && item.getSourceId() != null) {
@@ -324,6 +362,16 @@ public class AdminCourseContentServiceImpl implements AdminCourseContentService 
         String text = StringUtils.trimToNull(value);
         checkArgument(text != null, "El campo " + field + " es obligatorio");
         return text;
+    }
+
+    private String originalName(DocumentForm form) {
+        String original = form.file() == null ? null : form.file().getOriginalFilename();
+        if (original == null || original.isBlank()) return "documento";
+        try {
+            return Path.of(original.replace('\\', '/')).getFileName().toString();
+        } catch (InvalidPathException exception) {
+            return "documento";
+        }
     }
 
     private <T, ID> int indexOf(List<T> values, java.util.function.Function<T, ID> id, ID target) {

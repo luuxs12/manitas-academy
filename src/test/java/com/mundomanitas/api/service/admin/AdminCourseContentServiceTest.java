@@ -6,6 +6,7 @@ import com.mundomanitas.api.model.CourseResource;
 import com.mundomanitas.api.model.CourseSection;
 import com.mundomanitas.api.model.ContentItem;
 import com.mundomanitas.api.model.Video;
+import com.mundomanitas.api.service.CourseMaterialStorage;
 import com.mundomanitas.api.repository.ContentItemRepository;
 import com.mundomanitas.api.repository.CourseModuleRepository;
 import com.mundomanitas.api.repository.CourseRepository;
@@ -20,6 +21,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.List;
@@ -45,6 +47,7 @@ class AdminCourseContentServiceTest {
     @Mock private VideoRepository videos;
     @Mock private ExerciseRepository exercises;
     @Mock private AdminAuditService audit;
+    @Mock private CourseMaterialStorage materials;
 
     @InjectMocks private AdminCourseContentServiceImpl service;
 
@@ -145,6 +148,40 @@ class AdminCourseContentServiceTest {
         verify(items).save(first);
         verify(items).save(second);
         verify(audit).record(eq(actor), eq("UPDATE"), eq("ITEM"), eq(firstId), eq("BAJAR"));
+    }
+
+    @Test
+    @DisplayName("sube un documento y guarda su ruta interna y su nombre original")
+    void createsDocument() {
+        when(modules.findById(moduleId)).thenReturn(Optional.of(module()));
+        MockMultipartFile file = new MockMultipartFile(
+                "file", "Guía de redes.pdf", "application/pdf", "contenido".getBytes());
+        when(materials.store(file)).thenReturn("/uploads/materials/abc.pdf");
+
+        service.createDocument(new AdminCourseContentService.DocumentForm(moduleId, null,
+                "Guía descargable", "Material de la sesión", file, null, 0, true), actor);
+
+        ArgumentCaptor<ContentItem> captor = ArgumentCaptor.forClass(ContentItem.class);
+        verify(items).save(captor.capture());
+        assertThat(captor.getValue().getSourceType()).isEqualTo("MATERIAL");
+        assertThat(captor.getValue().getUrl()).isEqualTo("/uploads/materials/abc.pdf");
+        assertThat(captor.getValue().getFileName()).isEqualTo("Guía de redes.pdf");
+        verify(audit).record(eq(actor), eq("CREATE"), eq("ITEM"), any(), eq("Guía descargable"));
+    }
+
+    @Test
+    @DisplayName("borra el archivo subido cuando se elimina el documento")
+    void deletesStoredFileWithItem() {
+        UUID itemId = UUID.randomUUID();
+        ContentItem document = material(itemId, moduleId, 0);
+        ReflectionTestUtils.setField(document, "url", "/uploads/materials/abc.pdf");
+        when(items.findById(itemId)).thenReturn(Optional.of(document));
+
+        service.deleteItem(itemId, actor);
+
+        verify(materials).delete("/uploads/materials/abc.pdf");
+        verify(items).delete(document);
+        verify(audit).record(eq(actor), eq("DELETE"), eq("ITEM"), eq(itemId), eq("Guía"));
     }
 
     private CourseModule module() {

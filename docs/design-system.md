@@ -236,6 +236,7 @@ perfil, cursos y panel de administración:
 | `.field-hint` / `.field-error` en el perfil | pistas y errores con `id` propio, enlazados al campo con `aria-describedby`; los campos con error también marcan `aria-invalid="true"` |
 | `.panel-lesson-label` / `.panel-lesson-track` | avance real de videos en las tarjetas del panel: texto “X de Y videos terminados” y barra con la misma cifra en `aria-label` |
 | `.panel-course-cta` / `.panel-continue-cta` | accesos directos a la ficha del curso por `slug`; “Ver clases” en cada tarjeta y “Continuar curso” en el próximo curso, nunca al listado genérico |
+| `.panel-cert` / `.panel-cert-code` | certificados vigentes: título real, cantidad real de videos, fecha de emisión y código debajo del texto; “Ver certificado” solo aparece si el certificado existe |
 | `.panel-avatar-current` / `.panel-avatar-preview` | foto actual o iniciales junto al texto de formatos, antes de cualquier control |
 | `.panel-avatar-editor` / `.panel-avatar-actions` | campo de carga y grupo de acciones “Subir foto” / “Quitar foto”, en ese orden; “Quitar foto” usa `th:formaction` dentro del mismo formulario |
 

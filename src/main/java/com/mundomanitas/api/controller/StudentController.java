@@ -9,6 +9,7 @@ import com.mundomanitas.api.service.CourseCatalog;
 import com.mundomanitas.api.service.CourseContentService;
 import com.mundomanitas.api.service.EnrollmentService;
 import com.mundomanitas.api.service.LessonProgressService;
+import com.mundomanitas.api.service.StudentCertificateService;
 import com.mundomanitas.api.service.StudentContentService;
 import com.mundomanitas.api.service.VideoPlaybackService;
 import org.springframework.http.HttpStatus;
@@ -48,6 +49,7 @@ public class StudentController {
     private final VideoPlaybackService playback;
     private final StudentContentService content;
     private final CourseContentService structure;
+    private final StudentCertificateService certificates;
 
     public StudentController(
             AccountService accounts,
@@ -56,7 +58,8 @@ public class StudentController {
             LessonProgressService lessons,
             VideoPlaybackService playback,
             StudentContentService content,
-            CourseContentService structure
+            CourseContentService structure,
+            StudentCertificateService certificates
     ) {
         this.accounts = accounts;
         this.catalog = catalog;
@@ -65,6 +68,7 @@ public class StudentController {
         this.playback = playback;
         this.content = content;
         this.structure = structure;
+        this.certificates = certificates;
     }
 
     @GetMapping
@@ -117,6 +121,7 @@ public class StudentController {
         model.addAttribute("doneCounts", courseProgress.done());
         model.addAttribute("videoCounts", courseProgress.total());
         model.addAttribute("videoProgress", courseProgress.percent());
+        model.addAttribute("certificateSlugs", activeCertificateSlugs(user));
         return "student/cursos";
     }
 
@@ -153,6 +158,7 @@ public class StudentController {
         model.addAttribute("itemCount", outline.totalItems());
         model.addAttribute("doneCount", outline.doneItems());
         model.addAttribute("itemPercent", outline.percent());
+        model.addAttribute("certificateSlugs", activeCertificateSlugs(user));
         return "student/curso";
     }
 
@@ -244,9 +250,7 @@ public class StudentController {
             Model model
     ) {
         User user = accounts.require(principal.getId());
-        model.addAttribute("certificates", user.isPremium()
-                ? enrollments.completed(user)
-                : List.of());
+        model.addAttribute("certificates", certificates.available(user));
         model.addAttribute("completed", enrollments.completed(user).size());
         return "student/certificados";
     }
@@ -255,23 +259,14 @@ public class StudentController {
     public String certificate(
             @AuthenticationPrincipal AuthenticatedUser principal,
             @PathVariable String slug,
-            Model model,
-            RedirectAttributes redirect
+            Model model
     ) {
         User user = accounts.require(principal.getId());
-        Enrollment enrollment = enrollments.findMine(user, slug);
-        if (!enrollment.isCompleted()) {
-            throw new ResponseStatusException(
-                    HttpStatus.NOT_FOUND, "El curso todavía no está terminado");
-        }
-        if (!user.isPremium()) {
-            redirect.addFlashAttribute(
-                    "panelError", "Los certificados están incluidos en los planes Premium.");
-            return "redirect:/panel/certificados";
-        }
+        StudentCertificateService.Issued certificate = certificates.findActive(user, slug)
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "No tenés un certificado vigente de ese curso"));
 
-        model.addAttribute("enrollment", enrollment);
-        model.addAttribute("course", enrollment.getCourse());
+        model.addAttribute("certificate", certificate);
         model.addAttribute("account", user);
         return "student/certificado";
     }
@@ -291,6 +286,13 @@ public class StudentController {
                 "El curso «" + exception.getCourseTitle() + "» requiere un plan Premium."
         );
         return "redirect:/panel/explorar";
+    }
+
+    /** Slugs con certificado vigente, para no ofrecer links que dan 404. */
+    private List<String> activeCertificateSlugs(User user) {
+        return certificates.available(user).stream()
+                .map(StudentCertificateService.Issued::courseSlug)
+                .toList();
     }
 
     /** Avance por matrícula: el panel y el listado comparten una sola consulta. */

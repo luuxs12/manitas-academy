@@ -37,4 +37,42 @@ public interface CertificateRepository extends JpaRepository<Certificate, UUID> 
                              @Param("courseId") UUID courseId,
                              @Param("term") String term,
                              Pageable pageable);
+
+    /** Certificados vigentes de una cuenta con el curso y los videos reales. */
+    @Query("""
+            select c.id as certificateId, c.code as code, c.issuedAt as issuedAt,
+                   co.title as courseTitle, co.slug as courseSlug,
+                   (select count(v) from Video v, CourseModule m
+                     where v.moduleId = m.id and m.courseId = co.id) as videoCount
+            from Certificate c, Course co
+            where c.courseId = co.id and c.userId = :userId and c.revokedAt is null
+            order by c.issuedAt desc
+            """)
+    List<IssuedRow> findActiveByUser(@Param("userId") UUID userId);
+
+    @Query("""
+            select c.id as certificateId, c.code as code, c.issuedAt as issuedAt,
+                   co.title as courseTitle, co.slug as courseSlug,
+                   (select count(v) from Video v, CourseModule m
+                     where v.moduleId = m.id and m.courseId = co.id) as videoCount
+            from Certificate c, Course co
+            where c.courseId = co.id and c.userId = :userId
+              and c.revokedAt is null and co.slug = :courseSlug
+            """)
+    Optional<IssuedRow> findActiveByUserAndCourseSlug(@Param("userId") UUID userId,
+                                                      @Param("courseSlug") String courseSlug);
+
+    interface IssuedRow {
+        UUID getCertificateId();
+
+        String getCode();
+
+        OffsetDateTime getIssuedAt();
+
+        String getCourseTitle();
+
+        String getCourseSlug();
+
+        int getVideoCount();
+    }
 }

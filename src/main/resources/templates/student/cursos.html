@@ -84,10 +84,15 @@
                                     <button class="panel-inline-btn" type="submit">Ya terminé el curso</button>
                                 </form>
                                 <a class="panel-inline-btn"
-                                   th:if="${enrollment.completed and currentUser.premium()}"
+                                   th:if="${enrollment.completed and #lists.contains(certificateSlugs, enrollment.course.slug)}"
                                    th:href="@{/panel/certificados/{slug}(slug=${enrollment.course.slug})}">
                                     Ver certificado
                                 </a>
+                                <span class="panel-chip"
+                                      th:if="${enrollment.completed and currentUser.premium()
+                                          and !#lists.contains(certificateSlugs, enrollment.course.slug)}">
+                                    Certificado en preparación
+                                </span>
                                 <a class="panel-inline-btn"
                                    th:if="${enrollment.completed and !currentUser.premium()}"
                                    th:href="@{/panel/facturacion}">Certificado con Premium</a>

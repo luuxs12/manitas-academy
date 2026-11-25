@@ -21,17 +21,17 @@
         <p class="certificate-label">Certificado de finalización</p>
         <h1 th:text="${account.fullName}"></h1>
         <p class="certificate-text">Completó con éxito el curso</p>
-        <h2 th:text="${course.title}"></h2>
+        <h2 th:text="${certificate.courseTitle()}"></h2>
 
         <p class="certificate-detail">
-            <span th:text="${course.lessons} + ' lecciones'"></span>
+            <span th:text="${certificate.videoCount() + ' videos'}"></span>
             <span aria-hidden="true">·</span>
-            <span th:text="${#temporals.format(enrollment.completedAt, 'dd MMMM yyyy')}"></span>
+            <span th:text="${#temporals.format(certificate.issuedAt(), 'dd MMMM yyyy')}"></span>
         </p>
 
         <footer class="certificate-foot">
             <span>Emitido por Mundo Manitas</span>
-            <span class="certificate-code" th:text="${'MM-' + #strings.substring(enrollment.id.toString(), 0, 8)}"></span>
+            <span class="certificate-code" th:text="${certificate.code()}"></span>
         </footer>
     </article>
 </main>

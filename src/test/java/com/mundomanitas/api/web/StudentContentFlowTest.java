@@ -10,6 +10,7 @@ import com.mundomanitas.api.service.CourseCatalog;
 import com.mundomanitas.api.service.CourseContentService;
 import com.mundomanitas.api.service.EnrollmentService;
 import com.mundomanitas.api.service.LessonProgressService;
+import com.mundomanitas.api.service.StudentCertificateService;
 import com.mundomanitas.api.service.StudentContentService;
 import com.mundomanitas.api.service.VideoPlaybackService;
 import org.junit.jupiter.api.AfterEach;
@@ -22,8 +23,10 @@ import org.springframework.security.web.method.annotation.AuthenticationPrincipa
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.UUID;
 
@@ -35,6 +38,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 @DisplayName("Contenido estructurado en la vista del estudiante")
@@ -52,6 +56,7 @@ class StudentContentFlowTest {
     private CourseCatalog catalog;
     private EnrollmentService enrollments;
     private StudentContentService oldContent;
+    private StudentCertificateService certificates;
     private MockMvc mvc;
 
     @BeforeEach
@@ -74,6 +79,7 @@ class StudentContentFlowTest {
         oldContent = mock(StudentContentService.class);
         content = mock(CourseContentService.class);
         playback = mock(VideoPlaybackService.class);
+        certificates = mock(StudentCertificateService.class);
 
         course = mock(Course.class);
         when(course.getId()).thenReturn(courseId);
@@ -91,7 +97,8 @@ class StudentContentFlowTest {
                 .thenReturn(new CourseContentService.Outline(List.of(), 0, 0, 0, null));
 
         mvc = MockMvcBuilders.standaloneSetup(new StudentController(
-                        accounts, catalog, enrollments, lessons, playback, oldContent, content))
+                        accounts, catalog, enrollments, lessons, playback,
+                        oldContent, content, certificates))
                 .setCustomArgumentResolvers(new AuthenticationPrincipalArgumentResolver())
                 .build();
     }
@@ -184,5 +191,48 @@ class StudentContentFlowTest {
 
         verify(content).markSeen(student, slug, itemId, true);
         verify(content).markSeen(student, slug, itemId, false);
+    }
+
+    @Test
+    @DisplayName("el listado entrega los certificados emitidos reales")
+    void certificatesListUsesIssuedRecords() throws Exception {
+        StudentCertificateService.Issued issued = new StudentCertificateService.Issued(
+                UUID.randomUUID(), "MM-RED-ABCD1234",
+                OffsetDateTime.parse("2026-11-20T10:15:00Z"),
+                "Redes", "redes", 3);
+        when(certificates.available(student)).thenReturn(List.of(issued));
+
+        mvc.perform(get("/panel/certificados"))
+                .andExpect(view().name("student/certificados"))
+                .andExpect(model().attribute("certificates", List.of(issued)))
+                .andExpect(model().attribute("completed", 0));
+
+        verify(certificates).available(student);
+    }
+
+    @Test
+    @DisplayName("la ficha abre el certificado vigente de ese curso")
+    void certificateDetailUsesIssuedRecord() throws Exception {
+        StudentCertificateService.Issued issued = new StudentCertificateService.Issued(
+                UUID.randomUUID(), "MM-PYT-1234ABCD",
+                OffsetDateTime.parse("2026-11-21T10:15:00Z"),
+                "Python", slug, 5);
+        when(certificates.findActive(student, slug)).thenReturn(Optional.of(issued));
+
+        mvc.perform(get("/panel/certificados/{slug}", slug))
+                .andExpect(view().name("student/certificado"))
+                .andExpect(model().attribute("certificate", issued))
+                .andExpect(model().attribute("account", student));
+
+        verify(certificates).findActive(student, slug);
+    }
+
+    @Test
+    @DisplayName("un certificado revocado no abre su ficha")
+    void revokedCertificateIsNotFound() throws Exception {
+        when(certificates.findActive(student, slug)).thenReturn(Optional.empty());
+
+        mvc.perform(get("/panel/certificados/{slug}", slug))
+                .andExpect(status().isNotFound());
     }
 }

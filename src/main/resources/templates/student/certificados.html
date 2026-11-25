@@ -28,12 +28,12 @@
 
             <section class="panel-section" aria-labelledby="titulo-certificados">
                 <div class="panel-section-head">
-                    <h2 id="titulo-certificados">Disponibles</h2>
+                    <h2 id="titulo-certificados">Emitidos</h2>
                     <span class="panel-rule" aria-hidden="true"></span>
                 </div>
 
                 <div class="panel-cert-grid" th:if="${!#lists.isEmpty(certificates)}">
-                    <article class="panel-cert" th:each="enrollment : ${certificates}">
+                    <article class="panel-cert" th:each="certificate : ${certificates}">
                         <span class="panel-cert-icon" aria-hidden="true">
                             <svg class="ico" viewBox="0 0 24 24" focusable="false">
                                 <circle cx="12" cy="9" r="5"></circle>
@@ -41,13 +41,14 @@
                             </svg>
                         </span>
                         <div>
-                            <h3 th:text="${enrollment.course.title}"></h3>
-                            <p th:text="${enrollment.course.lessons + ' lecciones · ' +
-                                #temporals.format(enrollment.completedAt, 'dd/MM/yyyy')}">
+                            <h3 th:text="${certificate.courseTitle()}"></h3>
+                            <p th:text="${certificate.videoCount() + ' videos · ' +
+                                #temporals.format(certificate.issuedAt(), 'dd/MM/yyyy')}">
                             </p>
+                            <span class="panel-cert-code" th:text="${certificate.code()}"></span>
                         </div>
                         <a class="btn btn-ghost"
-                           th:href="@{/panel/certificados/{slug}(slug=${enrollment.course.slug})}">
+                           th:href="@{/panel/certificados/{slug}(slug=${certificate.courseSlug()})}">
                             Ver certificado
                         </a>
                     </article>

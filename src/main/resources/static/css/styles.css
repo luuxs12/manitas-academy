@@ -5341,6 +5341,14 @@ html[data-theme="dark"] .panel-stats li {
 .panel-cert > div { flex: 1 1 auto; min-width: 0; }
 .panel-cert h3 { margin: 0 0 .25rem; font-size: 1rem; }
 .panel-cert p { margin: 0; color: var(--muted); font-size: .8rem; }
+.panel-cert-code {
+    display: inline-block;
+    margin-top: .35rem;
+    color: var(--muted);
+    font-family: monospace;
+    font-size: .72rem;
+    letter-spacing: .04em;
+}
 
 .panel-cert-icon {
     display: grid;

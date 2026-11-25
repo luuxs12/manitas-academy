@@ -48,11 +48,8 @@
             <div class="panel-profile-grid">
                 <section class="panel-card" id="foto" aria-labelledby="titulo-foto">
                     <h2 id="titulo-foto">Foto de perfil</h2>
-                    <p class="panel-note">
-                        Usamos JPG, PNG o WebP de hasta 2 MB. Si no subís una foto, mostramos tus iniciales.
-                    </p>
 
-                    <div class="panel-avatar-form">
+                    <div class="panel-avatar-current">
                         <span class="panel-avatar-preview">
                             <span class="panel-avatar"
                                   th:classappend="${currentUser.hasAvatar()} ? ' panel-avatar--photo' : ''"
@@ -63,7 +60,12 @@
                                       th:text="${currentUser.initials()}">LM</span>
                             </span>
                         </span>
+                        <p class="panel-note">
+                            Usamos JPG, PNG o WebP de hasta 2 MB. Si no subís una foto, mostramos tus iniciales.
+                        </p>
+                    </div>
 
+                    <div class="panel-avatar-editor">
                         <form class="panel-form" th:action="@{/panel/perfil/foto}"
                               method="post" enctype="multipart/form-data">
                             <div class="field">
@@ -72,12 +74,16 @@
                                        accept="image/jpeg,image/png,image/webp">
                                 <p class="field-hint">La imagen se guarda solo en tu cuenta.</p>
                             </div>
-                            <button class="btn btn-dark" type="submit">Subir foto</button>
-                        </form>
 
-                        <form th:action="@{/panel/perfil/foto/eliminar}" method="post"
-                              th:if="${currentUser.hasAvatar()}">
-                            <button class="btn btn-ghost" type="submit">Quitar foto</button>
+                            <div class="panel-avatar-actions">
+                                <button class="btn btn-dark" type="submit">Subir foto</button>
+                                <button class="btn btn-ghost" type="submit"
+                                        th:if="${currentUser.hasAvatar()}"
+                                        th:formaction="@{/panel/perfil/foto/eliminar}"
+                                        formenctype="application/x-www-form-urlencoded">
+                                    Quitar foto
+                                </button>
+                            </div>
                         </form>
                     </div>
                 </section>

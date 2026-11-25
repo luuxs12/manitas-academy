@@ -5644,15 +5644,33 @@ html[data-theme="dark"] .panel-stats li {
     object-fit: cover;
 }
 
-.panel-avatar-form {
+.panel-avatar-current {
     display: flex;
-    flex-wrap: wrap;
-    align-items: flex-end;
-    gap: .8rem;
+    align-items: center;
+    gap: 1rem;
     margin-top: 1rem;
 }
 
-.panel-avatar-form .field { flex: 1 1 260px; }
+.panel-avatar-current p {
+    max-width: 38ch;
+    margin: 0;
+    font-size: .85rem;
+}
+
+.panel-avatar-editor {
+    margin-top: 1rem;
+}
+
+.panel-avatar-editor .panel-form {
+    margin-top: 0;
+}
+
+.panel-avatar-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .5rem;
+    margin-top: .8rem;
+}
 
 .panel-avatar-preview {
     width: 72px;
@@ -6730,10 +6748,27 @@ html[data-theme="dark"] .panel-stats li {
 
 .course-lesson-layout {
     display: grid;
-    grid-template-columns: minmax(0, 1.6fr) minmax(260px, .8fr);
+    grid-template-columns: minmax(0, 1.45fr) minmax(300px, .85fr);
     gap: 1.5rem;
     align-items: start;
     margin-top: 1.5rem;
+}
+
+/* El escenario queda a la vista mientras se recorre un temario largo. */
+.course-stage {
+    position: sticky;
+    top: 1.5rem;
+    min-width: 0;
+}
+
+.player-actions {
+    margin-top: 1rem;
+}
+
+.player-empty-hint {
+    margin-top: .75rem;
+    padding-top: .75rem;
+    border-top: 1px solid var(--line, #d0d0d0);
 }
 
 .player-card,
@@ -6821,6 +6856,29 @@ html[data-theme="dark"] .panel-stats li {
     letter-spacing: -.01em;
 }
 
+.syllabus-group-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: .35rem .75rem;
+}
+
+.syllabus-group-number {
+    display: block;
+    color: var(--muted, #666);
+    font-family: var(--nav);
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.syllabus-group-name {
+    display: block;
+    margin-top: .1rem;
+}
+
 .syllabus-no-videos {
     color: var(--muted, #666);
     font-size: .8rem;
@@ -6877,9 +6935,23 @@ html[data-theme="dark"] .panel-stats li {
     box-shadow: inset 3px 0 0 var(--accent, #0f0);
 }
 
+.syllabus-item-top {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: .35rem .6rem;
+}
+
 .syllabus-title {
     font-weight: 700;
     overflow-wrap: anywhere;
+}
+
+.syllabus-item .syllabus-title {
+    margin: 0;
+    font-size: .95rem;
+    line-height: 1.35;
 }
 
 .syllabus-meta {
@@ -6904,6 +6976,7 @@ html[data-theme="dark"] .panel-stats li {
 
 @media (max-width: 900px) {
     .course-lesson-layout { grid-template-columns: 1fr; }
+    .course-stage { position: static; }
 }
 
 /* ---- Temario estructurado del estudiante ---- */
@@ -6931,11 +7004,6 @@ html[data-theme="dark"] .panel-stats li {
 
 .syllabus-item-row { list-style: none; }
 
-.syllabus-item-copy {
-    display: grid;
-    gap: .25rem;
-}
-
 .syllabus-item-type {
     color: var(--muted, #666);
     font-size: .68rem;
@@ -6946,11 +7014,13 @@ html[data-theme="dark"] .panel-stats li {
 .syllabus-description {
     display: -webkit-box;
     overflow: hidden;
+    margin: 0;
     color: var(--muted, #666);
     font-size: .78rem;
     line-height: 1.5;
+    overflow-wrap: anywhere;
     -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
+    -webkit-line-clamp: 2;
 }
 
 .syllabus-item-actions {
@@ -6958,14 +7028,18 @@ html[data-theme="dark"] .panel-stats li {
     flex-wrap: wrap;
     align-items: center;
     gap: .5rem;
-    margin-top: .55rem;
+    margin-top: .35rem;
 }
 
-.syllabus-link {
-    color: var(--ink, #000);
+.syllabus-mark-form {
+    display: inline-flex;
+    margin: 0;
+}
+
+.syllabus-action {
+    min-height: 2.25rem;
+    padding: .4rem .8rem;
     font-size: .78rem;
-    font-weight: 700;
-    text-decoration: underline;
 }
 
 .player-hint {
@@ -6980,5 +7054,6 @@ html[data-theme="dark"] .panel-stats li {
 
 @media (max-width: 620px) {
     .syllabus-item-actions { align-items: stretch; flex-direction: column; }
-    .syllabus-link { text-align: left; }
+    .syllabus-mark-form,
+    .syllabus-action { width: 100%; }
 }

@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<body>
+
+<!-- Una sola fila del temario. La usan los ítems con sección y los sueltos. -->
+<li class="syllabus-item-row" th:fragment="row(item)">
+    <article class="syllabus-item"
+             th:id="'syllabus-' + ${item.id()}"
+             th:attr="aria-labelledby='syllabus-title-' + ${item.id()}"
+             th:classappend="${(selectedId != null and item.sourceId() != null and selectedId == item.sourceId() ? ' is-active' : '') + (item.seen() ? ' is-done' : '')}">
+        <div class="syllabus-item-top">
+            <span class="syllabus-item-type" th:text="${item.type()}"></span>
+            <span class="syllabus-state"
+                  th:text="${item.locked() ? 'Requiere Premium' : (item.seen() ? 'Visto' : 'Pendiente')}"></span>
+        </div>
+
+        <h5 class="syllabus-title" th:id="'syllabus-title-' + ${item.id()}"
+            th:text="${item.title()}"></h5>
+
+        <p class="syllabus-description"
+           th:if="${item.description() != null}"
+           th:attr="title=${item.description()}"
+           th:text="${item.description()}"></p>
+
+        <p class="syllabus-meta">
+            <span th:if="${item.type() == 'VIDEO'}" th:text="${item.durationLabel()}"></span>
+            <span th:unless="${item.type() == 'VIDEO'}">Sin fecha límite</span>
+        </p>
+
+        <div class="syllabus-item-actions" th:if="${!item.locked()}">
+            <a class="btn btn-dark syllabus-action"
+               th:if="${item.type() == 'VIDEO' and item.sourceId() != null}"
+               th:href="@{/panel/cursos/{slug}(slug=${enrollment.course.slug},video=${item.sourceId()})}"
+               th:attr="aria-label='Abrir la clase ' + ${item.title()}">Abrir clase</a>
+            <a class="btn btn-dark syllabus-action"
+               th:if="${item.type() == 'MATERIAL' and item.url() != null}"
+               th:href="${item.url()}" target="_blank"
+               rel="noopener noreferrer"
+               th:attr="aria-label='Abrir el material ' + ${item.title()} + ' (abre en pestaña nueva)'">Abrir material</a>
+            <form class="syllabus-mark-form"
+                  th:action="@{/panel/cursos/{slug}/items/{itemId}/visto(slug=${enrollment.course.slug},itemId=${item.id()})}"
+                  method="post">
+                <input type="hidden" name="seen" th:value="${!item.seen()}">
+                <button class="btn btn-ghost syllabus-action" type="submit"
+                        th:text="${item.seen()} ? 'Marcar como pendiente' : 'Marcar como visto'">
+                </button>
+            </form>
+        </div>
+    </article>
+</li>
+
+</body>
+</html>

@@ -213,21 +213,27 @@ perfil, cursos y panel de administración:
 | `.footer-col` | columna de enlaces del pie, con el título en Open Sans 700 |
 | `.footer-bottom` / `.footer-legal` | barra inferior negra: copyright y enlaces legales en blanco atenuado |
 | `.footer-top` | pastilla "Volver arriba" que se pinta de verde al pasar el mouse; se oculta bajo 520 px |
-| `.course-lesson-layout` | grilla del curso del estudiante: reproductor a la izquierda y temario a la derecha; se apila bajo 900 px |
+| `.course-lesson-layout` | grilla del curso del estudiante: escenario a la izquierda y temario a la derecha; se apila bajo 900 px |
+| `.course-stage` | columna del reproductor; queda fija al hacer scroll en pantallas anchas y vuelve al flujo al apilarse |
 | `.player-card` / `.player-empty` | contenedor del reproductor y estado cuando todavía no se eligió una clase |
+| `.player-actions` / `.player-empty-hint` | acción de marcar el video y separación del texto cuando el escenario está vacío |
 | `.player-frame` / `.player-frame video` | video 16:9 sobre negro, con foco verde hacia adentro y controles nativos |
 | `.player-note` / `.player-transcript` | aviso de archivo pendiente o video histórico, y transcripción en `details` |
-| `.course-syllabus` / `.syllabus-list` / `.syllabus-item` | temario ordenado: módulo, título, duración, vistos y distintivos de subtítulos o transcripción |
+| `.course-syllabus` / `.syllabus-list` / `.syllabus-item` | temario ordenado: módulo, título, descripción, duración, estado y acciones de cada ítem |
 | `.syllabus-item.is-active` / `.syllabus-item.is-done` | clase abierta (borde verde) y clase marcada como terminada (estado verde) |
-| `.syllabus-groups` / `.syllabus-group` / `.syllabus-group-title` | temario agrupado por módulo, con el título real del módulo como encabezado |
+| `.syllabus-groups` / `.syllabus-group` / `.syllabus-group-title` | temario agrupado por módulo, con la etiqueta visible “Módulo N” sobre el título real |
+| `.syllabus-group-head` / `.syllabus-group-number` / `.syllabus-group-name` | encabezado del módulo: número y nombre alineados, porcentaje a la derecha |
 | `.syllabus-no-videos` | aviso accesible cuando un módulo aún no tiene clases cargadas |
 | `.syllabus-progress` | porcentaje real del módulo, calculado sobre sus ítems visibles |
 | `.syllabus-section` / `.syllabus-section-title` | agrupación por sección del módulo; los ítems sin sección se muestran bajo “Sin sección” |
-| `.syllabus-item-copy` / `.syllabus-item-type` | bloque del ítem con su tipo (VIDEO, MATERIAL o EJERCICIO), título y descripción de PostgreSQL |
-| `.syllabus-item-actions` / `.syllabus-link` | acciones del ítem: abrir la clase, abrir el material o marcarlo como visto; se apilan bajo 620 px |
-| `.syllabus-description` | texto de apoyo del ítem; se limita a tres líneas y deja el valor completo en `title`, sin reemplazar al título ni inventar fechas |
+| `fragments/syllabus-item.html` | fila compartida por ítems con sección y sueltos: tipo y estado, título, descripción, duración o “Sin fecha límite” y acciones |
+| `.syllabus-item-top` / `.syllabus-item-type` | primera línea de la fila, con el tipo (VIDEO, MATERIAL o EJERCICIO) y el estado a los extremos |
+| `.syllabus-item-actions` / `.syllabus-mark-form` / `.syllabus-action` | acciones en botones del mismo tamaño: abrir la clase, abrir el material o marcarlo como visto; se apilan bajo 620 px |
+| `.syllabus-description` | texto de apoyo del ítem; se limita a dos líneas y deja el valor completo en `title`, sin reemplazar al título ni inventar fechas |
 | `.syllabus-title` / `.admin-content-copy strong` | títulos que pueden romperse con `overflow-wrap: anywhere` cuando el nombre no tiene espacios |
 | `.player-hint` | aviso `role="status"` que aparece si YouTube informa por `postMessage` que el video terminó; solo acepta mensajes del iframe del reproductor y el botón sigue siendo la acción confirmada |
+| `.panel-avatar-current` / `.panel-avatar-preview` | foto actual o iniciales junto al texto de formatos, antes de cualquier control |
+| `.panel-avatar-editor` / `.panel-avatar-actions` | campo de carga y grupo de acciones “Subir foto” / “Quitar foto”, en ese orden; “Quitar foto” usa `th:formaction` dentro del mismo formulario |
 
 ### Componentes del panel administrativo
 

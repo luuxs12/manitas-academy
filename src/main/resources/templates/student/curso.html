@@ -35,7 +35,7 @@
             <p class="panel-flash panel-flash--error" th:if="${panelError}" th:text="${panelError}" role="alert"></p>
 
             <div class="course-lesson-layout">
-                <div>
+                <div class="course-stage">
                     <section class="player-card" aria-labelledby="titulo-reproductor"
                              th:if="${player != null}">
                         <h2 id="titulo-reproductor" th:text="${player.title()}"></h2>
@@ -52,7 +52,8 @@
                         <p class="player-hint" data-video-end-hint hidden role="status">
                             El video terminó. Si lo viste, marcá la clase como vista.
                         </p>
-                        <form th:action="@{/panel/cursos/{slug}/videos/{videoId}(slug=${enrollment.course.slug},videoId=${selectedId})}"
+                        <form class="player-actions"
+                              th:action="@{/panel/cursos/{slug}/videos/{videoId}(slug=${enrollment.course.slug},videoId=${selectedId})}"
                               method="post">
                             <button class="btn btn-dark" type="submit"
                                     th:text="${doneVideos.contains(selectedId)} ? 'Marcar como pendiente' : 'Marcar como visto'">
@@ -63,8 +64,11 @@
                     <section class="player-empty" th:if="${player == null}"
                              aria-labelledby="titulo-elegir">
                         <h2 id="titulo-elegir">Elegí una clase para empezar</h2>
-                        <p>El temario está a la derecha. Los videos se abren acá; los materiales
-                           y los ejercicios se marcan desde su propia fila.</p>
+                        <p>El temario está a la derecha y muestra el avance de cada módulo.</p>
+                        <p class="player-empty-hint">
+                            Abrí un video para verlo acá. Los materiales y los ejercicios
+                            se marcan desde su propia fila.
+                        </p>
                     </section>
                 </div>
 
@@ -81,97 +85,29 @@
                     <div class="syllabus-groups" th:if="${!#lists.isEmpty(modules)}">
                         <section class="syllabus-group" th:each="module, i : ${modules}"
                                  th:attr="aria-labelledby='modulo-' + ${module.id()}">
-                            <h3 class="syllabus-group-title" th:id="'modulo-' + ${module.id()}">
-                                <span th:text="'Módulo ' + ${i.count}"></span>
-                                <span th:text="${module.title()}"></span>
-                            </h3>
-                            <p class="syllabus-progress" th:text="${module.percent()} + '% completado'"></p>
+                            <div class="syllabus-group-head">
+                                <h3 class="syllabus-group-title" th:id="'modulo-' + ${module.id()}">
+                                    <span class="syllabus-group-number" th:text="'Módulo ' + ${i.count}"></span>
+                                    <span class="syllabus-group-name" th:text="${module.title()}"></span>
+                                </h3>
+                                <p class="syllabus-progress" th:text="${module.percent()} + '% completado'"></p>
+                            </div>
 
                             <div class="syllabus-section" th:each="section : ${module.sections()}">
                                 <h4 class="syllabus-section-title" th:text="${section.title()}"></h4>
                                 <ul class="syllabus-list">
-                                    <li class="syllabus-item-row" th:each="item : ${section.items()}">
-                                        <div class="syllabus-item"
-                                             th:classappend="${(selectedId != null and item.sourceId() != null and selectedId == item.sourceId() ? ' is-active' : '') + (item.seen() ? ' is-done' : '')}">
-                                            <div class="syllabus-item-copy">
-                                                <span class="syllabus-item-type" th:text="${item.type()}"></span>
-                                                <span class="syllabus-title" th:text="${item.title()}"></span>
-                                                <span class="syllabus-meta">
-                                                    <span th:if="${item.type() == 'VIDEO'}"
-                                                          th:text="${item.durationLabel()}"></span>
-                                                    <span th:unless="${item.type() == 'VIDEO'}">Sin fecha límite</span>
-                                                    <span class="syllabus-state"
-                                                          th:text="${item.locked() ? 'Requiere Premium' : (item.seen() ? 'Visto' : 'Pendiente')}"></span>
-                                                </span>
-                                                <span class="syllabus-description"
-                                                      th:if="${item.description() != null}"
-                                                      th:attr="title=${item.description()}" th:text="${item.description()}"></span>
-                                            </div>
-                                            <div class="syllabus-item-actions">
-                                                <a class="syllabus-link"
-                                                   th:if="${item.type() == 'VIDEO' and !item.locked() and item.sourceId() != null}"
-                                                   th:href="@{/panel/cursos/{slug}(slug=${enrollment.course.slug},video=${item.sourceId()})}"
-                                                   th:attr="aria-label='Abrir la clase ' + ${item.title()}">Abrir clase</a>
-                                                <a class="syllabus-link"
-                                                   th:if="${item.type() == 'MATERIAL' and !item.locked() and item.url() != null}"
-                                                   th:href="${item.url()}" target="_blank"
-                                                   rel="noopener noreferrer"
-                                                   th:attr="aria-label='Abrir el material ' + ${item.title()} + ' (abre en pestaña nueva)'">Abrir material</a>
-                                                <form th:if="${!item.locked()}"
-                                                      th:action="@{/panel/cursos/{slug}/items/{itemId}/visto(slug=${enrollment.course.slug},itemId=${item.id()})}"
-                                                      method="post">
-                                                    <input type="hidden" name="seen" th:value="${!item.seen()}">
-                                                    <button class="panel-inline-btn" type="submit"
-                                                            th:text="${item.seen()} ? 'Marcar como pendiente' : 'Marcar como visto'">
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </li>
+                                    <th:block th:each="item : ${section.items()}">
+                                        <li th:replace="~{fragments/syllabus-item :: row(${item})}"></li>
+                                    </th:block>
                                 </ul>
                             </div>
 
                             <div class="syllabus-section" th:if="${!#lists.isEmpty(module.items())}">
                                 <h4 class="syllabus-section-title">Sin sección</h4>
                                 <ul class="syllabus-list">
-                                    <li class="syllabus-item-row" th:each="item : ${module.items()}">
-                                        <div class="syllabus-item"
-                                             th:classappend="${(selectedId != null and item.sourceId() != null and selectedId == item.sourceId() ? ' is-active' : '') + (item.seen() ? ' is-done' : '')}">
-                                            <div class="syllabus-item-copy">
-                                                <span class="syllabus-item-type" th:text="${item.type()}"></span>
-                                                <span class="syllabus-title" th:text="${item.title()}"></span>
-                                                <span class="syllabus-meta">
-                                                    <span th:if="${item.type() == 'VIDEO'}"
-                                                          th:text="${item.durationLabel()}"></span>
-                                                    <span th:unless="${item.type() == 'VIDEO'}">Sin fecha límite</span>
-                                                    <span class="syllabus-state"
-                                                          th:text="${item.locked() ? 'Requiere Premium' : (item.seen() ? 'Visto' : 'Pendiente')}"></span>
-                                                </span>
-                                                <span class="syllabus-description"
-                                                      th:if="${item.description() != null}"
-                                                      th:attr="title=${item.description()}" th:text="${item.description()}"></span>
-                                            </div>
-                                            <div class="syllabus-item-actions">
-                                                <a class="syllabus-link"
-                                                   th:if="${item.type() == 'VIDEO' and !item.locked() and item.sourceId() != null}"
-                                                   th:href="@{/panel/cursos/{slug}(slug=${enrollment.course.slug},video=${item.sourceId()})}"
-                                                   th:attr="aria-label='Abrir la clase ' + ${item.title()}">Abrir clase</a>
-                                                <a class="syllabus-link"
-                                                   th:if="${item.type() == 'MATERIAL' and !item.locked() and item.url() != null}"
-                                                   th:href="${item.url()}" target="_blank"
-                                                   rel="noopener noreferrer"
-                                                   th:attr="aria-label='Abrir el material ' + ${item.title()} + ' (abre en pestaña nueva)'">Abrir material</a>
-                                                <form th:if="${!item.locked()}"
-                                                      th:action="@{/panel/cursos/{slug}/items/{itemId}/visto(slug=${enrollment.course.slug},itemId=${item.id()})}"
-                                                      method="post">
-                                                    <input type="hidden" name="seen" th:value="${!item.seen()}">
-                                                    <button class="panel-inline-btn" type="submit"
-                                                            th:text="${item.seen()} ? 'Marcar como pendiente' : 'Marcar como visto'">
-                                                    </button>
-                                                </form>
-                                            </div>
-                                        </div>
-                                    </li>
+                                    <th:block th:each="item : ${module.items()}">
+                                        <li th:replace="~{fragments/syllabus-item :: row(${item})}"></li>
+                                    </th:block>
                                 </ul>
                             </div>
                         </section>

@@ -27,18 +27,19 @@ class StudentCourseViewTest {
     @DisplayName("el temario sale de módulos, secciones e ítems reales de PostgreSQL")
     void syllabusUsesDatabaseContent() throws IOException {
         String html = read("templates/student/curso.html");
+        String view = html + readSyllabusItem();
 
         assertThat(html).contains("th:each=\"module, i : ${modules}\"");
         assertThat(html).contains("th:text=\"'Módulo ' + ${i.count}\"");
         assertThat(html).contains("th:each=\"section : ${module.sections()}\"");
         assertThat(html).contains("th:each=\"item : ${section.items()}\"");
         assertThat(html).contains("th:each=\"item : ${module.items()}\"");
-        assertThat(html).contains("th:text=\"${item.type()}\"");
-        assertThat(html).contains("th:text=\"${item.title()}\"");
-        assertThat(html).contains("video=${item.sourceId()}");
-        assertThat(html).contains("/items/{itemId}/visto");
+        assertThat(view).contains("th:text=\"${item.type()}\"");
+        assertThat(view).contains("th:text=\"${item.title()}\"");
+        assertThat(view).contains("video=${item.sourceId()}");
+        assertThat(view).contains("/items/{itemId}/visto");
         assertThat(html).contains("Sin sección");
-        assertThat(html).contains("Sin fecha límite");
+        assertThat(view).contains("Sin fecha límite");
         assertThat(html).contains("th:title=\"${player.title()}\"");
         assertThat(html).doesNotContain("panel-eyebrow");
     }
@@ -97,6 +98,7 @@ class StudentCourseViewTest {
     @DisplayName("los paneles resisten singular, nombres largos y vídeos extensos")
     void worstCaseDataIsReadable() throws IOException {
         String student = read("templates/student/curso.html");
+        String item = readSyllabusItem();
         String admin = read("templates/admin/contenido.html");
         String css = read("static/css/styles.css");
 
@@ -104,24 +106,85 @@ class StudentCourseViewTest {
         assertThat(admin).contains("(${outline.totalItems()} == 1 ? ' ítem' : ' ítems')");
         assertThat(admin).contains("(${outline.doneItems()} == 1 ? ' visto' : ' vistos')");
 
-        assertThat(student).contains("th:text=\"${item.durationLabel()}\"");
+        assertThat(item).contains("th:text=\"${item.durationLabel()}\"");
         assertThat(admin).contains("th:text=\"${item.durationLabel()}\"");
-        assertThat(student).doesNotContain("item.durationSeconds() + ' s'");
+        assertThat(item).doesNotContain("item.durationSeconds() + ' s'");
         assertThat(admin).doesNotContain("item.durationSeconds() + ' s'");
 
         // Un ítem suelto también debe resaltarse cuando es la clase abierta.
+        // La fila vive en un fragmento compartido por los dos caminos.
         assertThat(student.split(java.util.regex.Pattern.quote(
-                "selectedId != null and item.sourceId() != null"), -1)).hasSize(3);
+                "~{fragments/syllabus-item :: row(${item})}"), -1)).hasSize(3);
 
-        assertThat(student).contains("th:attr=\"title=${item.description()}\"");
         assertThat(student).contains("<span aria-hidden=\"true\" th:style=");
-        assertThat(student).contains("(abre en pestaña nueva)");
+        assertThat(item).contains("(abre en pestaña nueva)");
         assertThat(admin).contains("en pestaña nueva");
 
         assertThat(css).contains(".syllabus-title {\n    font-weight: 700;\n    overflow-wrap: anywhere;\n}");
         assertThat(css).contains(".admin-content-copy strong { font-family: var(--nav); font-size: .84rem; overflow-wrap: anywhere; }");
-        assertThat(css).contains("-webkit-line-clamp: 3;");
+        assertThat(css).contains("-webkit-line-clamp: 2;")
+                .contains(".syllabus-description {\n    display: -webkit-box;\n    overflow: hidden;")
+                .contains("overflow-wrap: anywhere;");
         assertThat(css).doesNotContain("transition: width .4s var(--ease);");
+    }
+
+    @Test
+    @DisplayName("el curso separa el escenario del temario y ordena cada ítem en una fila propia")
+    void stageAndItemsHaveADeliberateOrder() throws IOException {
+        String student = read("templates/student/curso.html");
+        Path fragmentPath = Path.of("src", "main", "resources", "templates", "fragments",
+                "syllabus-item.html");
+        assertThat(fragmentPath).exists();
+        String item = Files.readString(fragmentPath, StandardCharsets.UTF_8);
+        String css = read("static/css/styles.css");
+
+        assertThat(student).contains("class=\"course-stage\"")
+                .contains("~{fragments/syllabus-item :: row(${item})}")
+                .doesNotContain("class=\"syllabus-item\"")
+                .doesNotContain("syllabus-item-copy");
+
+        assertThat(indexOf(item, "class=\"syllabus-item-top\""))
+                .isLessThan(indexOf(item, "<h5 class=\"syllabus-title\""));
+        assertThat(indexOf(item, "<h5 class=\"syllabus-title\""))
+                .isLessThan(indexOf(item, "<p class=\"syllabus-description\""));
+        assertThat(indexOf(item, "<p class=\"syllabus-description\""))
+                .isLessThan(indexOf(item, "<p class=\"syllabus-meta\""));
+        assertThat(indexOf(item, "<p class=\"syllabus-meta\""))
+                .isLessThan(indexOf(item, "class=\"syllabus-item-actions\""));
+        assertThat(item).contains("class=\"btn btn-dark syllabus-action\"")
+                .contains("class=\"syllabus-mark-form\"")
+                .contains("th:attr=\"title=${item.description()}\"");
+
+        assertThat(css).contains(".course-stage {")
+                .contains(".syllabus-item-top {")
+                .contains(".syllabus-action {")
+                .contains(".syllabus-mark-form {")
+                .contains("position: sticky");
+    }
+
+    @Test
+    @DisplayName("la foto de perfil ordena vista previa, carga y acciones en dos grupos")
+    void profilePhotoGroupsItsActions() throws IOException {
+        String profile = read("templates/student/perfil.html");
+        String css = read("static/css/styles.css");
+
+        assertThat(indexOf(profile, "panel-avatar-current"))
+                .isLessThan(indexOf(profile, "panel-avatar-editor"));
+        assertThat(indexOf(profile, "Elegir una imagen"))
+                .isLessThan(indexOf(profile, "panel-avatar-actions"));
+        assertThat(indexOf(profile, "Subir foto")).isLessThan(indexOf(profile, "Quitar foto"));
+        assertThat(profile).contains("th:formaction=\"@{/panel/perfil/foto/eliminar}\"")
+                .doesNotContain("th:action=\"@{/panel/perfil/foto/eliminar}\"");
+
+        assertThat(css).contains(".panel-avatar-current {")
+                .contains(".panel-avatar-editor {")
+                .contains(".panel-avatar-actions {");
+    }
+
+    private static int indexOf(String text, String needle) {
+        int position = text.indexOf(needle);
+        assertThat(position).as("fragmento %s", needle).isNotNegative();
+        return position;
     }
 
     @Test
@@ -130,6 +193,13 @@ class StudentCourseViewTest {
         String js = read("static/js/panel.js");
 
         assertThat(js).contains("event.source !== frame.contentWindow");
+    }
+
+    private String readSyllabusItem() throws IOException {
+        Path path = Path.of("src", "main", "resources", "templates", "fragments",
+                "syllabus-item.html");
+        assertThat(path).exists();
+        return Files.readString(path, StandardCharsets.UTF_8);
     }
 
     private String read(String path) throws IOException {

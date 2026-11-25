@@ -24,6 +24,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.util.Objects;
+
 /**
  * Pantallas y acciones de acceso.
  *
@@ -75,7 +77,7 @@ public class AuthController {
             HttpServletRequest request,
             HttpServletResponse response
     ) {
-        if (!form.getPassword().equals(form.getConfirmPassword())) {
+        if (!Objects.equals(form.getPassword(), form.getConfirmPassword())) {
             result.rejectValue(
                     "confirmPassword",
                     "password.mismatch",

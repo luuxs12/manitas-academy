@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.util.Objects;
+
 /**
  * Pantallas de recuperación de contraseña.
  *
@@ -80,7 +82,7 @@ public class PasswordResetController {
             BindingResult result,
             Model model
     ) {
-        if (!form.getPassword().equals(form.getConfirmPassword())) {
+        if (!Objects.equals(form.getPassword(), form.getConfirmPassword())) {
             result.rejectValue(
                     "confirmPassword",
                     "password.mismatch",

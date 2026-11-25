@@ -10,10 +10,6 @@
     <div class="panel-shell">
         <header th:replace="~{admin/fragments/admin-nav :: topbar('Cursos', 'Contenido del curso', ${courseTitle})}"></header>
         <main id="panel-main" class="panel-main admin-main">
-            <p class="panel-flash panel-flash--ok" th:if="${panelOk}" th:text="${panelOk}"
-               role="status" aria-live="polite"></p>
-            <p class="panel-flash panel-flash--error" th:if="${panelError}" th:text="${panelError}"
-               role="alert" aria-live="assertive"></p>
 
             <div class="admin-page-head">
                 <div>
@@ -68,9 +64,8 @@
                                 <input type="hidden" name="up" value="false">
                                 <button class="admin-move" type="submit" th:attr="aria-label='Bajar sección ' + ${section.title()}">↓</button>
                             </form>
-                            <a class="admin-confirm-link"
-                               th:href="@{/admin/cursos/{c}/contenido/secciones/{s}/eliminar(c=${courseId},s=${section.id()})}"
-                               th:attr="aria-label='Eliminar sección ' + ${section.title()}">Eliminar sección</a>
+                            <button type="button" class="admin-confirm-link"
+                                    th:attr="data-confirm-url=@{/admin/cursos/{c}/contenido/secciones/{s}/eliminar(c=${courseId},s=${section.id()})}, aria-label='Eliminar sección ' + ${section.title()}">Eliminar sección</button>
                         </div>
                     </div>
 

@@ -24,8 +24,6 @@
                    th:text="${'Tu plan: ' + currentUser.planLabel()}">Tu plan: Gratis</a>
             </div>
 
-            <p class="panel-flash panel-flash--ok" th:if="${panelOk}" th:text="${panelOk}" role="status"></p>
-            <p class="panel-flash panel-flash--error" th:if="${panelError}" th:text="${panelError}" role="alert"></p>
 
             <form class="panel-explore-search" role="search" th:action="@{/panel/explorar}" method="get">
                 <label class="sr-only" for="explorar-buscar">Buscar cursos</label>
@@ -81,7 +79,8 @@
                             <form class="panel-enroll-form"
                                   th:if="${!enrolledSlugs.contains(course.slug) and (course.free or currentUser.premium())}"
                                   th:action="@{/panel/cursos/{slug}/inscribir(slug=${course.slug})}"
-                                  method="post">
+                                  method="post" data-confirm-form
+                                  th:attr="data-confirm-message='¿Inscribirte en ' + ${course.title} + '?'">
                                 <button class="btn btn-dark panel-enroll-btn" type="submit">
                                     Inscribirme <span aria-hidden="true">→</span>
                                 </button>

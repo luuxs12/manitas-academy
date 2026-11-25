@@ -10,8 +10,6 @@
     <div class="panel-shell">
         <header th:replace="~{admin/fragments/admin-nav :: topbar('Cursos', ${courseId != null} ? 'Editar ficha' : 'Nueva ficha', '')}"></header>
         <main id="panel-main" class="panel-main admin-main">
-            <p class="panel-flash panel-flash--ok" th:if="${panelOk}" th:text="${panelOk}" role="status"></p>
-            <p class="panel-flash panel-flash--error" th:if="${panelError}" th:text="${panelError}" role="alert"></p>
 
             <div class="admin-page-head">
                 <div><h1 th:text="${courseId != null} ? 'Editar curso' : 'Nuevo curso'">Curso</h1>
@@ -20,7 +18,8 @@
             </div>
 
             <form class="panel-card admin-card admin-form" th:action="${courseId != null} ? @{/admin/cursos/{id}(id=${courseId})} : @{/admin/cursos}"
-                  th:object="${adminCourseForm}" method="post" novalidate>
+                  th:object="${adminCourseForm}" method="post" novalidate data-confirm-form
+                  th:attr="data-confirm-message=${courseId != null} ? '¿Guardar los cambios del curso?' : '¿Crear el curso con estos datos?'">
                 <input type="hidden" th:field="*{image}">
                 <div class="admin-form-grid">
                     <div class="admin-field">
@@ -106,11 +105,13 @@
                 </ul>
                 <div class="admin-form-actions">
                     <form th:if="${courseStatus != 'PUBLICADO'}"
-                          th:action="@{/admin/cursos/{id}/publicar(id=${courseId})}" method="post">
+                          th:action="@{/admin/cursos/{id}/publicar(id=${courseId})}" method="post"
+                          data-confirm-form data-confirm-message="¿Publicar el curso?">
                         <button class="btn btn-admin" type="submit" aria-describedby="checklist-help checklist">Publicar curso</button>
                     </form>
                     <form th:if="${courseStatus == 'PUBLICADO'}"
-                          th:action="@{/admin/cursos/{id}/despublicar(id=${courseId})}" method="post">
+                          th:action="@{/admin/cursos/{id}/despublicar(id=${courseId})}" method="post"
+                          data-confirm-form data-confirm-message="¿Pasar el curso a borrador?">
                         <button class="btn btn-ghost" type="submit">Pasar a borrador</button>
                     </form>
                 </div>

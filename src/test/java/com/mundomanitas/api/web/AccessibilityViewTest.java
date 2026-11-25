@@ -14,8 +14,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 class AccessibilityViewTest {
 
     @Test
-    @DisplayName("los avisos de las vistas revisadas declaran cada cambio de estado")
+    @DisplayName("los avisos viven en el modal compartido y declaran cada cambio de estado")
     void reviewedViewsDeclareLiveRegions() throws IOException {
+        String dialogs = read("templates/fragments/panel-dialogs.html");
+        assertThat(dialogs).as("aviso correcto en el modal")
+                .containsPattern("role=\"status\"\\s+aria-live=\"polite\"");
+        assertThat(dialogs).as("aviso de error en el modal")
+                .containsPattern("role=\"alert\"\\s+aria-live=\"assertive\"");
+
         List<String> views = List.of(
                 "templates/student/curso.html",
                 "templates/student/perfil.html",
@@ -23,11 +29,9 @@ class AccessibilityViewTest {
                 "templates/admin/cursos.html");
 
         for (String view : views) {
-            String html = read(view);
-            assertThat(html).as("aviso correcto en %s", view)
-                    .containsPattern("role=\"status\"\\s+aria-live=\"polite\"");
-            assertThat(html).as("aviso de error en %s", view)
-                    .containsPattern("role=\"alert\"\\s+aria-live=\"assertive\"");
+            assertThat(read(view)).as("sin avisos inline en %s", view)
+                    .doesNotContain("panel-flash--ok")
+                    .doesNotContain("panel-flash--error");
         }
     }
 

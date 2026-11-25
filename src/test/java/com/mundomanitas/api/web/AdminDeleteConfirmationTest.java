@@ -10,7 +10,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DisplayName("Confirmación de borrados en páginas")
+@DisplayName("Confirmación de borrados con modal")
 class AdminDeleteConfirmationTest {
 
     private static final List<String> TEMPLATES = List.of(
@@ -18,48 +18,62 @@ class AdminDeleteConfirmationTest {
             "templates/admin/modulos.html",
             "templates/admin/videos.html",
             "templates/admin/ejercicios.html",
-            "templates/admin/certificados.html");
+            "templates/admin/contenido.html",
+            "templates/admin/certificados.html",
+            "templates/fragments/admin-content-item.html");
 
     @Test
-    @DisplayName("los cinco borrados enlazan a una página, sin diálogos ni overlays")
-    void destructiveActionsUsePages() throws IOException {
+    @DisplayName("toda acción destructiva abre el modal en vez de navegar a una página")
+    void destructiveActionsOpenTheModal() throws IOException {
         for (String path : TEMPLATES) {
             String html = read(path);
-            assertThat(html).as(path).doesNotContain("<dialog");
-            assertThat(html).as(path).doesNotContain("data-confirm=");
-            assertThat(html).as(path).doesNotContain("confirm-dialog");
-            assertThat(html).as(path).contains("admin-confirm-link");
+            assertThat(html).as(path).contains("data-confirm-url")
+                    .contains("admin-confirm-link")
+                    .contains("aria-label")
+                    .doesNotContainPattern("(?s)admin-confirm-link[^>]*th:href");
         }
     }
 
     @Test
-    @DisplayName("la página compartida muestra datos reales y envía el POST con CSRF")
-    void confirmationPageIsAccessible() throws IOException {
+    @DisplayName("la página de confirmación sigue siendo el respaldo sin JS y conserva datos y CSRF")
+    void confirmationFallbackKeepsRealDataAndCsrf() throws IOException {
         String html = read("templates/admin/confirmar.html");
 
-        assertThat(html).contains("<main");
-        assertThat(html).contains("<h1");
-        assertThat(html).contains("admin-confirm-page");
-        assertThat(html).contains("th:action=\"@{${confirmAction}}\"");
-        assertThat(html).contains("method=\"post\"");
-        assertThat(html).contains("confirmMessage");
-        assertThat(html).contains("confirmDetails");
-        assertThat(html).contains("cancelUrl");
+        assertThat(html).contains("id=\"confirm-panel\"")
+                .contains("admin-confirm-details")
+                .contains("th:action=\"@{${confirmAction}}\"")
+                .contains("method=\"post\"")
+                .contains("confirmMessage")
+                .contains("confirmDetails")
+                .contains("cancelUrl")
+                .contains("data-dialog-close");
     }
 
     @Test
-    @DisplayName("el script y el CSS ya no mantienen el diálogo modal")
-    void modalConfirmationIsGone() throws IOException {
-        String js = read("static/js/admin.js");
-        assertThat(js).doesNotContain("showModal()");
-        assertThat(js).doesNotContain("form.submit()");
-        assertThat(js).doesNotContain("data-confirm");
-        assertThat(js).doesNotContain("data-upload");
+    @DisplayName("el modal se abre con los datos reales, cierra con Escape y devuelve el foco")
+    void modalScriptIsAccessible() throws IOException {
+        String js = read("static/js/panel-dialogs.js");
+        assertThat(js).contains("data-confirm-url")
+                .contains("fetch(")
+                .contains("DOMParser")
+                .contains("showModal()")
+                .contains(".close()")
+                .contains("addEventListener(\"close\"")
+                .contains(".focus()")
+                .contains("preventDefault()");
+    }
 
+    @Test
+    @DisplayName("el modal es pequeño, usa la paleta y respeta movimiento reducido")
+    void modalStylesAreSmallAndAccessible() throws IOException {
         String css = read("static/css/styles.css");
-        assertThat(css).doesNotContain(".admin-confirm {");
-        assertThat(css).contains(".admin-confirm-page");
-        assertThat(css).contains("panel-flash--ok::before");
+        assertThat(css).contains(".ui-dialog {")
+                .contains(".ui-dialog::backdrop")
+                .contains(".ui-dialog-card")
+                .contains(".ui-check")
+                .contains("stroke-dashoffset")
+                .contains("@media (prefers-reduced-motion: reduce)")
+                .contains("animation: none");
     }
 
     private String read(String path) throws IOException {

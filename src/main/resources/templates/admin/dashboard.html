@@ -14,8 +14,6 @@
 
         <main id="panel-main" class="panel-main admin-main"
               th:attr="data-admin-since=${adminSince}">
-            <p class="panel-flash panel-flash--ok" th:if="${panelOk}" th:text="${panelOk}" role="status"></p>
-            <p class="panel-flash panel-flash--error" th:if="${panelError}" th:text="${panelError}" role="alert"></p>
 
             <section class="admin-hero" aria-labelledby="admin-hero-title">
                 <div class="admin-hero-copy">

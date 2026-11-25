@@ -10,7 +10,6 @@
     <div class="panel-shell">
         <header th:replace="~{admin/fragments/admin-nav :: topbar('Ejercicios', ${itemId != null} ? 'Editar ejercicio' : 'Nuevo ejercicio', '')}"></header>
         <main id="panel-main" class="panel-main admin-main">
-            <p class="panel-flash panel-flash--error" th:if="${panelError}" th:text="${panelError}" role="alert"></p>
             <div class="admin-page-head">
                 <div><h1 th:text="${itemId != null} ? 'Editar ejercicio' : 'Nuevo ejercicio'">Ejercicio</h1><p>La consigna se guarda con el contenido del módulo.</p></div>
                 <a class="admin-back" th:href="@{/admin/ejercicios}">← Volver a ejercicios</a>

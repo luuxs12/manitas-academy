@@ -23,8 +23,6 @@
                       th:text="${'Plan ' + currentUser.planLabel()}">Plan gratis</span>
             </div>
 
-            <p class="panel-flash panel-flash--ok" th:if="${panelOk}" th:text="${panelOk}" role="status"></p>
-            <p class="panel-flash panel-flash--error" th:if="${panelError}" th:text="${panelError}" role="alert"></p>
 
             <ul class="panel-kpis" aria-label="Resumen de facturación">
                 <li class="panel-kpi">
@@ -141,7 +139,8 @@
                     Ya pediste la cancelación. Tu acceso sigue activo hasta el final del período pagado.
                 </p>
                 <form th:action="@{/panel/facturacion/cancelar}" method="post"
-                      th:if="${!cancelAtPeriodEnd and paymentEnabled}">
+                      th:if="${!cancelAtPeriodEnd and paymentEnabled}"
+                      data-confirm-form data-confirm-message="¿Cancelar la suscripción al final del período pagado?">
                     <button class="btn btn-ghost" type="submit">Cancelar al final del período</button>
                 </form>
                 <a class="panel-inline-btn" th:if="${!portalUrl.isEmpty()}"

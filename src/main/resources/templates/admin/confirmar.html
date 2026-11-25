@@ -10,9 +10,9 @@
     <div class="panel-shell">
         <header th:replace="~{admin/fragments/admin-nav :: topbar(${confirmTitle}, 'Confirmación', '')}"></header>
         <main id="panel-main" class="panel-main admin-main">
-            <section class="panel-card admin-card admin-confirm-page" aria-labelledby="confirm-title">
-                <h1 id="confirm-title" th:text="${confirmTitle}">Confirmar acción</h1>
-                <p id="confirm-message" th:text="${confirmMessage}">Revisá los datos antes de continuar.</p>
+            <section id="confirm-panel" class="panel-card admin-card admin-confirm-page" aria-labelledby="confirm-title">
+                <h1 id="confirm-dialog-title" th:text="${confirmTitle}">Confirmar acción</h1>
+                <p id="confirm-dialog-message" th:text="${confirmMessage}">Revisá los datos antes de continuar.</p>
                 <ul class="admin-confirm-details"
                     th:if="${confirmDetails != null and !#lists.isEmpty(confirmDetails)}">
                     <li th:each="detail : ${confirmDetails}" th:text="${detail}"></li>
@@ -22,7 +22,7 @@
                         <button class="btn btn-admin admin-confirm-accept" type="submit"
                                 th:text="${confirmLabel}">Confirmar</button>
                     </form>
-                    <a class="admin-back" th:href="@{${cancelUrl}}">Cancelar y volver</a>
+                    <a class="admin-back" th:href="@{${cancelUrl}}" data-dialog-close>Cancelar y volver</a>
                 </div>
             </section>
         </main>

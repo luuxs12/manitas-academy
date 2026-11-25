@@ -31,10 +31,6 @@
                 <a class="btn btn-ghost" th:href="@{/panel/cursos}">← Volver a mis cursos</a>
             </div>
 
-            <p class="panel-flash panel-flash--ok" th:if="${panelOk}" th:text="${panelOk}"
-               role="status" aria-live="polite"></p>
-            <p class="panel-flash panel-flash--error" th:if="${panelError}" th:text="${panelError}"
-               role="alert" aria-live="assertive"></p>
 
             <div class="course-lesson-layout">
                 <div class="course-stage">
@@ -117,7 +113,8 @@
 
             <div class="panel-course-actions">
                 <form th:action="@{/panel/cursos/{slug}/completar(slug=${enrollment.course.slug})}"
-                      method="post" th:if="${!enrollment.completed}">
+                      method="post" th:if="${!enrollment.completed}" data-confirm-form
+                      data-confirm-message="¿Marcar el curso como terminado? Se emitirá tu certificado si corresponde.">
                     <button class="panel-inline-btn" type="submit">Ya terminé el curso</button>
                 </form>
                 <a class="panel-inline-btn"

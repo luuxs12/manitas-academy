@@ -232,7 +232,12 @@ perfil, cursos y panel de administración:
 | `.syllabus-description` | texto de apoyo del ítem; se limita a dos líneas y deja el valor completo en `title`, sin reemplazar al título ni inventar fechas |
 | `.syllabus-title` / `.admin-content-copy strong` | títulos que pueden romperse con `overflow-wrap: anywhere` cuando el nombre no tiene espacios |
 | `.player-hint` | región `aria-live="polite"` presente desde el inicio y vacía hasta que YouTube informa por `postMessage` que el video terminó; solo acepta mensajes del iframe y el botón sigue siendo la acción confirmada |
-| `.panel-flash` | avisos del panel con `aria-live` explícito: `polite` para el estado y `assertive` para el error, además de su `role` |
+| `fragments/panel-dialogs.html :: notices` | avisos del panel fuera del documento: modal de éxito con check animado y modal de error, con `role`/`aria-live` (`polite` y `assertive`) y cierre por botón, Escape o fondo |
+| `.ui-dialog` / `.ui-dialog-card` / `.ui-dialog-actions` | modal pequeño (máximo 26 rem) sobre fondo difuminado; usa los tokens `--paper`, `--ink`, `--accent`, `--line` y `--focus`, sin cambiar paleta ni tipografía |
+| `.ui-check` | check animado del modal de éxito: círculo y trazo que se dibujan con `stroke-dashoffset`; con `prefers-reduced-motion` queda quieto y completo |
+| `static/js/panel-dialogs.js` | abre el modal de confirmación con los datos reales del respaldo, confirma formularios con `requestSubmit()` sin perder lo cargado y devuelve el foco al disparador al cerrar |
+| `data-confirm-url` | botón que abre la confirmación de un borrado o revocación; si falla la carga, navega a la página de respaldo |
+| `data-confirm-form` / `data-confirm-message` | formularios que piden confirmación antes de enviar: crear o guardar curso, publicar, emitir certificado, inscribirse, terminar un curso, cancelar el plan y cerrar la cuenta |
 | `.field-hint` / `.field-error` en el perfil | pistas y errores con `id` propio, enlazados al campo con `aria-describedby`; los campos con error también marcan `aria-invalid="true"` |
 | `.panel-lesson-label` / `.panel-lesson-track` | avance real de videos en las tarjetas del panel: texto “X de Y videos terminados” y barra con la misma cifra en `aria-label` |
 | `.panel-course-cta` / `.panel-continue-cta` | accesos directos a la ficha del curso por `slug`; “Ver clases” en cada tarjeta y “Continuar curso” en el próximo curso, nunca al listado genérico |
@@ -246,10 +251,11 @@ perfil, cursos y panel de administración:
 
 | Clase | Uso |
 |---|---|
-| `.admin-confirm-page` | página de confirmación de borrados; reemplaza al diálogo modal, con título, aviso y datos reales |
-| `.admin-confirm-details` | lista de datos calculados que se muestran antes de confirmar |
-| `.admin-confirm-actions` / `.admin-confirm-accept` | acciones separadas: cancelar vuelve al listado y confirmar envía el POST con CSRF |
-| `.admin-confirm-link` | enlace del listado que abre la página de confirmación; nunca dispara un borrado directo |
+| `fragments/panel-dialogs.html :: confirm` | diálogo vacío compartido por todos los borrados; el script lo llena con título, aviso, impacto y POST reales |
+| `.admin-confirm-page` | página de confirmación de borrados: respaldo sin JS y fuente de los datos reales que se muestran en el modal |
+| `.admin-confirm-details` | lista del impacto calculado; el modal la reproduce desde esta página antes de confirmar |
+| `.admin-confirm-actions` / `.admin-confirm-accept` | acciones del respaldo: cancelar vuelve al listado y confirmar envía el POST con CSRF |
+| `.admin-confirm-link` | botón del listado con `data-confirm-url`; nunca dispara un borrado directo |
 | `.admin-cover` | alta de portada local con `multipart/form-data`; muestra la ruta real guardada |
 | `.admin-publication` / `.admin-checklist` | estado `PUBLICADO`/`BORRADOR` y requisitos calculados desde la base antes de publicar |
 | `.admin-field` | envoltorio de etiqueta, control, ayuda y error; el error se enlaza con `aria-describedby` y `aria-invalid` |

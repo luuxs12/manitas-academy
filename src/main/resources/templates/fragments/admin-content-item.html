@@ -41,9 +41,8 @@
             <button class="admin-move" type="submit"
                     th:attr="aria-label='Bajar ' + ${item.title()}">↓</button>
         </form>
-        <a class="admin-confirm-link"
-           th:href="@{/admin/cursos/{c}/contenido/items/{i}/eliminar(c=${courseId},i=${item.id()})}"
-           th:attr="aria-label='Eliminar ' + ${item.title()}">Eliminar</a>
+        <button type="button" class="admin-confirm-link"
+                th:attr="data-confirm-url=@{/admin/cursos/{c}/contenido/items/{i}/eliminar(c=${courseId},i=${item.id()})}, aria-label='Eliminar ' + ${item.title()}">Eliminar</button>
     </div>
 </li>
 

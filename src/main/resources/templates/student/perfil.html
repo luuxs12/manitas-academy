@@ -23,10 +23,6 @@
                       th:text="${'Plan ' + currentUser.planLabel()}">Plan gratis</span>
             </div>
 
-            <p class="panel-flash panel-flash--ok" th:if="${panelOk}" th:text="${panelOk}"
-               role="status" aria-live="polite"></p>
-            <p class="panel-flash panel-flash--error" th:if="${panelError}" th:text="${panelError}"
-               role="alert" aria-live="assertive"></p>
 
             <ul class="panel-kpis" aria-label="Resumen de la cuenta">
                 <li class="panel-kpi">

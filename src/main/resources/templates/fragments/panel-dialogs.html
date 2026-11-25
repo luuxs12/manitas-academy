@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!-- Modales pequeños del panel: la confirmación se llena con la página de
+     respaldo y los avisos salen del documento en vez de colgarse arriba. -->
+<dialog th:fragment="confirm" id="confirm-dialog" class="ui-dialog ui-dialog--confirm"
+        aria-labelledby="confirm-dialog-title" aria-describedby="confirm-dialog-message">
+    <div class="ui-dialog-card" data-confirm-body>
+        <h2 id="confirm-dialog-title" class="ui-dialog-title" data-confirm-title>Confirmar acción</h2>
+        <p id="confirm-dialog-message" class="ui-dialog-message" data-confirm-message>Revisá los datos antes de continuar.</p>
+        <ul class="ui-dialog-details" data-confirm-details hidden></ul>
+        <div class="ui-dialog-actions">
+            <button type="button" class="btn btn-ghost" data-dialog-close>Cancelar</button>
+            <button type="submit" class="btn btn-primary" data-confirm-submit>Confirmar</button>
+        </div>
+    </div>
+</dialog>
+
+<th:block th:fragment="notices">
+    <dialog th:if="${panelOk}" id="success-dialog" class="ui-dialog ui-dialog--success"
+            aria-labelledby="success-dialog-title" aria-describedby="success-dialog-message">
+        <div class="ui-dialog-card">
+            <span class="ui-check" aria-hidden="true">
+                <svg viewBox="0 0 52 52" focusable="false">
+                    <circle cx="26" cy="26" r="23"></circle>
+                    <path d="M15 27l7 7 15-16"></path>
+                </svg>
+            </span>
+            <h2 id="success-dialog-title" class="ui-dialog-title">Listo</h2>
+            <p id="success-dialog-message" class="ui-dialog-message" role="status" aria-live="polite"
+               th:text="${panelOk}">Se guardó.</p>
+            <div class="ui-dialog-actions">
+                <button type="button" class="btn btn-primary" data-dialog-close>Cerrar</button>
+            </div>
+        </div>
+    </dialog>
+
+    <dialog th:if="${panelError}" id="error-dialog" class="ui-dialog ui-dialog--error"
+            aria-labelledby="error-dialog-title" aria-describedby="error-dialog-message">
+        <div class="ui-dialog-card">
+            <span class="ui-dialog-sign" aria-hidden="true">!</span>
+            <h2 id="error-dialog-title" class="ui-dialog-title">Revisá esto</h2>
+            <p id="error-dialog-message" class="ui-dialog-message" role="alert" aria-live="assertive"
+               th:text="${panelError}">No se pudo completar.</p>
+            <div class="ui-dialog-actions">
+                <button type="button" class="btn btn-primary" data-dialog-close>Cerrar</button>
+            </div>
+        </div>
+    </dialog>
+</th:block>
+
+</body>
+</html>

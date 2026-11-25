@@ -10,8 +10,6 @@
     <div class="panel-shell">
         <header th:replace="~{admin/fragments/admin-nav :: topbar('Módulos', 'Estructura de los cursos', ${query})}"></header>
         <main id="panel-main" class="panel-main admin-main">
-            <p class="panel-flash panel-flash--ok" th:if="${panelOk}" th:text="${panelOk}" role="status"></p>
-            <p class="panel-flash panel-flash--error" th:if="${panelError}" th:text="${panelError}" role="alert"></p>
 
             <div class="admin-page-head">
                 <div><h1>Gestión de módulos</h1><p th:text="${page.totalElements + ' módulos'}">0 módulos</p></div>
@@ -56,8 +54,8 @@
                             <form th:action="@{/admin/modulos/{id}/mover(id=${item.id()}, up=false)}" method="post">
                                 <button type="submit" th:attr="aria-label='Bajar ' + ${item.title()}">↓</button>
                             </form>
-                            <a class="admin-confirm-link" th:href="@{/admin/modulos/{id}/eliminar(id=${item.id()})}"
-                               th:attr="aria-label='Eliminar ' + ${item.title()}">Eliminar</a>
+                            <button type="button" class="admin-confirm-link"
+                                    th:attr="data-confirm-url=@{/admin/modulos/{id}/eliminar(id=${item.id()})}, aria-label='Eliminar ' + ${item.title()}">Eliminar</button>
                         </td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(page.content)}"><td colspan="6" class="admin-empty">Todavía no hay módulos. Creá uno para estructurar un curso.</td></tr>

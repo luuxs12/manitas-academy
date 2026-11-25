@@ -10,8 +10,6 @@
     <div class="panel-shell">
         <header th:replace="~{admin/fragments/admin-nav :: topbar('Ejercicios', 'Actividades por módulo', ${query})}"></header>
         <main id="panel-main" class="panel-main admin-main">
-            <p class="panel-flash panel-flash--ok" th:if="${panelOk}" th:text="${panelOk}" role="status"></p>
-            <p class="panel-flash panel-flash--error" th:if="${panelError}" th:text="${panelError}" role="alert"></p>
 
             <div class="admin-page-head">
                 <div><h1>Gestión de ejercicios</h1><p th:text="${page.totalElements + ' ejercicios'}">0 ejercicios</p></div>
@@ -49,8 +47,8 @@
                         <td th:text="${item.position()}">0</td>
                         <td class="admin-row-actions">
                             <a th:href="@{/admin/ejercicios/{id}/editar(id=${item.id()})}">Editar</a>
-                            <a class="admin-confirm-link" th:href="@{/admin/ejercicios/{id}/eliminar(id=${item.id()})}"
-                               th:attr="aria-label='Eliminar ' + ${item.title()}">Eliminar</a>
+                            <button type="button" class="admin-confirm-link"
+                                    th:attr="data-confirm-url=@{/admin/ejercicios/{id}/eliminar(id=${item.id()})}, aria-label='Eliminar ' + ${item.title()}">Eliminar</button>
                         </td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(page.content)}"><td colspan="5" class="admin-empty">Todavía no hay ejercicios cargados.</td></tr>

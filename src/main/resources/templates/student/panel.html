@@ -18,8 +18,6 @@
                 <strong>Tu cuenta está lista.</strong>
                 <span>Acá vas a inscribirte a cursos y seguir tu aprendizaje.</span>
             </div>
-            <p class="panel-flash panel-flash--ok" th:if="${panelOk}" th:text="${panelOk}" role="status"></p>
-            <p class="panel-flash panel-flash--error" th:if="${panelError}" th:text="${panelError}" role="alert"></p>
 
             <section class="panel-welcome" aria-labelledby="titulo-panel">
                 <div class="panel-welcome-copy">
@@ -161,7 +159,9 @@
                             <div class="panel-course-foot">
                                 <span class="panel-course-percent" th:text="${course.priceLabel()}"></span>
                                 <form th:action="@{/panel/cursos/{slug}/inscribir(slug=${course.slug})}"
-                                      method="post" th:if="${course.free or currentUser.premium()}">
+                                      method="post" th:if="${course.free or currentUser.premium()}"
+                                      data-confirm-form
+                                      th:attr="data-confirm-message='¿Inscribirte en ' + ${course.title} + '?'">
                                     <button class="panel-inline-btn" type="submit">Inscribirme</button>
                                 </form>
                                 <a class="panel-inline-btn" th:if="${!course.free and !currentUser.premium()}"

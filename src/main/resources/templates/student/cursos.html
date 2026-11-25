@@ -24,8 +24,6 @@
                 </a>
             </div>
 
-            <p class="panel-flash panel-flash--ok" th:if="${panelOk}" th:text="${panelOk}" role="status"></p>
-            <p class="panel-flash panel-flash--error" th:if="${panelError}" th:text="${panelError}" role="alert"></p>
 
             <ul class="panel-kpis" aria-label="Resumen de cursos">
                 <li class="panel-kpi">
@@ -80,7 +78,8 @@
                                     Ver clases
                                 </a>
                                 <form th:action="@{/panel/cursos/{slug}/completar(slug=${enrollment.course.slug})}"
-                                      method="post" th:if="${!enrollment.completed}">
+                                      method="post" th:if="${!enrollment.completed}" data-confirm-form
+                                      data-confirm-message="¿Marcar el curso como terminado? Se emitirá tu certificado si corresponde.">
                                     <button class="panel-inline-btn" type="submit">Ya terminé el curso</button>
                                 </form>
                                 <a class="panel-inline-btn"

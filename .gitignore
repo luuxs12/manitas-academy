@@ -58,6 +58,6 @@ Desktop.ini
 *.dump.sha256
 backups/
 
-### Skills del agente ###
-# Se reinstalan desde skills-lock.json con `npx skills add`.
+### Generado en local (no versionar) ###
+uploads/
 .agents/

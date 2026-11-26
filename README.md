@@ -231,7 +231,6 @@ entra directo al panel según el rol. Si la sesión no existe, `/panel` y
 api/
 ├── pom.xml                          dependencias
 ├── mvnw / mvnw.cmd                  Maven
-├── skills-lock.json                 skills del agente, fijadas por commit
 ├── docs/
 │   ├── design-system.md             contrato visual y reglas de detalle
 │   ├── git-conventions.md           ramas y mensajes de commit

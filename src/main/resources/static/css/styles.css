@@ -6744,6 +6744,7 @@ html[data-theme="dark"] .panel-stats li {
 }
 .admin-module-name { font-size: 1.2rem; }
 .admin-module-head .admin-status { align-self: flex-start; }
+.admin-session-download { align-self: flex-start; }
 .admin-section { margin-top: 1rem; }
 .admin-section-head { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; margin-bottom: .6rem; }
 .admin-section-head h4 { margin: 0; font-size: 1rem; }

@@ -275,6 +275,7 @@ perfil, cursos y panel de administración:
 | `.admin-structure` / `.admin-structure-head` | página de contenido del curso: temario, alta de ítems y sílabo en secciones apiladas |
 | `.admin-module` / `.admin-module-head` | módulo real con rótulo “Módulo N”, estado visible/oculto y ancla propia |
 | `.admin-module-number` / `.admin-module-name` / `.admin-module-head .admin-status` | número y nombre del módulo alineados, con el estado a la derecha |
+| `.admin-session-download` | descarga GET del PDF de la sesión en el encabezado del módulo; comparte `.btn btn-admin` y su `aria-label` nombra el módulo |
 | `.admin-section` / `.admin-section-head` | sección del módulo con su estado y acciones de orden y borrado |
 | `.admin-content-list` / `.admin-content-item` | lista de ítems (video, material, ejercicio) con más espacio entre filas |
 | `fragments/admin-content-item.html` | fila compartida por ítems con sección y sueltos: tipo y estado, título, detalles y acciones |

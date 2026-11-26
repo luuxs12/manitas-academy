@@ -37,6 +37,9 @@
                         </h3>
                         <span class="admin-status" th:classappend="${module.visible()} ? ' is-ok' : ' is-bad'"
                               th:text="${module.visible()} ? 'Visible' : 'Oculta'">Visible</span>
+                        <a class="btn btn-admin admin-session-download"
+                           th:href="@{/admin/exportar/sesion/modulos/{m}/pdf(m=${module.id()})}"
+                           th:attr="aria-label='Descargar PDF de la sesión ' + ${module.title()}">Descargar PDF de la sesión</a>
                     </div>
                     <p class="admin-muted" th:text="${!module.visible()} ? 'Oculto para el estudiante' : 'Visible para el estudiante'">Visible</p>
 

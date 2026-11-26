@@ -31,8 +31,24 @@ public class PlainPdfWriter {
     private static final int BODY_ROW = 18;
     private static final int ROWS_PER_PAGE = (TABLE_TOP - HEADER_ROW - 70) / BODY_ROW; // 31
 
+    private record Labels(String title, String subtitle, String total) {
+    }
+
     /** @param table primera fila = cabeceras; el resto = datos reales. */
     public byte[] write(String module, String generatedAt, List<List<String>> table) {
+        String lower = module.toLowerCase(Locale.ROOT);
+        return build(new Labels("Informe de " + module,
+                "Listado de " + lower + " registrados en la plataforma",
+                "Total de " + lower + ":"), generatedAt, table);
+    }
+
+    /** Variante para documentos con rótulos propios; deja intactos los informes. */
+    public byte[] writeDocument(String title, String subtitle, String total,
+                                String generatedAt, List<List<String>> table) {
+        return build(new Labels(title, subtitle, total), generatedAt, table);
+    }
+
+    private byte[] build(Labels labels, String generatedAt, List<List<String>> table) {
         List<String> headers = table.isEmpty() ? List.of() : table.getFirst();
         List<List<String>> data = table.size() > 1
                 ? new ArrayList<>(table.subList(1, table.size())) : List.of();
@@ -51,7 +67,7 @@ public class PlainPdfWriter {
         writeCatalogAndPages(output, offsets, pages.size(), firstPage);
         writeFonts(output, offsets);
         writeImageObject(output, offsets, logo, image);
-        writePageObjects(output, offsets, pages, module, generatedAt, headers, data.size(), firstPage);
+        writePageObjects(output, offsets, pages, labels, generatedAt, headers, data.size(), firstPage);
         writeTrailer(output, offsets, objectCount);
 
         return output.toByteArray();
@@ -91,13 +107,13 @@ public class PlainPdfWriter {
     }
 
     private void writePageObjects(ByteArrayOutputStream output, List<Long> offsets,
-                                  List<List<List<String>>> pages, String module,
+                                  List<List<List<String>>> pages, Labels labels,
                                   String generatedAt, List<String> headers,
                                   int dataSize, int firstPage) {
         for (int index = 0; index < pages.size(); index++) {
             int pageObject = firstPage + index * 2;
             int contentObject = pageObject + 1;
-            byte[] content = content(module, generatedAt, headers, pages.get(index), dataSize,
+            byte[] content = content(labels, generatedAt, headers, pages.get(index), dataSize,
                     index + 1, pages.size());
 
             offsets.add(position(output));
@@ -133,17 +149,17 @@ public class PlainPdfWriter {
                 + " 0 R >>\nendobj\n";
     }
 
-    private byte[] content(String module, String generatedAt, List<String> headers,
+    private byte[] content(Labels labels, String generatedAt, List<String> headers,
                            List<List<String>> rows, int recordCount, int page, int total) {
         StringBuilder content = new StringBuilder();
-        drawTopBarAndCard(content, module);
-        drawKpiCards(content, module, generatedAt, recordCount);
+        drawTopBarAndCard(content, labels);
+        drawKpiCards(content, labels, generatedAt, recordCount);
         drawTable(content, headers, rows);
         drawFooter(content, page, total);
         return content.toString().getBytes(StandardCharsets.ISO_8859_1);
     }
 
-    private void drawTopBarAndCard(StringBuilder content, String module) {
+    private void drawTopBarAndCard(StringBuilder content, Labels labels) {
         content.append("q\n0 1 0 rg\n0 838 ").append(PAGE_WIDTH).append(" 4 re f\nQ\n");
         content.append("q\n0.98 0.98 0.99 rg\n0.85 0.85 0.85 RG\n0.5 w\n")
                 .append(MARGIN).append(" 730 ").append(CONTENT_WIDTH).append(" 88 re B\nQ\n");
@@ -151,16 +167,15 @@ public class PlainPdfWriter {
         content.append("q\n0 0 0 rg\n48 736 148 76 re f\nQ\n");
         content.append("q\n136 0 0 46 54 751 cm\n/Im0 Do\nQ\n");
 
-        text(content, "F2", 16, 210, 786, "Informe de " + module, "0 0 0");
-        text(content, "F1", 9, 210, 768, "Listado de " + module.toLowerCase(Locale.ROOT)
-                + " registrados en la plataforma", "0.4 0.4 0.4");
+        text(content, "F2", 16, 210, 786, labels.title(), "0 0 0");
+        text(content, "F1", 9, 210, 768, labels.subtitle(), "0.4 0.4 0.4");
         text(content, "F1", 8, 210, 752, "Mundo Manitas · Plataforma accesible LSP", "0.55 0.55 0.55");
 
         content.append("q\n0 0 0 rg\n500 730 m 514 730 l 534 818 l 520 818 l f\nQ\n");
         content.append("q\n0 1 0 rg\n516 730 m 534 730 l 553 790 l 553 818 l 535 818 l f\nQ\n");
     }
 
-    private void drawKpiCards(StringBuilder content, String module, String generatedAt, int count) {
+    private void drawKpiCards(StringBuilder content, Labels labels, String generatedAt, int count) {
         int cardWidth = (CONTENT_WIDTH - 16) / 3; // 165
         int y = 678;
 
@@ -173,8 +188,7 @@ public class PlainPdfWriter {
         text(content, "F1", 7, MARGIN + 10, y + 24, "Fecha de generación:", "0.45 0.45 0.45");
         text(content, "F2", 8, MARGIN + 10, y + 9, "Generado: " + generatedAt, "0.1 0.1 0.1");
 
-        text(content, "F1", 7, MARGIN + cardWidth + 18, y + 24, "Total de "
-                + module.toLowerCase(Locale.ROOT) + ":", "0.45 0.45 0.45");
+        text(content, "F1", 7, MARGIN + cardWidth + 18, y + 24, labels.total(), "0.45 0.45 0.45");
         text(content, "F2", 8, MARGIN + cardWidth + 18, y + 9, count
                 + (count == 1 ? " registro" : " registros"), "0.1 0.1 0.1");
 

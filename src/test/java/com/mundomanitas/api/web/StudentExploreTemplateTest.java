@@ -1,5 +1,7 @@
 package com.mundomanitas.api.web;
 
+import com.mundomanitas.api.model.Course;
+import com.mundomanitas.api.repository.CourseRepository;
 import com.mundomanitas.api.repository.UserRepository;
 import com.mundomanitas.api.security.AuthenticatedUser;
 import org.junit.jupiter.api.AfterEach;
@@ -14,6 +16,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -23,6 +26,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -33,11 +37,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 /** El alta de inscripción se renderiza con el motor real y cursos de PostgreSQL. */
 @SpringBootTest
 @AutoConfigureMockMvc(addFilters = false)
+@Transactional
 @DisplayName("Render del explorador del estudiante")
 class StudentExploreTemplateTest {
 
     @Autowired private MockMvc mvc;
     @Autowired private UserRepository users;
+    @Autowired private CourseRepository courses;
     @Autowired private WebApplicationContext context;
 
     private RequestMappingHandlerAdapter adapter;
@@ -49,6 +55,13 @@ class StudentExploreTemplateTest {
                 .findByEmailIgnoreCase("luisfernandocastrodamian8@gmail.com").orElseThrow());
         SecurityContextHolder.getContext().setAuthentication(new UsernamePasswordAuthenticationToken(
                 principal, "sin-clave", principal.getAuthorities()));
+
+        Course course = courses.save(new Course(
+                "render-explorar-" + UUID.randomUUID(),
+                "Curso temporal del explorador", "Inicial", 1,
+                true, "Pruebas", "Curso creado solo para verificar el render.", "", 999));
+        course.publish();
+        courses.save(course);
 
         adapter = context.getBean(RequestMappingHandlerAdapter.class);
         originalResolvers = adapter.getArgumentResolvers();

@@ -236,6 +236,8 @@ perfil, cursos y panel de administración:
 | `.quiz-question` / `.quiz-alternative` | cada pregunta en `fieldset` con `legend` y sus cuatro alternativas como etiquetas clicables, con foco visible |
 | `.quiz-result` / `.quiz-score` / `.quiz-answer` | resultado con `aria-live="polite"`, nota sobre 20 y detalle por pregunta con la respuesta elegida y la correcta |
 | `templates/student/ejercicio.html` | vista del cuestionario del alumno: diez preguntas, envío único y resultado inmediato sin salir del panel |
+| `templates/admin/preguntas-form.html` | carga administrativa del cuestionario: diez tarjetas con enunciado, cuatro alternativas y botón radial de respuesta correcta por pregunta |
+| `.quiz-admin-question` / `.quiz-admin-alternatives` / `.quiz-admin-option` | tarjetas del formulario admin; los controles se apilan bajo 620 px y conservan foco visible y etiquetas asociadas |
 | `.player-hint` | región `aria-live="polite"` presente desde el inicio y vacía hasta que YouTube informa por `postMessage` que el video terminó; solo acepta mensajes del iframe y el botón sigue siendo la acción confirmada |
 | `fragments/panel-dialogs.html :: notices` | avisos del panel fuera del documento: modal de éxito con check animado y modal de error, con `role`/`aria-live` (`polite` y `assertive`) y cierre por botón, Escape o fondo |
 | `.ui-dialog` / `.ui-dialog-card` / `.ui-dialog-actions` | modal pequeño (máximo 26 rem) sobre fondo difuminado; usa los tokens `--paper`, `--ink`, `--accent`, `--line` y `--focus`, sin cambiar paleta ni tipografía |

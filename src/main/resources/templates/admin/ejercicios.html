@@ -47,6 +47,7 @@
                         <td th:text="${item.position()}">0</td>
                         <td class="admin-row-actions">
                             <a th:href="@{/admin/ejercicios/{id}/editar(id=${item.id()})}">Editar</a>
+                            <a th:href="@{/admin/ejercicios/{id}/preguntas(id=${item.id()})}">Preguntas</a>
                             <button type="button" class="admin-confirm-link"
                                     th:attr="data-confirm-url=@{/admin/ejercicios/{id}/eliminar(id=${item.id()})}, aria-label='Eliminar ' + ${item.title()}">Eliminar</button>
                         </td>

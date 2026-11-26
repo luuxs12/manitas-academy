@@ -12,5 +12,7 @@ public interface QuizAttemptRepository extends JpaRepository<QuizAttempt, UUID> 
 
     Optional<QuizAttempt> findByEnrollmentIdAndExerciseId(UUID enrollmentId, UUID exerciseId);
 
+    boolean existsByExerciseId(UUID exerciseId);
+
     List<QuizAttempt> findByEnrollmentIdIn(Collection<UUID> enrollmentIds);
 }

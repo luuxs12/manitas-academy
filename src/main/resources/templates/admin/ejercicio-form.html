@@ -12,7 +12,11 @@
         <main id="panel-main" class="panel-main admin-main">
             <div class="admin-page-head">
                 <div><h1 th:text="${itemId != null} ? 'Editar ejercicio' : 'Nuevo ejercicio'">Ejercicio</h1><p>La consigna se guarda con el contenido del módulo.</p></div>
-                <a class="admin-back" th:href="@{/admin/ejercicios}">← Volver a ejercicios</a>
+                <div class="admin-actions">
+                    <a class="btn btn-admin" th:if="${itemId != null}"
+                       th:href="@{/admin/ejercicios/{id}/preguntas(id=${itemId})}">Cargar preguntas</a>
+                    <a class="admin-back" th:href="@{/admin/ejercicios}">← Volver a ejercicios</a>
+                </div>
             </div>
             <form class="panel-card admin-card admin-form" th:action="${itemId != null} ? @{/admin/ejercicios/{id}(id=${itemId})} : @{/admin/ejercicios}"
                   th:object="${adminExerciseForm}" method="post" novalidate>

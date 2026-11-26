@@ -64,3 +64,44 @@
         }
     });
 })();
+
+/* Visor de PDF del temario. El archivo se pide con la sesión y se muestra
+   desde un blob: así no se enmarca la respuesta privada, que el sitio sirve
+   con X-Frame-Options: DENY. */
+(() => {
+    const frame = document.querySelector("[data-pdf-frame]");
+    if (!frame) return;
+
+    const url = frame.dataset.pdfUrl;
+    const status = document.querySelector("[data-pdf-status]");
+    let objectUrl = null;
+
+    const say = (text) => {
+        if (status) status.textContent = text;
+    };
+
+    if (!url) {
+        say("No se pudo abrir el documento.");
+        return;
+    }
+
+    say("Cargando documento…");
+
+    fetch(url, { credentials: "same-origin" })
+        .then((response) => {
+            if (!response.ok) throw new Error("No se pudo abrir el documento");
+            return response.blob();
+        })
+        .then((blob) => {
+            objectUrl = URL.createObjectURL(blob);
+            frame.src = objectUrl;
+            say("Documento listo para leer.");
+        })
+        .catch(() => {
+            say("No se pudo abrir el documento. Probá descargarlo.");
+        });
+
+    window.addEventListener("pagehide", () => {
+        if (objectUrl) URL.revokeObjectURL(objectUrl);
+    });
+})();

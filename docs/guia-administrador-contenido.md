@@ -53,8 +53,11 @@ En “Nuevo ítem” completá:
 | Visible | Si está desmarcado, el ítem queda como borrador y no se muestra al alumno. |
 
 Los enlaces se validan en el servidor: los materiales aceptan solo `https` con
-host explícito, y los videos aceptan solo dominios de YouTube. No se suben PDFs
-ni archivos desde esta página.
+host explícito, y los videos aceptan solo dominios de YouTube. Para subir un
+archivo propio se usa **Nuevo documento** en el encabezado de la página: acepta
+PDF, DOC, DOCX, PPT, PPTX o TXT de hasta 10 MB y lo guarda con un nombre interno
+seguro. Los PDFs subidos se abren en el visor del panel del alumno desde “Ver
+material” y también se pueden descargar desde “Descargar documento”.
 
 ### 3. Ordenar y borrar
 

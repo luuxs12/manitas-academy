@@ -219,6 +219,10 @@ perfil, cursos y panel de administración:
 | `.player-actions` / `.player-empty-hint` | acción de marcar el video y separación del texto cuando el escenario está vacío |
 | `.player-frame` / `.player-frame video` | video 16:9 sobre negro, con foco verde hacia adentro y controles nativos |
 | `.player-note` / `.player-transcript` | aviso de archivo pendiente o video histórico, y transcripción en `details` |
+| `.course-viewer` | escenario del PDF junto al temario: mismo borde, radio y fondo del reproductor, con el título real del material y la acción de descarga |
+| `.viewer-frame` / `.viewer-note` / `.viewer-actions` | área 16:9 sobre el fondo del campo con el PDF incrustado, el nombre original del archivo y la descarga debajo |
+| `.viewer-status` / `data-pdf-status` | región `aria-live="polite"` que anuncia la carga y el error del visor; queda oculta mientras está vacía |
+| `data-pdf-frame` / `data-pdf-url` / `static/js/panel.js` | el PDF se pide con la sesión y se muestra desde un blob, sin enmarcar la respuesta privada ni relajar `X-Frame-Options` |
 | `.course-syllabus` / `.syllabus-list` / `.syllabus-item` | temario ordenado: módulo, título, descripción, duración, estado y acciones de cada ítem |
 | `.syllabus-item.is-active` / `.syllabus-item.is-done` | clase abierta (borde verde) y clase marcada como terminada (estado verde) |
 | `.syllabus-groups` / `.syllabus-group` / `.syllabus-group-title` | temario agrupado por módulo, con la etiqueta visible “Módulo N” sobre el título real |
@@ -229,7 +233,7 @@ perfil, cursos y panel de administración:
 | `fragments/syllabus-item.html` | fila compartida por ítems con sección y sueltos: tipo y estado, título, descripción, duración o “Sin fecha límite” y acciones |
 | `.syllabus-kind` / `.syllabus-kind-title` | rótulo del primer ítem de cada tipo dentro de la sección: “Clase en video”, “Material de estudio” o “Práctica” |
 | `.syllabus-item-top` / `.syllabus-item-type` | primera línea de la fila, con el tipo (VIDEO, MATERIAL o EJERCICIO) y el estado a los extremos |
-| `.syllabus-item-actions` / `.syllabus-mark-form` / `.syllabus-action` | acciones en botones del mismo tamaño: abrir la clase, abrir el material externo, descargar el documento subido o marcarlo como visto; se apilan bajo 620 px |
+| `.syllabus-item-actions` / `.syllabus-mark-form` / `.syllabus-action` | acciones en botones del mismo tamaño: abrir la clase, abrir el material externo, ver el PDF subido en el escenario, descargar el documento o marcarlo como visto; se apilan bajo 620 px |
 | `.syllabus-description` | texto de apoyo del ítem; se limita a dos líneas y deja el valor completo en `title`, sin reemplazar al título ni inventar fechas |
 | `.syllabus-title` / `.admin-content-copy strong` | títulos que pueden romperse con `overflow-wrap: anywhere` cuando el nombre no tiene espacios |
 | `.quiz-card` / `.quiz-form` / `.quiz-warning` | contenedor del cuestionario, formulario de una sola entrega y aviso de que el resultado será definitivo |

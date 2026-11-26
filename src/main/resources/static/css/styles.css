@@ -6986,6 +6986,58 @@ html[data-theme="dark"] .panel-stats li {
     font-size: .85rem;
 }
 
+/* Visor de PDF: mismo contenedor del reproductor, con fondo de campo. */
+.course-viewer {
+    padding: 1.25rem;
+    border: 1px solid var(--line, #d0d0d0);
+    border-radius: 16px;
+    background: var(--surface, #fff);
+}
+
+.course-viewer h2 {
+    margin: 0 0 1rem;
+    font-size: 1.25rem;
+}
+
+.viewer-frame {
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+    border: 1px solid var(--line, #d0d0d0);
+    border-radius: 12px;
+    background: var(--field, #f5f5f5);
+}
+
+.viewer-frame iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+}
+
+.viewer-frame iframe:focus-visible {
+    outline: 3px solid var(--accent, #0f0);
+    outline-offset: -3px;
+}
+
+.viewer-note {
+    margin: .75rem 0 0;
+    color: var(--muted, #666);
+    font-size: .85rem;
+    overflow-wrap: anywhere;
+}
+
+.viewer-status {
+    margin: .5rem 0 0;
+    color: var(--muted, #666);
+    font-size: .85rem;
+}
+
+.viewer-status:empty { display: none; }
+
+.viewer-actions {
+    margin-top: 1rem;
+}
+
 .player-transcript {
     margin: 1rem 0;
     padding: .75rem 1rem;

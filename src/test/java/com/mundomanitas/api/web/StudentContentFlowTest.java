@@ -20,6 +20,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.method.annotation.AuthenticationPrincipalArgumentResolver;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
@@ -35,7 +36,9 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.flash;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.header;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.model;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.redirectedUrl;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -173,6 +176,51 @@ class StudentContentFlowTest {
                 .andExpect(model().attribute("selectedId", videoId));
 
         verify(playback).play(videoId, enrollment);
+    }
+
+    @Test
+    @DisplayName("abre el PDF del temario al lado del temario con sus datos reales")
+    void opensMaterialBesideSyllabus() throws Exception {
+        UUID itemId = UUID.randomUUID();
+        CourseContentService.MaterialView material = new CourseContentService.MaterialView(
+                itemId, "Guía de la clase 01", "guia-de-clase-01.pdf", "application/pdf");
+        when(content.viewMaterial(student, slug, itemId)).thenReturn(material);
+
+        mvc.perform(get("/panel/cursos/{slug}", slug).param("material", itemId.toString()))
+                .andExpect(view().name("student/curso"))
+                .andExpect(model().attribute("material", material))
+                .andExpect(model().attribute("selectedItemId", itemId));
+
+        verify(content).viewMaterial(student, slug, itemId);
+    }
+
+    @Test
+    @DisplayName("sirve el PDF en línea para el visor, con la matrícula validada")
+    void servesPdfInline() throws Exception {
+        UUID itemId = UUID.randomUUID();
+        byte[] bytes = "%PDF-1.7 contenido".getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        when(content.readPdf(student, slug, itemId)).thenReturn(
+                new CourseContentService.MaterialDownload("guia de clase 01.pdf", "application/pdf", bytes));
+
+        mvc.perform(get("/panel/cursos/{slug}/materiales/{itemId}/ver", slug, itemId))
+                .andExpect(status().isOk())
+                .andExpect(header().string("Content-Type", "application/pdf"))
+                .andExpect(header().string("Content-Disposition",
+                        "inline; filename=\"guia de clase 01.pdf\""))
+                .andExpect(content().bytes(bytes));
+
+        verify(content).readPdf(student, slug, itemId);
+    }
+
+    @Test
+    @DisplayName("un documento que no es PDF no abre el visor")
+    void refusesNonPdfViewer() throws Exception {
+        UUID itemId = UUID.randomUUID();
+        when(content.readPdf(student, slug, itemId)).thenThrow(
+                new ResponseStatusException(org.springframework.http.HttpStatus.NOT_FOUND));
+
+        mvc.perform(get("/panel/cursos/{slug}/materiales/{itemId}/ver", slug, itemId))
+                .andExpect(status().isNotFound());
     }
 
     @Test

@@ -13,7 +13,7 @@
         <article class="syllabus-item"
                  th:id="'syllabus-' + ${item.id()}"
                  th:attr="aria-labelledby='syllabus-title-' + ${item.id()}"
-                 th:classappend="${(selectedId != null and item.sourceId() != null and selectedId == item.sourceId() ? ' is-active' : '') + (item.seen() ? ' is-done' : '')}">
+                 th:classappend="${((selectedId != null and item.sourceId() != null and selectedId == item.sourceId()) or (selectedItemId != null and item.id() == selectedItemId) ? ' is-active' : '') + (item.seen() ? ' is-done' : '')}">
             <div class="syllabus-item-top">
                 <span class="syllabus-item-type" th:text="${item.type()}"></span>
                 <span class="syllabus-state"
@@ -43,6 +43,10 @@
                    th:href="${item.url()}" target="_blank"
                    rel="noopener noreferrer"
                    th:attr="aria-label='Abrir el material ' + ${item.title()} + ' (abre en pestaña nueva)'">Abrir material</a>
+                <a class="btn btn-dark syllabus-action"
+                   th:if="${item.type() == 'MATERIAL' and item.downloadable() and item.fileName() != null and #strings.endsWith(#strings.toLowerCase(item.fileName()), '.pdf')}"
+                   th:href="@{/panel/cursos/{slug}/materiales/{itemId}/ver(slug=${enrollment.course.slug},itemId=${item.id()})}"
+                   th:attr="aria-label='Abrir el PDF ' + ${item.title()}">Ver material</a>
                 <a class="btn btn-dark syllabus-action"
                    th:if="${item.type() == 'MATERIAL' and item.downloadable()}"
                    th:href="@{/panel/cursos/{slug}/materiales/{itemId}/descargar(slug=${enrollment.course.slug},itemId=${item.id()})}"

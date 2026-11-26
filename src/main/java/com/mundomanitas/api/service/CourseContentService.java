@@ -96,6 +96,10 @@ public interface CourseContentService {
         }
     }
 
+    /** Datos del PDF que se abre en el escenario del curso. */
+    record MaterialView(UUID id, String title, String fileName, String contentType) {
+    }
+
     Syllabus syllabus(UUID courseId);
 
     /** Temario con secciones y estados; {@code includeHidden} habilita la vista previa. */
@@ -110,4 +114,10 @@ public interface CourseContentService {
 
     /** Documento subido, solo para una matrícula válida y con plan habilitado. */
     MaterialDownload downloadMaterial(User user, String slug, UUID itemId);
+
+    /** Ficha del PDF a abrir, sin leer el archivo, con la matrícula ya validada. */
+    MaterialView viewMaterial(User user, String slug, UUID itemId);
+
+    /** Bytes del PDF para el visor, con la misma validación que la descarga. */
+    MaterialDownload readPdf(User user, String slug, UUID itemId);
 }

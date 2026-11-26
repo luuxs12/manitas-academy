@@ -34,8 +34,25 @@
 
             <div class="course-lesson-layout">
                 <div class="course-stage">
+                    <section class="course-viewer" aria-labelledby="titulo-visor"
+                             th:if="${material != null}">
+                        <h2 id="titulo-visor" th:text="${material.title()}"></h2>
+                        <div class="viewer-frame">
+                            <iframe data-pdf-frame
+                                    th:attr="data-pdf-url=@{/panel/cursos/{slug}/materiales/{itemId}/ver(slug=${enrollment.course.slug},itemId=${material.id()})}"
+                                    th:title="${material.title()}"
+                                    loading="lazy"></iframe>
+                        </div>
+                        <p class="viewer-note" th:text="'Archivo: ' + ${material.fileName()}"></p>
+                        <p class="viewer-status" data-pdf-status role="status" aria-live="polite"></p>
+                        <div class="viewer-actions">
+                            <a class="btn btn-dark"
+                               th:href="@{/panel/cursos/{slug}/materiales/{itemId}/descargar(slug=${enrollment.course.slug},itemId=${material.id()})}">Descargar documento</a>
+                        </div>
+                    </section>
+
                     <section class="player-card" aria-labelledby="titulo-reproductor"
-                             th:if="${player != null}">
+                             th:if="${player != null and material == null}">
                         <h2 id="titulo-reproductor" th:text="${player.title()}"></h2>
                         <div class="player-frame">
                             <iframe data-video-frame th:src="${player.url()}"
@@ -57,13 +74,13 @@
                         </form>
                     </section>
 
-                    <section class="player-empty" th:if="${player == null}"
+                    <section class="player-empty" th:if="${player == null and material == null}"
                              aria-labelledby="titulo-elegir">
                         <h2 id="titulo-elegir">Elegí una clase para empezar</h2>
                         <p>El temario está a la derecha y muestra el avance de cada módulo.</p>
                         <p class="player-empty-hint">
-                            Abrí un video para verlo acá. Los materiales y los ejercicios
-                            se marcan desde su propia fila.
+                            Abrí un video o un PDF para verlo acá. Los ejercicios
+                            se rinden desde su propia fila.
                         </p>
                     </section>
                 </div>

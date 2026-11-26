@@ -137,6 +137,7 @@ public class StudentController {
             @AuthenticationPrincipal AuthenticatedUser principal,
             @PathVariable String slug,
             @RequestParam(name = "video", required = false) UUID videoId,
+            @RequestParam(name = "material", required = false) UUID materialId,
             Model model
     ) {
         User user = accounts.require(principal.getId());
@@ -155,13 +156,24 @@ public class StudentController {
             }
         }
 
+        CourseContentService.MaterialView material = null;
+        if (materialId != null) {
+            try {
+                material = structure.viewMaterial(user, slug, materialId);
+            } catch (ResponseStatusException exception) {
+                model.addAttribute("panelError", "Ese documento no está disponible en este momento.");
+            }
+        }
+
         model.addAttribute("enrollment", enrollment);
         model.addAttribute("course", enrollment.getCourse());
         model.addAttribute("modules", outline.modules());
         model.addAttribute("itemHeadings", syllabusHeadings(outline));
         model.addAttribute("doneVideos", doneVideos);
         model.addAttribute("selectedId", player == null ? null : videoId);
+        model.addAttribute("selectedItemId", material == null ? null : material.id());
         model.addAttribute("player", player);
+        model.addAttribute("material", material);
         model.addAttribute("itemCount", outline.totalItems());
         model.addAttribute("doneCount", outline.doneItems());
         model.addAttribute("itemPercent", outline.percent());
@@ -267,6 +279,23 @@ public class StudentController {
                         "attachment; filename=\"" + download.safeFileName() + "\"")
                 .contentType(MediaType.parseMediaType(download.contentType()))
                 .body(download.bytes());
+    }
+
+    /** PDF privado para el visor del panel; la validación de acceso vive en el servicio. */
+    @GetMapping("/cursos/{slug}/materiales/{itemId}/ver")
+    @PreAuthorize("hasRole('STUDENT')")
+    public ResponseEntity<byte[]> viewPdf(
+            @AuthenticationPrincipal AuthenticatedUser principal,
+            @PathVariable String slug,
+            @PathVariable UUID itemId
+    ) {
+        User user = accounts.require(principal.getId());
+        CourseContentService.MaterialDownload pdf = structure.readPdf(user, slug, itemId);
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION,
+                        "inline; filename=\"" + pdf.safeFileName() + "\"")
+                .contentType(MediaType.APPLICATION_PDF)
+                .body(pdf.bytes());
     }
 
     @GetMapping("/certificados")

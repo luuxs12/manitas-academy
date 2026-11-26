@@ -288,6 +288,83 @@ class CourseContentServiceTest {
     }
 
     @Test
+    @DisplayName("prepara la ficha de un PDF subido para abrirlo en el visor")
+    void viewsUploadedPdf() {
+        User student = new User("alumno@test.local", "hash", "Alumno");
+        Enrollment enrollment = enrollment(student);
+        UUID itemId = UUID.randomUUID();
+        UUID moduleId = UUID.randomUUID();
+        ContentItem document = item(itemId, moduleId, null, "MATERIAL", null,
+                "Guía de la clase 01", null, 0);
+        ReflectionTestUtils.setField(document, "url", "/uploads/materials/abc.pdf");
+        ReflectionTestUtils.setField(document, "fileName", "guia-de-clase-01.pdf");
+
+        when(enrollments.findByUserAndCourseSlug(student, "python")).thenReturn(Optional.of(enrollment));
+        when(items.findById(itemId)).thenReturn(Optional.of(document));
+        when(modules.findById(moduleId)).thenReturn(Optional.of(module(moduleId)));
+        when(materials.contentType("/uploads/materials/abc.pdf")).thenReturn("application/pdf");
+
+        CourseContentService.MaterialView view = service.viewMaterial(student, "python", itemId);
+
+        assertThat(view.id()).isEqualTo(itemId);
+        assertThat(view.title()).isEqualTo("Guía de la clase 01");
+        assertThat(view.fileName()).isEqualTo("guia-de-clase-01.pdf");
+        assertThat(view.contentType()).isEqualTo("application/pdf");
+        verify(materials, never()).read(any());
+    }
+
+    @Test
+    @DisplayName("entrega al visor los bytes del PDF con su nombre seguro")
+    void readsPdfForViewer() {
+        User student = new User("alumno@test.local", "hash", "Alumno");
+        Enrollment enrollment = enrollment(student);
+        UUID itemId = UUID.randomUUID();
+        UUID moduleId = UUID.randomUUID();
+        ContentItem document = item(itemId, moduleId, null, "MATERIAL", null,
+                "Guía de la clase 01", null, 0);
+        ReflectionTestUtils.setField(document, "url", "/uploads/materials/abc.pdf");
+        ReflectionTestUtils.setField(document, "fileName", "guia de clase 01.pdf");
+        byte[] bytes = "%PDF-1.7 contenido".getBytes(java.nio.charset.StandardCharsets.UTF_8);
+
+        when(enrollments.findByUserAndCourseSlug(student, "python")).thenReturn(Optional.of(enrollment));
+        when(items.findById(itemId)).thenReturn(Optional.of(document));
+        when(modules.findById(moduleId)).thenReturn(Optional.of(module(moduleId)));
+        when(materials.contentType("/uploads/materials/abc.pdf")).thenReturn("application/pdf");
+        when(materials.read("/uploads/materials/abc.pdf")).thenReturn(bytes);
+
+        CourseContentService.MaterialDownload pdf = service.readPdf(student, "python", itemId);
+
+        assertThat(pdf.fileName()).isEqualTo("guia de clase 01.pdf");
+        assertThat(pdf.contentType()).isEqualTo("application/pdf");
+        assertThat(pdf.bytes()).isEqualTo(bytes);
+    }
+
+    @Test
+    @DisplayName("el visor rechaza documentos que no son PDF u ocultos")
+    void refusesNonPdfForViewer() {
+        User student = new User("alumno@test.local", "hash", "Alumno");
+        Enrollment enrollment = enrollment(student);
+        UUID itemId = UUID.randomUUID();
+        UUID moduleId = UUID.randomUUID();
+        ContentItem document = item(itemId, moduleId, null, "MATERIAL", null,
+                "Borrador", null, 0);
+        ReflectionTestUtils.setField(document, "url", "/uploads/materials/abc.doc");
+
+        when(enrollments.findByUserAndCourseSlug(student, "python")).thenReturn(Optional.of(enrollment));
+        when(items.findById(itemId)).thenReturn(Optional.of(document));
+        when(modules.findById(moduleId)).thenReturn(Optional.of(module(moduleId)));
+        when(materials.contentType("/uploads/materials/abc.doc")).thenReturn("application/msword");
+
+        assertThatThrownBy(() -> service.viewMaterial(student, "python", itemId))
+                .isInstanceOf(ResponseStatusException.class)
+                .extracting("statusCode").isEqualTo(HttpStatus.NOT_FOUND);
+        assertThatThrownBy(() -> service.readPdf(student, "python", itemId))
+                .isInstanceOf(ResponseStatusException.class)
+                .extracting("statusCode").isEqualTo(HttpStatus.NOT_FOUND);
+        verify(materials, never()).read(any());
+    }
+
+    @Test
     @DisplayName("no descarga documentos ocultos ni de otro curso")
     void refusesHiddenMaterial() {
         User student = new User("alumno@test.local", "hash", "Alumno");

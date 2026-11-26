@@ -212,14 +212,56 @@ public class CourseContentServiceImpl implements CourseContentService {
                     "El ítem no tiene un documento descargable");
         }
         String url = item.getUrl();
-        String fileName = item.getFileName() == null
-                ? url.substring(url.lastIndexOf('/') + 1)
-                : item.getFileName();
         MaterialDownload download = new MaterialDownload(
-                fileName, materials.contentType(url), materials.read(url));
+                fileNameOf(item, url), materials.contentType(url), materials.read(url));
         log.info("Documento descargado item={} matrícula={} actor={}",
                 itemId, access.enrollment().getId(), user.getId());
         return download;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MaterialView viewMaterial(User user, String slug, UUID itemId) {
+        ItemAccess access = requirePdfItem(user, slug, itemId);
+        ContentItem item = access.item();
+        String url = item.getUrl();
+        MaterialView view = new MaterialView(item.getId(), item.getTitle(),
+                fileNameOf(item, url), materials.contentType(url));
+        log.info("PDF abierto en el visor item={} matrícula={} actor={}",
+                itemId, access.enrollment().getId(), user.getId());
+        return view;
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public MaterialDownload readPdf(User user, String slug, UUID itemId) {
+        ItemAccess access = requirePdfItem(user, slug, itemId);
+        ContentItem item = access.item();
+        String url = item.getUrl();
+        MaterialDownload pdf = new MaterialDownload(fileNameOf(item, url),
+                materials.contentType(url), materials.read(url));
+        log.info("PDF servido al visor item={} matrícula={} actor={}",
+                itemId, access.enrollment().getId(), user.getId());
+        return pdf;
+    }
+
+    /** La misma entrada privada que la descarga, limitada a PDFs reales. */
+    private ItemAccess requirePdfItem(User user, String slug, UUID itemId) {
+        ItemAccess access = requireAccessibleItem(user, slug, itemId);
+        ContentItem item = access.item();
+        String url = item.getUrl();
+        if (!"MATERIAL".equals(item.getSourceType()) || url == null
+                || !url.startsWith(CourseMaterialStorage.URL_PREFIX)
+                || !"application/pdf".equals(materials.contentType(url))) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                    "El ítem no tiene un PDF para abrir");
+        }
+        return access;
+    }
+
+    private String fileNameOf(ContentItem item, String url) {
+        return item.getFileName() == null ? url.substring(url.lastIndexOf('/') + 1)
+                : item.getFileName();
     }
 
     private ItemAccess requireAccessibleItem(User user, String slug, UUID itemId) {

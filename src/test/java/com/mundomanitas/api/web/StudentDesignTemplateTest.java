@@ -124,6 +124,37 @@ class StudentDesignTemplateTest {
     }
 
     @Test
+    @DisplayName("el PDF abierto se muestra en el escenario junto al temario")
+    void rendersPdfViewerBesideSyllabus() throws Exception {
+        UUID itemId = UUID.randomUUID();
+        CourseContentService.ItemView material = new CourseContentService.ItemView(
+                UUID.randomUUID(), "MATERIAL", "Tema 01: Guía",
+                "Contenido de la sesion", "/uploads/materials/abc.pdf", null, null,
+                true, false, false, null, "guia.pdf", false);
+        CourseContentService.Outline outline = new CourseContentService.Outline(
+                List.of(new CourseContentService.ModuleView(
+                        UUID.randomUUID(), "Sesion 01", true,
+                        List.of(new CourseContentService.SectionView(
+                                UUID.randomUUID(), "Temas de la sesion", true, List.of(material))),
+                        List.of(), 0)),
+                1, 0, 0, null);
+        when(structure.outline(any(), any(), any(), eq(false))).thenReturn(outline);
+        when(structure.viewMaterial(any(), eq("redes"), eq(itemId))).thenReturn(
+                new CourseContentService.MaterialView(
+                        itemId, "Tema 01: Guía", "guia.pdf", "application/pdf"));
+
+        mvc.perform(get("/panel/cursos/{slug}", "redes").param("material", itemId.toString()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("student/curso"))
+                .andExpect(content().string(containsString("course-viewer")))
+                .andExpect(content().string(containsString("data-pdf-frame")))
+                .andExpect(content().string(containsString("Tema 01: Guía")))
+                .andExpect(content().string(containsString(
+                        "/panel/cursos/redes/materiales/" + itemId + "/ver")))
+                .andExpect(content().string(containsString("Descargar documento")));
+    }
+
+    @Test
     @DisplayName("el perfil usa un avatar compacto en lugar de un cuadrado vacío")
     void rendersCompactAvatar() throws Exception {
         mvc.perform(get("/panel/perfil"))

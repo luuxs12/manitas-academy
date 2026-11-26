@@ -46,7 +46,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-@DisplayName("Cuestionarios de una sola oportunidad")
+@DisplayName("Cuestionarios con aprobación 20/20 y repetición")
 class CuestionarioServiceTest {
 
     @Mock private InscripcionRepository enrollments;
@@ -130,6 +130,49 @@ class CuestionarioServiceTest {
         assertThat(saved.getValue()).hasSize(10);
         assertThat(saved.getValue()).extracting(CuestionarioIntentoRespuesta::getPointsEarned)
                 .containsExactly(2, 2, 2, 2, 2, 2, 2, 0, 0, 0);
+    }
+
+    @Test
+    @DisplayName("reemplaza el intento fallido y cierra el ejercicio con 20/20")
+    void retriesUntilPerfectScore() {
+        fixture();
+        CuestionarioIntento fallido = new CuestionarioIntento(inscripcionId, ejercicioId, 14);
+        ReflectionTestUtils.setField(fallido, "id", UUID.randomUUID());
+        when(attempts.buscarPorInscripcionIdAndEjercicioId(inscripcionId, ejercicioId))
+                .thenReturn(Optional.of(fallido));
+        when(attempts.saveAndFlush(any(CuestionarioIntento.class))).thenAnswer(invocation -> {
+            CuestionarioIntento intento = invocation.getArgument(0);
+            ReflectionTestUtils.setField(intento, "id", UUID.randomUUID());
+            return intento;
+        });
+        Map<UUID, UUID> correctas = new HashMap<>();
+        correctPorPregunta.forEach((preguntaId, alternativa) ->
+                correctas.put(preguntaId, alternativa.getId()));
+
+        CuestionarioService.IntentoVista resultado = service.submit(estudiante, "python", itemId, correctas);
+
+        assertThat(resultado.score()).isEqualTo(20);
+        verify(attempts).delete(fallido);
+        verify(attempts).flush();
+        ArgumentCaptor<CuestionarioIntento> guardado = ArgumentCaptor.forClass(CuestionarioIntento.class);
+        verify(attempts).saveAndFlush(guardado.capture());
+        assertThat(guardado.getValue().getScore()).isEqualTo(20);
+    }
+
+    @Test
+    @DisplayName("un intento de 14/20 no marca el ejercicio como aprobado")
+    void failedAttemptIsNotAprobado() {
+        fixture();
+        CuestionarioIntento fallido = new CuestionarioIntento(inscripcionId, ejercicioId, 14);
+        ReflectionTestUtils.setField(fallido, "id", UUID.randomUUID());
+        when(attempts.buscarPorInscripcionIdAndEjercicioId(inscripcionId, ejercicioId))
+                .thenReturn(Optional.of(fallido));
+        when(answers.buscarPorIntentoId(fallido.getId())).thenReturn(detailFor(fallido.getId()));
+
+        CuestionarioService.CuestionarioVista vista = service.view(estudiante, "python", itemId);
+
+        assertThat(vista.submitted()).isTrue();
+        assertThat(vista.aprobado()).isFalse();
     }
 
     @Test

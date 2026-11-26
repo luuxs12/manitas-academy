@@ -11,7 +11,7 @@
         <header th:replace="~{admin/fragments/admin-nav :: topbar('Módulos', ${itemId != null} ? 'Editar módulo' : 'Nuevo módulo', '')}"></header>
         <main id="panel-main" class="panel-main admin-main">
             <div class="admin-page-head">
-                <div><h1 th:text="${itemId != null} ? 'Editar módulo' : 'Nuevo módulo'">Módulo</h1><p>Ordená el contenido dentro de cada curso.</p></div>
+                <div><h1 th:text="${itemId != null} ? 'Editar módulo' : 'Nuevo módulo'">Módulo</h1><p>Orden del temario por curso.</p></div>
                 <a class="admin-back" th:href="@{/admin/modulos}">← Volver a módulos</a>
             </div>
             <form class="panel-card admin-card admin-form" th:action="${itemId != null} ? @{/admin/modulos/{id}(id=${itemId})} : @{/admin/modulos}"

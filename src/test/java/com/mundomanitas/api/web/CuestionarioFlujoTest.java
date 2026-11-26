@@ -155,7 +155,7 @@ class CuestionarioFlujoTest {
     }
 
     @Test
-    @DisplayName("muestra las diez preguntas, guarda un solo intento y explica cada respuesta")
+    @DisplayName("explica cada respuesta, permite repetir y cierra con 20/20")
     void rendersSubmitsAndShowsResultadoOnce() throws Exception {
         String ejercicioPath = "/panel/cursos/" + slug + "/ejercicios/" + itemId;
 
@@ -164,7 +164,7 @@ class CuestionarioFlujoTest {
                 .andExpect(view().name("student/ejercicio"))
                 .andExpect(content().string(containsString("Enviar respuestas")))
                 .andExpect(content().string(containsString("Pregunta 10")))
-                .andExpect(content().string(containsString("Enviar una sola vez")));
+                .andExpect(content().string(containsString("Necesitás 20/20")));
 
         mvc.perform(answers(ejercicioPath + "/enviar"))
                 .andExpect(redirectedUrl(ejercicioPath));
@@ -174,27 +174,41 @@ class CuestionarioFlujoTest {
                 .andExpect(content().string(containsString("Resultado: 14 / 20")))
                 .andExpect(content().string(containsString("Respuesta correcta")))
                 .andExpect(content().string(containsString("aria-live=\"polite\"")))
-                .andExpect(content().string(containsString("Pregunta 10")));
+                .andExpect(content().string(containsString("podés volver a intentarlo")))
+                .andExpect(content().string(containsString("Enviar respuestas")));
 
         assertThat(intentoContar()).isEqualTo(1);
 
         mvc.perform(answers(ejercicioPath + "/enviar"))
                 .andExpect(redirectedUrl(ejercicioPath));
+        assertThat(intentoContar()).isEqualTo(1);
+
+        mvc.perform(perfectAnswers(ejercicioPath + "/enviar"))
+                .andExpect(redirectedUrl(ejercicioPath));
 
         mvc.perform(get(ejercicioPath))
-                .andExpect(content().string(containsString("Ya enviaste este cuestionario")));
+                .andExpect(content().string(containsString("Resultado: 20 / 20")))
+                .andExpect(content().string(containsString("el ejercicio quedó marcado como visto")));
         assertThat(intentoContar()).isEqualTo(1);
     }
 
     @Test
-    @DisplayName("el temario ofrece rendir el cuestionario y cuenta el intento como visto")
+    @DisplayName("el ejercicio solo se cuenta como visto con 20/20")
     void ejercicioIsDoneDespuesSubmitting() throws Exception {
+        String enviarPath = "/panel/cursos/" + slug + "/ejercicios/" + itemId + "/enviar";
+
         mvc.perform(get("/panel/cursos/{slug}", slug))
                 .andExpect(status().isOk())
                 .andExpect(content().string(containsString("Rendir cuestionario")))
                 .andExpect(content().string(containsString("0 de 1 ítem terminado")));
 
-        mvc.perform(answers("/panel/cursos/" + slug + "/ejercicios/" + itemId + "/enviar"));
+        mvc.perform(answers(enviarPath));
+
+        mvc.perform(get("/panel/cursos/{slug}", slug))
+                .andExpect(status().isOk())
+                .andExpect(content().string(containsString("0 de 1 ítem terminado")));
+
+        mvc.perform(perfectAnswers(enviarPath));
 
         mvc.perform(get("/panel/cursos/{slug}", slug))
                 .andExpect(status().isOk())
@@ -217,6 +231,15 @@ class CuestionarioFlujoTest {
         for (int index = 0; index < preguntaIds.size(); index++) {
             UUID alternativaId = index < 7 ? correctIds.get(index) : incorrectaIds.get(index);
             request.param("respuestas[" + preguntaIds.get(index) + "]", alternativaId.toString());
+        }
+        return request;
+    }
+
+    private MockHttpServletRequestBuilder perfectAnswers(String path) {
+        MockHttpServletRequestBuilder request = post(path);
+        for (int index = 0; index < preguntaIds.size(); index++) {
+            request.param("respuestas[" + preguntaIds.get(index) + "]",
+                    correctIds.get(index).toString());
         }
         return request;
     }

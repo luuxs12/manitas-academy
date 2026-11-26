@@ -57,6 +57,19 @@ class AuthServiceTest {
     }
 
     @Test
+    @DisplayName("guarda el identificador LSP elegido en el registro")
+    void registersLspAccount() {
+        RegistroFormulario formulario = formulario("ana@correo.com", "Ana Quispe");
+        formulario.setQuiereLsp(true);
+        when(contrasenaEncoder.encode("ClaveSegura2026")).thenReturn("bcrypt-nuevo");
+        when(users.save(any(Usuario.class))).thenAnswer(invocation -> invocation.getArgument(0));
+
+        Usuario saved = service.registro(formulario);
+
+        assertThat(saved.isUsaLsp()).isTrue();
+    }
+
+    @Test
     @DisplayName("no guarda dos cuentas con el mismo correo")
     void rejectsDuplicadoEmail() {
         when(users.existePorEmailIgnorandoMayusculas("ana@correo.com")).thenReturn(true);

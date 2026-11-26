@@ -16,7 +16,7 @@ public record AdminItemFormulario(
         UUID seccionId,
 
         @NotBlank(message = "Elegí el tipo de ítem.")
-        @Pattern(regexp = "^(VIDEO|MATERIAL|EJERCICIO)$", message = "El tipo de ítem no es válido.")
+        @Pattern(regexp = "^(VIDEO|VIDEO_LSP|MATERIAL|EJERCICIO)$", message = "El tipo de ítem no es válido.")
         String type,
 
         @NotBlank(message = "Ingresá el título del ítem.")

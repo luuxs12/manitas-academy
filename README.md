@@ -106,7 +106,7 @@ mantiene al navegar entre la portada, las páginas internas y el panel.
 | Base de datos | PostgreSQL 18 |
 | Migraciones | Flyway (`ddl-auto: validate`) |
 | Build | Maven con wrapper incluido |
-| Pruebas | JUnit 5 + AssertJ + Mockito (308 pruebas) |
+| Pruebas | JUnit 5 + AssertJ + Mockito (328 pruebas) |
 | Métricas | Spring Boot Actuator + Micrometer/Prometheus |
 
 ## Requisitos
@@ -150,10 +150,11 @@ cuenta ADMIN si no existe; si ya existe con otro rol la promueve, sin cambiarle
 la clave. Sin esa variable no se crea ni se modifica ninguna cuenta.
 
 Las migraciones van de `V1__accounts.sql` a
-`V16__cuestionarios_ejercicios.sql`: cuentas, recuperación, cursos e
+`V17__marcado_ejercicios_y_lsp.sql`: cuentas, recuperación, cursos e
 inscripciones, módulos de cuenta, administración, videos privados, progreso,
 publicación, la estructura de contenido (módulos, secciones, ítems y sílabo),
-documentos descargables y cuestionarios de ejercicios. `V14` no borra las tablas
+documentos descargables, cuestionarios de ejercicios, marcado configurable del
+ejercicio e identificador LSP de la cuenta. `V14` no borra las tablas
 anteriores: crea `content_items` con `source_type`/`source_id` y los triggers
 que conservan videos, ejercicios y progreso ya cargados. Una migración ya
 ejecutada **no se edita** (Flyway guarda su checksum); el cambio va en una
@@ -190,7 +191,7 @@ Compilar y probar:
 
 ```powershell
 .\mvnw.cmd clean package      # jar en target\api-0.0.1-SNAPSHOT.jar
-.\mvnw.cmd test               # 308 pruebas
+.\mvnw.cmd test               # 328 pruebas
 java -jar target\api-0.0.1-SNAPSHOT.jar
 ```
 
@@ -389,10 +390,11 @@ no aparezca un destello blanco. Los tokens y las reglas están en
 | `CertificadoPlantillaTest` | Render real del documento compartido para la vista previa admin y la ficha del alumno |
 | `ContrasenaRestablecerServiceTest` | Hash del token, vencimiento, un solo uso y correo |
 | `RequestIdFilterTest` | `X-Request-Id`, validación y limpieza del MDC |
+| `MonitorServiceTest`, `MonitorRequestFilterTest` | Series reales de peticiones, latencias, caídas y arranque diferido del filtro |
 | `ActuatorSecurityTest`, `BusinessMetricsTest` | Acceso a Actuator y contadores `mundomanitas_*` |
 | `PagoHealthIndicatorTest` | Estado de la pasarela de pago |
 
-Resultado actual: **308 de 308 en verde**. El detalle de monitoreo está en
+Resultado actual: **328 de 328 en verde**. El detalle de monitoreo está en
 [`docs/plan-de-monitoreo.md`](docs/plan-de-monitoreo.md).
 
 ## Estado
@@ -408,12 +410,25 @@ modo claro/oscuro y correos con Resend.
 El contenido se arma en `/admin/cursos/{id}/contenido` y se ve en
 `/panel/cursos/{slug}` sin datos de ejemplo: los videos salen de YouTube sin
 cookies, los materiales son enlaces `https` y los ejercicios muestran su
-consigna. La guía de carga está en
-[`docs/guia-administrador-contenido.md`](docs/guia-administrador-contenido.md).
+consigna. Al hacer clic en una sesión del temario se abre su video a la
+izquierda. El registro pregunta si la persona usa LSP; esas cuentas ven solo
+los ítems `VIDEO_LSP` cargados desde el panel admin. Los ejercicios se marcan
+como vistos con 20/20; con menor puntaje se puede volver a rendir, y el admin
+puede pasar el marcado a manual desde `/admin/ejercicios`. La guía de carga está
+en [`docs/guia-administrador-contenido.md`](docs/guia-administrador-contenido.md).
+
+El sidebar incluye **Monitoreo**, entre Reportes y Auditoría. Es una consola
+operativa con reloj en vivo, sondeo cada 2 segundos, KPIs con tendencia y
+sparklines, tráfico apilado por tipo de respuesta, bandas p50/p95/p99, mapa de
+calor por minuto, feed de respuestas recientes, rutas calientes, caídas con su
+`requestId` y actividad real de PostgreSQL. La vista consulta
+`/admin/api/monitoreo`; el JSON sale del buffer de peticiones del servidor, no
+de un `fetch` a Actuator desde el navegador.
 
 Falta: intérprete en LSP y subtítulos propios sincronizados dentro del
-reproductor; la velocidad y el tamaño de subtítulos son preferencias guardadas,
-pero YouTube controla su presentación.
+reproductor; los videos en señas son ítems independientes y la velocidad y el
+tamaño de subtítulos son preferencias guardadas, pero YouTube controla su
+presentación.
 
 ## Para contribuir
 

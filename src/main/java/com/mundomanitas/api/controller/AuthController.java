@@ -79,7 +79,7 @@ public class AuthController {
     ) {
         if (!Objects.equals(formulario.getContrasena(), formulario.getConfirmContrasena())) {
             resultado.rejectValue(
-                    "confirmPassword",
+                    "confirmContrasena",
                     "password.mismatch",
                     "Las contraseñas no coinciden."
             );

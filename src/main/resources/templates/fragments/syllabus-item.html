@@ -16,12 +16,20 @@
                  th:classappend="${((selectedId != null and item.origenId() != null and selectedId == item.origenId()) or (selectedItemId != null and item.id() == selectedItemId) ? ' is-activo' : '') + (item.visto() ? ' is-done' : '')}">
             <div class="syllabus-item-top">
                 <span class="syllabus-item-type" th:text="${item.type()}"></span>
+                <span class="admin-status" th:if="${item.type() == 'VIDEO_LSP'}">LSP</span>
                 <span class="syllabus-state"
                       th:text="${item.bloqueado() ? 'Requiere Premium' : (item.visto() ? 'Visto' : 'Pendiente')}"></span>
             </div>
 
-            <h5 class="syllabus-title" th:id="'syllabus-title-' + ${item.id()}"
-                th:text="${item.titulo()}"></h5>
+            <h5 class="syllabus-title" th:id="'syllabus-title-' + ${item.id()}">
+                <a th:if="${(item.type() == 'VIDEO' or item.type() == 'VIDEO_LSP') and !item.bloqueado()}"
+                   class="syllabus-title-link"
+                   th:href="@{/panel/cursos/{slug}(slug=${inscripcion.curso.slug},item=${item.id()})}"
+                   th:attr="aria-label='Abrir la clase ' + ${item.titulo()}"
+                   th:text="${item.titulo()}">Clase</a>
+                <th:block th:unless="${(item.type() == 'VIDEO' or item.type() == 'VIDEO_LSP') and !item.bloqueado()}"
+                          th:text="${item.titulo()}">Clase</th:block>
+            </h5>
 
             <p class="syllabus-description"
                th:if="${item.descripcion() != null}"
@@ -29,15 +37,21 @@
                th:text="${item.descripcion()}"></p>
 
             <p class="syllabus-meta">
-                <span th:if="${item.type() == 'VIDEO'}" th:text="${item.duracionLabel()}"></span>
-                <span th:unless="${item.type() == 'VIDEO'}">Sin fecha límite</span>
+                <span th:if="${item.type() == 'VIDEO' or item.type() == 'VIDEO_LSP'}"
+                      th:text="${item.duracionLabel()}"></span>
+                <span th:unless="${item.type() == 'VIDEO' or item.type() == 'VIDEO_LSP'}">Sin fecha límite</span>
             </p>
 
             <div class="syllabus-item-actions" th:if="${!item.bloqueado()}">
                 <a class="btn btn-dark syllabus-action"
-                   th:if="${item.type() == 'VIDEO' and item.origenId() != null}"
+                   th:if="${item.type() == 'VIDEO' and !item.bloqueado()}"
                    th:href="@{/panel/cursos/{slug}(slug=${inscripcion.curso.slug},video=${item.origenId()})}"
                    th:attr="aria-label='Abrir la clase ' + ${item.titulo()}">Abrir clase</a>
+                <a class="btn btn-dark syllabus-action"
+                   th:if="${item.type() == 'VIDEO_LSP' and !item.bloqueado()}"
+                   th:href="@{/panel/cursos/{slug}(slug=${inscripcion.curso.slug},item=${item.id()})}"
+                   th:attr="aria-label='Abrir la clase en lengua de señas ' + ${item.titulo()}"
+                   >Abrir clase en LSP</a>
                 <a class="btn btn-dark syllabus-action"
                    th:if="${item.type() == 'MATERIAL' and item.url() != null and !item.downloadable()}"
                    th:href="${item.url()}" target="_blank"

@@ -38,8 +38,12 @@
                 </p>
 
                 <div class="quiz-result" th:if="${cuestionario.submitted()}" aria-live="polite">
-                    <p class="quiz-submitted-hint">
-                        Ya enviaste este cuestionario; este es el resultado definitivo.
+                    <p class="quiz-submitted-hint" th:if="${cuestionario.aprobado()}">
+                        20/20: el ejercicio quedó marcado como visto. Este es el resultado definitivo.
+                    </p>
+                    <p class="quiz-submitted-hint" th:unless="${cuestionario.aprobado()}">
+                        Este fue tu último intento. Necesitás 20/20 para marcar el ejercicio
+                        como visto; podés volver a rendirlo.
                     </p>
                     <p class="quiz-score" th:text="'Resultado: ' + ${cuestionario.intento().score()} + ' / 20'"></p>
                     <ol class="quiz-answers">
@@ -55,12 +59,13 @@
                     </ol>
                 </div>
 
-                <form class="quiz-form" th:if="${!cuestionario.submitted() and cuestionario.ready()}"
+                <form class="quiz-form" th:if="${!cuestionario.aprobado() and cuestionario.ready()}"
                       th:action="@{/panel/cursos/{slug}/ejercicios/{itemId}/enviar(slug=${slug},itemId=${itemId})}"
                       method="post">
                     <p class="quiz-warning">
-                        <strong>Enviar una sola vez.</strong> Son diez preguntas de dos puntos
-                        cada una; el resultado será definitivo y no se puede repetir.
+                        <strong>Necesitás 20/20.</strong> Son diez preguntas de dos puntos cada una.
+                        Si no llegás al puntaje completo, podés volver a intentarlo; el ejercicio
+                        se marca como visto solo con todas las respuestas correctas.
                     </p>
                     <fieldset class="quiz-question" th:each="pregunta : ${cuestionario.questions()}">
                         <legend th:text="'Pregunta ' + ${pregunta.posicion()} + '. ' + ${pregunta.prompt()}"></legend>

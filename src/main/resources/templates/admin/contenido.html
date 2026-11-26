@@ -127,7 +127,7 @@
                 </details>
 
                 <details class="admin-inline-form">
-                    <summary>Nuevo ítem (video, material o ejercicio)</summary>
+                    <summary>Nuevo ítem (video, video en LSP, material o ejercicio)</summary>
                     <form class="admin-form" method="post" novalidate
                           th:action="@{/admin/cursos/{c}/contenido/items(c=${cursoId})}"
                           th:object="${adminItemFormulario}">
@@ -153,6 +153,7 @@
                                 <label for="item-tipo">Tipo</label>
                                 <select id="item-tipo" th:field="*{type}" required>
                                     <option value="VIDEO">Video de YouTube</option>
+                                    <option value="VIDEO_LSP">Video en lengua de señas (LSP)</option>
                                     <option value="MATERIAL">Material con enlace</option>
                                     <option value="EJERCICIO">Ejercicio</option>
                                 </select>
@@ -173,7 +174,11 @@
                                 <label for="item-youtube">Enlace de YouTube</label>
                                 <input id="item-youtube" type="url" th:field="*{youtubeUrl}" maxlength="300"
                                        placeholder="https://www.youtube.com/watch?v=…">
-                                <small class="admin-hint">Solo para videos; se reproduce sin cookies.</small>
+                                <small class="admin-hint">
+                                    Para VIDEO y VIDEO_LSP; se reproduce sin cookies.
+                                    Cargá el video en lengua de señas con la misma posición
+                                    del video normal: lo verán solo las cuentas con LSP activo.
+                                </small>
                                 <small class="admin-error" th:if="${#fields.hasErrors('youtubeUrl')}" th:errors="*{youtubeUrl}"></small>
                             </div>
                             <div class="admin-field">

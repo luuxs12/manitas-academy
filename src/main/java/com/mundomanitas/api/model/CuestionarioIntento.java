@@ -10,7 +10,7 @@ import jakarta.persistence.Table;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
-/** Intento único y definitivo del alumno en un ejercicio. */
+/** Último intento del alumno: solo 20/20 cierra el ejercicio como definitivo. */
 @Entity
 @Table(name = "quiz_attempts")
 public class CuestionarioIntento {

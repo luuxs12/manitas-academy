@@ -11,21 +11,31 @@
         <header th:replace="~{admin/fragments/admin-nav :: topbar('Videos', ${itemId != null} ? 'Editar video' : 'Nuevo video', '')}"></header>
         <main id="panel-main" class="panel-main admin-main">
             <div class="admin-page-head">
-                <div><h1 th:text="${itemId != null} ? 'Editar video' : 'Nuevo video'">Video</h1><p>Pegá el enlace público de YouTube.</p></div>
+                <div><h1 th:text="${itemId != null} ? 'Editar video' : 'Nuevo video'">Video</h1><p>Clase de YouTube por curso y módulo.</p></div>
                 <a class="admin-back" th:href="@{/admin/videos}">← Volver a videos</a>
             </div>
             <form class="panel-card admin-card admin-form" th:action="${itemId != null} ? @{/admin/videos/{id}(id=${itemId})} : @{/admin/videos}"
                   th:object="${adminVideoFormulario}" method="post" novalidate>
                 <div class="admin-form-grid">
-                    <div class="admin-field">
-                        <label for="video-modulo">Módulo</label>
-                        <select id="video-modulo" th:field="*{moduloId}" required
-                                th:attr="aria-invalid=${#fields.hasErrors('moduloId')} ? 'true' : null,
-                                         aria-describedby=${#fields.hasErrors('moduloId')} ? 'error-video-modulo' : null">
-                            <option value="">Elegí un módulo</option>
-                            <option th:each="o : ${options}" th:value="${o.id()}" th:text="${o.label()}"></option>
-                        </select>
-                        <small id="error-video-modulo" class="admin-error" th:if="${#fields.hasErrors('moduloId')}" th:errors="*{moduloId}"></small>
+                    <div class="admin-dependiente" data-admin-curso data-requerir-curso="true">
+                        <div class="admin-field">
+                            <label for="video-curso">Curso</label>
+                            <select id="video-curso" name="curso" data-course-select>
+                                <option value="">Elegí un curso</option>
+                                <option th:each="o : ${cursoOptions}" th:value="${o.id()}" th:text="${o.label()}"></option>
+                            </select>
+                        </div>
+                        <div class="admin-field">
+                            <label for="video-modulo">Módulo</label>
+                            <select id="video-modulo" th:field="*{moduloId}" data-module-select required
+                                    th:attr="aria-invalid=${#fields.hasErrors('moduloId')} ? 'true' : null,
+                                             aria-describedby=${#fields.hasErrors('moduloId')} ? 'error-video-modulo' : null">
+                                <option value="">Elegí un módulo</option>
+                                <option th:each="o : ${options}" th:value="${o.id()}" th:text="${o.nombre()}"
+                                        th:attr="data-curso=${o.cursoId()}, data-nombre=${o.nombre()}, data-label=${o.label()}"></option>
+                            </select>
+                            <small id="error-video-modulo" class="admin-error" th:if="${#fields.hasErrors('moduloId')}" th:errors="*{moduloId}"></small>
+                        </div>
                     </div>
                     <div class="admin-field">
                         <label for="video-titulo">Título</label>
@@ -61,5 +71,6 @@
 </div>
 <script defer th:src="@{/js/panel.js}"></script>
 <script defer th:src="@{/js/admin.js}"></script>
+<script defer th:src="@{/js/admin-form.js}"></script>
 </body>
 </html>

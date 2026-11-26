@@ -48,6 +48,12 @@ public class AccesibilidadPreferencias {
         this.usuarioId = usuarioId;
     }
 
+    /** Fila inicial con el identificador LSP que la persona eligió al registrarse. */
+    public AccesibilidadPreferencias(UUID usuarioId, boolean signLanguageEnabled) {
+        this.usuarioId = usuarioId;
+        this.signLanguageEnabled = signLanguageEnabled;
+    }
+
     public UUID getUsuarioId() {
         return usuarioId;
     }

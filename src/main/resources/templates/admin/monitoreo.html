@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{admin/fragments/admin-head :: adminHead('Monitoreo')}"></head>
+
+<body class="panel-body admin-body">
+<a class="skip-link" href="#panel-main">Saltar al contenido</a>
+
+<div class="panel admin">
+    <aside th:replace="~{admin/fragments/admin-nav :: sidebar('monitoreo')}"></aside>
+
+    <div class="panel-shell">
+        <header th:replace="~{admin/fragments/admin-nav :: topbar('Monitoreo', 'Centro de operaciones de la plataforma', '')}"></header>
+
+        <main id="panel-main" class="panel-main admin-main admin-monitor" data-monitoreo
+              th:attr="data-admin-since=${adminDesde}">
+
+            <div class="monitor-console">
+                <header class="monitor-console-head">
+                    <div class="monitor-console-title">
+                        <span class="monitor-eyebrow">Centro de operaciones</span>
+                        <h1>Monitoreo</h1>
+                        <p>Señales reales del servidor y de PostgreSQL. Refresco automático cada 2 segundos.</p>
+                    </div>
+                    <div class="monitor-live" role="status" aria-live="polite">
+                        <div class="monitor-live-row">
+                            <span class="monitor-live-badge" data-monitoreo-estado
+                                  th:text="${monitor.estado()}">operativo</span>
+                            <strong class="monitor-live-clock" data-monitoreo-reloj
+                                    th:text="${monitor.servidor()}">—</strong>
+                        </div>
+                        <div class="monitor-live-meta">
+                            <span>Último dato <time data-monitoreo-actualizado
+                                                    th:text="${monitor.servidor()}">—</time></span>
+                            <span data-monitoreo-sonda>Sondeo 2 s</span>
+                        </div>
+                        <div class="monitor-live-track" aria-hidden="true">
+                            <span data-monitoreo-barra></span>
+                        </div>
+                        <div class="monitor-live-actions">
+                            <button type="button" class="monitor-button" data-monitoreo-refrescar>
+                                Actualizar ahora
+                            </button>
+                            <button type="button" class="monitor-button monitor-button--ghost"
+                                    data-monitoreo-pausa>Pausar
+                            </button>
+                        </div>
+                    </div>
+                </header>
+
+                <section class="monitor-kpis" aria-label="Indicadores en vivo">
+                    <article class="monitor-kpi monitor-kpi--ok" data-kpi="disponibilidad">
+                        <div class="monitor-kpi-top">
+                            <span class="monitor-kpi-label">Disponibilidad</span>
+                            <span class="monitor-kpi-chip" data-monitoreo-disponibilidad-chip
+                                  th:text="${monitor.peticiones() == 0 ? 'sin tráfico' : '30 min'}">30 min</span>
+                        </div>
+                        <strong class="monitor-kpi-value" data-monitoreo-disponibilidad
+                                th:text="${monitor.disponibilidad() + '%'}">—</strong>
+                        <svg class="monitor-spark" data-spark="disponibilidad" viewBox="0 0 160 44"
+                             preserveAspectRatio="none" aria-hidden="true">
+                            <polyline data-spark-line points=""></polyline>
+                        </svg>
+                        <span class="monitor-kpi-foot" data-monitoreo-disponibilidad-foot
+                              th:text="${monitor.erroresServidor() + ' respuestas 5xx'}">—</span>
+                    </article>
+
+                    <article class="monitor-kpi monitor-kpi--traffic">
+                        <div class="monitor-kpi-top">
+                            <span class="monitor-kpi-label">Ritmo actual</span>
+                            <span class="monitor-kpi-chip" data-monitoreo-tendencia
+                                  th:class="${'monitor-kpi-chip ' + (monitor.tendenciaPeticiones() > 0 ? 'is-up' : monitor.tendenciaPeticiones() < 0 ? 'is-down' : 'is-flat')}"
+                                  th:text="${(monitor.tendenciaPeticiones() > 0 ? '+' : '') + monitor.tendenciaPeticiones() + '%'}">0%</span>
+                        </div>
+                        <strong class="monitor-kpi-value" data-monitoreo-ultimo-minuto
+                                th:text="${monitor.peticionesUltimoMinuto()}">—</strong>
+                        <svg class="monitor-spark" data-spark="peticiones" viewBox="0 0 160 44"
+                             preserveAspectRatio="none" aria-hidden="true">
+                            <polyline data-spark-line points=""></polyline>
+                        </svg>
+                        <span class="monitor-kpi-foot">Peticiones en el último minuto</span>
+                    </article>
+
+                    <article class="monitor-kpi monitor-kpi--traffic">
+                        <div class="monitor-kpi-top">
+                            <span class="monitor-kpi-label">Tráfico en ventana</span>
+                            <span class="monitor-kpi-chip" th:text="${monitor.peticionesPorMinuto() + '/min'}">—</span>
+                        </div>
+                        <strong class="monitor-kpi-value" data-monitoreo-peticiones
+                                th:text="${monitor.peticiones()}">—</strong>
+                        <svg class="monitor-spark" data-spark="peticiones" viewBox="0 0 160 44"
+                             preserveAspectRatio="none" aria-hidden="true">
+                            <polyline data-spark-line points=""></polyline>
+                        </svg>
+                        <span class="monitor-kpi-foot">Últimos 30 minutos</span>
+                    </article>
+
+                    <article class="monitor-kpi monitor-kpi--danger">
+                        <div class="monitor-kpi-top">
+                            <span class="monitor-kpi-label">Errores del servidor</span>
+                            <span class="monitor-kpi-chip" data-monitoreo-tasa-errores
+                                  th:text="${monitor.tasaErrores() + '% del tráfico'}">—</span>
+                        </div>
+                        <strong class="monitor-kpi-value" data-monitoreo-errores
+                                th:text="${monitor.erroresServidor()}">—</strong>
+                        <svg class="monitor-spark" data-spark="errores" viewBox="0 0 160 44"
+                             preserveAspectRatio="none" aria-hidden="true">
+                            <polyline data-spark-line points=""></polyline>
+                        </svg>
+                        <span class="monitor-kpi-foot"
+                              th:text="${monitor.erroresCliente() + ' errores de cliente'}">—</span>
+                    </article>
+
+                    <article class="monitor-kpi monitor-kpi--warn">
+                        <div class="monitor-kpi-top">
+                            <span class="monitor-kpi-label">Latencia p95</span>
+                            <span class="monitor-kpi-chip" data-monitoreo-latencia-total
+                                  th:text="${monitor.latenciaP95() + ' ms'}">—</span>
+                        </div>
+                        <strong class="monitor-kpi-value" data-monitoreo-p95
+                                th:text="${monitor.latenciaP95() + ' ms'}">—</strong>
+                        <svg class="monitor-spark" data-spark="latencia" viewBox="0 0 160 44"
+                             preserveAspectRatio="none" aria-hidden="true">
+                            <polyline data-spark-line points=""></polyline>
+                        </svg>
+                        <span class="monitor-kpi-foot"
+                              th:text="${'p50 ' + monitor.latenciaP50() + ' · p99 ' + monitor.latenciaP99()}">—</span>
+                    </article>
+
+                    <article class="monitor-kpi monitor-kpi--users">
+                        <div class="monitor-kpi-top">
+                            <span class="monitor-kpi-label">Personas activas</span>
+                            <span class="monitor-kpi-chip">24 h</span>
+                        </div>
+                        <strong class="monitor-kpi-value" data-monitoreo-activos
+                                th:text="${monitor.actividad().activos()}">—</strong>
+                        <span class="monitor-kpi-bar" aria-hidden="true"><span></span></span>
+                        <span class="monitor-kpi-foot">Cuentas con actividad real</span>
+                    </article>
+                </section>
+
+                <div class="monitor-grid monitor-grid--charts">
+                    <section class="monitor-card monitor-card--traffic" aria-labelledby="monitor-trafico">
+                        <header class="monitor-card-head">
+                            <div>
+                                <span class="monitor-card-kicker">Tráfico</span>
+                                <h2 id="monitor-trafico">Respuestas por minuto</h2>
+                            </div>
+                            <span class="monitor-card-note" data-monitoreo-ventana>
+                                Ventana de 30 minutos
+                            </span>
+                        </header>
+                        <div class="monitor-chart-wrap">
+                            <svg class="monitor-chart" viewBox="0 0 960 280" role="img"
+                                 aria-label="Peticiones por minuto desglosadas por tipo de respuesta"
+                                 data-grafico-trafico>
+                                <defs>
+                                    <linearGradient id="monitor-trafico-fill" x1="0" y1="0" x2="0" y2="1">
+                                        <stop class="monitor-stop-ok" offset="0%" stop-opacity=".32"></stop>
+                                        <stop class="monitor-stop-ok" offset="100%" stop-opacity="0"></stop>
+                                    </linearGradient>
+                                </defs>
+                                <g class="monitor-chart-grid" aria-hidden="true">
+                                    <line x1="48" y1="30" x2="930" y2="30"></line>
+                                    <line x1="48" y1="90" x2="930" y2="90"></line>
+                                    <line x1="48" y1="150" x2="930" y2="150"></line>
+                                    <line x1="48" y1="210" x2="930" y2="210"></line>
+                                </g>
+                                <g class="admin-axis-y" aria-hidden="true">
+                                    <text x="40" y="34" data-eje-trafico-max>—</text>
+                                    <text x="40" y="214">0</text>
+                                </g>
+                                <g data-barras-trafico></g>
+                                <path class="monitor-area" data-area-trafico d=""></path>
+                                <polyline class="admin-line admin-line--trafico" data-linea-trafico
+                                          points=""></polyline>
+                                <g data-puntos-trafico></g>
+                                <g class="admin-axis-x" aria-hidden="true" data-eje-trafico></g>
+                            </svg>
+                        </div>
+                        <footer class="monitor-card-foot">
+                            <span class="monitor-legend">
+                                <span><i class="admin-dot admin-dot--ok"></i>2xx correctas</span>
+                                <span><i class="admin-dot admin-dot--redirect"></i>3xx</span>
+                                <span><i class="admin-dot admin-dot--warn"></i>4xx</span>
+                                <span><i class="admin-dot admin-dot--bad"></i>5xx</span>
+                            </span>
+                            <span class="monitor-card-note">Pasa el cursor sobre una barra para ver el minuto</span>
+                        </footer>
+                    </section>
+
+                    <section class="monitor-card monitor-card--latency" aria-labelledby="monitor-latencia">
+                        <header class="monitor-card-head">
+                            <div>
+                                <span class="monitor-card-kicker">Rendimiento</span>
+                                <h2 id="monitor-latencia">Latencia por minuto</h2>
+                            </div>
+                            <span class="monitor-card-note" data-monitoreo-latencia-nota
+                                  th:text="${monitor.latenciaP95() + ' ms p95'}">—</span>
+                        </header>
+                        <div class="monitor-chart-wrap">
+                            <svg class="monitor-chart" viewBox="0 0 960 280" role="img"
+                                 aria-label="Percentiles p50, p95 y p99 de latencia por minuto"
+                                 data-grafico-latencia>
+                                <defs>
+                                    <linearGradient id="monitor-latencia-fill" x1="0" y1="0" x2="0" y2="1">
+                                        <stop class="monitor-stop-warn" offset="0%" stop-opacity=".28"></stop>
+                                        <stop class="monitor-stop-warn" offset="100%" stop-opacity="0"></stop>
+                                    </linearGradient>
+                                </defs>
+                                <g class="monitor-chart-grid" aria-hidden="true">
+                                    <line x1="48" y1="30" x2="930" y2="30"></line>
+                                    <line x1="48" y1="90" x2="930" y2="90"></line>
+                                    <line x1="48" y1="150" x2="930" y2="150"></line>
+                                    <line x1="48" y1="210" x2="930" y2="210"></line>
+                                </g>
+                                <g class="admin-axis-y" aria-hidden="true">
+                                    <text x="40" y="34" data-eje-latencia-max>—</text>
+                                    <text x="40" y="214">0</text>
+                                </g>
+                                <path class="monitor-area monitor-area--latencia" data-area-latencia d=""></path>
+                                <polyline class="admin-line admin-line--latencia-p99" data-linea-latencia-p99
+                                          points=""></polyline>
+                                <polyline class="admin-line admin-line--latencia" data-linea-latencia
+                                          points=""></polyline>
+                                <polyline class="admin-line admin-line--latencia-p50" data-linea-latencia-p50
+                                          points=""></polyline>
+                                <g data-puntos-latencia></g>
+                                <g class="admin-axis-x" aria-hidden="true" data-eje-latencia></g>
+                            </svg>
+                        </div>
+                        <footer class="monitor-card-foot">
+                            <span class="monitor-legend">
+                                <span><i class="admin-dot admin-dot--ok"></i>p50</span>
+                                <span><i class="admin-dot admin-dot--warn"></i>p95</span>
+                                <span><i class="admin-dot admin-dot--bad"></i>p99</span>
+                            </span>
+                            <span class="monitor-card-note">Milisegundos por respuesta</span>
+                        </footer>
+                    </section>
+                </div>
+
+                <div class="monitor-grid monitor-grid--signal">
+                    <section class="monitor-card" aria-labelledby="monitor-senal">
+                        <header class="monitor-card-head">
+                            <div>
+                                <span class="monitor-card-kicker">Salud</span>
+                                <h2 id="monitor-senal">Señal por minuto</h2>
+                            </div>
+                            <span class="monitor-card-note">Cada columna es un minuto real</span>
+                        </header>
+                        <div class="monitor-heatmap" data-monitoreo-franjas role="img"
+                             aria-label="Estado de cada minuto de los últimos 30 minutos"></div>
+                        <div class="monitor-heatmap-scale" aria-hidden="true">
+                            <span>Hace 30 min</span><span>Ahora</span>
+                        </div>
+                        <div class="monitor-status-counts">
+                            <div><span>2xx</span><strong data-monitoreo-exitosas
+                                                        th:text="${monitor.exitosas()}">—</strong></div>
+                            <div><span>3xx</span><strong data-monitoreo-redirecciones
+                                                        th:text="${monitor.redirecciones()}">—</strong></div>
+                            <div><span>4xx</span><strong data-monitoreo-errores-cliente
+                                                        th:text="${monitor.erroresCliente()}">—</strong></div>
+                            <div><span>5xx</span><strong data-monitoreo-errores-count
+                                                        th:text="${monitor.erroresServidor()}">—</strong></div>
+                        </div>
+                    </section>
+
+                    <section class="monitor-card" aria-labelledby="monitor-rutas">
+                        <header class="monitor-card-head">
+                            <div>
+                                <span class="monitor-card-kicker">Carga</span>
+                                <h2 id="monitor-rutas">Rutas más solicitadas</h2>
+                            </div>
+                            <span class="monitor-card-note">p95 por ruta</span>
+                        </header>
+                        <ol class="monitor-routes" data-monitoreo-rutas>
+                            <li th:each="ruta : ${monitor.rutas()}">
+                                <div class="monitor-route-top">
+                                    <span th:text="${ruta.metodo() + ' ' + ruta.ruta()}">—</span>
+                                    <strong th:text="${ruta.peticiones() + ' · ' + ruta.p95() + ' ms'}">—</strong>
+                                </div>
+                                <span class="monitor-route-track" aria-hidden="true">
+                                    <span th:style="${'width: ' + (ruta.peticiones() * 100 / (monitor.peticiones() == 0 ? 1 : monitor.peticiones())) + '%'}"></span>
+                                </span>
+                            </li>
+                        </ol>
+                        <p class="monitor-empty" data-monitoreo-sin-rutas
+                           th:if="${#lists.isEmpty(monitor.rutas())}">
+                            Sin peticiones en la ventana analizada.
+                        </p>
+                    </section>
+                </div>
+
+                <div class="monitor-grid monitor-grid--events">
+                    <section class="monitor-card monitor-card--feed" aria-labelledby="monitor-feed">
+                        <header class="monitor-card-head">
+                            <div>
+                                <span class="monitor-card-kicker">En vivo</span>
+                                <h2 id="monitor-feed">Últimas respuestas</h2>
+                            </div>
+                            <span class="monitor-card-note">Incluye aciertos y errores</span>
+                        </header>
+                        <div class="monitor-table-wrap">
+                            <table class="monitor-table">
+                                <caption>Respuestas más recientes del servidor</caption>
+                                <thead>
+                                <tr>
+                                    <th scope="col">Cuándo</th>
+                                    <th scope="col">Ruta</th>
+                                    <th scope="col">Estado</th>
+                                    <th scope="col">Tiempo</th>
+                                    <th scope="col">Request</th>
+                                </tr>
+                                </thead>
+                                <tbody data-monitoreo-recientes>
+                                <tr th:each="evento : ${monitor.recientes()}">
+                                    <td th:text="${evento.cuando()}">—</td>
+                                    <td th:text="${evento.metodo() + ' ' + evento.ruta()}">—</td>
+                                    <td><span class="monitor-status"
+                                              th:class="${'monitor-status is-' + (evento.estado() < 300 ? 'ok' : evento.estado() < 400 ? 'redirect' : evento.estado() < 500 ? 'warn' : 'bad')}"
+                                              th:text="${evento.estado()}">—</span></td>
+                                    <td th:text="${evento.duracionMs() + ' ms'}">—</td>
+                                    <td class="monitor-request" th:text="${evento.requestId()}">—</td>
+                                </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <div class="monitor-stack">
+                        <section class="monitor-card" aria-labelledby="monitor-incidentes">
+                            <header class="monitor-card-head">
+                                <div>
+                                    <span class="monitor-card-kicker">Alertas</span>
+                                    <h2 id="monitor-incidentes">Caídas y avisos</h2>
+                                </div>
+                            </header>
+                            <ul class="monitor-incidents" data-monitoreo-incidentes>
+                                <li th:each="incidente : ${monitor.incidentes()}"
+                                    th:class="${'monitor-incident is-' + incidente.nivel()}">
+                                    <strong th:text="${incidente.titulo()}">Incidente</strong>
+                                    <span th:text="${incidente.detalle()}">Detalle</span>
+                                    <time th:text="${incidente.cuando()}">—</time>
+                                </li>
+                            </ul>
+                            <p class="monitor-empty" data-monitoreo-sin-incidentes
+                               th:if="${#lists.isEmpty(monitor.incidentes())}">
+                                Sin caídas detectadas en la ventana activa.
+                            </p>
+                            <div class="monitor-table-wrap">
+                                <table class="monitor-table monitor-table--compact">
+                                    <caption>Errores recientes</caption>
+                                    <thead>
+                                    <tr>
+                                        <th scope="col">Cuándo</th>
+                                        <th scope="col">Ruta</th>
+                                        <th scope="col">Estado</th>
+                                        <th scope="col">Tiempo</th>
+                                        <th scope="col">Request</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody data-monitoreo-tabla-errores>
+                                    <tr th:each="evento : ${monitor.eventos()}">
+                                        <td th:text="${evento.cuando()}">—</td>
+                                        <td th:text="${evento.metodo() + ' ' + evento.ruta()}">—</td>
+                                        <td><span class="monitor-status is-bad"
+                                                  th:text="${evento.estado()}">—</span></td>
+                                        <td th:text="${evento.duracionMs() + ' ms'}">—</td>
+                                        <td class="monitor-request" th:text="${evento.requestId()}">—</td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </section>
+
+                        <section class="monitor-card" aria-labelledby="monitor-servicios">
+                            <header class="monitor-card-head">
+                                <div>
+                                    <span class="monitor-card-kicker">Dependencias</span>
+                                    <h2 id="monitor-servicios">Estado de servicios</h2>
+                                </div>
+                            </header>
+                            <ul class="monitor-services" data-monitoreo-servicios>
+                                <li th:each="servicio : ${monitor.servicios()}"
+                                    th:class="${'monitor-service ' + (servicio.ok() ? 'is-ok' : 'is-bad')}">
+                                    <span class="monitor-service-dot" aria-hidden="true"></span>
+                                    <strong th:text="${servicio.nombre()}">Servicio</strong>
+                                    <span th:text="${servicio.detalle()}">—</span>
+                                </li>
+                            </ul>
+                        </section>
+                    </div>
+                </div>
+
+                <section class="monitor-card monitor-card--business" aria-labelledby="monitor-actividad">
+                    <header class="monitor-card-head">
+                        <div>
+                            <span class="monitor-card-kicker">Negocio</span>
+                            <h2 id="monitor-actividad">Actividad real de PostgreSQL</h2>
+                        </div>
+                        <span class="monitor-card-note">Últimas 24 horas y últimos 7 días</span>
+                    </header>
+                    <div class="monitor-business">
+                        <ul class="monitor-funnel">
+                            <li class="monitor-funnel-row" data-funnel="altas">
+                                <span>Altas</span>
+                                <span class="monitor-funnel-track"><span></span></span>
+                                <strong data-monitoreo-altas th:text="${monitor.actividad().altas()}">—</strong>
+                            </li>
+                            <li class="monitor-funnel-row" data-funnel="matriculas">
+                                <span>Matrículas</span>
+                                <span class="monitor-funnel-track"><span></span></span>
+                                <strong data-monitoreo-matriculas th:text="${monitor.actividad().matriculas()}">—</strong>
+                            </li>
+                            <li class="monitor-funnel-row" data-funnel="lecciones">
+                                <span>Lecciones vistas</span>
+                                <span class="monitor-funnel-track"><span></span></span>
+                                <strong data-monitoreo-lecciones th:text="${monitor.actividad().lecciones()}">—</strong>
+                            </li>
+                            <li class="monitor-funnel-row" data-funnel="cuestionarios">
+                                <span>Cuestionarios aprobados</span>
+                                <span class="monitor-funnel-track"><span></span></span>
+                                <strong data-monitoreo-cuestionarios
+                                        th:text="${monitor.actividad().cuestionariosAprobados()}">—</strong>
+                            </li>
+                            <li class="monitor-funnel-row" data-funnel="certificados">
+                                <span>Certificados emitidos</span>
+                                <span class="monitor-funnel-track"><span></span></span>
+                                <strong data-monitoreo-certificados
+                                        th:text="${monitor.actividad().certificados()}">—</strong>
+                            </li>
+                            <li class="monitor-funnel-row" data-funnel="pagos">
+                                <span>Pagos confirmados</span>
+                                <span class="monitor-funnel-track"><span></span></span>
+                                <strong data-monitoreo-pagos th:text="${monitor.actividad().pagos()}">—</strong>
+                            </li>
+                            <li class="monitor-funnel-row" data-funnel="pagos-fallidos">
+                                <span>Pagos rechazados</span>
+                                <span class="monitor-funnel-track"><span></span></span>
+                                <strong data-monitoreo-pagos-fallidos
+                                        th:text="${monitor.actividad().pagosFallidos()}">—</strong>
+                            </li>
+                        </ul>
+                        <div class="monitor-business-chart">
+                            <svg class="monitor-chart" viewBox="0 0 900 250" role="img"
+                                 aria-label="Matrículas, pagos y certificados por día durante los últimos siete días"
+                                 data-grafico-actividad>
+                                <g class="monitor-chart-grid" aria-hidden="true">
+                                    <line x1="40" y1="40" x2="860" y2="40"></line>
+                                    <line x1="40" y1="125" x2="860" y2="125"></line>
+                                    <line x1="40" y1="210" x2="860" y2="210"></line>
+                                </g>
+                                <g class="admin-axis-y" aria-hidden="true">
+                                    <text x="8" y="44" data-eje-actividad-max>—</text>
+                                    <text x="8" y="214">0</text>
+                                </g>
+                                <g data-barras-actividad></g>
+                                <g class="admin-axis-x" aria-hidden="true" data-eje-actividad></g>
+                            </svg>
+                            <p class="monitor-legend">
+                                <span><i class="admin-dot admin-dot--ok"></i>Matrículas</span>
+                                <span><i class="admin-dot admin-dot--warn"></i>Pagos</span>
+                                <span><i class="admin-dot admin-dot--certificates"></i>Certificados</span>
+                            </p>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+</div>
+
+<script defer th:src="@{/js/panel.js}"></script>
+<script defer th:src="@{/js/admin.js}"></script>
+<script defer th:src="@{/js/monitoreo.js}"></script>
+</body>
+</html>

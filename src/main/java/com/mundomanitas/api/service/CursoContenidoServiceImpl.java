@@ -2,6 +2,8 @@ package com.mundomanitas.api.service;
 
 import com.mundomanitas.api.model.ContenidoItem;
 import com.mundomanitas.api.model.Curso;
+import com.mundomanitas.api.model.Ejercicio;
+import com.mundomanitas.api.model.Video;
 import com.mundomanitas.api.model.CursoModulo;
 import com.mundomanitas.api.model.CursoSeccion;
 import com.mundomanitas.api.model.Inscripcion;
@@ -14,6 +16,7 @@ import com.mundomanitas.api.repository.CursoModuloRepository;
 import com.mundomanitas.api.repository.CursoRepository;
 import com.mundomanitas.api.repository.CursoRecursoRepository;
 import com.mundomanitas.api.repository.CursoSeccionRepository;
+import com.mundomanitas.api.repository.EjercicioRepository;
 import com.mundomanitas.api.repository.InscripcionRepository;
 import com.mundomanitas.api.repository.ItemProgresoRepository;
 import com.mundomanitas.api.repository.LeccionProgresoRepository;
@@ -40,6 +43,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
 public class CursoContenidoServiceImpl implements CursoContenidoService {
 
     private static final Logger log = LoggerFactory.getLogger(CursoContenidoServiceImpl.class);
+    private static final int QUIZ_MAX_SCORE = 20;
 
     private final CursoRepository courses;
     private final CursoModuloRepository modules;
@@ -50,6 +54,7 @@ public class CursoContenidoServiceImpl implements CursoContenidoService {
     private final LeccionProgresoRepository leccionProgreso;
     private final ItemProgresoRepository itemProgreso;
     private final CuestionarioIntentoRepository cuestionarioAttempts;
+    private final EjercicioRepository exercises;
     private final VideoRepository videos;
     private final CursoMaterialStorage materials;
 
@@ -63,6 +68,7 @@ public class CursoContenidoServiceImpl implements CursoContenidoService {
             LeccionProgresoRepository leccionProgreso,
             ItemProgresoRepository itemProgreso,
             CuestionarioIntentoRepository cuestionarioAttempts,
+            EjercicioRepository exercises,
             VideoRepository videos,
             CursoMaterialStorage materials
     ) {
@@ -75,6 +81,7 @@ public class CursoContenidoServiceImpl implements CursoContenidoService {
         this.leccionProgreso = leccionProgreso;
         this.itemProgreso = itemProgreso;
         this.cuestionarioAttempts = cuestionarioAttempts;
+        this.exercises = exercises;
         this.videos = videos;
         this.materials = materials;
     }
@@ -103,10 +110,13 @@ public class CursoContenidoServiceImpl implements CursoContenidoService {
         Set<UUID> vistoItems = inscripcionId == null ? Set.of()
                 : itemProgreso.buscarPorInscripcionIdOrdenarPorFechaFinalizacionAsc(inscripcionId).stream()
                         .map(ItemProgreso::getItemId).collect(Collectors.toSet());
+        // Solo 20/20 marca el ejercicio como visto; un intento fallido se puede repetir.
         Set<UUID> cuestionarioDone = inscripcionId == null ? Set.of()
                 : cuestionarioAttempts.buscarPorInscripcionIdIn(Set.of(inscripcionId)).stream()
+                        .filter(intento -> intento.getScore() >= QUIZ_MAX_SCORE)
                         .map(CuestionarioIntento::getEjercicioId).collect(Collectors.toSet());
 
+        boolean usaLsp = viewer != null && viewer.isUsaLsp();
         List<ModuloVista> moduloViews = new ArrayList<>();
         List<ItemVista> orderedItems = new ArrayList<>();
         for (CursoModulo modulo : modules.buscarPorCursoIdOrdenarPorPosicionAsc(cursoId)) {
@@ -116,7 +126,10 @@ public class CursoContenidoServiceImpl implements CursoContenidoService {
             Set<UUID> visibleSections = moduloSections.stream()
                     .map(CursoSeccion::getId).collect(Collectors.toSet());
             List<ContenidoItem> moduloItems = items.buscarPorModuloIdOrdenarPorPosicionAsc(modulo.getId())
-                    .stream().filter(item -> includeHidden || item.isVisible()).toList();
+                    .stream()
+                    .filter(item -> includeHidden || item.isVisible())
+                    .filter(item -> visiblePara(item, usaLsp, includeHidden))
+                    .toList();
 
             List<SeccionVista> seccionViews = new ArrayList<>();
             for (CursoSeccion seccion : moduloSections) {
@@ -171,9 +184,9 @@ public class CursoContenidoServiceImpl implements CursoContenidoService {
         ContenidoItem item = access.item();
         Curso curso = inscripcion.getCurso();
 
-        if ("EJERCICIO".equals(item.getOrigenTipo())) {
+        if ("EJERCICIO".equals(item.getOrigenTipo()) && marcarAlRendir(item)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "El ejercicio solo se marca como visto al rendir el cuestionario");
+                    "Este ejercicio se marca como visto al rendir el cuestionario");
         }
         if ("VIDEO".equals(item.getOrigenTipo())) {
             UUID videoId = item.getOrigenId();
@@ -234,6 +247,46 @@ public class CursoContenidoServiceImpl implements CursoContenidoService {
 
     @Override
     @Transactional(readOnly = true)
+    public VideoItemVista videoItem(Usuario usuario, String slug, UUID itemId) {
+        ItemAccess access = requireAccessibleItem(usuario, slug, itemId);
+        ContenidoItem item = access.item();
+        boolean usaLsp = usuario != null && usuario.isUsaLsp();
+        String tipo = item.getOrigenTipo();
+
+        if ("VIDEO_LSP".equals(tipo)) {
+            if (!usaLsp) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "La versión en lengua de señas no está disponible para esta cuenta");
+            }
+            if (item.getYoutubeId() == null) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "La clase en lengua de señas todavía no tiene video");
+            }
+            return new VideoItemVista(item.getId(), null, item.getYoutubeId(),
+                    item.getTitulo(), true);
+        }
+        if ("VIDEO".equals(tipo)) {
+            if (usaLsp) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "Esta cuenta ve las clases en lengua de señas");
+            }
+            UUID videoId = item.getOrigenId();
+            UUID cursoId = access.inscripcion().getCurso().getId();
+            if (videoId == null || !videos.existeInCurso(videoId, cursoId)) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                        "El video no pertenece a este curso");
+            }
+            Video video = videos.findById(videoId)
+                    .orElseThrow(() -> missing("Video no encontrado"));
+            return new VideoItemVista(item.getId(), videoId, video.getYoutubeId(),
+                    video.getTitulo(), false);
+        }
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                "El índice seleccionado no tiene video");
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public MaterialDescarga leidoPdf(Usuario usuario, String slug, UUID itemId) {
         ItemAccess access = requirePdfItem(usuario, slug, itemId);
         ContenidoItem item = access.item();
@@ -288,10 +341,25 @@ public class CursoContenidoServiceImpl implements CursoContenidoService {
         return new ItemAccess(inscripcion, item);
     }
 
+    /** Las cuentas con LSP ven solo las versiones en señas; el resto, los videos normales. */
+    private boolean visiblePara(ContenidoItem item, boolean usaLsp, boolean includeHidden) {
+        if (includeHidden) return true;
+        if ("VIDEO_LSP".equals(item.getOrigenTipo())) return usaLsp;
+        return !("VIDEO".equals(item.getOrigenTipo()) && usaLsp);
+    }
+
+    /** Un ejercicio se marca solo al rendir o a mano, según lo configuró el administrador. */
+    private boolean marcarAlRendir(ContenidoItem item) {
+        if (item.getOrigenId() == null) return true;
+        return exercises.findById(item.getOrigenId())
+                .map(Ejercicio::isMarcarAlRendir)
+                .orElse(true);
+    }
+
     private ItemVista view(ContenidoItem item, Set<UUID> vistoVideos, Set<UUID> vistoItems,
                           Set<UUID> cuestionarioDone, boolean bloqueado) {
-        boolean done = "EJERCICIO".equals(item.getOrigenTipo()) && item.getOrigenId() != null
-                && cuestionarioDone.contains(item.getOrigenId());
+        boolean done = "EJERCICIO".equals(item.getOrigenTipo()) && marcarAlRendir(item)
+                && item.getOrigenId() != null && cuestionarioDone.contains(item.getOrigenId());
         return new ItemVista(item.getId(), item.getOrigenTipo(), item.getTitulo(),
                 item.getDescripcion(), item.getUrl(), item.getYoutubeId(),
                 item.getDuracionSegundos(), item.isVisible(),
@@ -304,7 +372,7 @@ public class CursoContenidoServiceImpl implements CursoContenidoService {
         if ("VIDEO".equals(item.getOrigenTipo())) {
             return vistoVideos.contains(item.getOrigenId());
         }
-        if ("EJERCICIO".equals(item.getOrigenTipo())) {
+        if ("EJERCICIO".equals(item.getOrigenTipo()) && marcarAlRendir(item)) {
             return item.getOrigenId() != null && cuestionarioDone.contains(item.getOrigenId());
         }
         return vistoItems.contains(item.getId());

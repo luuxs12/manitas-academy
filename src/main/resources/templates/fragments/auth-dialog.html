@@ -93,8 +93,8 @@
                     <p class="section-kicker">Cuentas</p>
                     <h2 id="auth-register-title">Creá tu cuenta</h2>
                     <p class="auth-sub">
-                        Empezá gratis y sin tarjeta. El intérprete en LSP y los
-                        subtítulos vienen activados desde la primera clase.
+                        Empezá gratis y sin tarjeta. Si usás lengua de señas,
+                        marcá tu opción y verás las clases traducidas en LSP.
                     </p>
                 </header>
 
@@ -105,7 +105,7 @@
                     <div class="auth-fields">
                         <div class="field">
                             <label for="modal-fullName">Nombre completo</label>
-                            <input id="modal-fullName" name="fullName" type="text"
+                            <input id="modal-fullName" name="nombreCompleto" type="text"
                                    autocomplete="name" placeholder="Ana Quispe"
                                    maxlength="120" required>
                             <p class="field-error" id="modal-fullName-error" role="alert" hidden></p>
@@ -129,7 +129,7 @@
                                         aria-controls="modal-password"
                                         aria-pressed="false">Mostrar</button>
                             </div>
-                            <input id="modal-password" name="password" type="password"
+                            <input id="modal-password" name="contrasena" type="password"
                                    data-password-input autocomplete="new-password"
                                    placeholder="Mínimo 8 caracteres" minlength="8" maxlength="72"
                                    aria-describedby="modal-password-hint" required>
@@ -146,12 +146,24 @@
 
                         <div class="field">
                             <label for="modal-confirmPassword">Repetí la contraseña</label>
-                            <input id="modal-confirmPassword" name="confirmPassword" type="password"
+                            <input id="modal-confirmPassword" name="confirmContrasena" type="password"
                                    autocomplete="new-password" placeholder="La misma de arriba"
                                    minlength="8" maxlength="72" required>
                             <p class="field-error" id="modal-confirmPassword-error" role="alert" hidden></p>
                         </div>
                     </div>
+
+                    <fieldset class="auth-accesibilidad">
+                        <legend>Accesibilidad</legend>
+                        <p class="field-hint">
+                            ¿Sos sordomudo/a o usás LSP? Marcá la opción para ver los
+                            videos de los cursos traducidos en lengua de señas.
+                        </p>
+                        <label class="check" for="modal-quiereLsp">
+                            <input id="modal-quiereLsp" name="quiereLsp" type="checkbox">
+                            <span>Sí, quiero los videos en Lengua de Señas Peruana.</span>
+                        </label>
+                    </fieldset>
 
                     <div class="auth-terms">
                         <label class="check check--terms">

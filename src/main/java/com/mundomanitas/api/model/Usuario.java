@@ -67,6 +67,10 @@ public class Usuario {
     @Column(name = "cancel_at_period_end", nullable = false)
     private boolean cancelAtPeriodFin;
 
+    /** Identificador de cuenta para entregar videos en lengua de senas (V17). */
+    @Column(name = "uses_lsp", nullable = false)
+    private boolean usaLsp;
+
     @Column(name = "created_at", insertable = false, updatable = false)
     private OffsetDateTime fechaCreacion;
 
@@ -170,6 +174,15 @@ public class Usuario {
 
     public boolean isCancelAtPeriodFin() {
         return cancelAtPeriodFin;
+    }
+
+    public boolean isUsaLsp() {
+        return usaLsp;
+    }
+
+    /** Identificador LSP de la cuenta; lo elige la persona al registrarse o en accesibilidad. */
+    public void changeUsaLsp(boolean usaLsp) {
+        this.usaLsp = usaLsp;
     }
 
     public void changePreferencias(String theme, boolean notifyEmail) {

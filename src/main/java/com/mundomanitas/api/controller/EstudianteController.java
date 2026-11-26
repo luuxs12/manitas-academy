@@ -12,6 +12,7 @@ import com.mundomanitas.api.service.LeccionProgresoService;
 import com.mundomanitas.api.service.EstudianteCertificadoService;
 import com.mundomanitas.api.service.EstudianteContenidoService;
 import com.mundomanitas.api.service.VideoReproduccionService;
+import com.mundomanitas.api.service.YouTubeLink;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -37,6 +38,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Módulos del área de estudiante.
@@ -137,6 +139,8 @@ public class EstudianteController {
             @AuthenticationPrincipal AutenticadoUsuario principal,
             @PathVariable String slug,
             @RequestParam(name = "video", required = false) UUID videoId,
+            @RequestParam(name = "item", required = false) UUID itemId,
+            @RequestParam(name = "sesion", required = false) UUID sesionId,
             @RequestParam(name = "material", required = false) UUID materialId,
             Model model
     ) {
@@ -147,10 +151,54 @@ public class EstudianteController {
                 estructura.esquema(cursoId, inscripcion.getId(), usuario, false);
         Set<UUID> doneVideos = lessons.finalizadoVideos(inscripcion.getId());
 
+        // Un clic en la sesión abre la primera clase en video de ese módulo.
+        if (itemId == null && sesionId != null) {
+            itemId = esquema.modules().stream()
+                    .filter(modulo -> modulo.id().equals(sesionId))
+                    .flatMap(modulo -> Stream.concat(
+                            modulo.sections().stream().flatMap(seccion -> seccion.items().stream()),
+                            modulo.items().stream()))
+                    .filter(vista -> "VIDEO".equals(vista.type())
+                            || "VIDEO_LSP".equals(vista.type()))
+                    .map(CursoContenidoService.ItemVista::id)
+                    .findFirst().orElse(null);
+        }
+
         VideoReproduccionService.Reproduccion player = null;
-        if (videoId != null) {
+        UUID selectedVideoId = null;
+        UUID selectedItemId = null;
+        boolean esLsp = false;
+        boolean selectedDone = false;
+        UUID itemSeleccionado = itemId;
+        if (itemId != null) {
+            try {
+                CursoContenidoService.VideoItemVista clase = estructura.videoItem(usuario, slug, itemId);
+                String url = YouTubeLink.embedUrl(clase.youtubeId());
+                if (url == null) {
+                    throw new ResponseStatusException(HttpStatus.NOT_FOUND,
+                            "La clase todavía no tiene video");
+                }
+                player = new VideoReproduccionService.Reproduccion(clase.titulo(), url);
+                esLsp = clase.lsp();
+                selectedItemId = clase.itemId();
+                selectedVideoId = clase.videoId();
+                selectedDone = !esLsp && selectedVideoId != null
+                        && doneVideos.contains(selectedVideoId);
+                if (esLsp) {
+                    selectedDone = esquema.modules().stream()
+                            .flatMap(modulo -> Stream.concat(
+                                    modulo.sections().stream().flatMap(seccion -> seccion.items().stream()),
+                                    modulo.items().stream()))
+                            .anyMatch(vista -> vista.id().equals(itemSeleccionado) && vista.visto());
+                }
+            } catch (ResponseStatusException exception) {
+                model.addAttribute("panelError", "Esa clase no está disponible en este momento.");
+            }
+        } else if (videoId != null) {
             try {
                 player = reproduccion.play(videoId, inscripcion);
+                selectedVideoId = videoId;
+                selectedDone = doneVideos.contains(videoId);
             } catch (ResponseStatusException exception) {
                 model.addAttribute("panelError", "Ese video no está disponible en este momento.");
             }
@@ -170,8 +218,10 @@ public class EstudianteController {
         model.addAttribute("modules", esquema.modules());
         model.addAttribute("itemHeadings", silaboHeadings(esquema));
         model.addAttribute("doneVideos", doneVideos);
-        model.addAttribute("selectedId", player == null ? null : videoId);
-        model.addAttribute("selectedItemId", material == null ? null : material.id());
+        model.addAttribute("selectedId", selectedVideoId);
+        model.addAttribute("selectedItemId", material == null ? selectedItemId : material.id());
+        model.addAttribute("selectedDone", selectedDone);
+        model.addAttribute("esLsp", esLsp);
         model.addAttribute("player", player);
         model.addAttribute("material", material);
         model.addAttribute("itemContar", esquema.totalItems());

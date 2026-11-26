@@ -32,6 +32,10 @@ public class Ejercicio {
     @Column(name = "position", nullable = false)
     private int posicion;
 
+    /** Define si el cuestionario marca el ejercicio como visto (V17). */
+    @Column(name = "mark_on_quiz", nullable = false)
+    private boolean marcarAlRendir = true;
+
     @Column(name = "created_at", insertable = false, updatable = false)
     private OffsetDateTime fechaCreacion;
 
@@ -39,10 +43,16 @@ public class Ejercicio {
     }
 
     public Ejercicio(UUID moduloId, String titulo, String prompt, int posicion) {
+        this(moduloId, titulo, prompt, posicion, true);
+    }
+
+    public Ejercicio(UUID moduloId, String titulo, String prompt, int posicion,
+                     boolean marcarAlRendir) {
         this.moduloId = moduloId;
         this.titulo = titulo;
         this.prompt = prompt;
         this.posicion = posicion;
+        this.marcarAlRendir = marcarAlRendir;
     }
 
     public UUID getId() {
@@ -65,14 +75,23 @@ public class Ejercicio {
         return posicion;
     }
 
+    public boolean isMarcarAlRendir() {
+        return marcarAlRendir;
+    }
+
     public OffsetDateTime getFechaCreacion() {
         return fechaCreacion;
     }
 
     public void update(String titulo, String prompt, int posicion) {
+        update(titulo, prompt, posicion, this.marcarAlRendir);
+    }
+
+    public void update(String titulo, String prompt, int posicion, boolean marcarAlRendir) {
         this.titulo = titulo;
         this.prompt = prompt;
         this.posicion = posicion;
+        this.marcarAlRendir = marcarAlRendir;
     }
 
     public void moveTo(UUID moduloId) {

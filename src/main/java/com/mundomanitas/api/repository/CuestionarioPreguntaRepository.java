@@ -13,4 +13,7 @@ public interface CuestionarioPreguntaRepository extends JpaRepository<Cuestionar
             select x from CuestionarioPregunta x where x.ejercicioId = ?1 order by x.posicion asc
     """)
     List<CuestionarioPregunta> buscarPorEjercicioIdOrdenarPorPosicionAsc(UUID ejercicioId);
+
+    @Query("select count(x) from CuestionarioPregunta x where x.ejercicioId = ?1")
+    long contarPorEjercicioId(UUID ejercicioId);
 }

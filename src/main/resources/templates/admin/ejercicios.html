@@ -8,11 +8,11 @@
 <div class="panel admin">
     <aside th:replace="~{admin/fragments/admin-nav :: sidebar('ejercicios')}"></aside>
     <div class="panel-shell">
-        <header th:replace="~{admin/fragments/admin-nav :: topbar('Ejercicios', 'Actividades por módulo', ${query})}"></header>
+        <header th:replace="~{admin/fragments/admin-nav :: topbar('Ejercicios', 'Ejercicios por curso', ${query})}"></header>
         <main id="panel-main" class="panel-main admin-main">
 
             <div class="admin-page-head">
-                <div><h1>Gestión de ejercicios</h1><p th:text="${page.totalElements + ' ejercicios'}">0 ejercicios</p></div>
+                <div><h1>Ejercicios</h1><p th:text="${page.totalElements == 1 ? '1 ejercicio' : page.totalElements + ' ejercicios'}">0 ejercicios</p></div>
                 <div class="admin-actions">
                     <a class="btn btn-admin" th:href="@{/admin/ejercicios/nuevo}">Nuevo ejercicio</a>
                     <details class="admin-export"><summary>Exportar</summary><div class="panel-menu-pop">
@@ -23,13 +23,21 @@
                 </div>
             </div>
 
-            <form class="admin-filters admin-filters--full" method="get" th:action="@{/admin/ejercicios}">
+            <form class="admin-filters admin-filters--full" method="get" th:action="@{/admin/ejercicios}"
+                  data-admin-curso>
                 <label class="sr-only" for="filtro-ejercicios">Buscar ejercicios</label>
                 <input id="filtro-ejercicios" name="q" type="search" th:value="${query}" placeholder="Título del ejercicio…">
+                <label class="sr-only" for="filtro-curso-ej">Filtrar por curso</label>
+                <select id="filtro-curso-ej" name="curso" data-course-select>
+                    <option value="">Todos los cursos</option>
+                    <option th:each="o : ${cursoOptions}" th:value="${o.id()}" th:text="${o.label()}"
+                            th:selected="${cursoId != null and cursoId.toString() == o.id().toString()}"></option>
+                </select>
                 <label class="sr-only" for="filtro-modulo-ej">Filtrar por módulo</label>
-                <select id="filtro-modulo-ej" name="modulo">
+                <select id="filtro-modulo-ej" name="modulo" data-module-select>
                     <option value="">Todos los módulos</option>
                     <option th:each="o : ${options}" th:value="${o.id()}" th:text="${o.label()}"
+                            th:attr="data-curso=${o.cursoId()}, data-nombre=${o.nombre()}, data-label=${o.label()}"
                             th:selected="${moduloId != null and moduloId.toString() == o.id().toString()}"></option>
                 </select>
                 <button class="btn btn-admin" type="submit">Filtrar</button>
@@ -37,34 +45,44 @@
 
             <div class="panel-card admin-card admin-table-wrap">
                 <table class="admin-table">
-                    <caption>Ejercicios por módulo con la consigna que ve el alumnado.</caption>
-                    <thead><tr><th scope="col">Ejercicio</th><th scope="col">Curso / Módulo</th><th scope="col">Consigna</th><th scope="col">Pos.</th><th scope="col">Acciones</th></tr></thead>
+                    <caption>Ejercicios por módulo</caption>
+                    <thead><tr><th scope="col">Ejercicio</th><th scope="col">Curso / Módulo</th><th scope="col">Consigna</th><th scope="col">Cuestionario</th><th scope="col">Marcado</th><th scope="col">Pos.</th><th scope="col">Acciones</th></tr></thead>
                     <tbody>
                     <tr th:each="item : ${page.content}">
                         <td><strong th:text="${item.titulo()}">Ejercicio</strong></td>
                         <td><small th:text="${item.cursoTitulo()}">Curso</small><br><small th:text="${item.moduloTitulo()}">Módulo</small></td>
                         <td class="admin-clip" th:text="${item.prompt()}">Consigna</td>
+                        <td>
+                            <span class="admin-status"
+                                  th:classappend="${item.preguntas() == 10} ? ' is-ok' : ' is-bad'"
+                                  th:text="${item.preguntas() == 10} ? '10/10 cargadas' : (${item.preguntas()} + '/10 cargadas')">0/10 cargadas</span>
+                        </td>
+                        <td>
+                            <span class="admin-status"
+                                  th:text="${item.marcarAlRendir()} ? 'Al rendir' : 'Manual'">Al rendir</span>
+                        </td>
                         <td th:text="${item.posicion()}">0</td>
                         <td class="admin-row-actions">
                             <a th:href="@{/admin/ejercicios/{id}/editar(id=${item.id()})}">Editar</a>
-                            <a th:href="@{/admin/ejercicios/{id}/preguntas(id=${item.id()})}">Preguntas</a>
+                            <a th:href="@{/admin/ejercicios/{id}/preguntas(id=${item.id()})}">Configurar preguntas</a>
                             <button type="button" class="admin-confirm-link"
                                     th:attr="data-confirm-url=@{/admin/ejercicios/{id}/eliminar(id=${item.id()})}, aria-label='Eliminar ' + ${item.titulo()}">Eliminar</button>
                         </td>
                     </tr>
-                    <tr th:if="${#lists.isEmpty(page.content)}"><td colspan="5" class="admin-empty">Todavía no hay ejercicios cargados.</td></tr>
+                    <tr th:if="${#lists.isEmpty(page.content)}"><td colspan="7" class="admin-empty">Sin ejercicios.</td></tr>
                     </tbody>
                 </table>
             </div>
             <nav class="admin-pager" th:if="${page.totalPages > 1}" aria-label="Paginación de ejercicios">
-                <a th:if="${!page.first}" th:href="@{/admin/ejercicios(page=${page.number - 1}, q=${query}, modulo=${moduloId})}">← Anterior</a>
+                <a th:if="${!page.first}" th:href="@{/admin/ejercicios(page=${page.number - 1}, q=${query}, curso=${cursoId}, modulo=${moduloId})}">← Anterior</a>
                 <span th:text="${'Página ' + (page.number + 1) + ' de ' + page.totalPages}">Página 1</span>
-                <a th:if="${!page.last}" th:href="@{/admin/ejercicios(page=${page.number + 1}, q=${query}, modulo=${moduloId})}">Siguiente →</a>
+                <a th:if="${!page.last}" th:href="@{/admin/ejercicios(page=${page.number + 1}, q=${query}, curso=${cursoId}, modulo=${moduloId})}">Siguiente →</a>
             </nav>
         </main>
     </div>
 </div>
 <script defer th:src="@{/js/panel.js}"></script>
 <script defer th:src="@{/js/admin.js}"></script>
+<script defer th:src="@{/js/admin-form.js}"></script>
 </body>
 </html>

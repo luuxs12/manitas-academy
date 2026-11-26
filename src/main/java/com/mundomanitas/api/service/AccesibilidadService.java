@@ -4,6 +4,7 @@ import com.mundomanitas.api.dto.AccesibilidadFormulario;
 import com.mundomanitas.api.model.AccesibilidadPreferencias;
 import com.mundomanitas.api.model.Usuario;
 import com.mundomanitas.api.repository.AccesibilidadPreferenciasRepository;
+import com.mundomanitas.api.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,22 +14,27 @@ import java.util.UUID;
  * Preferencias de accesibilidad guardadas en PostgreSQL desde V1.
  *
  * <p>Si la persona nunca las abrió, se crea la fila con los valores
- * iniciales del esquema. No hay preferencias "de relleno".</p>
+ * iniciales del esquema y con el identificador LSP elegido al registrarse.
+ * El identificador de la cuenta y la preferencia se mantienen iguales.</p>
  */
 @Service
 public class AccesibilidadService {
 
     private final AccesibilidadPreferenciasRepository preferencias;
+    private final UsuarioRepository users;
 
-    public AccesibilidadService(AccesibilidadPreferenciasRepository preferencias) {
+    public AccesibilidadService(AccesibilidadPreferenciasRepository preferencias,
+                                UsuarioRepository users) {
         this.preferencias = preferencias;
+        this.users = users;
     }
 
     @Transactional
     public AccesibilidadPreferencias forUsuario(Usuario usuario) {
         UUID usuarioId = usuario.getId();
         return preferencias.findById(usuarioId)
-                .orElseGet(() -> preferencias.save(new AccesibilidadPreferencias(usuarioId)));
+                .orElseGet(() -> preferencias.save(new AccesibilidadPreferencias(
+                        usuarioId, usuario.isUsaLsp())));
     }
 
     @Transactional
@@ -44,6 +50,9 @@ public class AccesibilidadService {
                 formulario.getCaptionSize(),
                 formulario.getReproduccionSpeed()
         );
+        // El identificador de la cuenta manda a la hora de elegir videos.
+        usuario.changeUsaLsp(formulario.isSignLanguageEnabled());
+        users.save(usuario);
         return preferencias.save(actual);
     }
 

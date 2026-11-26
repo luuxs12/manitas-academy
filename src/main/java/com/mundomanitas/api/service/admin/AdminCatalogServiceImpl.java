@@ -19,6 +19,7 @@ import com.mundomanitas.api.model.Video;
 import com.mundomanitas.api.repository.CursoModuloRepository;
 import com.mundomanitas.api.repository.CertificadoRepository;
 import com.mundomanitas.api.repository.CursoRepository;
+import com.mundomanitas.api.repository.CuestionarioPreguntaRepository;
 import com.mundomanitas.api.repository.InscripcionRepository;
 import com.mundomanitas.api.repository.EjercicioRepository;
 import com.mundomanitas.api.repository.UsuarioRepository;
@@ -55,6 +56,7 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
     private final CursoModuloRepository modules;
     private final VideoRepository videos;
     private final EjercicioRepository exercises;
+    private final CuestionarioPreguntaRepository preguntas;
     private final InscripcionRepository enrollments;
     private final CertificadoRepository certificates;
     private final PasswordEncoder encoder;
@@ -67,6 +69,7 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
             CursoModuloRepository modules,
             VideoRepository videos,
             EjercicioRepository exercises,
+            CuestionarioPreguntaRepository preguntas,
             InscripcionRepository enrollments,
             CertificadoRepository certificates,
             PasswordEncoder encoder,
@@ -78,6 +81,7 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
         this.modules = modules;
         this.videos = videos;
         this.exercises = exercises;
+        this.preguntas = preguntas;
         this.enrollments = enrollments;
         this.certificates = certificates;
         this.encoder = encoder;
@@ -377,9 +381,15 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
     @Override
     @Transactional(readOnly = true)
     public Page<FilaVideo> videos(UUID moduloId, String term, Pageable pageable) {
+        return videos(null, moduloId, term, pageable);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<FilaVideo> videos(UUID cursoId, UUID moduloId, String term, Pageable pageable) {
         Map<UUID, CursoModulo> moduloMap = moduloMap();
         Map<UUID, Curso> cursoMap = cursoMap();
-        return videos.search(moduloId, blankToNull(term), pageable).map(video -> {
+        return videos.search(moduloId, cursoId, blankToNull(term), pageable).map(video -> {
             CursoModulo modulo = moduloMap.get(video.getModuloId());
             Curso curso = modulo == null ? null : cursoMap.get(modulo.getCursoId());
             return new FilaVideo(video.getId(),
@@ -471,30 +481,43 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
 
     @Transactional(readOnly = true)
     public Page<FilaEjercicio> exercises(UUID moduloId, String term, Pageable pageable) {
+        return exercises(null, moduloId, term, pageable);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Page<FilaEjercicio> exercises(UUID cursoId, UUID moduloId, String term, Pageable pageable) {
         Map<UUID, CursoModulo> moduloMap = moduloMap();
         Map<UUID, Curso> cursoMap = cursoMap();
-        return exercises.search(moduloId, blankToNull(term), pageable).map(ejercicio -> {
+        return exercises.search(moduloId, cursoId, blankToNull(term), pageable).map(ejercicio -> {
             CursoModulo modulo = moduloMap.get(ejercicio.getModuloId());
             Curso curso = modulo == null ? null : cursoMap.get(modulo.getCursoId());
             return new FilaEjercicio(ejercicio.getId(),
                     modulo == null ? "Módulo eliminado" : modulo.getTitulo(),
                     curso == null ? "Curso eliminado" : curso.getTitulo(),
-                    ejercicio.getTitulo(), ejercicio.getPrompt(), ejercicio.getPosicion());
+                    ejercicio.getTitulo(), ejercicio.getPrompt(), ejercicio.getPosicion(),
+                    (int) contarPreguntas(ejercicio.getId()), ejercicio.isMarcarAlRendir());
         });
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public long contarPreguntas(UUID ejercicioId) {
+        return preguntas.contarPorEjercicioId(ejercicioId);
     }
 
     @Transactional(readOnly = true)
     public AdminEjercicioFormulario ejercicioFormulario(UUID id) {
         Ejercicio ejercicio = exercises.findById(id).orElseThrow();
         return new AdminEjercicioFormulario(ejercicio.getModuloId(), ejercicio.getTitulo(),
-                ejercicio.getPrompt(), ejercicio.getPosicion());
+                ejercicio.getPrompt(), ejercicio.getPosicion(), ejercicio.isMarcarAlRendir());
     }
 
     @Transactional
     public UUID createEjercicio(AdminEjercicioFormulario formulario, UUID actor) {
         requireModulo(formulario.moduloId());
         Ejercicio ejercicio = new Ejercicio(formulario.moduloId(), formulario.titulo().trim(),
-                formulario.prompt().trim(), formulario.posicion());
+                formulario.prompt().trim(), formulario.posicion(), formulario.marcarAlRendir());
         exercises.save(ejercicio);
         exercises.flush();
         auditoria.record(actor, "CREATE", "EJERCICIO", ejercicio.getId(), formulario.titulo().trim());
@@ -506,7 +529,8 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
     public void updateEjercicio(UUID id, AdminEjercicioFormulario formulario, UUID actor) {
         Ejercicio ejercicio = exercises.findById(id).orElseThrow();
         requireModulo(formulario.moduloId());
-        ejercicio.update(formulario.titulo().trim(), formulario.prompt().trim(), formulario.posicion());
+        ejercicio.update(formulario.titulo().trim(), formulario.prompt().trim(),
+                formulario.posicion(), formulario.marcarAlRendir());
         ejercicio.moveTo(formulario.moduloId());
         auditoria.record(actor, "UPDATE", "EJERCICIO", id, formulario.titulo().trim());
         log.info("Ejercicio actualizado id={} actor={}", id, actor);
@@ -534,10 +558,14 @@ public class AdminCatalogServiceImpl implements AdminCatalogService {
     public List<AdminOpcion> moduloOptions() {
         Map<UUID, Curso> cursoMap = cursoMap();
         return modules.buscarAllPorOrdenarPorPosicionAsc().stream()
-                .map(modulo -> new AdminOpcion(modulo.getId(),
-                        (cursoMap.containsKey(modulo.getCursoId())
-                                ? cursoMap.get(modulo.getCursoId()).getTitulo()
-                                : "Curso eliminado") + " · " + modulo.getTitulo()))
+                .map(modulo -> {
+                    String cursoTitulo = cursoMap.containsKey(modulo.getCursoId())
+                            ? cursoMap.get(modulo.getCursoId()).getTitulo()
+                            : "Curso eliminado";
+                    return new AdminOpcion(modulo.getId(),
+                            cursoTitulo + " · " + modulo.getTitulo(),
+                            modulo.getCursoId(), modulo.getTitulo());
+                })
                 .toList();
     }
 

@@ -154,15 +154,20 @@ public class AdminContenidoController extends AdminBaseController {
 
     @GetMapping("/videos")
     public String videos(@RequestParam(name = "q", required = false) String query,
+                         @RequestParam(name = "curso", required = false) UUID cursoId,
                          @RequestParam(name = "modulo", required = false) UUID moduloId,
                          @RequestParam(name = "page", defaultValue = "0") int page,
                          Model model) {
         common(model, "videos", "Videos");
-        model.addAttribute("page", catalog.videos(moduloId, query,
-                PageRequest.of(Math.max(page, 0), 10)));
+        var pagina = PageRequest.of(Math.max(page, 0), 10);
+        model.addAttribute("page", cursoId == null
+                ? catalog.videos(moduloId, query, pagina)
+                : catalog.videos(cursoId, moduloId, query, pagina));
         model.addAttribute("query", query);
+        model.addAttribute("cursoId", cursoId);
         model.addAttribute("moduloId", moduloId);
         model.addAttribute("options", catalog.moduloOptions());
+        model.addAttribute("cursoOptions", catalog.cursoOptions());
         return "admin/videos";
     }
 
@@ -171,6 +176,7 @@ public class AdminContenidoController extends AdminBaseController {
         common(model, "videos", "Nuevo video");
         model.addAttribute("adminVideoFormulario", new AdminVideoFormulario(null, "", 0, ""));
         model.addAttribute("options", catalog.moduloOptions());
+        model.addAttribute("cursoOptions", catalog.cursoOptions());
         return "admin/video-form";
     }
 
@@ -198,6 +204,7 @@ public class AdminContenidoController extends AdminBaseController {
             model.addAttribute("adminVideoFormulario", catalog.videoFormulario(id));
             model.addAttribute("itemId", id);
             model.addAttribute("options", catalog.moduloOptions());
+            model.addAttribute("cursoOptions", catalog.cursoOptions());
             return "admin/video-form";
         } catch (IllegalArgumentException exception) {
             redirect.addFlashAttribute("panelError", exception.getMessage());
@@ -268,15 +275,20 @@ public class AdminContenidoController extends AdminBaseController {
 
     @GetMapping("/ejercicios")
     public String exercises(@RequestParam(name = "q", required = false) String query,
+                            @RequestParam(name = "curso", required = false) UUID cursoId,
                             @RequestParam(name = "modulo", required = false) UUID moduloId,
                             @RequestParam(name = "page", defaultValue = "0") int page,
                             Model model) {
         common(model, "ejercicios", "Ejercicios");
-        model.addAttribute("page", catalog.exercises(moduloId, query,
-                PageRequest.of(Math.max(page, 0), 10)));
+        var pagina = PageRequest.of(Math.max(page, 0), 10);
+        model.addAttribute("page", cursoId == null
+                ? catalog.exercises(moduloId, query, pagina)
+                : catalog.exercises(cursoId, moduloId, query, pagina));
         model.addAttribute("query", query);
+        model.addAttribute("cursoId", cursoId);
         model.addAttribute("moduloId", moduloId);
         model.addAttribute("options", catalog.moduloOptions());
+        model.addAttribute("cursoOptions", catalog.cursoOptions());
         return "admin/ejercicios";
     }
 
@@ -285,6 +297,7 @@ public class AdminContenidoController extends AdminBaseController {
         common(model, "ejercicios", "Nuevo ejercicio");
         model.addAttribute("adminEjercicioFormulario", new AdminEjercicioFormulario(null, "", "", 0));
         model.addAttribute("options", catalog.moduloOptions());
+        model.addAttribute("cursoOptions", catalog.cursoOptions());
         return "admin/ejercicio-form";
     }
 
@@ -310,8 +323,10 @@ public class AdminContenidoController extends AdminBaseController {
         try {
             common(model, "ejercicios", "Editar ejercicio");
             model.addAttribute("adminEjercicioFormulario", catalog.ejercicioFormulario(id));
+            model.addAttribute("preguntasCount", catalog.contarPreguntas(id));
             model.addAttribute("itemId", id);
             model.addAttribute("options", catalog.moduloOptions());
+            model.addAttribute("cursoOptions", catalog.cursoOptions());
             return "admin/ejercicio-form";
         } catch (IllegalArgumentException exception) {
             redirect.addFlashAttribute("panelError", exception.getMessage());
@@ -377,14 +392,19 @@ public class AdminContenidoController extends AdminBaseController {
         model.addAttribute("adminVideoFormulario", formulario);
         if (id != null) model.addAttribute("itemId", id);
         model.addAttribute("options", catalog.moduloOptions());
+        model.addAttribute("cursoOptions", catalog.cursoOptions());
         return "admin/video-form";
     }
 
     private String ejercicioFormulario(Model model, AdminEjercicioFormulario formulario, String titulo, UUID id) {
         common(model, "ejercicios", titulo);
         model.addAttribute("adminEjercicioFormulario", formulario);
-        if (id != null) model.addAttribute("itemId", id);
+        if (id != null) {
+            model.addAttribute("itemId", id);
+            model.addAttribute("preguntasCount", catalog.contarPreguntas(id));
+        }
         model.addAttribute("options", catalog.moduloOptions());
+        model.addAttribute("cursoOptions", catalog.cursoOptions());
         return "admin/ejercicio-form";
     }
 }

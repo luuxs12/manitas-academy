@@ -1,6 +1,7 @@
 package com.mundomanitas.api.repository;
 
 import com.mundomanitas.api.dto.admin.ConteoDia;
+import com.mundomanitas.api.dto.admin.ConteoMonitor;
 import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Repository;
 
@@ -22,6 +23,15 @@ public class AdminStatsRepository {
     private static final String COURSES =
             "select cast(date_trunc('day', created_at) as date) as day, count(*) as total "
                     + "from courses where created_at >= :from group by 1 order by 1";
+    private static final String ENROLLMENTS =
+            "select cast(date_trunc('day', enrolled_at) as date) as day, count(*) as total "
+                    + "from enrollments where enrolled_at >= :from group by 1 order by 1";
+    private static final String PAID_PAYMENTS =
+            "select cast(date_trunc('day', paid_at) as date) as day, count(*) as total "
+                    + "from payments where status = 'PAID' and paid_at >= :from group by 1 order by 1";
+    private static final String CERTIFICATES =
+            "select cast(date_trunc('day', issued_at) as date) as day, count(*) as total "
+                    + "from certificates where issued_at >= :from group by 1 order by 1";
 
     private final EntityManager entityManager;
 
@@ -46,6 +56,45 @@ public class AdminStatsRepository {
                  group by 1 order by 1
                 """;
         return daily(sql, from);
+    }
+
+    /** Comprobación mínima para el monitor; falla si PostgreSQL no responde. */
+    public boolean ping() {
+        Object value = entityManager.createNativeQuery("select 1").getSingleResult();
+        return value instanceof Number number && number.intValue() == 1;
+    }
+
+    /** Conteos recientes del negocio para el panel de monitoreo. */
+    @SuppressWarnings("unchecked")
+    public ConteoMonitor conteosMonitor(OffsetDateTime from) {
+        String sql = """
+                select
+                  (select count(*) from users where created_at >= :from),
+                  (select count(*) from enrollments where enrolled_at >= :from),
+                  (select count(*) from lesson_progress where completed_at >= :from),
+                  (select count(*) from quiz_attempts where submitted_at >= :from and score = 20),
+                  (select count(*) from certificates where issued_at >= :from and revoked_at is null),
+                  (select count(*) from payments where status = 'PAID' and paid_at >= :from),
+                  (select count(*) from payments where status = 'FAILED' and created_at >= :from)
+                """;
+        Object[] row = (Object[]) entityManager.createNativeQuery(sql)
+                .setParameter("from", from)
+                .getSingleResult();
+        return new ConteoMonitor(
+                number(row[0]), number(row[1]), number(row[2]), number(row[3]),
+                number(row[4]), number(row[5]), number(row[6]));
+    }
+
+    public List<ConteoDia> inscripcionesPorDia(OffsetDateTime from) {
+        return daily(ENROLLMENTS, from);
+    }
+
+    public List<ConteoDia> pagosAprobadosPorDia(OffsetDateTime from) {
+        return daily(PAID_PAYMENTS, from);
+    }
+
+    public List<ConteoDia> certificadosPorDia(OffsetDateTime from) {
+        return daily(CERTIFICATES, from);
     }
 
     /** Personas con movimiento real en el período (matrícula o avance). */
@@ -81,5 +130,9 @@ public class AdminStatsRepository {
         if (value instanceof Date date) return date.toLocalDate();
         if (value instanceof LocalDate date) return date;
         return LocalDate.parse(value.toString());
+    }
+
+    private long number(Object value) {
+        return value instanceof Number number ? number.longValue() : 0L;
     }
 }

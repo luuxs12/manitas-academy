@@ -54,6 +54,9 @@
                     <section class="player-card" aria-labelledby="titulo-reproductor"
                              th:if="${player != null and material == null}">
                         <h2 id="titulo-reproductor" th:text="${player.titulo()}"></h2>
+                        <p class="player-lsp-badge" th:if="${esLsp}">
+                            Versión en Lengua de Señas Peruana
+                        </p>
                         <div class="player-frame">
                             <iframe data-video-frame th:src="${player.url()}"
                                     th:title="${player.titulo()}"
@@ -65,21 +68,29 @@
                             Este video se reproduce desde YouTube sin cookies de terceros.
                         </p>
                         <p class="player-hint" data-video-end-hint aria-live="polite"></p>
-                        <form class="player-actions"
+                        <form class="player-actions" th:if="${esLsp}"
+                              th:action="@{/panel/cursos/{slug}/items/{itemId}/visto(slug=${inscripcion.curso.slug},itemId=${selectedItemId})}"
+                              method="post">
+                            <input type="hidden" name="visto" th:value="${!selectedDone}">
+                            <button class="btn btn-dark" type="submit"
+                                    th:text="${selectedDone} ? 'Marcar como pendiente' : 'Marcar como visto'">
+                            </button>
+                        </form>
+                        <form class="player-actions" th:unless="${esLsp}"
                               th:action="@{/panel/cursos/{slug}/videos/{videoId}(slug=${inscripcion.curso.slug},videoId=${selectedId})}"
                               method="post">
                             <button class="btn btn-dark" type="submit"
-                                    th:text="${doneVideos.contains(selectedId)} ? 'Marcar como pendiente' : 'Marcar como visto'">
+                                    th:text="${selectedDone} ? 'Marcar como pendiente' : 'Marcar como visto'">
                             </button>
                         </form>
                     </section>
 
                     <section class="player-empty" th:if="${player == null and material == null}"
                              aria-labelledby="titulo-elegir">
-                        <h2 id="titulo-elegir">Elegí una clase para empezar</h2>
-                        <p>El temario está a la derecha y muestra el avance de cada módulo.</p>
+                        <h2 id="titulo-elegir">Elegí una sesión para empezar</h2>
+                        <p>Hacé clic en una sesión del temario y su video aparece acá, a la izquierda.</p>
                         <p class="player-empty-hint">
-                            Abrí un video o un PDF para verlo acá. Los ejercicios
+                            También podés abrir un video o un PDF desde su fila. Los ejercicios
                             se rinden desde su propia fila.
                         </p>
                     </section>
@@ -101,7 +112,10 @@
                             <div class="syllabus-group-head">
                                 <h3 class="syllabus-group-title" th:id="'modulo-' + ${modulo.id()}">
                                     <span class="syllabus-group-number" th:text="'Módulo ' + ${i.count}"></span>
-                                    <span class="syllabus-group-name" th:text="${modulo.titulo()}"></span>
+                                    <a class="syllabus-group-name syllabus-session-link"
+                                       th:href="@{/panel/cursos/{slug}(slug=${inscripcion.curso.slug},sesion=${modulo.id()})}"
+                                       th:attr="aria-label='Abrir el video de la sesión ' + ${modulo.titulo()}"
+                                       th:text="${modulo.titulo()}"></a>
                                 </h3>
                                 <p class="syllabus-progress" th:text="${modulo.percent()} + '% completado'"></p>
                             </div>

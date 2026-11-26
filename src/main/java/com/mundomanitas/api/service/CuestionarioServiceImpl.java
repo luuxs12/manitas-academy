@@ -44,6 +44,7 @@ public class CuestionarioServiceImpl implements CuestionarioService {
     private static final int QUESTION_COUNT = 10;
     private static final int ALTERNATIVE_COUNT = 4;
     private static final int POINTS_PER_QUESTION = 2;
+    private static final int MAX_SCORE = QUESTION_COUNT * POINTS_PER_QUESTION;
 
     private final InscripcionRepository enrollments;
     private final CursoModuloRepository modules;
@@ -80,9 +81,10 @@ public class CuestionarioServiceImpl implements CuestionarioService {
                 attempts.buscarPorInscripcionIdAndEjercicioId(access.inscripcionId(), access.ejercicioId());
         IntentoVista resultado = existing.isPresent()
                 ? resultado(existing.get(), cargado) : null;
+        boolean aprobado = existing.map(intento -> intento.getScore() >= MAX_SCORE).orElse(false);
         return new CuestionarioVista(itemId, access.item().getTitulo(),
                 StringUtils.defaultString(access.item().getDescripcion()),
-                cargado.ready(), existing.isPresent(), resultado, cargado.views());
+                cargado.ready(), existing.isPresent(), aprobado, resultado, cargado.views());
     }
 
     @Override
@@ -94,9 +96,13 @@ public class CuestionarioServiceImpl implements CuestionarioService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "El cuestionario todavía no tiene las diez preguntas cargadas");
         }
-        if (attempts.buscarPorInscripcionIdAndEjercicioId(
-                access.inscripcionId(), access.ejercicioId()).isPresent()) {
-            throw alreadySubmitted();
+        Optional<CuestionarioIntento> previo = attempts.buscarPorInscripcionIdAndEjercicioId(
+                access.inscripcionId(), access.ejercicioId());
+        if (previo.isPresent()) {
+            if (previo.get().getScore() >= MAX_SCORE) throw alreadySubmitted();
+            // El intento fallido se reemplaza: 20/20 es la única entrega definitiva.
+            attempts.delete(previo.get());
+            attempts.flush();
         }
         validateAnswers(answers, cargado);
 

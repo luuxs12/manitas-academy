@@ -11,7 +11,19 @@
         <header th:replace="~{admin/fragments/admin-nav :: topbar('Ejercicios', ${itemId != null} ? 'Editar ejercicio' : 'Nuevo ejercicio', '')}"></header>
         <main id="panel-main" class="panel-main admin-main">
             <div class="admin-page-head">
-                <div><h1 th:text="${itemId != null} ? 'Editar ejercicio' : 'Nuevo ejercicio'">Ejercicio</h1><p>La consigna se guarda con el contenido del módulo.</p></div>
+                <div>
+                    <h1 th:text="${itemId != null} ? 'Editar ejercicio' : 'Nuevo ejercicio'">Ejercicio</h1>
+                    <p>Consigna, preguntas y marcado.</p>
+                    <p class="admin-hint" th:if="${itemId == null}">
+                        Guardalo para cargar las 10 preguntas.
+                    </p>
+                    <p class="admin-hint" th:if="${itemId != null}">
+                        Cuestionario:
+                        <span class="admin-status"
+                              th:classappend="${preguntasCount == 10} ? ' is-ok' : ' is-bad'"
+                              th:text="${preguntasCount == 10} ? '10/10 preguntas cargadas' : (${preguntasCount} + '/10 preguntas cargadas')">0/10</span>
+                    </p>
+                </div>
                 <div class="admin-actions">
                     <a class="btn btn-admin" th:if="${itemId != null}"
                        th:href="@{/admin/ejercicios/{id}/preguntas(id=${itemId})}">Cargar preguntas</a>
@@ -21,15 +33,25 @@
             <form class="panel-card admin-card admin-form" th:action="${itemId != null} ? @{/admin/ejercicios/{id}(id=${itemId})} : @{/admin/ejercicios}"
                   th:object="${adminEjercicioFormulario}" method="post" novalidate>
                 <div class="admin-form-grid">
-                    <div class="admin-field">
-                        <label for="ejercicio-modulo">Módulo</label>
-                        <select id="ejercicio-modulo" th:field="*{moduloId}" required
-                                th:attr="aria-invalid=${#fields.hasErrors('moduloId')} ? 'true' : null,
-                                         aria-describedby=${#fields.hasErrors('moduloId')} ? 'error-ejercicio-modulo' : null">
-                            <option value="">Elegí un módulo</option>
-                            <option th:each="o : ${options}" th:value="${o.id()}" th:text="${o.label()}"></option>
-                        </select>
-                        <small id="error-ejercicio-modulo" class="admin-error" th:if="${#fields.hasErrors('moduloId')}" th:errors="*{moduloId}"></small>
+                    <div class="admin-dependiente" data-admin-curso data-requerir-curso="true">
+                        <div class="admin-field">
+                            <label for="ejercicio-curso">Curso</label>
+                            <select id="ejercicio-curso" name="curso" data-course-select>
+                                <option value="">Elegí un curso</option>
+                                <option th:each="o : ${cursoOptions}" th:value="${o.id()}" th:text="${o.label()}"></option>
+                            </select>
+                        </div>
+                        <div class="admin-field">
+                            <label for="ejercicio-modulo">Módulo</label>
+                            <select id="ejercicio-modulo" th:field="*{moduloId}" data-module-select required
+                                    th:attr="aria-invalid=${#fields.hasErrors('moduloId')} ? 'true' : null,
+                                             aria-describedby=${#fields.hasErrors('moduloId')} ? 'error-ejercicio-modulo' : null">
+                                <option value="">Elegí un módulo</option>
+                                <option th:each="o : ${options}" th:value="${o.id()}" th:text="${o.nombre()}"
+                                        th:attr="data-curso=${o.cursoId()}, data-nombre=${o.nombre()}, data-label=${o.label()}"></option>
+                            </select>
+                            <small id="error-ejercicio-modulo" class="admin-error" th:if="${#fields.hasErrors('moduloId')}" th:errors="*{moduloId}"></small>
+                        </div>
                     </div>
                     <div class="admin-field">
                         <label for="ejercicio-titulo">Título</label>
@@ -52,6 +74,18 @@
                                         aria-describedby=${#fields.hasErrors('posicion')} ? 'error-ejercicio-posicion' : null">
                         <small id="error-ejercicio-posicion" class="admin-error" th:if="${#fields.hasErrors('posicion')}" th:errors="*{posicion}"></small>
                     </div>
+                    <div class="admin-field admin-span-2">
+                        <label class="admin-check" for="ejercicio-marcar">
+                            <input id="ejercicio-marcar" type="checkbox" name="marcarAlRendir"
+                                   value="true" th:checked="*{marcarAlRendir}">
+                            <input type="hidden" name="marcarAlRendir" value="false">
+                            Marcar como visto al rendir el cuestionario
+                        </label>
+                        <small class="admin-hint">
+                            Sin tildar, el alumno lo marca a mano desde el temario.
+                            Las preguntas se cargan después de guardar.
+                        </small>
+                    </div>
                 </div>
                 <div class="admin-form-actions">
                     <button class="btn btn-admin" type="submit" th:text="${itemId != null} ? 'Guardar cambios' : 'Crear ejercicio'">Guardar</button>
@@ -63,5 +97,6 @@
 </div>
 <script defer th:src="@{/js/panel.js}"></script>
 <script defer th:src="@{/js/admin.js}"></script>
+<script defer th:src="@{/js/admin-form.js}"></script>
 </body>
 </html>

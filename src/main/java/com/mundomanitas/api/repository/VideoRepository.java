@@ -58,8 +58,12 @@ public interface VideoRepository extends JpaRepository<Video, UUID> {
     @Query("""
             select v from Video v
             where (:moduloId is null or v.moduloId = :moduloId)
+              and (:cursoId is null or exists (
+                  select m.id from CursoModulo m where m.id = v.moduloId and m.cursoId = :cursoId
+              ))
               and (:term is null or lower(v.titulo) like lower(concat('%', cast(:term as string), '%')))
             order by v.posicion, v.titulo
             """)
-    Page<Video> search(@Param("moduloId") UUID moduloId, @Param("term") String term, Pageable pageable);
+    Page<Video> search(@Param("moduloId") UUID moduloId, @Param("cursoId") UUID cursoId,
+                       @Param("term") String term, Pageable pageable);
 }

@@ -32,6 +32,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -103,6 +104,47 @@ class AdminCursoContenidoServiceTest {
         verify(videos).save(captor.capture());
         assertThat(captor.getValue().getYoutubeId()).isEqualTo("dQw4w9WgXcQ");
         assertThat(captor.getValue().getTitulo()).isEqualTo("Clase 1");
+    }
+
+    @Test
+    @DisplayName("crea un VIDEO_LSP en content_items sin duplicar la fila de videos")
+    void createsVideoLsp() {
+        when(modules.findById(moduloId)).thenReturn(Optional.of(modulo()));
+
+        service.createItem(new AdminCursoContenidoService.ItemFormulario(moduloId, null, "VIDEO_LSP",
+                "Clase 1 en señas", "Versión en LSP", null, "https://youtu.be/dQw4w9WgXcQ",
+                600, 0, true), actor);
+
+        ArgumentCaptor<ContenidoItem> captor = ArgumentCaptor.forClass(ContenidoItem.class);
+        verify(items).save(captor.capture());
+        assertThat(captor.getValue().getOrigenTipo()).isEqualTo("VIDEO_LSP");
+        assertThat(captor.getValue().getOrigenId()).isNull();
+        assertThat(captor.getValue().getYoutubeId()).isEqualTo("dQw4w9WgXcQ");
+        verify(videos, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("edita y borra un VIDEO_LSP sin tocar la tabla de videos")
+    void updatesAndDeletesVideoLsp() {
+        UUID itemId = UUID.randomUUID();
+        ContenidoItem lsp = new ContenidoItem(moduloId, null, "VIDEO_LSP", null,
+                "Clase 1 en señas", "Versión en LSP", null, "abc", 600, 0, true);
+        ReflectionTestUtils.setField(lsp, "id", itemId);
+        when(modules.findById(moduloId)).thenReturn(Optional.of(modulo()));
+        when(items.findById(itemId)).thenReturn(Optional.of(lsp));
+
+        service.updateItem(itemId, new AdminCursoContenidoService.ItemFormulario(moduloId, null,
+                "VIDEO_LSP", "Clase 2 en señas", "Versión actualizada", null,
+                "https://youtu.be/dQw4w9WgXcQ", 700, 1, false), actor);
+        assertThat(lsp.getTitulo()).isEqualTo("Clase 2 en señas");
+        assertThat(lsp.getDescripcion()).isEqualTo("Versión actualizada");
+        assertThat(lsp.getYoutubeId()).isEqualTo("dQw4w9WgXcQ");
+        assertThat(lsp.getPosicion()).isEqualTo(1);
+        assertThat(lsp.isVisible()).isFalse();
+
+        service.deleteItem(itemId, actor);
+        verify(items).delete(lsp);
+        verify(videos, never()).delete(any());
     }
 
     @Test

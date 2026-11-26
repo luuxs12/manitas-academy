@@ -8,11 +8,11 @@
 <div class="panel admin">
     <aside th:replace="~{admin/fragments/admin-nav :: sidebar('cursos')}"></aside>
     <div class="panel-shell">
-        <header th:replace="~{admin/fragments/admin-nav :: topbar('Cursos', 'Catálogo, acceso y contenido', ${query})}"></header>
+        <header th:replace="~{admin/fragments/admin-nav :: topbar('Cursos', 'Cursos del catálogo', ${query})}"></header>
         <main id="panel-main" class="panel-main admin-main">
 
             <div class="admin-page-head">
-                <div><h1>Gestión de cursos</h1><p th:text="${page.totalElements + ' cursos'}">0 cursos</p></div>
+                <div><h1>Cursos</h1><p th:text="${page.totalElements == 1 ? '1 curso' : page.totalElements + ' cursos'}">0 cursos</p></div>
                 <div class="admin-actions">
                     <a class="btn btn-admin" th:href="@{/admin/cursos/nuevo}">Nuevo curso</a>
                     <details class="admin-export"><summary>Exportar</summary><div class="panel-menu-pop">
@@ -31,7 +31,7 @@
 
             <div class="panel-card admin-card admin-table-wrap">
                 <table class="admin-table">
-                    <caption>Cursos del catálogo con su estado real y cantidad de inscriptos.</caption>
+                    <caption>Cursos</caption>
                     <thead><tr><th scope="col">Curso</th><th scope="col">Categoría</th><th scope="col">Estado</th><th scope="col">Lecciones</th><th scope="col">Acceso</th><th scope="col">Inscriptos</th><th scope="col">Pos.</th><th scope="col">Acciones</th></tr></thead>
                     <tbody>
                     <tr th:each="curso : ${page.content}">
@@ -55,7 +55,7 @@
                                     th:attr="data-confirm-url=@{/admin/cursos/{id}/eliminar(id=${curso.id()})}, aria-label='Eliminar ' + ${curso.titulo()}">Eliminar</button>
                         </td>
                     </tr>
-                    <tr th:if="${#lists.isEmpty(page.content)}"><td colspan="8" class="admin-empty">No hay cursos que coincidan con la búsqueda.</td></tr>
+                    <tr th:if="${#lists.isEmpty(page.content)}"><td colspan="8" class="admin-empty">Sin cursos.</td></tr>
                     </tbody>
                 </table>
             </div>

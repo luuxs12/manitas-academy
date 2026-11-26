@@ -113,7 +113,7 @@ public class AdminCursoContenidoServiceImpl implements AdminCursoContenidoServic
         String prompt = null;
         if ("MATERIAL".equals(type)) {
             url = ContenidoEnlaces.https(formulario.url(), "enlace");
-        } else if ("VIDEO".equals(type)) {
+        } else if ("VIDEO".equals(type) || "VIDEO_LSP".equals(type)) {
             youtubeId = ContenidoEnlaces.youtubeId(formulario.youtubeUrl());
         } else {
             prompt = requireText(formulario.descripcion(), "consigna");
@@ -133,6 +133,12 @@ public class AdminCursoContenidoServiceImpl implements AdminCursoContenidoServic
             videos.flush();
             item = items.buscarPorOrigenTipoAndOrigenId(type, video.getId());
             applyMetadata(item, formulario);
+        } else if ("VIDEO_LSP".equals(type)) {
+            // La versión en señas vive sola en content_items: no duplica la fila de videos.
+            item = new ContenidoItem(formulario.moduloId(), formulario.seccionId(), type, null,
+                    titulo, StringUtils.trimToNull(formulario.descripcion()), null, youtubeId,
+                    formulario.duracionSegundos(), formulario.posicion(), formulario.visible());
+            items.save(item);
         } else {
             Ejercicio ejercicio = new Ejercicio(formulario.moduloId(), titulo, prompt, formulario.posicion());
             exercises.save(ejercicio);
@@ -196,6 +202,9 @@ public class AdminCursoContenidoServiceImpl implements AdminCursoContenidoServic
             videos.save(video);
             videos.flush();
             item = items.buscarPorOrigenTipoAndOrigenId(type, item.getOrigenId());
+        } else if ("VIDEO_LSP".equals(type)) {
+            item.updateVideoLsp(titulo, StringUtils.trimToNull(formulario.descripcion()),
+                    ContenidoEnlaces.youtubeId(formulario.youtubeUrl()));
         } else {
             Ejercicio ejercicio = exercises.findById(item.getOrigenId())
                     .orElseThrow(() -> new IllegalArgumentException("Ejercicio no encontrado"));
@@ -353,8 +362,9 @@ public class AdminCursoContenidoServiceImpl implements AdminCursoContenidoServic
 
     private String requireTipo(String type) {
         String value = StringUtils.trimToNull(type);
-        checkArgument("VIDEO".equals(value) || "MATERIAL".equals(value)
-                || "EJERCICIO".equals(value), "Tipo de ítem no válido");
+        checkArgument("VIDEO".equals(value) || "VIDEO_LSP".equals(value)
+                || "MATERIAL".equals(value) || "EJERCICIO".equals(value),
+                "Tipo de ítem no válido");
         return value;
     }
 

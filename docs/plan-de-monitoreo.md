@@ -4,6 +4,21 @@ Esta guía explica cómo observar la API sin exponer datos privados. Todo lo que
 se describe acá se configura con variables de entorno: no hay claves en el
 repositorio.
 
+## Panel de Monitoreo
+
+Los usuarios `ADMIN` tienen **Monitoreo** en el sidebar, entre Reportes y
+Auditoría. La vista consulta `/admin/api/monitoreo` cada 2 segundos y muestra una
+consola con disponibilidad, ritmo actual, tráfico por tipo de respuesta, bandas
+p50/p95/p99, mapa de calor por minuto, rutas más solicitadas, feed de respuestas
+recientes con `requestId`, caídas, estado de servicios y actividad real de
+PostgreSQL.
+
+Las series vienen de un buffer acotado de peticiones ya terminadas: excluye
+archivos estáticos, Actuator y el propio polling. Los conteos de negocio se leen
+de PostgreSQL con una cache de 10 segundos para no cargar la base durante el
+refresco. El navegador nunca llama a Actuator: si hay `MONITOR_PASSWORD`, ese
+endpoint exige Basic con rol `MONITOR` y la sesión admin recibiría `401`.
+
 ## Logs
 
 - Formato: fecha, nivel, `requestId`, logger y mensaje.

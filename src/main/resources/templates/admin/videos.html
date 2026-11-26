@@ -8,11 +8,11 @@
 <div class="panel admin">
     <aside th:replace="~{admin/fragments/admin-nav :: sidebar('videos')}"></aside>
     <div class="panel-shell">
-        <header th:replace="~{admin/fragments/admin-nav :: topbar('Videos', 'Material audiovisual por módulo', ${query})}"></header>
+        <header th:replace="~{admin/fragments/admin-nav :: topbar('Videos', 'Videos por curso', ${query})}"></header>
         <main id="panel-main" class="panel-main admin-main">
 
             <div class="admin-page-head">
-                <div><h1>Gestión de videos</h1><p th:text="${page.totalElements + ' videos'}">0 videos</p></div>
+                <div><h1>Videos</h1><p th:text="${page.totalElements == 1 ? '1 video' : page.totalElements + ' videos'}">0 videos</p></div>
                 <div class="admin-actions">
                     <a class="btn btn-admin" th:href="@{/admin/videos/nuevo}">Nuevo video</a>
                     <details class="admin-export"><summary>Exportar</summary><div class="panel-menu-pop">
@@ -23,13 +23,21 @@
                 </div>
             </div>
 
-            <form class="admin-filters admin-filters--full" method="get" th:action="@{/admin/videos}">
+            <form class="admin-filters admin-filters--full" method="get" th:action="@{/admin/videos}"
+                  data-admin-curso>
                 <label class="sr-only" for="filtro-videos">Buscar videos</label>
                 <input id="filtro-videos" name="q" type="search" th:value="${query}" placeholder="Título del video…">
+                <label class="sr-only" for="filtro-curso-video">Filtrar por curso</label>
+                <select id="filtro-curso-video" name="curso" data-course-select>
+                    <option value="">Todos los cursos</option>
+                    <option th:each="o : ${cursoOptions}" th:value="${o.id()}" th:text="${o.label()}"
+                            th:selected="${cursoId != null and cursoId.toString() == o.id().toString()}"></option>
+                </select>
                 <label class="sr-only" for="filtro-modulo">Filtrar por módulo</label>
-                <select id="filtro-modulo" name="modulo">
+                <select id="filtro-modulo" name="modulo" data-module-select>
                     <option value="">Todos los módulos</option>
                     <option th:each="o : ${options}" th:value="${o.id()}" th:text="${o.label()}"
+                            th:attr="data-curso=${o.cursoId()}, data-nombre=${o.nombre()}, data-label=${o.label()}"
                             th:selected="${moduloId != null and moduloId.toString() == o.id().toString()}"></option>
                 </select>
                 <button class="btn btn-admin" type="submit">Filtrar</button>
@@ -37,7 +45,7 @@
 
             <div class="panel-card admin-card admin-table-wrap">
                 <table class="admin-table">
-                    <caption>Clases de YouTube por módulo, con su posición en el temario.</caption>
+                    <caption>Videos por módulo</caption>
                     <thead><tr><th scope="col">Video</th><th scope="col">Curso / Módulo</th><th scope="col">Origen</th><th scope="col">Pos.</th><th scope="col">Acciones</th></tr></thead>
                     <tbody>
                     <tr th:each="item : ${page.content}">
@@ -57,19 +65,20 @@
                                     th:attr="data-confirm-url=@{/admin/videos/{id}/eliminar(id=${item.id()})}, aria-label='Eliminar ' + ${item.titulo()}">Eliminar</button>
                         </td>
                     </tr>
-                    <tr th:if="${#lists.isEmpty(page.content)}"><td colspan="5" class="admin-empty">Todavía no hay videos cargados.</td></tr>
+                    <tr th:if="${#lists.isEmpty(page.content)}"><td colspan="5" class="admin-empty">Sin videos.</td></tr>
                     </tbody>
                 </table>
             </div>
             <nav class="admin-pager" th:if="${page.totalPages > 1}" aria-label="Paginación de videos">
-                <a th:if="${!page.first}" th:href="@{/admin/videos(page=${page.number - 1}, q=${query}, modulo=${moduloId})}">← Anterior</a>
+                <a th:if="${!page.first}" th:href="@{/admin/videos(page=${page.number - 1}, q=${query}, curso=${cursoId}, modulo=${moduloId})}">← Anterior</a>
                 <span th:text="${'Página ' + (page.number + 1) + ' de ' + page.totalPages}">Página 1</span>
-                <a th:if="${!page.last}" th:href="@{/admin/videos(page=${page.number + 1}, q=${query}, modulo=${moduloId})}">Siguiente →</a>
+                <a th:if="${!page.last}" th:href="@{/admin/videos(page=${page.number + 1}, q=${query}, curso=${cursoId}, modulo=${moduloId})}">Siguiente →</a>
             </nav>
         </main>
     </div>
 </div>
 <script defer th:src="@{/js/panel.js}"></script>
 <script defer th:src="@{/js/admin.js}"></script>
+<script defer th:src="@{/js/admin-form.js}"></script>
 </body>
 </html>

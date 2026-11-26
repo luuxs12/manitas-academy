@@ -77,6 +77,9 @@ public interface AdminCatalogService {
 
     Page<FilaVideo> videos(UUID moduloId, String term, Pageable pageable);
 
+    /** Listado de videos acotado primero por curso y después por módulo. */
+    Page<FilaVideo> videos(UUID cursoId, UUID moduloId, String term, Pageable pageable);
+
     AdminVideoFormulario videoFormulario(UUID id);
 
     UUID createVideo(AdminVideoFormulario formulario, UUID actor);
@@ -86,6 +89,12 @@ public interface AdminCatalogService {
     void deleteVideo(UUID id, UUID actor);
 
     Page<FilaEjercicio> exercises(UUID moduloId, String term, Pageable pageable);
+
+    /** Listado de ejercicios acotado primero por curso y después por módulo. */
+    Page<FilaEjercicio> exercises(UUID cursoId, UUID moduloId, String term, Pageable pageable);
+
+    /** Cantidad de preguntas cargadas, para mostrar el estado del cuestionario. */
+    long contarPreguntas(UUID ejercicioId);
 
     AdminEjercicioFormulario ejercicioFormulario(UUID id);
 

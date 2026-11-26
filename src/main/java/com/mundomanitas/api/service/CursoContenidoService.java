@@ -9,9 +9,9 @@ import java.util.UUID;
  * Estructura y avance reales del contenido de un curso.
  *
  * <p>El estado de un VIDEO se lee del progreso existente por video; el de un
- * MATERIAL, del avance por ítem; y el de un EJERCICIO, del intento definitivo
- * de su cuestionario. Los porcentajes cuentan solo los ítems visibles que
- * existen en PostgreSQL.</p>
+ * MATERIAL, del avance por ítem; y el de un EJERCICIO, del cuestionario aprobado
+ * con 20/20. Los porcentajes cuentan solo los ítems visibles que existen en
+ * PostgreSQL.</p>
  */
 public interface CursoContenidoService {
 
@@ -100,6 +100,10 @@ public interface CursoContenidoService {
     record MaterialVista(UUID id, String titulo, String nombreArchivo, String contenidoTipo) {
     }
 
+    /** Clase a reproducir: video normal o versión en lengua de señas del índice. */
+    record VideoItemVista(UUID itemId, UUID videoId, String youtubeId, String titulo, boolean lsp) {
+    }
+
     Silabo silabo(UUID cursoId);
 
     /** Temario con secciones y estados; {@code includeHidden} habilita la vista previa. */
@@ -117,6 +121,9 @@ public interface CursoContenidoService {
 
     /** Ficha del PDF a abrir, sin leer el archivo, con la matrícula ya validada. */
     MaterialVista vistaMaterial(Usuario usuario, String slug, UUID itemId);
+
+    /** Resuelve un índice de video según el identificador LSP de la cuenta. */
+    VideoItemVista videoItem(Usuario usuario, String slug, UUID itemId);
 
     /** Bytes del PDF para el visor, con la misma validación que la descarga. */
     MaterialDescarga leidoPdf(Usuario usuario, String slug, UUID itemId);

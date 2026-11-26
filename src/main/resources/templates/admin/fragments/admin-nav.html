@@ -85,6 +85,15 @@
             <span>Reportes</span>
         </a>
 
+        <a class="panel-nav-link" th:href="@{/admin/monitoreo}"
+           th:attr="aria-current=${activo == 'monitoreo'} ? 'page' : null">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                <path d="M3 13h4l2.5-7 4 12 2.5-7h5"></path>
+                <path d="M3 20h18"></path>
+            </svg>
+            <span>Monitoreo</span>
+        </a>
+
         <a class="panel-nav-link" th:href="@{/admin/auditoria}"
            th:attr="aria-current=${activo == 'auditoria'} ? 'page' : null">
             <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">

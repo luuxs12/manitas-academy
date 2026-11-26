@@ -6,11 +6,14 @@ import com.mundomanitas.api.controller.admin.AdminContenidoController;
 import com.mundomanitas.api.controller.admin.AdminController;
 import com.mundomanitas.api.controller.admin.AdminCursoController;
 import com.mundomanitas.api.controller.admin.AdminExportacionController;
+import com.mundomanitas.api.controller.admin.AdminMonitoreoApiController;
+import com.mundomanitas.api.controller.admin.AdminMonitoreoController;
 import com.mundomanitas.api.controller.admin.AdminNotificacionApiController;
 import com.mundomanitas.api.controller.admin.AdminReporteController;
 import com.mundomanitas.api.controller.admin.AdminSearchController;
 import com.mundomanitas.api.controller.admin.AdminUsuarioController;
 import com.mundomanitas.api.dto.admin.GraficoActividad;
+import com.mundomanitas.api.dto.admin.MonitorSnapshot;
 import com.mundomanitas.api.dto.admin.AdminCursoFormulario;
 import com.mundomanitas.api.dto.admin.AdminEjercicioFormulario;
 import com.mundomanitas.api.dto.admin.AdminModuloFormulario;
@@ -32,6 +35,7 @@ import com.mundomanitas.api.service.admin.AdminCertificadoService;
 import com.mundomanitas.api.service.admin.AdminDashboardService;
 import com.mundomanitas.api.service.admin.AdminExportacionService;
 import com.mundomanitas.api.service.admin.AdminNotificacionService;
+import com.mundomanitas.api.service.admin.MonitorService;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -91,6 +95,7 @@ class AdminPanelFlujoTest {
     private AdminCertificadoVistapreviaService vistaprevia;
     private AdminAuditoriaService auditoria;
     private AdminExportacionService exporter;
+    private MonitorService monitor;
     private MockMvc mvc;
     private UUID actor;
 
@@ -119,7 +124,9 @@ class AdminPanelFlujoTest {
         vistaprevia = mock(AdminCertificadoVistapreviaService.class);
         auditoria = mock(AdminAuditoriaService.class);
         exporter = mock(AdminExportacionService.class);
+        monitor = mock(MonitorService.class);
 
+        when(monitor.snapshot()).thenReturn(snapshot(0, "operativo"));
         when(notifications.reciente(any())).thenReturn(List.of());
         when(notifications.unread(any())).thenReturn(0L);
         when(catalog.cursoOptions()).thenReturn(List.of());
@@ -136,6 +143,8 @@ class AdminPanelFlujoTest {
                         new AdminReporteController(notifications, dashboard),
                         new AdminExportacionController(exporter),
                         new AdminSearchController(notifications, catalog),
+                        new AdminMonitoreoController(notifications, monitor),
+                        new AdminMonitoreoApiController(monitor),
                         new AdminNotificacionApiController(notifications))
                 .setCustomArgumentResolvers(new AuthenticationPrincipalArgumentResolver())
                 .build();
@@ -412,6 +421,15 @@ class AdminPanelFlujoTest {
         mvc.perform(get("/admin/auditoria"))
                 .andExpect(view().name("admin/auditoria"))
                 .andExpect(model().attributeExists("page"));
+        mvc.perform(get("/admin/monitoreo"))
+                .andExpect(view().name("admin/monitoreo"))
+                .andExpect(model().attribute("activo", "monitoreo"))
+                .andExpect(model().attribute("titulo", "Monitoreo"))
+                .andExpect(model().attributeExists("monitor"));
+        mvc.perform(get("/admin/api/monitoreo"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.estado").value("operativo"))
+                .andExpect(jsonPath("$.seriePeticiones").isArray());
         mvc.perform(get("/admin/buscar").param("q", "señas"))
                 .andExpect(view().name("admin/buscar"))
                 .andExpect(model().attributeExists("users", "courses", "modules", "videos", "exercises"));
@@ -510,6 +528,35 @@ class AdminPanelFlujoTest {
         mvc.perform(get("/admin/usuarios/{id}/editar", usuarioId))
                 .andExpect(view().name("admin/usuario-form"))
                 .andExpect(model().attribute("usuarioId", usuarioId));
+    }
+
+    @Test
+    @DisplayName("los filtros de videos y ejercicios pasan primero el curso y después el módulo")
+    void listadosUsanCursoAntesQueModulo() throws Exception {
+        UUID cursoId = UUID.randomUUID();
+        UUID moduloId = UUID.randomUUID();
+        when(catalog.videos(eq(cursoId), eq(moduloId), nullable(String.class), any()))
+                .thenReturn(new PageImpl<>(List.of()));
+        when(catalog.exercises(eq(cursoId), eq(moduloId), nullable(String.class), any()))
+                .thenReturn(new PageImpl<>(List.of()));
+
+        mvc.perform(get("/admin/videos")
+                        .param("curso", cursoId.toString())
+                        .param("modulo", moduloId.toString()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("admin/videos"))
+                .andExpect(model().attribute("cursoId", cursoId))
+                .andExpect(model().attributeExists("cursoOptions", "options"));
+        mvc.perform(get("/admin/ejercicios")
+                        .param("curso", cursoId.toString())
+                        .param("modulo", moduloId.toString()))
+                .andExpect(status().isOk())
+                .andExpect(view().name("admin/ejercicios"))
+                .andExpect(model().attribute("cursoId", cursoId))
+                .andExpect(model().attributeExists("cursoOptions", "options"));
+
+        verify(catalog).videos(eq(cursoId), eq(moduloId), nullable(String.class), any());
+        verify(catalog).exercises(eq(cursoId), eq(moduloId), nullable(String.class), any());
     }
 
     @Test
@@ -632,6 +679,23 @@ class AdminPanelFlujoTest {
 
         mvc.perform(get("/admin/certificados/{id}/ver", id))
                 .andExpect(status().isNotFound());
+    }
+
+    private MonitorSnapshot snapshot(int peticiones, String estado) {
+        return new MonitorSnapshot(
+                "2026-11-26T12:02:00Z", estado, peticiones, peticiones, peticiones, 0,
+                100, 0, peticiones, 0, 0, 0, 10L, 20L, 30L,
+                List.of("12:01", "12:02"),
+                List.of((long) peticiones, 0L),
+                List.of((long) peticiones, 0L), List.of(0L, 0L), List.of(0L, 0L),
+                List.of(0L, 0L), List.of(0L, 0L), List.of(10L, 20L),
+                List.of(10L, 20L), List.of(10L, 20L),
+                List.of(), List.of(),
+                List.of(new MonitorSnapshot.Servicio(
+                        "Base de datos", "PostgreSQL responde", true)),
+                List.of(), List.of(),
+                new MonitorSnapshot.Actividad(6, 3, 5, 7, 2, 1, 4, 1),
+                List.of(new MonitorSnapshot.ActividadDia("26/11", 5, 4, 1)));
     }
 
     private GraficoActividad graficoActividad(int days) {

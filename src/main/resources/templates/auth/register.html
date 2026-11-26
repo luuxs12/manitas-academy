@@ -17,8 +17,8 @@
                     <p class="section-kicker">Cuentas</p>
                     <h1 id="titulo-registro">Creá tu cuenta</h1>
                     <p class="auth-sub">
-                        Empezá gratis y sin tarjeta. El intérprete en LSP y los
-                        subtítulos vienen activados desde la primera clase.
+                        Empezá gratis y sin tarjeta. Si usás lengua de señas,
+                        marcá tu opción y verás las clases traducidas en LSP.
                     </p>
                 </header>
 
@@ -92,6 +92,23 @@
                            th:if="${#fields.hasErrors('confirmContrasena')}"
                            th:errors="*{confirmContrasena}" role="alert"></p>
                     </div>
+
+                    <fieldset class="auth-accesibilidad">
+                        <legend>Accesibilidad</legend>
+                        <p class="field-hint">
+                            Pregunta para personas sordas o sordomudas: ¿necesitás que las
+                            clases se muestren en Lengua de Señas Peruana?
+                        </p>
+                        <label class="check" for="quiereLsp">
+                            <input id="quiereLsp" type="checkbox" th:field="*{quiereLsp}">
+                            <span>Sí, soy sordomudo/a o uso LSP. Quiero los videos traducidos.</span>
+                        </label>
+                        <p class="field-hint">
+                            Guardamos este identificador en tu cuenta para mostrarte
+                            automáticamente los videos en lengua de señas. Podés cambiarlo
+                            después en Accesibilidad.
+                        </p>
+                    </fieldset>
 
                     <div class="auth-terms">
                         <label class="check check--terms">

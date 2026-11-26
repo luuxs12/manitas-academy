@@ -42,6 +42,8 @@ public class AuthServiceImpl implements AuthService {
                 contrasenaEncoder.encode(formulario.getContrasena()),
                 StringUtils.trimToEmpty(formulario.getNombreCompleto())
         );
+        // Identificador LSP de la cuenta, elegido en el formulario de registro.
+        usuario.changeUsaLsp(formulario.isQuiereLsp());
 
         Usuario saved = users.save(usuario);
         log.info("Cuenta registrada id={}", saved.getId());

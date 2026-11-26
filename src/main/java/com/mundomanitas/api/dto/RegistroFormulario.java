@@ -29,6 +29,9 @@ public class RegistroFormulario {
     @AssertTrue(message = "Tenés que aceptar los términos para continuar.")
     private boolean acceptTerms;
 
+    /** Identificador LSP: la persona necesita los videos en lengua de señas. */
+    private boolean quiereLsp;
+
     public String getNombreCompleto() {
         return nombreCompleto;
     }
@@ -67,5 +70,13 @@ public class RegistroFormulario {
 
     public void setAcceptTerms(boolean acceptTerms) {
         this.acceptTerms = acceptTerms;
+    }
+
+    public boolean isQuiereLsp() {
+        return quiereLsp;
+    }
+
+    public void setQuiereLsp(boolean quiereLsp) {
+        this.quiereLsp = quiereLsp;
     }
 }

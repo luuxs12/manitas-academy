@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-/** Cuestionario de un ejercicio: una sola entrega y resultado inmediato. */
+/** Cuestionario de un ejercicio: se aprueba con 20/20 y se puede repetir si no se llega. */
 public interface CuestionarioService {
 
     record AlternativaVista(UUID id, String label) {
@@ -25,12 +25,12 @@ public interface CuestionarioService {
     }
 
     record CuestionarioVista(UUID itemId, String titulo, String prompt, boolean ready, boolean submitted,
-                    IntentoVista intento, List<PreguntaVista> questions) {
+                    boolean aprobado, IntentoVista intento, List<PreguntaVista> questions) {
     }
 
-    /** Devuelve el cuestionario o el intento definitivo si ya fue enviado. */
+    /** Devuelve el cuestionario, el último resultado y si ya se alcanzó 20/20. */
     CuestionarioVista view(Usuario usuario, String slug, UUID itemId);
 
-    /** Corrige y guarda el intento; el puntaje siempre lo calcula el servidor. */
+    /** Corrige y guarda el intento; 20/20 cierra el ejercicio, un puntaje menor se puede repetir. */
     IntentoVista submit(Usuario usuario, String slug, UUID itemId, Map<UUID, UUID> answers);
 }

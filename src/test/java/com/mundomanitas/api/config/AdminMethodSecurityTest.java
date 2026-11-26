@@ -6,6 +6,8 @@ import com.mundomanitas.api.controller.admin.AdminContenidoController;
 import com.mundomanitas.api.controller.admin.AdminController;
 import com.mundomanitas.api.controller.admin.AdminCursoController;
 import com.mundomanitas.api.controller.admin.AdminExportacionController;
+import com.mundomanitas.api.controller.admin.AdminMonitoreoApiController;
+import com.mundomanitas.api.controller.admin.AdminMonitoreoController;
 import com.mundomanitas.api.controller.admin.AdminNotificacionApiController;
 import com.mundomanitas.api.controller.admin.AdminCuestionarioController;
 import com.mundomanitas.api.controller.admin.AdminReporteController;
@@ -34,6 +36,8 @@ class AdminMethodSecurityTest {
             AdminReporteController.class,
             AdminExportacionController.class,
             AdminSearchController.class,
+            AdminMonitoreoController.class,
+            AdminMonitoreoApiController.class,
             AdminNotificacionApiController.class,
             AdminCuestionarioController.class,
             AdminSesionPdfController.class

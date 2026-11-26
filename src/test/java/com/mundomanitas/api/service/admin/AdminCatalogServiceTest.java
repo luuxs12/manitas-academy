@@ -11,6 +11,7 @@ import com.mundomanitas.api.model.Video;
 import com.mundomanitas.api.repository.CertificadoRepository;
 import com.mundomanitas.api.repository.CursoModuloRepository;
 import com.mundomanitas.api.repository.CursoRepository;
+import com.mundomanitas.api.repository.CuestionarioPreguntaRepository;
 import com.mundomanitas.api.repository.InscripcionRepository;
 import com.mundomanitas.api.repository.EjercicioRepository;
 import com.mundomanitas.api.repository.UsuarioRepository;
@@ -22,6 +23,8 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.util.List;
@@ -50,6 +53,7 @@ class AdminCatalogServiceTest {
     @Mock private CursoModuloRepository modules;
     @Mock private VideoRepository videos;
     @Mock private EjercicioRepository exercises;
+    @Mock private CuestionarioPreguntaRepository preguntas;
     @Mock private InscripcionRepository enrollments;
     @Mock private CertificadoRepository certificates;
     @Mock private PasswordEncoder encoder;
@@ -61,7 +65,7 @@ class AdminCatalogServiceTest {
     @BeforeEach
     void setUp() {
         service = new AdminCatalogServiceImpl(
-                users, courses, modules, videos, exercises, enrollments, certificates,
+                users, courses, modules, videos, exercises, preguntas, enrollments, certificates,
                 encoder, auditoria, format);
     }
 
@@ -309,6 +313,24 @@ class AdminCatalogServiceTest {
 
         assertThat(curso.getLessons()).isEqualTo(3);
         verify(auditoria).record(eq(actor), eq("CREATE"), eq("VIDEO"), any(), eq("Clase 1"));
+    }
+
+    @Test
+    @DisplayName("filtra los listados por curso antes que por módulo")
+    void filtersByCursoBeforeModulo() {
+        UUID cursoId = UUID.randomUUID();
+        UUID moduloId = UUID.randomUUID();
+        var pageable = PageRequest.of(0, 10);
+        when(videos.search(moduloId, cursoId, null, pageable))
+                .thenReturn(new PageImpl<>(List.of()));
+        when(exercises.search(moduloId, cursoId, null, pageable))
+                .thenReturn(new PageImpl<>(List.of()));
+
+        assertThat(service.videos(cursoId, moduloId, null, pageable)).isEmpty();
+        assertThat(service.exercises(cursoId, moduloId, null, pageable)).isEmpty();
+
+        verify(videos).search(moduloId, cursoId, null, pageable);
+        verify(exercises).search(moduloId, cursoId, null, pageable);
     }
 
     private static CursoModulo mockModulo() {

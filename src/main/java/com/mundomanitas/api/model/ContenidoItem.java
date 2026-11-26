@@ -158,6 +158,13 @@ public class ContenidoItem {
         this.nombreArchivo = nombreArchivo;
     }
 
+    /** Actualiza la clase en lengua de señas guardada en el propio índice. */
+    public void updateVideoLsp(String titulo, String descripcion, String youtubeId) {
+        this.titulo = titulo;
+        this.descripcion = descripcion;
+        this.youtubeId = youtubeId;
+    }
+
     public void moveTo(UUID moduloId, UUID seccionId) {
         this.moduloId = moduloId;
         this.seccionId = seccionId;

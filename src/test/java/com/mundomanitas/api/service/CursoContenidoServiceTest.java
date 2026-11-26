@@ -15,6 +15,7 @@ import com.mundomanitas.api.repository.CursoModuloRepository;
 import com.mundomanitas.api.repository.CursoRepository;
 import com.mundomanitas.api.repository.CursoRecursoRepository;
 import com.mundomanitas.api.repository.CursoSeccionRepository;
+import com.mundomanitas.api.repository.EjercicioRepository;
 import com.mundomanitas.api.repository.InscripcionRepository;
 import com.mundomanitas.api.repository.ItemProgresoRepository;
 import com.mundomanitas.api.repository.LeccionProgresoRepository;
@@ -56,6 +57,7 @@ class CursoContenidoServiceTest {
     @Mock private LeccionProgresoRepository leccionProgreso;
     @Mock private ItemProgresoRepository itemProgreso;
     @Mock private CuestionarioIntentoRepository cuestionarioAttempts;
+    @Mock private EjercicioRepository exercises;
     @Mock private VideoRepository videos;
     @Mock private CursoMaterialStorage materials;
 
@@ -409,6 +411,67 @@ class CursoContenidoServiceTest {
         assertThat(view.visto()).isTrue();
         assertThat(view.cuestionarioDone()).isTrue();
         assertThat(esquema.doneItems()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("una cuenta con LSP ve la clase en señas y no el video habitual")
+    void esquemaFiltraVideoSegunLsp() {
+        UUID inscripcionId = UUID.randomUUID();
+        UUID moduloId = UUID.randomUUID();
+        UUID videoId = UUID.randomUUID();
+        UUID videoItemId = UUID.randomUUID();
+        UUID lspItemId = UUID.randomUUID();
+        ContenidoItem video = item(videoItemId, moduloId, null, "VIDEO", videoId,
+                "Clase 1", "dQw4w9WgXcQ", 0);
+        ContenidoItem lsp = item(lspItemId, moduloId, null, "VIDEO_LSP", null,
+                "Clase 1 en señas", "dQw4w9WgXcQ", 1);
+
+        when(courses.findById(cursoId)).thenReturn(Optional.of(curso(true)));
+        when(modules.buscarPorCursoIdOrdenarPorPosicionAsc(cursoId)).thenReturn(List.of(modulo(moduloId)));
+        when(sections.buscarPorModuloIdOrdenarPorPosicionAsc(moduloId)).thenReturn(List.of());
+        when(items.buscarPorModuloIdOrdenarPorPosicionAsc(moduloId)).thenReturn(List.of(video, lsp));
+        when(leccionProgreso.buscarPorInscripcionIdOrdenarPorFechaFinalizacionAsc(inscripcionId))
+                .thenReturn(List.of());
+        when(itemProgreso.buscarPorInscripcionIdOrdenarPorFechaFinalizacionAsc(inscripcionId))
+                .thenReturn(List.of());
+
+        Usuario conLsp = new Usuario("lsp@example.com", "hash", "Ana Lsp");
+        conLsp.changeUsaLsp(true);
+        CursoContenidoService.Esquema paraLsp = service.esquema(cursoId, inscripcionId, conLsp, false);
+        assertThat(paraLsp.modules().get(0).items())
+                .extracting(CursoContenidoService.ItemVista::id).containsExactly(lspItemId);
+
+        Usuario sinLsp = new Usuario("oyente@example.com", "hash", "Ana Oyente");
+        CursoContenidoService.Esquema sinIdentificador =
+                service.esquema(cursoId, inscripcionId, sinLsp, false);
+        assertThat(sinIdentificador.modules().get(0).items())
+                .extracting(CursoContenidoService.ItemVista::id).containsExactly(videoItemId);
+    }
+
+    @Test
+    @DisplayName("un intento fallido no marca el ejercicio como visto")
+    void ejercicioNoVistoConIntentoFallido() {
+        UUID inscripcionId = UUID.randomUUID();
+        UUID moduloId = UUID.randomUUID();
+        UUID ejercicioId = UUID.randomUUID();
+        ContenidoItem ejercicio = item(UUID.randomUUID(), moduloId, null, "EJERCICIO", ejercicioId,
+                "Practica", null, 0);
+
+        when(courses.findById(cursoId)).thenReturn(Optional.of(curso(true)));
+        when(modules.buscarPorCursoIdOrdenarPorPosicionAsc(cursoId)).thenReturn(List.of(modulo(moduloId)));
+        when(sections.buscarPorModuloIdOrdenarPorPosicionAsc(moduloId)).thenReturn(List.of());
+        when(items.buscarPorModuloIdOrdenarPorPosicionAsc(moduloId)).thenReturn(List.of(ejercicio));
+        when(leccionProgreso.buscarPorInscripcionIdOrdenarPorFechaFinalizacionAsc(inscripcionId)).thenReturn(List.of());
+        when(itemProgreso.buscarPorInscripcionIdOrdenarPorFechaFinalizacionAsc(inscripcionId)).thenReturn(List.of());
+        when(cuestionarioAttempts.buscarPorInscripcionIdIn(Set.of(inscripcionId)))
+                .thenReturn(List.of(new CuestionarioIntento(inscripcionId, ejercicioId, 14)));
+
+        CursoContenidoService.Esquema esquema = service.esquema(cursoId, inscripcionId, null, false);
+
+        CursoContenidoService.ItemVista view = esquema.modules().get(0).items().get(0);
+        assertThat(view.visto()).isFalse();
+        assertThat(view.cuestionarioDone()).isFalse();
+        assertThat(esquema.doneItems()).isZero();
     }
 
     @Test

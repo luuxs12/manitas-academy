@@ -21,7 +21,8 @@
                th:attr="aria-label='Abrir el enlace de ' + ${item.titulo()} + ' en pestaña nueva'"
                th:text="${item.url()}">Enlace</a>
         </small>
-        <small th:if="${item.type() == 'VIDEO'}" th:text="${item.duracionLabel()}">Sin duración</small>
+        <small th:if="${item.type() == 'VIDEO' or item.type() == 'VIDEO_LSP'}"
+               th:text="${item.duracionLabel()}">Sin duración</small>
         <small th:if="${seccion == null}">Sin sección</small>
         <small th:if="${!item.visible() or (seccion != null and !seccion.visible())}">
             Oculto en el temario del estudiante

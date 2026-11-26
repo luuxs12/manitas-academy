@@ -8,11 +8,11 @@
 <div class="panel admin">
     <aside th:replace="~{admin/fragments/admin-nav :: sidebar('modulos')}"></aside>
     <div class="panel-shell">
-        <header th:replace="~{admin/fragments/admin-nav :: topbar('Módulos', 'Estructura de los cursos', ${query})}"></header>
+        <header th:replace="~{admin/fragments/admin-nav :: topbar('Módulos', 'Módulos por curso', ${query})}"></header>
         <main id="panel-main" class="panel-main admin-main">
 
             <div class="admin-page-head">
-                <div><h1>Gestión de módulos</h1><p th:text="${page.totalElements + ' módulos'}">0 módulos</p></div>
+                <div><h1>Módulos</h1><p th:text="${page.totalElements == 1 ? '1 módulo' : page.totalElements + ' módulos'}">0 módulos</p></div>
                 <div class="admin-actions">
                     <a class="btn btn-admin" th:href="@{/admin/modulos/nuevo}">Nuevo módulo</a>
                     <details class="admin-export"><summary>Exportar</summary><div class="panel-menu-pop">
@@ -37,7 +37,7 @@
 
             <div class="panel-card admin-card admin-table-wrap">
                 <table class="admin-table">
-                    <caption>Módulos por curso, con su contenido real y orden de aparición.</caption>
+                    <caption>Módulos por curso</caption>
                     <thead><tr><th scope="col">Curso</th><th scope="col">Módulo</th><th scope="col">Pos.</th><th scope="col">Videos</th><th scope="col">Ejercicios</th><th scope="col">Acciones</th></tr></thead>
                     <tbody>
                     <tr th:each="item : ${page.content}">
@@ -58,7 +58,7 @@
                                     th:attr="data-confirm-url=@{/admin/modulos/{id}/eliminar(id=${item.id()})}, aria-label='Eliminar ' + ${item.titulo()}">Eliminar</button>
                         </td>
                     </tr>
-                    <tr th:if="${#lists.isEmpty(page.content)}"><td colspan="6" class="admin-empty">Todavía no hay módulos. Creá uno para estructurar un curso.</td></tr>
+                    <tr th:if="${#lists.isEmpty(page.content)}"><td colspan="6" class="admin-empty">Sin módulos.</td></tr>
                     </tbody>
                 </table>
             </div>

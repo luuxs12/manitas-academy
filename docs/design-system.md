@@ -232,6 +232,10 @@ perfil, cursos y panel de administración:
 | `.syllabus-item-actions` / `.syllabus-mark-form` / `.syllabus-action` | acciones en botones del mismo tamaño: abrir la clase, abrir el material externo, descargar el documento subido o marcarlo como visto; se apilan bajo 620 px |
 | `.syllabus-description` | texto de apoyo del ítem; se limita a dos líneas y deja el valor completo en `title`, sin reemplazar al título ni inventar fechas |
 | `.syllabus-title` / `.admin-content-copy strong` | títulos que pueden romperse con `overflow-wrap: anywhere` cuando el nombre no tiene espacios |
+| `.quiz-card` / `.quiz-form` / `.quiz-warning` | contenedor del cuestionario, formulario de una sola entrega y aviso de que el resultado será definitivo |
+| `.quiz-question` / `.quiz-alternative` | cada pregunta en `fieldset` con `legend` y sus cuatro alternativas como etiquetas clicables, con foco visible |
+| `.quiz-result` / `.quiz-score` / `.quiz-answer` | resultado con `aria-live="polite"`, nota sobre 20 y detalle por pregunta con la respuesta elegida y la correcta |
+| `templates/student/ejercicio.html` | vista del cuestionario del alumno: diez preguntas, envío único y resultado inmediato sin salir del panel |
 | `.player-hint` | región `aria-live="polite"` presente desde el inicio y vacía hasta que YouTube informa por `postMessage` que el video terminó; solo acepta mensajes del iframe y el botón sigue siendo la acción confirmada |
 | `fragments/panel-dialogs.html :: notices` | avisos del panel fuera del documento: modal de éxito con check animado y modal de error, con `role`/`aria-live` (`polite` y `assertive`) y cierre por botón, Escape o fondo |
 | `.ui-dialog` / `.ui-dialog-card` / `.ui-dialog-actions` | modal pequeño (máximo 26 rem) sobre fondo difuminado; usa los tokens `--paper`, `--ink`, `--accent`, `--line` y `--focus`, sin cambiar paleta ni tipografía |

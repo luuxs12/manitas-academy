@@ -7,6 +7,7 @@ import com.mundomanitas.api.model.CourseSection;
 import com.mundomanitas.api.model.Enrollment;
 import com.mundomanitas.api.model.ItemProgress;
 import com.mundomanitas.api.model.LessonProgress;
+import com.mundomanitas.api.model.QuizAttempt;
 import com.mundomanitas.api.model.User;
 import com.mundomanitas.api.repository.ContentItemRepository;
 import com.mundomanitas.api.repository.CourseModuleRepository;
@@ -16,6 +17,7 @@ import com.mundomanitas.api.repository.CourseSectionRepository;
 import com.mundomanitas.api.repository.EnrollmentRepository;
 import com.mundomanitas.api.repository.ItemProgressRepository;
 import com.mundomanitas.api.repository.LessonProgressRepository;
+import com.mundomanitas.api.repository.QuizAttemptRepository;
 import com.mundomanitas.api.repository.VideoRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -47,6 +49,7 @@ public class CourseContentServiceImpl implements CourseContentService {
     private final EnrollmentRepository enrollments;
     private final LessonProgressRepository lessonProgress;
     private final ItemProgressRepository itemProgress;
+    private final QuizAttemptRepository quizAttempts;
     private final VideoRepository videos;
     private final CourseMaterialStorage materials;
 
@@ -59,6 +62,7 @@ public class CourseContentServiceImpl implements CourseContentService {
             EnrollmentRepository enrollments,
             LessonProgressRepository lessonProgress,
             ItemProgressRepository itemProgress,
+            QuizAttemptRepository quizAttempts,
             VideoRepository videos,
             CourseMaterialStorage materials
     ) {
@@ -70,6 +74,7 @@ public class CourseContentServiceImpl implements CourseContentService {
         this.enrollments = enrollments;
         this.lessonProgress = lessonProgress;
         this.itemProgress = itemProgress;
+        this.quizAttempts = quizAttempts;
         this.videos = videos;
         this.materials = materials;
     }
@@ -98,6 +103,9 @@ public class CourseContentServiceImpl implements CourseContentService {
         Set<UUID> seenItems = enrollmentId == null ? Set.of()
                 : itemProgress.findByEnrollmentIdOrderByCompletedAtAsc(enrollmentId).stream()
                         .map(ItemProgress::getItemId).collect(Collectors.toSet());
+        Set<UUID> quizDone = enrollmentId == null ? Set.of()
+                : quizAttempts.findByEnrollmentIdIn(Set.of(enrollmentId)).stream()
+                        .map(QuizAttempt::getExerciseId).collect(Collectors.toSet());
 
         List<ModuleView> moduleViews = new ArrayList<>();
         List<ItemView> orderedItems = new ArrayList<>();
@@ -114,7 +122,7 @@ public class CourseContentServiceImpl implements CourseContentService {
             for (CourseSection section : moduleSections) {
                 List<ItemView> sectionItems = moduleItems.stream()
                         .filter(item -> section.getId().equals(item.getSectionId()))
-                        .map(item -> view(item, seenVideos, seenItems, locked))
+                        .map(item -> view(item, seenVideos, seenItems, quizDone, locked))
                         .toList();
                 sectionItems.forEach(orderedItems::add);
                 sectionViews.add(new SectionView(section.getId(), section.getTitle(),
@@ -123,12 +131,12 @@ public class CourseContentServiceImpl implements CourseContentService {
             List<ItemView> looseItems = moduleItems.stream()
                     .filter(item -> item.getSectionId() == null
                             || !visibleSections.contains(item.getSectionId()))
-                    .map(item -> view(item, seenVideos, seenItems, locked))
+                    .map(item -> view(item, seenVideos, seenItems, quizDone, locked))
                     .toList();
             looseItems.forEach(orderedItems::add);
 
             int done = (int) moduleItems.stream()
-                    .filter(item -> isSeen(item, seenVideos, seenItems)).count();
+                    .filter(item -> isSeen(item, seenVideos, seenItems, quizDone)).count();
             int percent = percent(done, moduleItems.size());
             moduleViews.add(new ModuleView(module.getId(), module.getTitle(), module.isVisible(),
                     List.copyOf(sectionViews), looseItems, percent));
@@ -163,6 +171,10 @@ public class CourseContentServiceImpl implements CourseContentService {
         ContentItem item = access.item();
         Course course = enrollment.getCourse();
 
+        if ("EJERCICIO".equals(item.getSourceType())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "El ejercicio solo se marca como visto al rendir el cuestionario");
+        }
         if ("VIDEO".equals(item.getSourceType())) {
             UUID videoId = item.getSourceId();
             if (videoId == null || !videos.existsInCourse(videoId, course.getId())) {
@@ -235,18 +247,25 @@ public class CourseContentServiceImpl implements CourseContentService {
     }
 
     private ItemView view(ContentItem item, Set<UUID> seenVideos, Set<UUID> seenItems,
-                          boolean locked) {
+                          Set<UUID> quizDone, boolean locked) {
+        boolean done = "EJERCICIO".equals(item.getSourceType()) && item.getSourceId() != null
+                && quizDone.contains(item.getSourceId());
         return new ItemView(item.getId(), item.getSourceType(), item.getTitle(),
                 item.getDescription(), item.getUrl(), item.getYoutubeId(),
                 item.getDurationSeconds(), item.isVisible(),
-                isSeen(item, seenVideos, seenItems), locked, item.getSourceId(),
-                item.getFileName());
+                isSeen(item, seenVideos, seenItems, quizDone), locked, item.getSourceId(),
+                item.getFileName(), done);
     }
 
-    private boolean isSeen(ContentItem item, Set<UUID> seenVideos, Set<UUID> seenItems) {
-        return "VIDEO".equals(item.getSourceType())
-                ? seenVideos.contains(item.getSourceId())
-                : seenItems.contains(item.getId());
+    private boolean isSeen(ContentItem item, Set<UUID> seenVideos, Set<UUID> seenItems,
+                           Set<UUID> quizDone) {
+        if ("VIDEO".equals(item.getSourceType())) {
+            return seenVideos.contains(item.getSourceId());
+        }
+        if ("EJERCICIO".equals(item.getSourceType())) {
+            return item.getSourceId() != null && quizDone.contains(item.getSourceId());
+        }
+        return seenItems.contains(item.getId());
     }
 
     private int percent(int done, int total) {

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{fragments/panel-head :: panelHead('Cuestionario')}"></head>
+
+<body class="panel-body">
+<a class="skip-link" href="#contenido">Saltar al contenido</a>
+
+<div class="panel">
+    <aside th:replace="~{fragments/panel-nav :: sidebar('cursos')}"></aside>
+
+    <div class="panel-shell">
+        <header th:replace="~{fragments/panel-nav :: topbar('')}"></header>
+
+        <main id="contenido" class="panel-main">
+            <nav class="panel-breadcrumb" aria-label="Ruta de navegación">
+                <a th:href="@{/panel/cursos}">Mis cursos</a>
+                <span aria-hidden="true">/</span>
+                <a th:href="@{/panel/cursos/{slug}(slug=${slug})}">Curso</a>
+                <span aria-hidden="true">/</span>
+                <span>Cuestionario</span>
+            </nav>
+
+            <div class="panel-page-head">
+                <div>
+                    <h1 th:text="${quiz.title()}"></h1>
+                    <p th:text="${quiz.prompt()}"></p>
+                </div>
+                <a class="btn btn-ghost" th:href="@{/panel/cursos/{slug}(slug=${slug})}">← Volver al curso</a>
+            </div>
+
+            <section class="quiz-card" aria-labelledby="titulo-cuestionario">
+                <h2 id="titulo-cuestionario"
+                    th:text="${quiz.submitted()} ? 'Resultado del cuestionario' : 'Cuestionario'"></h2>
+
+                <p class="panel-empty" th:if="${!quiz.ready() and !quiz.submitted()}">
+                    Cuestionario sin preguntas cargadas.
+                </p>
+
+                <div class="quiz-result" th:if="${quiz.submitted()}" aria-live="polite">
+                    <p class="quiz-submitted-hint">
+                        Ya enviaste este cuestionario; este es el resultado definitivo.
+                    </p>
+                    <p class="quiz-score" th:text="'Resultado: ' + ${quiz.attempt().score()} + ' / 20'"></p>
+                    <ol class="quiz-answers">
+                        <li class="quiz-answer" th:each="answer : ${quiz.attempt().answers()}">
+                            <h3 th:text="'Pregunta ' + ${answer.position()}"></h3>
+                            <p th:text="${answer.prompt()}"></p>
+                            <p><strong>Tu respuesta:</strong>
+                                <span th:text="${answer.selectedLabel()}"></span></p>
+                            <p><strong>Respuesta correcta:</strong>
+                                <span th:text="${answer.correctLabel()}"></span></p>
+                            <p th:text="${answer.pointsEarned()} + ' / 2 puntos'"></p>
+                        </li>
+                    </ol>
+                </div>
+
+                <form class="quiz-form" th:if="${!quiz.submitted() and quiz.ready()}"
+                      th:action="@{/panel/cursos/{slug}/ejercicios/{itemId}/enviar(slug=${slug},itemId=${itemId})}"
+                      method="post">
+                    <p class="quiz-warning">
+                        <strong>Enviar una sola vez.</strong> Son diez preguntas de dos puntos
+                        cada una; el resultado será definitivo y no se puede repetir.
+                    </p>
+                    <fieldset class="quiz-question" th:each="question : ${quiz.questions()}">
+                        <legend th:text="'Pregunta ' + ${question.position()} + '. ' + ${question.prompt()}"></legend>
+                        <div class="quiz-alternatives">
+                            <label class="quiz-alternative"
+                                   th:each="alternative : ${question.alternatives()}">
+                                <input type="radio"
+                                       th:name="'respuestas[' + ${question.id()} + ']'"
+                                       th:value="${alternative.id()}" required>
+                                <span th:text="${alternative.label()}"></span>
+                            </label>
+                        </div>
+                    </fieldset>
+                    <button class="btn btn-dark" type="submit">Enviar respuestas</button>
+                </form>
+            </section>
+        </main>
+    </div>
+</div>
+
+<script defer th:src="@{/js/panel.js}"></script>
+</body>
+</html>

@@ -9,8 +9,9 @@ import java.util.UUID;
  * Estructura y avance reales del contenido de un curso.
  *
  * <p>El estado de un VIDEO se lee del progreso existente por video; el de un
- * MATERIAL o EJERCICIO, del avance por ítem. Los porcentajes cuentan solo los
- * ítems visibles que existen en PostgreSQL.</p>
+ * MATERIAL, del avance por ítem; y el de un EJERCICIO, del intento definitivo
+ * de su cuestionario. Los porcentajes cuentan solo los ítems visibles que
+ * existen en PostgreSQL.</p>
  */
 public interface CourseContentService {
 
@@ -23,14 +24,14 @@ public interface CourseContentService {
 
     record ItemView(UUID id, String type, String title, String description, String url,
                     String youtubeId, Integer durationSeconds, boolean visible, boolean seen,
-                    boolean locked, UUID sourceId, String fileName) {
+                    boolean locked, UUID sourceId, String fileName, boolean quizDone) {
 
         /** Conserva la firma anterior para vistas que no necesitan datos del archivo. */
         public ItemView(UUID id, String type, String title, String description, String url,
                         String youtubeId, Integer durationSeconds, boolean visible, boolean seen,
                         boolean locked) {
             this(id, type, title, description, url, youtubeId, durationSeconds, visible, seen,
-                    locked, null, null);
+                    locked, null, null, false);
         }
 
         /** Conserva la firma con video para vistas sin documento subido. */
@@ -38,7 +39,15 @@ public interface CourseContentService {
                         String youtubeId, Integer durationSeconds, boolean visible, boolean seen,
                         boolean locked, UUID sourceId) {
             this(id, type, title, description, url, youtubeId, durationSeconds, visible, seen,
-                    locked, sourceId, null);
+                    locked, sourceId, null, false);
+        }
+
+        /** Conserva la firma sin dato de cuestionario para vistas administrativas. */
+        public ItemView(UUID id, String type, String title, String description, String url,
+                        String youtubeId, Integer durationSeconds, boolean visible, boolean seen,
+                        boolean locked, UUID sourceId, String fileName) {
+            this(id, type, title, description, url, youtubeId, durationSeconds, visible, seen,
+                    locked, sourceId, fileName, false);
         }
 
         /** true cuando el material se descarga desde el panel, no desde un enlace externo. */

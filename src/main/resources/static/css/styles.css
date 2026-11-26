@@ -7242,3 +7242,88 @@ html[data-theme="dark"] .panel-stats li {
     .syllabus-mark-form,
     .syllabus-action { width: 100%; }
 }
+
+/* Cuestionario definitivo de los ejercicios del panel del estudiante. */
+.quiz-card {
+    margin-top: 1.5rem;
+    padding: clamp(1rem, 3vw, 1.75rem);
+    border: 1px solid var(--line, #d0d0d0);
+    border-radius: 14px;
+    background: var(--paper, #fff);
+}
+
+.quiz-card h2 { margin-top: 0; }
+
+.quiz-warning {
+    padding: .7rem .9rem;
+    border-left: 3px solid var(--accent, #1a7f37);
+    background: var(--field, #f1f1ef);
+    color: var(--ink, #000);
+    font-size: .9rem;
+}
+
+.quiz-question {
+    min-width: 0;
+    margin: 1.25rem 0 0;
+    padding: 1rem 1.1rem 1.2rem;
+    border: 1px solid var(--line, #d0d0d0);
+    border-radius: 10px;
+}
+
+.quiz-question legend {
+    padding: 0 .35rem;
+    color: var(--ink, #000);
+    font-weight: 700;
+    line-height: 1.5;
+}
+
+.quiz-alternatives {
+    display: grid;
+    gap: .55rem;
+}
+
+.quiz-alternative {
+    display: flex;
+    align-items: flex-start;
+    gap: .6rem;
+    padding: .55rem .7rem;
+    border: 1px solid var(--line, #d0d0d0);
+    border-radius: 8px;
+    cursor: pointer;
+    line-height: 1.45;
+}
+
+.quiz-alternative:hover,
+.quiz-alternative:focus-within { border-color: var(--accent, #1a7f37); }
+
+.quiz-alternative input { margin-top: .2rem; accent-color: var(--accent, #1a7f37); }
+
+.quiz-alternative input:focus-visible {
+    outline: 3px solid var(--focus, #1a7f37);
+    outline-offset: 2px;
+}
+
+.quiz-form > .btn { margin-top: 1.5rem; }
+
+.quiz-result {
+    margin-top: 1rem;
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--line, #d0d0d0);
+    border-radius: 10px;
+    background: var(--field, #f1f1ef);
+}
+
+.quiz-submitted-hint { margin: 0 0 .75rem; color: var(--muted, #666); font-size: .85rem; }
+
+.quiz-score { margin: 0 0 1rem; font-size: 1.25rem; font-weight: 700; }
+
+.quiz-answers { display: grid; gap: 1rem; margin: 0; padding-left: 1.25rem; }
+
+.quiz-answer h3 { margin: 0 0 .3rem; font-size: 1rem; }
+
+.quiz-answer p { margin: .2rem 0; font-size: .9rem; }
+
+@media (max-width: 620px) {
+    .quiz-card { padding: 1rem; }
+    .quiz-question { padding: .85rem; }
+}

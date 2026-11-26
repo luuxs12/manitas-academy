@@ -24,6 +24,7 @@ import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandl
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -83,7 +84,7 @@ class StudentCourseTemplateTest {
     @Test
     @DisplayName("muestra las tres sesiones reales, sus temas y prácticas con datos de PostgreSQL")
     void rendersEnrolledCourse() throws Exception {
-        mvc.perform(get("/panel/cursos/{slug}", "redes"))
+        String html = mvc.perform(get("/panel/cursos/{slug}", "redes"))
                 .andExpect(status().isOk())
                 .andExpect(view().name("student/curso"))
                 .andExpect(content().string(containsString("Temario")))
@@ -98,9 +99,13 @@ class StudentCourseTemplateTest {
                 .andExpect(content().string(containsString("VIDEO")))
                 .andExpect(content().string(containsString("EJERCICIO")))
                 .andExpect(content().string(containsString("0 de 7 ítems terminados")))
-                .andExpect(content().string(containsString("Marcar como visto")))
                 .andExpect(content().string(containsString("Saltar al contenido")))
                 .andExpect(content().string(not(containsString("Sin sección"))))
-                .andExpect(content().string(not(containsString("Redes Neuronales"))));
+                .andExpect(content().string(not(containsString("Redes Neuronales"))))
+                .andReturn().getResponse().getContentAsString();
+
+        int start = html.indexOf("EJERCICIO");
+        String exerciseRow = html.substring(start, html.indexOf("</article>", start));
+        assertThat(exerciseRow).contains("Rendir cuestionario").doesNotContain("/visto");
     }
 }

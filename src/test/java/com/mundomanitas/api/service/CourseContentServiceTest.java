@@ -8,6 +8,7 @@ import com.mundomanitas.api.model.ContentItem;
 import com.mundomanitas.api.model.Enrollment;
 import com.mundomanitas.api.model.ItemProgress;
 import com.mundomanitas.api.model.LessonProgress;
+import com.mundomanitas.api.model.QuizAttempt;
 import com.mundomanitas.api.model.User;
 import com.mundomanitas.api.repository.ContentItemRepository;
 import com.mundomanitas.api.repository.CourseModuleRepository;
@@ -17,6 +18,7 @@ import com.mundomanitas.api.repository.CourseSectionRepository;
 import com.mundomanitas.api.repository.EnrollmentRepository;
 import com.mundomanitas.api.repository.ItemProgressRepository;
 import com.mundomanitas.api.repository.LessonProgressRepository;
+import com.mundomanitas.api.repository.QuizAttemptRepository;
 import com.mundomanitas.api.repository.VideoRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -53,6 +55,7 @@ class CourseContentServiceTest {
     @Mock private EnrollmentRepository enrollments;
     @Mock private LessonProgressRepository lessonProgress;
     @Mock private ItemProgressRepository itemProgress;
+    @Mock private QuizAttemptRepository quizAttempts;
     @Mock private VideoRepository videos;
     @Mock private CourseMaterialStorage materials;
 
@@ -303,6 +306,53 @@ class CourseContentServiceTest {
                 .isInstanceOf(ResponseStatusException.class)
                 .extracting("statusCode").isEqualTo(HttpStatus.NOT_FOUND);
         verify(materials, never()).read(any());
+    }
+
+    @Test
+    @DisplayName("el ejercicio cuenta como visto cuando existe su intento de cuestionario")
+    void exerciseSeenComesFromQuizAttempt() {
+        UUID enrollmentId = UUID.randomUUID();
+        UUID moduleId = UUID.randomUUID();
+        UUID exerciseId = UUID.randomUUID();
+        ContentItem exercise = item(UUID.randomUUID(), moduleId, null, "EJERCICIO", exerciseId,
+                "Practica", null, 0);
+
+        when(courses.findById(courseId)).thenReturn(Optional.of(course(true)));
+        when(modules.findByCourseIdOrderByPositionAsc(courseId)).thenReturn(List.of(module(moduleId)));
+        when(sections.findByModuleIdOrderByPositionAsc(moduleId)).thenReturn(List.of());
+        when(items.findByModuleIdOrderByPositionAsc(moduleId)).thenReturn(List.of(exercise));
+        when(lessonProgress.findByEnrollmentIdOrderByCompletedAtAsc(enrollmentId)).thenReturn(List.of());
+        when(itemProgress.findByEnrollmentIdOrderByCompletedAtAsc(enrollmentId)).thenReturn(List.of());
+        when(quizAttempts.findByEnrollmentIdIn(Set.of(enrollmentId)))
+                .thenReturn(List.of(new QuizAttempt(enrollmentId, exerciseId, 20)));
+
+        CourseContentService.Outline outline = service.outline(courseId, enrollmentId, null, false);
+
+        CourseContentService.ItemView view = outline.modules().get(0).items().get(0);
+        assertThat(view.seen()).isTrue();
+        assertThat(view.quizDone()).isTrue();
+        assertThat(outline.doneItems()).isEqualTo(1);
+    }
+
+    @Test
+    @DisplayName("un ejercicio no se puede marcar como visto a mano")
+    void exerciseCannotBeMarkedAsSeenManually() {
+        User student = new User("alumno@test.local", "hash", "Alumno");
+        UUID moduleId = UUID.randomUUID();
+        UUID itemId = UUID.randomUUID();
+        Enrollment enrollment = enrollment(student);
+        ContentItem exercise = item(itemId, moduleId, null, "EJERCICIO", UUID.randomUUID(),
+                "Practica", null, 0);
+
+        when(enrollments.findByUserAndCourseSlug(student, "python")).thenReturn(Optional.of(enrollment));
+        when(items.findById(itemId)).thenReturn(Optional.of(exercise));
+        when(modules.findById(moduleId)).thenReturn(Optional.of(module(moduleId)));
+
+        assertThatThrownBy(() -> service.markSeen(student, "python", itemId, true))
+                .isInstanceOf(ResponseStatusException.class)
+                .extracting("statusCode").isEqualTo(HttpStatus.BAD_REQUEST);
+
+        verify(itemProgress, never()).save(any(ItemProgress.class));
     }
 
     private CourseContentService.ItemView withDuration(Integer seconds) {

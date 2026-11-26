@@ -47,7 +47,13 @@
                    th:if="${item.type() == 'MATERIAL' and item.downloadable()}"
                    th:href="@{/panel/cursos/{slug}/materiales/{itemId}/descargar(slug=${enrollment.course.slug},itemId=${item.id()})}"
                    th:attr="aria-label='Descargar el documento ' + ${item.title()}">Descargar documento</a>
+                <a class="btn btn-dark syllabus-action"
+                   th:if="${item.type() == 'EJERCICIO'}"
+                   th:href="@{/panel/cursos/{slug}/ejercicios/{itemId}(slug=${enrollment.course.slug},itemId=${item.id()})}"
+                   th:attr="aria-label='Abrir el cuestionario ' + ${item.title()}"
+                   th:text="${item.quizDone()} ? 'Ver resultado' : 'Rendir cuestionario'"></a>
                 <form class="syllabus-mark-form"
+                      th:if="${item.type() != 'EJERCICIO'}"
                       th:action="@{/panel/cursos/{slug}/items/{itemId}/visto(slug=${enrollment.course.slug},itemId=${item.id()})}"
                       method="post">
                     <input type="hidden" name="seen" th:value="${!item.seen()}">

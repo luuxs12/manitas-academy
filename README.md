@@ -189,9 +189,19 @@ Compilar y probar:
 
 ```powershell
 .\mvnw.cmd clean package      # jar en target\api-0.0.1-SNAPSHOT.jar
-.\mvnw.cmd test               # 229 pruebas
+.\mvnw.cmd test               # 308 pruebas
 java -jar target\api-0.0.1-SNAPSHOT.jar
 ```
+
+## Despliegue en Render
+
+El repositorio incluye `Dockerfile`, `.dockerignore` y `render.yaml` para
+publicar la app con Docker y un Postgres administrado. La guía paso a paso,
+con los límites del plan gratuito y cómo pasar a un plan pago, está en
+[`docs/despliegue-render.md`](docs/despliegue-render.md).
+
+Con `ADMIN_PASSWORD` definida en Render, la cuenta
+`admin@damianprint.com` se crea sola en el primer arranque.
 
 ## Rutas
 

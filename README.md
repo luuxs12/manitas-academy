@@ -13,7 +13,7 @@ Aprendé a tu ritmo, con intérprete y subtítulos en cada clase.
 ![Thymeleaf](https://img.shields.io/badge/Thymeleaf-3-0d0d0d)
 ![PostgreSQL 18](https://img.shields.io/badge/PostgreSQL-18-0d0d0d)
 ![Flyway](https://img.shields.io/badge/Flyway-migraciones-0d0d0d)
-![Tests](https://img.shields.io/badge/tests-229_en_verde-00a63e)
+![Tests](https://img.shields.io/badge/tests-308_en_verde-00a63e)
 
 </div>
 
@@ -106,7 +106,7 @@ mantiene al navegar entre la portada, las páginas internas y el panel.
 | Base de datos | PostgreSQL 18 |
 | Migraciones | Flyway (`ddl-auto: validate`) |
 | Build | Maven con wrapper incluido |
-| Pruebas | JUnit 5 + AssertJ + Mockito (229 pruebas) |
+| Pruebas | JUnit 5 + AssertJ + Mockito (308 pruebas) |
 | Métricas | Spring Boot Actuator + Micrometer/Prometheus |
 
 ## Requisitos
@@ -150,13 +150,14 @@ cuenta ADMIN si no existe; si ya existe con otro rol la promueve, sin cambiarle
 la clave. Sin esa variable no se crea ni se modifica ninguna cuenta.
 
 Las migraciones van de `V1__accounts.sql` a
-`V14__estructura_contenido.sql`: cuentas, recuperación, cursos e inscripciones,
-módulos de cuenta, administración, videos privados, progreso, publicación y la
-estructura de contenido (módulos, secciones, ítems y sílabo). `V14` no borra las
-tablas anteriores: crea `content_items` con `source_type`/`source_id` y los
-triggers que conservan videos, ejercicios y progreso ya cargados. Una migración
-ya ejecutada **no se edita** (Flyway guarda su checksum); el cambio va en `V15`
-o posterior.
+`V16__cuestionarios_ejercicios.sql`: cuentas, recuperación, cursos e
+inscripciones, módulos de cuenta, administración, videos privados, progreso,
+publicación, la estructura de contenido (módulos, secciones, ítems y sílabo),
+documentos descargables y cuestionarios de ejercicios. `V14` no borra las tablas
+anteriores: crea `content_items` con `source_type`/`source_id` y los triggers
+que conservan videos, ejercicios y progreso ya cargados. Una migración ya
+ejecutada **no se edita** (Flyway guarda su checksum); el cambio va en una
+migración posterior a `V16`.
 
 ### Backup y restauración
 
@@ -183,7 +184,7 @@ verifica el checksum antes de tocar la base. El detalle está en
 | URL | Qué es |
 |---|---|
 | http://localhost:8080 | Sitio |
-| http://localhost:8080/actuator/health | Estado de la app, R2 y pagos (protegido) |
+| http://localhost:8080/actuator/health | Estado de la app y de los pagos (protegido) |
 
 Compilar y probar:
 
@@ -225,7 +226,7 @@ Con `ADMIN_PASSWORD` definida en Render, la cuenta
 | `/recuperar` | Pedir el enlace para restablecer la contraseña |
 | `/restablecer?token=` | Elegir la contraseña nueva desde el enlace del correo |
 | `/logout` | Cierre de sesión (POST con token CSRF) |
-| `/actuator/health` | Estado de la app, R2 y pagos (protegido) |
+| `/actuator/health` | Estado de la app y de los pagos (protegido) |
 | `/actuator/info` · `/actuator/metrics` · `/actuator/prometheus` | Métricas (protegido) |
 
 Las páginas del sitio cargan el modal de cuenta como fragmento. Los botones
@@ -268,12 +269,11 @@ api/
     │       ├── static/                  css, js, fuentes, imágenes y video
     │       └── templates/
     │           ├── fragments/           cabecera, pie y modal de cuenta
-    │           ├── auth/                login y registro
+    │           ├── auth/                registro y recuperación (el login es modal)
     │           ├── cursos/              catálogo y detalle
     │           ├── admin/               panel de administración y contenido
     │           ├── student/             panel del estudiante
-    │           ├── legal/               términos y privacidad
-    │           └── error/               páginas de error
+    │           └── legal/               términos y privacidad
     └── test/java/com/mundomanitas/api/  pruebas
 ```
 
@@ -390,9 +390,9 @@ no aparezca un destello blanco. Los tokens y las reglas están en
 | `PasswordResetServiceTest` | Hash del token, vencimiento, un solo uso y correo |
 | `RequestIdFilterTest` | `X-Request-Id`, validación y limpieza del MDC |
 | `ActuatorSecurityTest`, `BusinessMetricsTest` | Acceso a Actuator y contadores `mundomanitas_*` |
-| `R2HealthIndicatorTest`, `PaymentHealthIndicatorTest` | Estado de R2 y de la pasarela |
+| `PaymentHealthIndicatorTest` | Estado de la pasarela de pago |
 
-Resultado actual: **229 de 229 en verde**. El detalle de monitoreo está en
+Resultado actual: **308 de 308 en verde**. El detalle de monitoreo está en
 [`docs/plan-de-monitoreo.md`](docs/plan-de-monitoreo.md).
 
 ## Estado

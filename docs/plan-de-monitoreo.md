@@ -9,19 +9,19 @@ repositorio.
 - Formato: fecha, nivel, `requestId`, logger y mensaje.
 - `requestId` viene del header `X-Request-Id` cuando es válido; si no, se genera
   un UUID. Se devuelve en la respuesta para poder pedir el log de una petición.
-- Niveles: `INFO` para la aplicación, `WARN` para Spring Security, Hibernate y
-  el SDK de AWS. Así no se registran consultas con datos personales.
+- Niveles: `INFO` para la aplicación, `WARN` para Spring Security y Hibernate.
+  Así no se registran consultas con datos personales.
 - Rotación: `logs/mundomanitas.log`, hasta 10 MB por archivo, 14 días de
   historia y 500 MB total. Se puede cambiar con `LOG_FILE`.
-- Regla: nunca se loguean correos, contraseñas, tokens de pago, claves de R2 ni
-  residuos de formularios. Solo ids internos, planes, ids de matrícula y el
-  `requestId`.
+- Regla: nunca se loguean correos, contraseñas, tokens de pago, claves de la
+  pasarela ni residuos de formularios. Solo ids internos, planes, ids de
+  matrícula y el `requestId`.
 
 ## Endpoints de Actuator
 
 | Endpoint | Uso | Acceso |
 |---|---|---|
-| `/actuator/health` | estado de la app, R2 y pagos | credenciales de monitoreo |
+| `/actuator/health` | estado de la app y de los pagos | credenciales de monitoreo |
 | `/actuator/info` | versión del servicio | credenciales de monitoreo |
 | `/actuator/metrics` | métricas disponibles | credenciales de monitoreo |
 | `/actuator/prometheus` | scrape de Prometheus | credenciales de monitoreo |
@@ -39,12 +39,10 @@ hasheada en memoria y nunca se escribe en logs.
 
 ## Health indicators
 
-- `r2`: `UP` si hay endpoint, bucket, claves y URL pública; `UNKNOWN` si el
-  almacenamiento está apagado. Muestra el nombre del bucket, nunca las claves.
 - `payments`: `UP` si la pasarela tiene credenciales; `UNKNOWN` si el cobro está
   apagado. No llama a la red durante el scrape.
 
-Un indicator en `UNKNOWN` no derriba la app: significa "integración opcional no
+Un indicador en `UNKNOWN` no derriba la app: significa "integración opcional no
 configurada", algo esperado en desarrollo.
 
 ## Métricas propias
@@ -80,7 +78,7 @@ el datasource variable `DS_PROMETHEUS`.
 ## Verificación
 
 ```bash
-.\mvnw.cmd -B "-Dtest=RequestIdFilterTest,BusinessMetricsTest,R2HealthIndicatorTest,PaymentHealthIndicatorTest,ActuatorSecurityTest" test
+.\mvnw.cmd -B "-Dtest=RequestIdFilterTest,BusinessMetricsTest,PaymentHealthIndicatorTest,ActuatorSecurityTest" test
 .\mvnw.cmd -B test
 ```
 

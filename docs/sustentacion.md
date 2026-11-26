@@ -49,7 +49,7 @@ exige que `mvnw.cmd -B test` termine en verde.
 ### Qué se buscó
 
 Poder responder “qué pasó” sin mirar la base de datos ni exponer secretos. Se
-quería saber si R2 y la pasarela están configuradas, contar los hechos de
+quería saber si la pasarela de pago está configurada, contar los hechos de
 negocio y tener un id de petición para seguir un problema en los logs.
 
 ### Qué cambió
@@ -61,8 +61,8 @@ negocio y tener un id de petición para seguir un problema en los logs.
 - Actuator expone `health`, `info`, `metrics` y `prometheus`, pero todos los
   endpoints están protegidos. Si se define `MONITOR_PASSWORD`, Prometheus usa
   un usuario propio con rol de monitoreo; si no, queda con rol `ADMIN`.
-- Hay dos health indicators nuevos: `r2` y `payments`. Cuando la integración no
-  está configurada informan `UNKNOWN`, no `DOWN`.
+- Hay un health indicator nuevo: `payments`. Cuando la integración no está
+  configurada informa `UNKNOWN`, no `DOWN`.
 - Se agregaron contadores `mundomanitas_*` para checkouts, pagos, matrículas y
   certificados.
 - Se dejaron ejemplos de Prometheus, alertas y dashboard de Grafana en

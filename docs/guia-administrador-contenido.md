@@ -115,4 +115,4 @@ triggers de la migración `V14__estructura_contenido.sql`, así que el progreso
 anterior no se pierde.
 
 Las migraciones ya ejecutadas **no se editan**: un cambio nuevo va en una
-migración posterior (la próxima libre es `V15`).
+migración posterior a `V16`.

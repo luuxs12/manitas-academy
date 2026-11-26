@@ -7,9 +7,9 @@ PostgreSQL. Los scripts viven en `scripts/` y usan las herramientas oficiales
 ## Qué cubre
 
 - **Base de datos**: tablas, datos, índices y restricciones creados por Flyway.
-- **No cubre**: los archivos de `uploads/avatars` ni los videos/imágenes de R2.
-  Esos se respaldan con su propio mecanismo de almacenamiento; el backup de la
-  base solo guarda las URLs y los metadatos.
+- **No cubre**: los archivos de `uploads/` (avatares, portadas y materiales).
+  En el plan free de Render ese disco es efímero; la base solo guarda las rutas
+  y los metadatos.
 
 ## Generar un backup
 

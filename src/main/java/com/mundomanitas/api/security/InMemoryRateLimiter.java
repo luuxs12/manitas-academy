@@ -19,40 +19,40 @@ public final class InMemoryRateLimiter implements RateLimiter {
     private static final Logger log = LoggerFactory.getLogger(InMemoryRateLimiter.class);
 
     private final int maxAttempts;
-    private final Duration window;
-    private final ConcurrentMap<String, Window> windows = new ConcurrentHashMap<>();
+    private final Duration ventana;
+    private final ConcurrentMap<String, Ventana> windows = new ConcurrentHashMap<>();
 
-    public InMemoryRateLimiter(int maxAttempts, Duration window) {
+    public InMemoryRateLimiter(int maxAttempts, Duration ventana) {
         if (maxAttempts <= 0) {
             throw new IllegalArgumentException("El límite de intentos debe ser positivo");
         }
-        if (window == null || window.isZero() || window.isNegative()) {
+        if (ventana == null || ventana.isZero() || ventana.isNegative()) {
             throw new IllegalArgumentException("La ventana de intentos debe ser positiva");
         }
         this.maxAttempts = maxAttempts;
-        this.window = window;
+        this.ventana = ventana;
         log.info("Limitador de intentos configurado max={} ventana={}s",
-                maxAttempts, window.toSeconds());
+                maxAttempts, ventana.toSeconds());
     }
 
     @Override
-    public Decision check(String key, Instant now) {
+    public Decision verificacion(String key, Instant now) {
         Objects.requireNonNull(key, "key");
         Objects.requireNonNull(now, "now");
         purge(now);
 
-        Window current = windows.computeIfAbsent(key, ignored -> new Window(now));
-        synchronized (current) {
-            if (!now.isBefore(current.start.plus(window))) {
-                current.start = now;
-                current.count = 0;
+        Ventana actual = windows.computeIfAbsent(key, ignored -> new Ventana(now));
+        synchronized (actual) {
+            if (!now.isBefore(actual.start.plus(ventana))) {
+                actual.start = now;
+                actual.count = 0;
             }
-            if (current.count < maxAttempts) {
-                current.count++;
+            if (actual.count < maxAttempts) {
+                actual.count++;
                 return new Decision(true, 0);
             }
-            long elapsed = Math.max(0, Duration.between(current.start, now).getSeconds());
-            long retry = Math.max(1, window.toSeconds() - elapsed);
+            long elapsed = Math.max(0, Duration.between(actual.start, now).getSeconds());
+            long retry = Math.max(1, ventana.toSeconds() - elapsed);
             return new Decision(false, retry);
         }
     }
@@ -60,18 +60,18 @@ public final class InMemoryRateLimiter implements RateLimiter {
     private void purge(Instant now) {
         if (windows.size() < CLEANUP_FROM) return;
         windows.entrySet().removeIf(entry -> {
-            Window candidate = entry.getValue();
+            Ventana candidate = entry.getValue();
             synchronized (candidate) {
-                return !now.isBefore(candidate.start.plus(window));
+                return !now.isBefore(candidate.start.plus(ventana));
             }
         });
     }
 
-    private static final class Window {
+    private static final class Ventana {
         private Instant start;
         private int count;
 
-        private Window(Instant start) {
+        private Ventana(Instant start) {
             this.start = start;
         }
     }

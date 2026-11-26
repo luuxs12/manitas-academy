@@ -1,17 +1,17 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="~{admin/fragments/admin-head :: adminHead(${confirmTitle})}"></head>
+<head th:replace="~{admin/fragments/admin-head :: adminHead(${confirmTitulo})}"></head>
 
 <body class="panel-body admin-body">
 <a class="skip-link" href="#panel-main">Saltar al contenido</a>
 <div class="panel admin">
-    <aside th:replace="~{admin/fragments/admin-nav :: sidebar(${active})}"></aside>
+    <aside th:replace="~{admin/fragments/admin-nav :: sidebar(${activo})}"></aside>
     <div class="panel-shell">
-        <header th:replace="~{admin/fragments/admin-nav :: topbar(${confirmTitle}, 'Confirmación', '')}"></header>
+        <header th:replace="~{admin/fragments/admin-nav :: topbar(${confirmTitulo}, 'Confirmación', '')}"></header>
         <main id="panel-main" class="panel-main admin-main">
             <section id="confirm-panel" class="panel-card admin-card admin-confirm-page" aria-labelledby="confirm-title">
-                <h1 id="confirm-dialog-title" th:text="${confirmTitle}">Confirmar acción</h1>
+                <h1 id="confirm-dialog-title" th:text="${confirmTitulo}">Confirmar acción</h1>
                 <p id="confirm-dialog-message" th:text="${confirmMessage}">Revisá los datos antes de continuar.</p>
                 <ul class="admin-confirm-details"
                     th:if="${confirmDetails != null and !#lists.isEmpty(confirmDetails)}">

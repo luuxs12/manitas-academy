@@ -9,40 +9,40 @@
         <div class="admin-content-top">
             <span class="admin-type" th:text="${item.type()}">VIDEO</span>
             <span class="admin-status"
-                  th:classappend="${item.visible() and (section == null or section.visible())} ? ' is-ok' : ' is-bad'"
-                  th:text="${item.visible() and (section == null or section.visible())} ? 'Visible' : 'Oculto'">Visible</span>
+                  th:classappend="${item.visible() and (seccion == null or seccion.visible())} ? ' is-ok' : ' is-bad'"
+                  th:text="${item.visible() and (seccion == null or seccion.visible())} ? 'Visible' : 'Oculto'">Visible</span>
         </div>
 
-        <strong th:text="${item.title()}">Ítem</strong>
+        <strong th:text="${item.titulo()}">Ítem</strong>
 
-        <small th:if="${item.description() != null}" th:text="${item.description()}">Descripción</small>
+        <small th:if="${item.descripcion() != null}" th:text="${item.descripcion()}">Descripción</small>
         <small th:if="${item.type() == 'MATERIAL' and item.url() != null}">
             <a th:href="${item.url()}" target="_blank" rel="noopener noreferrer"
-               th:attr="aria-label='Abrir el enlace de ' + ${item.title()} + ' en pestaña nueva'"
+               th:attr="aria-label='Abrir el enlace de ' + ${item.titulo()} + ' en pestaña nueva'"
                th:text="${item.url()}">Enlace</a>
         </small>
-        <small th:if="${item.type() == 'VIDEO'}" th:text="${item.durationLabel()}">Sin duración</small>
-        <small th:if="${section == null}">Sin sección</small>
-        <small th:if="${!item.visible() or (section != null and !section.visible())}">
+        <small th:if="${item.type() == 'VIDEO'}" th:text="${item.duracionLabel()}">Sin duración</small>
+        <small th:if="${seccion == null}">Sin sección</small>
+        <small th:if="${!item.visible() or (seccion != null and !seccion.visible())}">
             Oculto en el temario del estudiante
         </small>
     </div>
 
     <div class="admin-row-actions">
         <form method="post"
-              th:action="@{/admin/cursos/{c}/contenido/items/{i}/mover(c=${courseId},i=${item.id()})}">
+              th:action="@{/admin/cursos/{c}/contenido/items/{i}/mover(c=${cursoId},i=${item.id()})}">
             <input type="hidden" name="up" value="true">
             <button class="admin-move" type="submit"
-                    th:attr="aria-label='Subir ' + ${item.title()}">↑</button>
+                    th:attr="aria-label='Subir ' + ${item.titulo()}">↑</button>
         </form>
         <form method="post"
-              th:action="@{/admin/cursos/{c}/contenido/items/{i}/mover(c=${courseId},i=${item.id()})}">
+              th:action="@{/admin/cursos/{c}/contenido/items/{i}/mover(c=${cursoId},i=${item.id()})}">
             <input type="hidden" name="up" value="false">
             <button class="admin-move" type="submit"
-                    th:attr="aria-label='Bajar ' + ${item.title()}">↓</button>
+                    th:attr="aria-label='Bajar ' + ${item.titulo()}">↓</button>
         </form>
         <button type="button" class="admin-confirm-link"
-                th:attr="data-confirm-url=@{/admin/cursos/{c}/contenido/items/{i}/eliminar(c=${courseId},i=${item.id()})}, aria-label='Eliminar ' + ${item.title()}">Eliminar</button>
+                th:attr="data-confirm-url=@{/admin/cursos/{c}/contenido/items/{i}/eliminar(c=${cursoId},i=${item.id()})}, aria-label='Eliminar ' + ${item.titulo()}">Eliminar</button>
     </div>
 </li>
 

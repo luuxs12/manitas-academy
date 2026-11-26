@@ -1,8 +1,8 @@
 package com.mundomanitas.api.controller.admin;
 
-import com.mundomanitas.api.security.AuthenticatedUser;
+import com.mundomanitas.api.security.AutenticadoUsuario;
 import com.mundomanitas.api.service.admin.AdminCatalogService;
-import com.mundomanitas.api.service.admin.AdminNotificationService;
+import com.mundomanitas.api.service.admin.AdminNotificacionService;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -20,14 +20,14 @@ public class AdminSearchController extends AdminBaseController {
 
     private final AdminCatalogService catalog;
 
-    public AdminSearchController(AdminNotificationService notifications, AdminCatalogService catalog) {
+    public AdminSearchController(AdminNotificacionService notifications, AdminCatalogService catalog) {
         super(notifications);
         this.catalog = catalog;
     }
 
     @GetMapping
     public String search(@RequestParam(name = "q", required = false) String query,
-                         @AuthenticationPrincipal AuthenticatedUser principal,
+                         @AuthenticationPrincipal AutenticadoUsuario principal,
                          Model model) {
         common(model, "buscar", "Resultados de búsqueda");
         String term = query == null ? "" : query.trim();

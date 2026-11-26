@@ -16,22 +16,22 @@ public class AdminBootstrapRunner implements ApplicationRunner {
 
     private final AdminBootstrapService bootstrap;
     private final String email;
-    private final String password;
+    private final String contrasena;
 
     public AdminBootstrapRunner(AdminBootstrapService bootstrap,
                                 @Value("${app.admin.email:admin@damianprint.com}") String email,
-                                @Value("${app.admin.password:}") String password) {
+                                @Value("${app.admin.password:}") String contrasena) {
         this.bootstrap = bootstrap;
         this.email = email;
-        this.password = password;
+        this.contrasena = contrasena;
     }
 
     @Override
     public void run(ApplicationArguments args) {
-        if (password == null || password.isBlank()) {
+        if (contrasena == null || contrasena.isBlank()) {
             log.info("Sin ADMIN_PASSWORD: se conserva la cuenta administradora existente.");
             return;
         }
-        bootstrap.ensureAdmin(email, password);
+        bootstrap.ensureAdmin(email, contrasena);
     }
 }

@@ -19,31 +19,31 @@
                 <a class="admin-back" th:href="@{/admin/usuarios}">← Volver a usuarios</a>
             </div>
 
-            <form class="panel-card admin-card admin-form" th:action="@{/admin/usuarios/{id}(id=${userId})}"
-                  th:object="${adminUserForm}" method="post" novalidate>
+            <form class="panel-card admin-card admin-form" th:action="@{/admin/usuarios/{id}(id=${usuarioId})}"
+                  th:object="${adminUsuarioFormulario}" method="post" novalidate>
                 <div class="admin-form-grid">
                     <label>Nombre completo
-                        <input type="text" th:field="*{fullName}" maxlength="120" autocomplete="name" required>
-                        <small class="admin-error" th:if="${#fields.hasErrors('fullName')}" th:errors="*{fullName}"></small>
+                        <input type="text" th:field="*{nombreCompleto}" maxlength="120" autocomplete="name" required>
+                        <small class="admin-error" th:if="${#fields.hasErrors('nombreCompleto')}" th:errors="*{nombreCompleto}"></small>
                     </label>
                     <label>Correo electrónico
                         <input type="email" th:field="*{email}" maxlength="160" autocomplete="email" required>
                         <small class="admin-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></small>
                     </label>
                     <label>Rol
-                        <select th:field="*{role}">
+                        <select th:field="*{rol}">
                             <option th:each="r : ${roles}" th:value="${r}" th:text="${r == 'ADMIN' ? 'Administrador' : 'Estudiante'}">Rol</option>
                         </select>
                     </label>
                     <label>Contraseña <span class="admin-muted">(dejar vacía para mantenerla; escribí una nueva para el reseteo por soporte)</span>
-                        <input type="password" th:field="*{password}" minlength="8" autocomplete="new-password">
-                        <small class="admin-error" th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></small>
+                        <input type="password" th:field="*{contrasena}" minlength="8" autocomplete="new-password">
+                        <small class="admin-error" th:if="${#fields.hasErrors('contrasena')}" th:errors="*{contrasena}"></small>
                     </label>
                 </div>
-                <input type="hidden" name="_active" value="false">
-                <label class="admin-check"><input type="checkbox" th:field="*{active}"> Cuenta activa</label>
+                <input type="hidden" name="_activo" value="false">
+                <label class="admin-check"><input type="checkbox" th:field="*{activo}"> Cuenta activa</label>
                 <div class="admin-form-actions">
-                    <button class="btn btn-admin" type="submit" th:text="${userId != null} ? 'Guardar cambios' : 'Crear cuenta'">Guardar</button>
+                    <button class="btn btn-admin" type="submit" th:text="${usuarioId != null} ? 'Guardar cambios' : 'Crear cuenta'">Guardar</button>
                     <a class="admin-back" th:href="@{/admin/usuarios}">Cancelar</a>
                 </div>
             </form>

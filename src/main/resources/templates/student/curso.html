@@ -16,15 +16,15 @@
             <nav class="panel-breadcrumb" aria-label="Ruta de navegación">
                 <a th:href="@{/panel/cursos}">Mis cursos</a>
                 <span aria-hidden="true">/</span>
-                <span th:text="${course.title}"></span>
+                <span th:text="${curso.titulo}"></span>
             </nav>
 
             <div class="panel-page-head">
                 <div>
-                    <h1 th:text="${course.title}"></h1>
-                    <p th:text="${doneCount} + ' de ' + ${itemCount} + ' ' + (${itemCount} == 1 ? 'ítem terminado' : 'ítems terminados')"></p>
+                    <h1 th:text="${curso.titulo}"></h1>
+                    <p th:text="${doneContar} + ' de ' + ${itemContar} + ' ' + (${itemContar} == 1 ? 'ítem terminado' : 'ítems terminados')"></p>
                     <div class="panel-lesson-track" role="img"
-                         th:attr="aria-label=${doneCount} + ' de ' + ${itemCount} + ' ' + (${itemCount} == 1 ? 'ítem terminado' : 'ítems terminados')">
+                         th:attr="aria-label=${doneContar} + ' de ' + ${itemContar} + ' ' + (${itemContar} == 1 ? 'ítem terminado' : 'ítems terminados')">
                         <span aria-hidden="true" th:style="${'width: ' + itemPercent + '%'}"></span>
                     </div>
                 </div>
@@ -36,27 +36,27 @@
                 <div class="course-stage">
                     <section class="course-viewer" aria-labelledby="titulo-visor"
                              th:if="${material != null}">
-                        <h2 id="titulo-visor" th:text="${material.title()}"></h2>
+                        <h2 id="titulo-visor" th:text="${material.titulo()}"></h2>
                         <div class="viewer-frame">
                             <iframe data-pdf-frame
-                                    th:attr="data-pdf-url=@{/panel/cursos/{slug}/materiales/{itemId}/ver(slug=${enrollment.course.slug},itemId=${material.id()})}"
-                                    th:title="${material.title()}"
+                                    th:attr="data-pdf-url=@{/panel/cursos/{slug}/materiales/{itemId}/ver(slug=${inscripcion.curso.slug},itemId=${material.id()})}"
+                                    th:title="${material.titulo()}"
                                     loading="lazy"></iframe>
                         </div>
-                        <p class="viewer-note" th:text="'Archivo: ' + ${material.fileName()}"></p>
+                        <p class="viewer-note" th:text="'Archivo: ' + ${material.nombreArchivo()}"></p>
                         <p class="viewer-status" data-pdf-status role="status" aria-live="polite"></p>
                         <div class="viewer-actions">
                             <a class="btn btn-dark"
-                               th:href="@{/panel/cursos/{slug}/materiales/{itemId}/descargar(slug=${enrollment.course.slug},itemId=${material.id()})}">Descargar documento</a>
+                               th:href="@{/panel/cursos/{slug}/materiales/{itemId}/descargar(slug=${inscripcion.curso.slug},itemId=${material.id()})}">Descargar documento</a>
                         </div>
                     </section>
 
                     <section class="player-card" aria-labelledby="titulo-reproductor"
                              th:if="${player != null and material == null}">
-                        <h2 id="titulo-reproductor" th:text="${player.title()}"></h2>
+                        <h2 id="titulo-reproductor" th:text="${player.titulo()}"></h2>
                         <div class="player-frame">
                             <iframe data-video-frame th:src="${player.url()}"
-                                    th:title="${player.title()}"
+                                    th:title="${player.titulo()}"
                                     allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                                     referrerpolicy="strict-origin-when-cross-origin"
                                     allowfullscreen loading="lazy"></iframe>
@@ -66,7 +66,7 @@
                         </p>
                         <p class="player-hint" data-video-end-hint aria-live="polite"></p>
                         <form class="player-actions"
-                              th:action="@{/panel/cursos/{slug}/videos/{videoId}(slug=${enrollment.course.slug},videoId=${selectedId})}"
+                              th:action="@{/panel/cursos/{slug}/videos/{videoId}(slug=${inscripcion.curso.slug},videoId=${selectedId})}"
                               method="post">
                             <button class="btn btn-dark" type="submit"
                                     th:text="${doneVideos.contains(selectedId)} ? 'Marcar como pendiente' : 'Marcar como visto'">
@@ -96,29 +96,29 @@
                     </p>
 
                     <div class="syllabus-groups" th:if="${!#lists.isEmpty(modules)}">
-                        <section class="syllabus-group" th:each="module, i : ${modules}"
-                                 th:attr="aria-labelledby='modulo-' + ${module.id()}">
+                        <section class="syllabus-group" th:each="modulo, i : ${modules}"
+                                 th:attr="aria-labelledby='modulo-' + ${modulo.id()}">
                             <div class="syllabus-group-head">
-                                <h3 class="syllabus-group-title" th:id="'modulo-' + ${module.id()}">
+                                <h3 class="syllabus-group-title" th:id="'modulo-' + ${modulo.id()}">
                                     <span class="syllabus-group-number" th:text="'Módulo ' + ${i.count}"></span>
-                                    <span class="syllabus-group-name" th:text="${module.title()}"></span>
+                                    <span class="syllabus-group-name" th:text="${modulo.titulo()}"></span>
                                 </h3>
-                                <p class="syllabus-progress" th:text="${module.percent()} + '% completado'"></p>
+                                <p class="syllabus-progress" th:text="${modulo.percent()} + '% completado'"></p>
                             </div>
 
-                            <div class="syllabus-section" th:each="section : ${module.sections()}">
-                                <h4 class="syllabus-section-title" th:text="${section.title()}"></h4>
+                            <div class="syllabus-section" th:each="seccion : ${modulo.sections()}">
+                                <h4 class="syllabus-section-title" th:text="${seccion.titulo()}"></h4>
                                 <ul class="syllabus-list">
-                                    <th:block th:each="item : ${section.items()}">
+                                    <th:block th:each="item : ${seccion.items()}">
                                         <li th:replace="~{fragments/syllabus-item :: row(${item})}"></li>
                                     </th:block>
                                 </ul>
                             </div>
 
-                            <div class="syllabus-section" th:if="${!#lists.isEmpty(module.items())}">
+                            <div class="syllabus-section" th:if="${!#lists.isEmpty(modulo.items())}">
                                 <h4 class="syllabus-section-title">Sin sección</h4>
                                 <ul class="syllabus-list">
-                                    <th:block th:each="item : ${module.items()}">
+                                    <th:block th:each="item : ${modulo.items()}">
                                         <li th:replace="~{fragments/syllabus-item :: row(${item})}"></li>
                                     </th:block>
                                 </ul>
@@ -129,14 +129,14 @@
             </div>
 
             <div class="panel-course-actions">
-                <form th:action="@{/panel/cursos/{slug}/completar(slug=${enrollment.course.slug})}"
-                      method="post" th:if="${!enrollment.completed}" data-confirm-form
+                <form th:action="@{/panel/cursos/{slug}/completar(slug=${inscripcion.curso.slug})}"
+                      method="post" th:if="${!inscripcion.finalizado}" data-confirm-form
                       data-confirm-message="¿Marcar el curso como terminado? Se emitirá tu certificado si corresponde.">
                     <button class="panel-inline-btn" type="submit">Ya terminé el curso</button>
                 </form>
                 <a class="panel-inline-btn"
-                   th:if="${enrollment.completed and #lists.contains(certificateSlugs, enrollment.course.slug)}"
-                   th:href="@{/panel/certificados/{slug}(slug=${enrollment.course.slug})}">
+                   th:if="${inscripcion.finalizado and #lists.contains(certificadoSlugs, inscripcion.curso.slug)}"
+                   th:href="@{/panel/certificados/{slug}(slug=${inscripcion.curso.slug})}">
                     Ver certificado
                 </a>
             </div>

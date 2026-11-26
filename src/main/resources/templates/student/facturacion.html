@@ -20,13 +20,13 @@
                     <p>Elegí tu plan, revisá tus pagos y gestioná la cancelación.</p>
                 </div>
                 <span class="panel-plan panel-plan--static"
-                      th:text="${'Plan ' + currentUser.planLabel()}">Plan gratis</span>
+                      th:text="${'Plan ' + usuarioActual.planLabel()}">Plan gratis</span>
             </div>
 
 
             <ul class="panel-kpis" aria-label="Resumen de facturación">
                 <li class="panel-kpi">
-                    <strong th:text="${currentUser.planLabel()}">Gratis</strong>
+                    <strong th:text="${usuarioActual.planLabel()}">Gratis</strong>
                     <span>Plan actual</span>
                 </li>
                 <li class="panel-kpi">
@@ -38,7 +38,7 @@
                     <span>Pagos confirmados</span>
                 </li>
                 <li class="panel-kpi">
-                    <strong th:text="${subscriptionEndLabel.isEmpty() ? '—' : subscriptionEndLabel}">—</strong>
+                    <strong th:text="${subscriptionFinLabel.isEmpty() ? '—' : subscriptionFinLabel}">—</strong>
                     <span>Acceso hasta</span>
                 </li>
             </ul>
@@ -50,24 +50,24 @@
                 </div>
 
                 <div class="panel-plan-grid">
-                    <article class="panel-plan-card" th:each="option : ${planes}">
-                        <h3 th:text="${option.label}">Mensual</h3>
-                        <span class="panel-plan-price" th:text="${option.priceLabel()}">S/ 29 al mes</span>
+                    <article class="panel-plan-card" th:each="opcion : ${planes}">
+                        <h3 th:text="${opcion.label}">Mensual</h3>
+                        <span class="panel-plan-price" th:text="${opcion.priceLabel()}">S/ 29 al mes</span>
                         <p>Catálogo completo y certificados. Podés cancelar cuando quieras.</p>
-                        <span class="panel-plan-tag" th:if="${currentUser.plan() == option}">Plan actual</span>
+                        <span class="panel-plan-tag" th:if="${usuarioActual.plan() == opcion}">Plan actual</span>
 
                         <button class="btn btn-dark" type="button" th:if="${embeddedEnabled}"
-                                th:data-checkout-plan="${option.name()}">
+                                th:data-checkout-plan="${opcion.name()}">
                             Pagar dentro del panel <span aria-hidden="true">→</span>
                         </button>
                     </article>
                 </div>
 
-                <p class="panel-note" th:if="${paymentEnabled and !embeddedEnabled}">
+                <p class="panel-note" th:if="${pagoEnabled and !embeddedEnabled}">
                     Falta la clave pública de Stripe para mostrar el pago embebido. El plan
                     no se activa sin el cobro confirmado.
                 </p>
-                <p class="panel-note" th:unless="${paymentEnabled}">
+                <p class="panel-note" th:unless="${pagoEnabled}">
                     Los pagos todavía no están habilitados en este entorno: falta configurar Stripe.
                     El plan no se puede activar sin el cobro confirmado.
                 </p>
@@ -90,21 +90,21 @@
                         </tr>
                         </thead>
                         <tbody>
-                        <tr th:each="payment : ${payments}">
-                            <td th:text="${#temporals.format(payment.createdAt, 'dd/MM/yyyy HH:mm')}">
+                        <tr th:each="pago : ${payments}">
+                            <td th:text="${#temporals.format(pago.fechaCreacion, 'dd/MM/yyyy HH:mm')}">
                                 01/01/2026 12:00
                             </td>
-                            <td th:text="${payment.plan.label}">Mensual</td>
-                            <td th:text="${(payment.currency == 'PEN' ? 'S/ ' : payment.currency + ' ') +
-                                          #numbers.formatDecimal(payment.amountCents / 100.0, 1, 2)}">
+                            <td th:text="${pago.plan.label}">Mensual</td>
+                            <td th:text="${(pago.currency == 'PEN' ? 'S/ ' : pago.currency + ' ') +
+                                          #numbers.formatDecimal(pago.amountCents / 100.0, 1, 2)}">
                                 S/ 29.00
                             </td>
                             <td>
                                 <span class="panel-payment-status"
-                                      th:classappend="${payment.paid} ? ' panel-payment-status--paid' : ''"
-                                      th:text="${payment.status == 'PAID' ? 'Pagado' :
-                                                (payment.status == 'PENDING' ? 'Pendiente' :
-                                                 (payment.status == 'FAILED' ? 'Fallido' : 'Reembolsado'))}">
+                                      th:classappend="${pago.pagado} ? ' panel-payment-status--paid' : ''"
+                                      th:text="${pago.status == 'PAID' ? 'Pagado' :
+                                                (pago.status == 'PENDING' ? 'Pendiente' :
+                                                 (pago.status == 'FAILED' ? 'Fallido' : 'Reembolsado'))}">
                                     Pendiente
                                 </span>
                             </td>
@@ -131,15 +131,15 @@
                     <h2 id="titulo-cancelar">Cancelar suscripción</h2>
                     <span class="panel-rule" aria-hidden="true"></span>
                 </div>
-                <p class="panel-progress-copy" th:if="${!cancelAtPeriodEnd}">
+                <p class="panel-progress-copy" th:if="${!cancelAtPeriodFin}">
                     La cancelación rige al final del período pagado. Hasta entonces conservás
                     el acceso completo y tus certificados.
                 </p>
-                <p class="panel-note" th:if="${cancelAtPeriodEnd}">
+                <p class="panel-note" th:if="${cancelAtPeriodFin}">
                     Ya pediste la cancelación. Tu acceso sigue activo hasta el final del período pagado.
                 </p>
                 <form th:action="@{/panel/facturacion/cancelar}" method="post"
-                      th:if="${!cancelAtPeriodEnd and paymentEnabled}"
+                      th:if="${!cancelAtPeriodFin and pagoEnabled}"
                       data-confirm-form data-confirm-message="¿Cancelar la suscripción al final del período pagado?">
                     <button class="btn btn-ghost" type="submit">Cancelar al final del período</button>
                 </form>
@@ -159,7 +159,7 @@
 <div class="billing-checkout" id="billing-checkout"
      th:if="${embeddedEnabled}"
      th:attr="data-endpoint=@{/panel/facturacion/checkout/embebido},
-              data-publishable-key=${publishableKey}"
+              data-publishable-key=${publishableClave}"
      hidden role="dialog" aria-modal="true" aria-labelledby="billing-checkout-title">
     <div class="billing-checkout-card">
         <div class="billing-checkout-head">

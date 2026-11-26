@@ -1,9 +1,9 @@
 package com.mundomanitas.api.service;
 
-import com.mundomanitas.api.dto.RegisterForm;
-import com.mundomanitas.api.exception.DuplicateEmailException;
-import com.mundomanitas.api.model.User;
-import com.mundomanitas.api.repository.UserRepository;
+import com.mundomanitas.api.dto.RegistroFormulario;
+import com.mundomanitas.api.exception.DuplicadoEmailException;
+import com.mundomanitas.api.model.Usuario;
+import com.mundomanitas.api.repository.UsuarioRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -25,56 +25,56 @@ import static org.mockito.Mockito.when;
 class AuthServiceTest {
 
     @Mock
-    private UserRepository users;
+    private UsuarioRepository users;
 
     @Mock
-    private PasswordEncoder passwordEncoder;
+    private PasswordEncoder contrasenaEncoder;
 
     private AuthService service;
 
     @BeforeEach
     void setUp() {
-        service = new AuthServiceImpl(users, passwordEncoder);
+        service = new AuthServiceImpl(users, contrasenaEncoder);
     }
 
     @Test
     @DisplayName("normaliza el correo y guarda la contraseña cifrada")
-    void registersNormalizedAccount() {
-        RegisterForm form = form("  ANA@Correo.COM  ", "  Ana Quispe  ");
-        when(passwordEncoder.encode("ClaveSegura2026")).thenReturn("bcrypt-nuevo");
-        when(users.save(any(User.class))).thenAnswer(invocation -> invocation.getArgument(0));
+    void registersNormalizedCuenta() {
+        RegistroFormulario formulario = formulario("  ANA@Correo.COM  ", "  Ana Quispe  ");
+        when(contrasenaEncoder.encode("ClaveSegura2026")).thenReturn("bcrypt-nuevo");
+        when(users.save(any(Usuario.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        User saved = service.register(form);
+        Usuario saved = service.registro(formulario);
 
-        ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
-        verify(users).existsByEmailIgnoreCase("ana@correo.com");
+        ArgumentCaptor<Usuario> captor = ArgumentCaptor.forClass(Usuario.class);
+        verify(users).existePorEmailIgnorandoMayusculas("ana@correo.com");
         verify(users).save(captor.capture());
         assertThat(saved).isSameAs(captor.getValue());
         assertThat(saved.getEmail()).isEqualTo("ana@correo.com");
-        assertThat(saved.getFullName()).isEqualTo("Ana Quispe");
-        assertThat(saved.getPasswordHash()).isEqualTo("bcrypt-nuevo");
-        assertThat(saved.getRole()).isEqualTo("STUDENT");
+        assertThat(saved.getNombreCompleto()).isEqualTo("Ana Quispe");
+        assertThat(saved.getContrasenaHash()).isEqualTo("bcrypt-nuevo");
+        assertThat(saved.getRol()).isEqualTo("STUDENT");
     }
 
     @Test
     @DisplayName("no guarda dos cuentas con el mismo correo")
-    void rejectsDuplicateEmail() {
-        when(users.existsByEmailIgnoreCase("ana@correo.com")).thenReturn(true);
+    void rejectsDuplicadoEmail() {
+        when(users.existePorEmailIgnorandoMayusculas("ana@correo.com")).thenReturn(true);
 
-        assertThatThrownBy(() -> service.register(form("ana@correo.com", "Ana Quispe")))
-                .isInstanceOf(DuplicateEmailException.class);
+        assertThatThrownBy(() -> service.registro(formulario("ana@correo.com", "Ana Quispe")))
+                .isInstanceOf(DuplicadoEmailException.class);
 
         verify(users, never()).save(any());
-        verify(passwordEncoder, never()).encode(any());
+        verify(contrasenaEncoder, never()).encode(any());
     }
 
-    private RegisterForm form(String email, String fullName) {
-        RegisterForm form = new RegisterForm();
-        form.setEmail(email);
-        form.setFullName(fullName);
-        form.setPassword("ClaveSegura2026");
-        form.setConfirmPassword("ClaveSegura2026");
-        form.setAcceptTerms(true);
-        return form;
+    private RegistroFormulario formulario(String email, String nombreCompleto) {
+        RegistroFormulario formulario = new RegistroFormulario();
+        formulario.setEmail(email);
+        formulario.setNombreCompleto(nombreCompleto);
+        formulario.setContrasena("ClaveSegura2026");
+        formulario.setConfirmContrasena("ClaveSegura2026");
+        formulario.setAcceptTerms(true);
+        return formulario;
     }
 }

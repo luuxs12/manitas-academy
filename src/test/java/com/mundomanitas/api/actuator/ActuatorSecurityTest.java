@@ -55,8 +55,8 @@ class ActuatorSecurityTest {
                 .andExpect(status().isUnauthorized());
     }
 
-    private String basic(String user, String password) {
+    private String basic(String usuario, String contrasena) {
         return "Basic " + Base64.getEncoder().encodeToString(
-                (user + ":" + password).getBytes(StandardCharsets.UTF_8));
+                (usuario + ":" + contrasena).getBytes(StandardCharsets.UTF_8));
     }
 }

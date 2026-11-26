@@ -13,18 +13,18 @@
             <div class="admin-page-head">
                 <div>
                     <h1>Cargar cuestionario</h1>
-                    <p th:text="${exerciseTitle} ?: 'Ejercicio'">Ejercicio</p>
+                    <p th:text="${ejercicioTitulo} ?: 'Ejercicio'">Ejercicio</p>
                 </div>
                 <a class="admin-back" th:href="@{/admin/ejercicios/{id}/editar(id=${itemId})}">← Volver al ejercicio</a>
             </div>
 
             <form class="admin-form" th:action="@{/admin/ejercicios/{id}/preguntas(id=${itemId})}"
-                  th:object="${adminQuizForm}" method="post" novalidate>
+                  th:object="${adminCuestionarioFormulario}" method="post" novalidate>
                 <p class="admin-hint">Cargá diez preguntas con cuatro alternativas. Marcá la respuesta correcta de cada una. Cada acierto vale 2 puntos.</p>
                 <p class="admin-error" role="alert" th:if="${#fields.hasErrors('questions')}" th:errors="*{questions}"></p>
 
                 <section class="panel-card admin-card quiz-admin-question"
-                         th:each="question, i : ${adminQuizForm.questions}">
+                         th:each="pregunta, i : ${adminCuestionarioFormulario.questions}">
                     <h2 th:text="${'Pregunta ' + (i.index + 1)}">Pregunta 1</h2>
                     <div class="admin-field">
                         <label th:for="|quiz-prompt-${i.index}|">Enunciado</label>
@@ -40,23 +40,23 @@
                     <fieldset class="quiz-admin-alternatives">
                         <legend>Alternativas y respuesta correcta</legend>
                         <div class="quiz-admin-option"
-                             th:each="alternative, option : ${question.alternatives}">
+                             th:each="alternativa, opcion : ${pregunta.alternatives}">
                             <input type="radio"
                                    th:field="*{questions[__${i.index}__].correctIndex}"
-                                   th:value="${option.index + 1}"
-                                   th:id="|quiz-correct-${i.index}-${option.index}|">
+                                   th:value="${opcion.index + 1}"
+                                   th:id="|quiz-correct-${i.index}-${opcion.index}|">
                             <label class="quiz-admin-correct-label"
-                                   th:for="|quiz-correct-${i.index}-${option.index}|"
-                                   th:text="${'Correcta ' + (option.index + 1)}">Correcta 1</label>
-                            <label class="sr-only" th:for="|quiz-alternative-${i.index}-${option.index}|"
-                                   th:text="${'Texto de la alternativa ' + (option.index + 1)}">Texto</label>
+                                   th:for="|quiz-correct-${i.index}-${opcion.index}|"
+                                   th:text="${'Correcta ' + (opcion.index + 1)}">Correcta 1</label>
+                            <label class="sr-only" th:for="|quiz-alternative-${i.index}-${opcion.index}|"
+                                   th:text="${'Texto de la alternativa ' + (opcion.index + 1)}">Texto</label>
                             <input type="text" maxlength="300" required
-                                   th:id="|quiz-alternative-${i.index}-${option.index}|"
-                                   th:field="*{questions[__${i.index}__].alternatives[__${option.index}__].label}"
-                                   th:attr="aria-invalid=${#fields.hasErrors('questions[__${i.index}__].alternatives[__${option.index}__].label')} ? 'true' : null">
+                                   th:id="|quiz-alternative-${i.index}-${opcion.index}|"
+                                   th:field="*{questions[__${i.index}__].alternatives[__${opcion.index}__].label}"
+                                   th:attr="aria-invalid=${#fields.hasErrors('questions[__${i.index}__].alternatives[__${opcion.index}__].label')} ? 'true' : null">
                             <small class="admin-error"
-                                   th:if="${#fields.hasErrors('questions[__${i.index}__].alternatives[__${option.index}__].label')}"
-                                   th:errors="*{questions[__${i.index}__].alternatives[__${option.index}__].label}"></small>
+                                   th:if="${#fields.hasErrors('questions[__${i.index}__].alternatives[__${opcion.index}__].label')}"
+                                   th:errors="*{questions[__${i.index}__].alternatives[__${opcion.index}__].label}"></small>
                         </div>
                         <small class="admin-error"
                                th:if="${#fields.hasErrors('questions[__${i.index}__].correctIndex')}"

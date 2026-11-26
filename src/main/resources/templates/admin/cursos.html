@@ -34,25 +34,25 @@
                     <caption>Cursos del catálogo con su estado real y cantidad de inscriptos.</caption>
                     <thead><tr><th scope="col">Curso</th><th scope="col">Categoría</th><th scope="col">Estado</th><th scope="col">Lecciones</th><th scope="col">Acceso</th><th scope="col">Inscriptos</th><th scope="col">Pos.</th><th scope="col">Acciones</th></tr></thead>
                     <tbody>
-                    <tr th:each="course : ${page.content}">
+                    <tr th:each="curso : ${page.content}">
                         <td>
                             <div class="admin-course-copy">
-                                <strong th:text="${course.title()}">Curso</strong>
-                                <small th:text="${course.slug()}">slug</small>
+                                <strong th:text="${curso.titulo()}">Curso</strong>
+                                <small th:text="${curso.slug()}">slug</small>
                             </div>
                         </td>
-                        <td th:text="${course.category()}">Categoría</td>
-                        <td><span class="admin-status" th:classappend="${course.status() == 'PUBLICADO'} ? ' is-ok' : ' is-bad'"
-                                  th:text="${course.status() == 'PUBLICADO'} ? 'Publicado' : 'Borrador'">Borrador</span></td>
-                        <td th:text="${course.lessons()}">0</td>
-                        <td th:text="${course.price()}">Gratis</td>
-                        <td th:text="${course.enrolled()}">0</td>
-                        <td th:text="${course.position()}">0</td>
+                        <td th:text="${curso.categoria()}">Categoría</td>
+                        <td><span class="admin-status" th:classappend="${curso.status() == 'PUBLICADO'} ? ' is-ok' : ' is-bad'"
+                                  th:text="${curso.status() == 'PUBLICADO'} ? 'Publicado' : 'Borrador'">Borrador</span></td>
+                        <td th:text="${curso.lessons()}">0</td>
+                        <td th:text="${curso.price()}">Gratis</td>
+                        <td th:text="${curso.inscripto()}">0</td>
+                        <td th:text="${curso.posicion()}">0</td>
                         <td class="admin-row-actions">
-                            <a th:href="@{/admin/cursos/{id}/editar(id=${course.id()})}">Editar</a>
-                            <a th:href="@{/admin/cursos/{id}/contenido(id=${course.id()})}">Contenido</a>
+                            <a th:href="@{/admin/cursos/{id}/editar(id=${curso.id()})}">Editar</a>
+                            <a th:href="@{/admin/cursos/{id}/contenido(id=${curso.id()})}">Contenido</a>
                             <button type="button" class="admin-confirm-link"
-                                    th:attr="data-confirm-url=@{/admin/cursos/{id}/eliminar(id=${course.id()})}, aria-label='Eliminar ' + ${course.title()}">Eliminar</button>
+                                    th:attr="data-confirm-url=@{/admin/cursos/{id}/eliminar(id=${curso.id()})}, aria-label='Eliminar ' + ${curso.titulo()}">Eliminar</button>
                         </td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(page.content)}"><td colspan="8" class="admin-empty">No hay cursos que coincidan con la búsqueda.</td></tr>

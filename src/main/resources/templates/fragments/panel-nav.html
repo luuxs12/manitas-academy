@@ -16,7 +16,7 @@
 
     <nav class="panel-nav" aria-label="Panel del estudiante">
         <a class="panel-nav-link" th:href="@{/panel}"
-           th:attr="aria-current=${active == 'inicio'} ? 'page' : null">
+           th:attr="aria-current=${activo == 'inicio'} ? 'page' : null">
             <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                 <path d="M4 10.5 12 4l8 6.5"></path>
                 <path d="M6 9.8V20h12V9.8"></path>
@@ -26,7 +26,7 @@
         </a>
 
         <a class="panel-nav-link" th:href="@{/panel/cursos}"
-           th:attr="aria-current=${active == 'cursos'} ? 'page' : null">
+           th:attr="aria-current=${activo == 'cursos'} ? 'page' : null">
             <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                 <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"></path>
                 <path d="M4 20.5A2.5 2.5 0 0 1 6.5 18H20v3H6.5A2.5 2.5 0 0 1 4 20.5z"></path>
@@ -36,7 +36,7 @@
         </a>
 
         <a class="panel-nav-link" th:href="@{/panel/explorar}"
-           th:attr="aria-current=${active == 'explorar'} ? 'page' : null">
+           th:attr="aria-current=${activo == 'explorar'} ? 'page' : null">
             <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                 <circle cx="11" cy="11" r="6.5"></circle>
                 <path d="m16 16 4.5 4.5"></path>
@@ -45,7 +45,7 @@
         </a>
 
         <a class="panel-nav-link" th:href="@{/panel/certificados}"
-           th:attr="aria-current=${active == 'certificados'} ? 'page' : null">
+           th:attr="aria-current=${activo == 'certificados'} ? 'page' : null">
             <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                 <circle cx="12" cy="9" r="5"></circle>
                 <path d="m8.5 13-1 7 4.5-2.5 4.5 2.5-1-7"></path>
@@ -54,7 +54,7 @@
         </a>
 
         <a class="panel-nav-link" th:href="@{/panel/accesibilidad}"
-           th:attr="aria-current=${active == 'accesibilidad'} ? 'page' : null">
+           th:attr="aria-current=${activo == 'accesibilidad'} ? 'page' : null">
             <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                 <path d="M8 11V6.5a1.5 1.5 0 0 1 3 0V10"></path>
                 <path d="M11 10V4.5a1.5 1.5 0 0 1 3 0V10"></path>
@@ -64,7 +64,7 @@
         </a>
 
         <a class="panel-nav-link" th:href="@{/panel/facturacion}"
-           th:attr="aria-current=${active == 'facturacion'} ? 'page' : null">
+           th:attr="aria-current=${activo == 'facturacion'} ? 'page' : null">
             <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                 <path d="M5 3h14v18l-3-2-4 2-4-2-3 2z"></path>
                 <path d="M9 8h6M9 12h6"></path>
@@ -73,7 +73,7 @@
         </a>
 
         <a class="panel-nav-link" th:href="@{/panel/perfil}"
-           th:attr="aria-current=${active == 'perfil'} ? 'page' : null">
+           th:attr="aria-current=${activo == 'perfil'} ? 'page' : null">
             <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                 <circle cx="12" cy="8" r="3.5"></circle>
                 <path d="M5 20a7 7 0 0 1 14 0"></path>
@@ -82,7 +82,7 @@
         </a>
 
         <a class="panel-nav-link" th:href="@{/panel/preferencias}"
-           th:attr="aria-current=${active == 'preferencias'} ? 'page' : null">
+           th:attr="aria-current=${activo == 'preferencias'} ? 'page' : null">
             <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                 <circle cx="12" cy="12" r="3"></circle>
                 <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4v-.2a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H3v-4h.2a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.6V3h4v.2a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4h-.2a1.7 1.7 0 0 0-1.6 1z"></path>
@@ -91,7 +91,7 @@
         </a>
 
         <a class="panel-nav-link" th:href="@{/panel/ayuda}"
-           th:attr="aria-current=${active == 'ayuda'} ? 'page' : null">
+           th:attr="aria-current=${activo == 'ayuda'} ? 'page' : null">
             <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                 <circle cx="12" cy="12" r="9"></circle>
                 <path d="M9.2 9.2a3 3 0 1 1 4.2 2.8c-.9.4-1.4 1-1.4 2"></path>
@@ -139,22 +139,22 @@
                     <path d="M18 9a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6"></path>
                     <path d="M10.3 20a2 2 0 0 0 3.4 0"></path>
                 </svg>
-                <span class="panel-notify-count" th:if="${unreadCount > 0}"
-                      th:text="${unreadCount > 9 ? '9+' : unreadCount}"
+                <span class="panel-notify-count" th:if="${unreadContar > 0}"
+                      th:text="${unreadContar > 9 ? '9+' : unreadContar}"
                       aria-label="Avisos sin leer">0</span>
             </summary>
             <div class="panel-menu-pop panel-notify-pop">
                 <p class="panel-menu-name">Notificaciones</p>
-                <ul class="panel-notify-list" th:if="${!#lists.isEmpty(recentNotifications)}">
-                    <li class="panel-notify-item" th:each="notice : ${recentNotifications}">
+                <ul class="panel-notify-list" th:if="${!#lists.isEmpty(recienteNotifications)}">
+                    <li class="panel-notify-item" th:each="notice : ${recienteNotifications}">
                         <strong>
-                            <span class="panel-notify-dot" th:if="${!notice.read}" aria-hidden="true"></span>
-                            <span th:text="${notice.title}">Aviso</span>
+                            <span class="panel-notify-dot" th:if="${!notice.leido}" aria-hidden="true"></span>
+                            <span th:text="${notice.titulo}">Aviso</span>
                         </strong>
                         <span th:text="${notice.message}">Mensaje del aviso.</span>
                     </li>
                 </ul>
-                <p class="panel-notify-empty" th:if="${#lists.isEmpty(recentNotifications)}">
+                <p class="panel-notify-empty" th:if="${#lists.isEmpty(recienteNotifications)}">
                     Todavía no tenés avisos. Aparecen cuando te inscribís, terminás un curso
                     o se confirma un pago.
                 </p>
@@ -176,11 +176,11 @@
         <details class="panel-menu" data-panel-menu>
             <summary class="panel-menu-trigger" aria-label="Abrir menú de la cuenta">
                 <span class="panel-avatar" aria-hidden="true"
-                      th:classappend="${currentUser.hasAvatar()} ? ' panel-avatar--photo' : ''">
-                    <img th:if="${currentUser.hasAvatar()}"
-                         th:src="${currentUser.avatarPath()}" alt="">
-                    <span th:unless="${currentUser.hasAvatar()}"
-                          th:text="${currentUser.initials()}">LM</span>
+                      th:classappend="${usuarioActual.hasAvatar()} ? ' panel-avatar--photo' : ''">
+                    <img th:if="${usuarioActual.hasAvatar()}"
+                         th:src="${usuarioActual.avatarPath()}" alt="">
+                    <span th:unless="${usuarioActual.hasAvatar()}"
+                          th:text="${usuarioActual.initials()}">LM</span>
                 </span>
                 <svg class="ico panel-menu-chevron" viewBox="0 0 24 24"
                      aria-hidden="true" focusable="false">
@@ -189,8 +189,8 @@
             </summary>
 
             <div class="panel-menu-pop">
-                <p class="panel-menu-name" th:text="${currentUser.fullName()}">Lucía Méndez</p>
-                <p class="panel-menu-mail" th:text="${currentUser.email()}">lucia@correo.com</p>
+                <p class="panel-menu-name" th:text="${usuarioActual.nombreCompleto()}">Lucía Méndez</p>
+                <p class="panel-menu-mail" th:text="${usuarioActual.email()}">lucia@correo.com</p>
                 <a th:href="@{/panel/perfil}">Mi perfil</a>
                 <a th:href="@{/panel/facturacion}">Mi suscripción</a>
                 <a th:href="@{/panel/notificaciones}">Notificaciones</a>

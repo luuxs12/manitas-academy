@@ -21,7 +21,7 @@
                 </div>
                 <a class="panel-plan panel-plan--link"
                    th:href="@{/panel/facturacion}"
-                   th:text="${'Tu plan: ' + currentUser.planLabel()}">Tu plan: Gratis</a>
+                   th:text="${'Tu plan: ' + usuarioActual.planLabel()}">Tu plan: Gratis</a>
             </div>
 
 
@@ -58,36 +58,36 @@
                 </div>
 
                 <div class="panel-course-grid" th:if="${!#lists.isEmpty(courses)}">
-                    <article class="panel-course" th:each="course : ${courses}">
-                        <img th:src="${!#strings.isEmpty(course.image) ? course.image : '/img/course-placeholder.svg'}" alt="" width="960" height="600" loading="lazy">
+                    <article class="panel-course" th:each="curso : ${courses}">
+                        <img th:src="${!#strings.isEmpty(curso.imagen) ? curso.imagen : '/img/curso-placeholder.svg'}" alt="" width="960" height="600" loading="lazy">
                         <div class="panel-course-body">
-                            <h3 th:text="${course.title}"></h3>
-                            <span class="panel-chip" th:text="${course.category}"></span>
-                            <p class="panel-course-summary" th:text="${course.summary}"></p>
+                            <h3 th:text="${curso.titulo}"></h3>
+                            <span class="panel-chip" th:text="${curso.categoria}"></span>
+                            <p class="panel-course-summary" th:text="${curso.resumen}"></p>
                             <p class="panel-course-meta">
-                                <span th:text="${course.level}"></span>
+                                <span th:text="${curso.nivel}"></span>
                                 ·
-                                <span th:text="${course.lessons} + ' lecciones'"></span>
+                                <span th:text="${curso.lessons} + ' lecciones'"></span>
                             </p>
 
                             <div class="panel-course-foot">
-                                <span class="panel-course-percent" th:text="${course.priceLabel()}"></span>
+                                <span class="panel-course-percent" th:text="${curso.priceLabel()}"></span>
                                 <span class="panel-course-status is-done"
-                                      th:if="${enrolledSlugs.contains(course.slug)}">Ya inscripto</span>
+                                      th:if="${inscriptoSlugs.contains(curso.slug)}">Ya inscripto</span>
                             </div>
 
                             <form class="panel-enroll-form"
-                                  th:if="${!enrolledSlugs.contains(course.slug) and (course.free or currentUser.premium())}"
-                                  th:action="@{/panel/cursos/{slug}/inscribir(slug=${course.slug})}"
+                                  th:if="${!inscriptoSlugs.contains(curso.slug) and (curso.free or usuarioActual.premium())}"
+                                  th:action="@{/panel/cursos/{slug}/inscribir(slug=${curso.slug})}"
                                   method="post" data-confirm-form
-                                  th:attr="data-confirm-message='¿Inscribirte en ' + ${course.title} + '?'">
+                                  th:attr="data-confirm-message='¿Inscribirte en ' + ${curso.titulo} + '?'">
                                 <button class="btn btn-dark panel-enroll-btn" type="submit">
                                     Inscribirme <span aria-hidden="true">→</span>
                                 </button>
                             </form>
 
                             <a class="panel-inline-btn panel-locked"
-                               th:if="${!enrolledSlugs.contains(course.slug) and !course.free and !currentUser.premium()}"
+                               th:if="${!inscriptoSlugs.contains(curso.slug) and !curso.free and !usuarioActual.premium()}"
                                th:href="@{/panel/facturacion}">
                                 Requiere plan Premium →
                             </a>

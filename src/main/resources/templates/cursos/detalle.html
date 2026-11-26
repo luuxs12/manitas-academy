@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="~{fragments/layout :: head(${course.title})}"></head>
+<head th:replace="~{fragments/layout :: head(${curso.titulo})}"></head>
 
 <body>
 <div class="shell">
@@ -14,25 +14,25 @@
         <div class="detail">
 
             <div class="detail-body">
-                <h1 th:text="${course.title}">Nombre del curso</h1>
-                <p class="lead" th:text="${course.summary}">Descripción del curso.</p>
+                <h1 th:text="${curso.titulo}">Nombre del curso</h1>
+                <p class="lead" th:text="${curso.resumen}">Descripción del curso.</p>
 
                 <dl class="detail-facts">
                     <div>
                         <dt>Área</dt>
-                        <dd th:text="${course.category}">Programación</dd>
+                        <dd th:text="${curso.categoria}">Programación</dd>
                     </div>
                     <div>
                         <dt>Lecciones</dt>
-                        <dd th:text="${course.lessons}">24</dd>
+                        <dd th:text="${curso.lessons}">24</dd>
                     </div>
                     <div>
                         <dt>Nivel</dt>
-                        <dd th:text="${course.level}">Inicial</dd>
+                        <dd th:text="${curso.nivel}">Inicial</dd>
                     </div>
                     <div>
                         <dt>Acceso</dt>
-                        <dd th:text="${course.priceLabel()}">Gratis</dd>
+                        <dd th:text="${curso.priceLabel()}">Gratis</dd>
                     </div>
                     <div>
                         <dt>Idioma</dt>
@@ -41,26 +41,26 @@
                 </dl>
 
                 <div class="detail-actions">
-                    <form th:if="${signedIn and currentUser != null and !currentUser.admin() and !enrolled and canEnroll}"
-                          th:action="@{/panel/cursos/{slug}/inscribir(slug=${course.slug})}"
+                    <form th:if="${signedIn and usuarioActual != null and !usuarioActual.admin() and !inscripto and canEnroll}"
+                          th:action="@{/panel/cursos/{slug}/inscribir(slug=${curso.slug})}"
                           method="post">
                         <button class="btn btn-solid btn-lg" type="submit">
                             Inscribirme <span aria-hidden="true">→</span>
                         </button>
                     </form>
 
-                    <a th:if="${signedIn and currentUser != null and !currentUser.admin() and enrolled}"
+                    <a th:if="${signedIn and usuarioActual != null and !usuarioActual.admin() and inscripto}"
                        class="btn btn-solid btn-lg"
                        th:href="@{/panel/cursos}">
                         Ir a mis cursos <span aria-hidden="true">→</span>
                     </a>
 
-                    <a th:if="${signedIn and currentUser != null and !currentUser.admin() and !enrolled and !canEnroll}"
+                    <a th:if="${signedIn and usuarioActual != null and !usuarioActual.admin() and !inscripto and !canEnroll}"
                        class="btn btn-solid btn-lg" th:href="@{/panel/facturacion}">
                         Hacerme Premium para inscribirme
                     </a>
 
-                    <a th:if="${signedIn and currentUser != null and currentUser.admin()}"
+                    <a th:if="${signedIn and usuarioActual != null and usuarioActual.admin()}"
                        class="btn btn-solid btn-lg" th:href="@{/admin}">
                         Ir al panel administrativo <span aria-hidden="true">→</span>
                     </a>
@@ -71,19 +71,19 @@
                     </a>
 
                     <p class="detail-note">
-                        <span th:if="${course.free}">Gratis, sin tarjeta.</span>
-                        <span th:unless="${course.free}">Incluido en la membresía de S/ 29 al mes.</span>
+                        <span th:if="${curso.free}">Gratis, sin tarjeta.</span>
+                        <span th:unless="${curso.free}">Incluido en la membresía de S/ 29 al mes.</span>
                         Podés cancelar cuando quieras.
                     </p>
                 </div>
             </div>
 
             <div class="detail-media">
-                <img th:src="${!#strings.isEmpty(course.image) ? course.image : '/img/course-placeholder.svg'}"
-                     th:alt="'Portada del curso ' + ${course.title}"
+                <img th:src="${!#strings.isEmpty(curso.imagen) ? curso.imagen : '/img/curso-placeholder.svg'}"
+                     th:alt="'Portada del curso ' + ${curso.titulo}"
                      width="960" height="600" fetchpriority="high" decoding="async">
-                <span class="course-badge" th:text="${course.category}">Programación</span>
-                <span class="course-level" th:text="${course.level}">Nivel inicial</span>
+                <span class="course-badge" th:text="${curso.categoria}">Programación</span>
+                <span class="course-level" th:text="${curso.nivel}">Nivel inicial</span>
             </div>
 
         </div>
@@ -130,16 +130,16 @@
                    th:href="@{/cursos/{slug}(slug=${other.slug})}">
 
                     <figure class="course-media">
-                        <img th:src="${other.image}" alt="" width="960" height="600"
+                        <img th:src="${other.imagen}" alt="" width="960" height="600"
                              loading="lazy" decoding="async">
-                        <span class="course-badge" th:text="${other.category}">Programación</span>
+                        <span class="course-badge" th:text="${other.categoria}">Programación</span>
                     </figure>
 
                     <div class="course-body">
                         <span class="course-meta">
                             <span th:text="${other.lessons}">32</span> lecciones
                         </span>
-                        <h3 class="course-title" th:text="${other.title}">Nombre del curso</h3>
+                        <h3 class="course-title" th:text="${other.titulo}">Nombre del curso</h3>
                         <div class="course-foot">
                             <span class="course-price" th:text="${other.priceLabel()}">Gratis</span>
                             <span class="course-go">Ver curso <span aria-hidden="true">→</span></span>

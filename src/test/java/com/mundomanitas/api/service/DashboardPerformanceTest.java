@@ -1,14 +1,14 @@
 package com.mundomanitas.api.service;
 
-import com.mundomanitas.api.model.Course;
-import com.mundomanitas.api.model.CourseModule;
-import com.mundomanitas.api.model.Enrollment;
-import com.mundomanitas.api.model.User;
+import com.mundomanitas.api.model.Curso;
+import com.mundomanitas.api.model.CursoModulo;
+import com.mundomanitas.api.model.Inscripcion;
+import com.mundomanitas.api.model.Usuario;
 import com.mundomanitas.api.model.Video;
-import com.mundomanitas.api.repository.CourseModuleRepository;
-import com.mundomanitas.api.repository.CourseRepository;
-import com.mundomanitas.api.repository.EnrollmentRepository;
-import com.mundomanitas.api.repository.UserRepository;
+import com.mundomanitas.api.repository.CursoModuloRepository;
+import com.mundomanitas.api.repository.CursoRepository;
+import com.mundomanitas.api.repository.InscripcionRepository;
+import com.mundomanitas.api.repository.UsuarioRepository;
 import com.mundomanitas.api.repository.VideoRepository;
 import org.hibernate.SessionFactory;
 import org.hibernate.stat.Statistics;
@@ -34,41 +34,41 @@ class DashboardPerformanceTest {
 
     private static final Logger log = LoggerFactory.getLogger(DashboardPerformanceTest.class);
 
-    @Autowired private UserRepository users;
-    @Autowired private CourseRepository courses;
-    @Autowired private CourseModuleRepository modules;
+    @Autowired private UsuarioRepository users;
+    @Autowired private CursoRepository courses;
+    @Autowired private CursoModuloRepository modules;
     @Autowired private VideoRepository videos;
-    @Autowired private EnrollmentRepository savedEnrollments;
-    @Autowired private EnrollmentService enrollments;
-    @Autowired private StudentContentService content;
+    @Autowired private InscripcionRepository savedEnrollments;
+    @Autowired private InscripcionService enrollments;
+    @Autowired private EstudianteContenidoService content;
     @Autowired private EntityManager entityManager;
 
     @Test
     @DisplayName("el avance general resuelve varias matrículas en consultas constantes")
     void totalsUseBoundedQueries() {
-        User student = users.save(new User(
+        Usuario estudiante = users.save(new Usuario(
                 "rendimiento-" + UUID.randomUUID() + "@ejemplo.test",
                 "hash-de-prueba",
                 "Prueba de rendimiento"));
 
         for (int index = 0; index < 2; index++) {
-            Course course = new Course(
+            Curso curso = new Curso(
                     "rendimiento-" + UUID.randomUUID(),
                     "Curso de rendimiento " + index,
                     "Inicial", 2, true, "Pruebas",
                     "Curso creado para medir consultas.", "", index);
-            course.publish();
-            course = courses.save(course);
+            curso.publicar();
+            curso = courses.save(curso);
 
-            CourseModule module = modules.save(new CourseModule(course.getId(), "Unidad 1", 0));
-            videos.save(new Video(module.getId(), "Clase 1", "dQw4w9WgXcQ", 0));
-            videos.save(new Video(module.getId(), "Clase 2", "dQw4w9WgXcQ", 1));
-            savedEnrollments.save(new Enrollment(student, course));
+            CursoModulo modulo = modules.save(new CursoModulo(curso.getId(), "Unidad 1", 0));
+            videos.save(new Video(modulo.getId(), "Clase 1", "dQw4w9WgXcQ", 0));
+            videos.save(new Video(modulo.getId(), "Clase 2", "dQw4w9WgXcQ", 1));
+            savedEnrollments.save(new Inscripcion(estudiante, curso));
         }
         entityManager.flush();
         entityManager.clear();
 
-        List<Enrollment> mine = enrollments.mine(student);
+        List<Inscripcion> mine = enrollments.mine(estudiante);
         assertThat(mine).hasSize(2);
 
         Statistics stats = entityManager.getEntityManagerFactory()
@@ -76,7 +76,7 @@ class DashboardPerformanceTest {
         stats.setStatisticsEnabled(true);
         stats.clear();
 
-        StudentContentService.Progress totals = content.totals(mine);
+        EstudianteContenidoService.Progreso totals = content.totals(mine);
         long statements = stats.getPrepareStatementCount();
 
         log.info("Avance de {} matrículas resuelto en {} sentencias", mine.size(), statements);

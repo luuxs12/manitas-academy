@@ -42,18 +42,18 @@ class PanelDialogsTest {
     void bothPanelsIncludeTheDialogs() throws IOException {
         String adminNav = html(resolver.getResource(
                 "classpath:templates/admin/fragments/admin-nav.html"));
-        String studentNav = html(resolver.getResource(
+        String estudianteNav = html(resolver.getResource(
                 "classpath:templates/fragments/panel-nav.html"));
         String adminHead = html(resolver.getResource(
                 "classpath:templates/admin/fragments/admin-head.html"));
-        String studentHead = html(resolver.getResource(
+        String estudianteHead = html(resolver.getResource(
                 "classpath:templates/fragments/panel-head.html"));
 
         assertThat(adminNav).contains("~{fragments/panel-dialogs :: confirm}")
                 .contains("~{fragments/panel-dialogs :: notices}");
-        assertThat(studentNav).contains("~{fragments/panel-dialogs :: notices}");
+        assertThat(estudianteNav).contains("~{fragments/panel-dialogs :: notices}");
         assertThat(adminHead).contains("/js/panel-dialogs.js");
-        assertThat(studentHead).contains("/js/panel-dialogs.js");
+        assertThat(estudianteHead).contains("/js/panel-dialogs.js");
     }
 
     @Test
@@ -62,9 +62,9 @@ class PanelDialogsTest {
         Resource[] templates = resolver.getResources("classpath*:templates/**/*.html");
         assertThat(templates).isNotEmpty();
 
-        for (Resource template : templates) {
-            if (template.getFilename().equals("panel-dialogs.html")) continue;
-            assertThat(html(template)).as(template.getFilename())
+        for (Resource plantilla : templates) {
+            if (plantilla.getFilename().equals("panel-dialogs.html")) continue;
+            assertThat(html(plantilla)).as(plantilla.getFilename())
                     .doesNotContain("th:if=\"${panelOk}\"")
                     .doesNotContain("th:if=\"${panelError}\"");
         }
@@ -73,12 +73,12 @@ class PanelDialogsTest {
     @Test
     @DisplayName("crear un curso y emitir un certificado piden confirmación antes de enviar")
     void importantFormsAskForConfirmation() throws IOException {
-        String courseForm = html(resolver.getResource(
+        String cursoFormulario = html(resolver.getResource(
                 "classpath:templates/admin/curso-form.html"));
         String certificates = html(resolver.getResource(
                 "classpath:templates/admin/certificados.html"));
 
-        assertThat(courseForm).contains("data-confirm-form")
+        assertThat(cursoFormulario).contains("data-confirm-form")
                 .contains("data-confirm-message");
         assertThat(certificates).contains("data-confirm-form")
                 .contains("data-confirm-message");
@@ -86,7 +86,7 @@ class PanelDialogsTest {
 
     @Test
     @DisplayName("el alumno confirma al cerrar la cuenta, cancelar el plan y terminar un curso")
-    void studentIrreversibleActionsAskForConfirmation() throws IOException {
+    void estudianteIrreversibleActionsAskForConfirmation() throws IOException {
         for (String path : List.of("templates/student/preferencias.html",
                 "templates/student/facturacion.html",
                 "templates/student/curso.html",
@@ -115,17 +115,17 @@ class PanelDialogsTest {
     void controllersStillSendTheMessage() throws IOException {
         String admin = java.nio.file.Files.readString(java.nio.file.Path.of(
                 "src", "main", "java", "com", "mundomanitas", "api", "controller", "admin",
-                "AdminCourseController.java"));
-        String student = java.nio.file.Files.readString(java.nio.file.Path.of(
+                "AdminCursoController.java"));
+        String estudiante = java.nio.file.Files.readString(java.nio.file.Path.of(
                 "src", "main", "java", "com", "mundomanitas", "api", "controller",
-                "StudentController.java"));
+                "EstudianteController.java"));
 
         assertThat(admin).contains("addFlashAttribute(\"panelOk\"");
-        assertThat(student).contains("addFlashAttribute(\"panelOk\"");
+        assertThat(estudiante).contains("addFlashAttribute(\"panelOk\"");
     }
 
-    private static String html(Resource resource) throws IOException {
-        try (var stream = resource.getInputStream()) {
+    private static String html(Resource recurso) throws IOException {
+        try (var stream = recurso.getInputStream()) {
             return new String(stream.readAllBytes(), StandardCharsets.UTF_8);
         }
     }

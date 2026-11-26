@@ -19,24 +19,24 @@
                 </div>
             </div>
             <form class="panel-card admin-card admin-form" th:action="${itemId != null} ? @{/admin/ejercicios/{id}(id=${itemId})} : @{/admin/ejercicios}"
-                  th:object="${adminExerciseForm}" method="post" novalidate>
+                  th:object="${adminEjercicioFormulario}" method="post" novalidate>
                 <div class="admin-form-grid">
                     <div class="admin-field">
                         <label for="ejercicio-modulo">Módulo</label>
-                        <select id="ejercicio-modulo" th:field="*{moduleId}" required
-                                th:attr="aria-invalid=${#fields.hasErrors('moduleId')} ? 'true' : null,
-                                         aria-describedby=${#fields.hasErrors('moduleId')} ? 'error-ejercicio-modulo' : null">
+                        <select id="ejercicio-modulo" th:field="*{moduloId}" required
+                                th:attr="aria-invalid=${#fields.hasErrors('moduloId')} ? 'true' : null,
+                                         aria-describedby=${#fields.hasErrors('moduloId')} ? 'error-ejercicio-modulo' : null">
                             <option value="">Elegí un módulo</option>
                             <option th:each="o : ${options}" th:value="${o.id()}" th:text="${o.label()}"></option>
                         </select>
-                        <small id="error-ejercicio-modulo" class="admin-error" th:if="${#fields.hasErrors('moduleId')}" th:errors="*{moduleId}"></small>
+                        <small id="error-ejercicio-modulo" class="admin-error" th:if="${#fields.hasErrors('moduloId')}" th:errors="*{moduloId}"></small>
                     </div>
                     <div class="admin-field">
                         <label for="ejercicio-titulo">Título</label>
-                        <input id="ejercicio-titulo" type="text" th:field="*{title}" maxlength="140" required
-                               th:attr="aria-invalid=${#fields.hasErrors('title')} ? 'true' : null,
-                                        aria-describedby=${#fields.hasErrors('title')} ? 'error-ejercicio-titulo' : null">
-                        <small id="error-ejercicio-titulo" class="admin-error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></small>
+                        <input id="ejercicio-titulo" type="text" th:field="*{titulo}" maxlength="140" required
+                               th:attr="aria-invalid=${#fields.hasErrors('titulo')} ? 'true' : null,
+                                        aria-describedby=${#fields.hasErrors('titulo')} ? 'error-ejercicio-titulo' : null">
+                        <small id="error-ejercicio-titulo" class="admin-error" th:if="${#fields.hasErrors('titulo')}" th:errors="*{titulo}"></small>
                     </div>
                     <div class="admin-field admin-span-2">
                         <label for="ejercicio-consigna">Consigna</label>
@@ -47,10 +47,10 @@
                     </div>
                     <div class="admin-field">
                         <label for="ejercicio-posicion">Posición</label>
-                        <input id="ejercicio-posicion" type="number" th:field="*{position}" min="0" max="9999"
-                               th:attr="aria-invalid=${#fields.hasErrors('position')} ? 'true' : null,
-                                        aria-describedby=${#fields.hasErrors('position')} ? 'error-ejercicio-posicion' : null">
-                        <small id="error-ejercicio-posicion" class="admin-error" th:if="${#fields.hasErrors('position')}" th:errors="*{position}"></small>
+                        <input id="ejercicio-posicion" type="number" th:field="*{posicion}" min="0" max="9999"
+                               th:attr="aria-invalid=${#fields.hasErrors('posicion')} ? 'true' : null,
+                                        aria-describedby=${#fields.hasErrors('posicion')} ? 'error-ejercicio-posicion' : null">
+                        <small id="error-ejercicio-posicion" class="admin-error" th:if="${#fields.hasErrors('posicion')}" th:errors="*{posicion}"></small>
                     </div>
                 </div>
                 <div class="admin-form-actions">

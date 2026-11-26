@@ -20,21 +20,21 @@
                     <p>Editá tus datos, tu foto y tu contraseña. El plan se gestiona con el pago.</p>
                 </div>
                 <span class="panel-plan panel-plan--static"
-                      th:text="${'Plan ' + currentUser.planLabel()}">Plan gratis</span>
+                      th:text="${'Plan ' + usuarioActual.planLabel()}">Plan gratis</span>
             </div>
 
 
             <ul class="panel-kpis" aria-label="Resumen de la cuenta">
                 <li class="panel-kpi">
-                    <strong th:text="${enrolled}">0</strong>
+                    <strong th:text="${inscripto}">0</strong>
                     <span>Cursos inscriptos</span>
                 </li>
                 <li class="panel-kpi">
-                    <strong th:text="${videoTotals.completed()}">0</strong>
+                    <strong th:text="${videoTotals.finalizado()}">0</strong>
                     <span>Videos terminados</span>
                 </li>
                 <li class="panel-kpi">
-                    <strong th:text="${completed}">0</strong>
+                    <strong th:text="${finalizado}">0</strong>
                     <span>Cursos terminados</span>
                 </li>
                 <li class="panel-kpi">
@@ -50,12 +50,12 @@
                     <div class="panel-avatar-current">
                         <span class="panel-avatar-compact">
                             <span class="panel-avatar"
-                                  th:classappend="${currentUser.hasAvatar()} ? ' panel-avatar--photo' : ''"
+                                  th:classappend="${usuarioActual.hasAvatar()} ? ' panel-avatar--photo' : ''"
                                   aria-hidden="true">
-                                <img th:if="${currentUser.hasAvatar()}"
-                                     th:src="${currentUser.avatarPath()}" alt="">
-                                <span th:unless="${currentUser.hasAvatar()}"
-                                      th:text="${currentUser.initials()}">LM</span>
+                                <img th:if="${usuarioActual.hasAvatar()}"
+                                     th:src="${usuarioActual.avatarPath()}" alt="">
+                                <span th:unless="${usuarioActual.hasAvatar()}"
+                                      th:text="${usuarioActual.initials()}">LM</span>
                             </span>
                         </span>
                         <p class="panel-note">
@@ -77,7 +77,7 @@
                             <div class="panel-avatar-actions">
                                 <button class="btn btn-dark" type="submit">Subir foto</button>
                                 <button class="btn btn-ghost" type="submit"
-                                        th:if="${currentUser.hasAvatar()}"
+                                        th:if="${usuarioActual.hasAvatar()}"
                                         th:formaction="@{/panel/perfil/foto/eliminar}"
                                         formenctype="application/x-www-form-urlencoded">
                                     Quitar foto
@@ -90,17 +90,17 @@
                 <section class="panel-card" aria-labelledby="titulo-datos">
                     <h2 id="titulo-datos">Datos personales</h2>
                     <form class="panel-form auth-form" th:action="@{/panel/perfil}"
-                          th:object="${profileForm}" method="post">
+                          th:object="${perfilFormulario}" method="post">
                         <div class="field">
                             <label for="fullName">Nombre completo</label>
-                            <input id="fullName" type="text" th:field="*{fullName}"
+                            <input id="fullName" type="text" th:field="*{nombreCompleto}"
                                    autocomplete="name" maxlength="120"
-                                   th:classappend="${#fields.hasErrors('fullName')} ? 'is-invalid' : ''"
-                                   th:attr="aria-invalid=${#fields.hasErrors('fullName')} ? 'true' : null,
-                                            aria-describedby=${#fields.hasErrors('fullName')} ? 'error-fullName' : null">
+                                   th:classappend="${#fields.hasErrors('nombreCompleto')} ? 'is-invalid' : ''"
+                                   th:attr="aria-invalid=${#fields.hasErrors('nombreCompleto')} ? 'true' : null,
+                                            aria-describedby=${#fields.hasErrors('nombreCompleto')} ? 'error-fullName' : null">
                             <p class="field-error" id="error-fullName"
-                               th:if="${#fields.hasErrors('fullName')}"
-                               th:errors="*{fullName}">Revisá este dato.</p>
+                               th:if="${#fields.hasErrors('nombreCompleto')}"
+                               th:errors="*{nombreCompleto}">Revisá este dato.</p>
                         </div>
 
                         <div class="field">
@@ -121,11 +121,11 @@
                     <dl class="panel-data panel-data--compact">
                         <div>
                             <dt>Tipo de cuenta</dt>
-                            <dd th:text="${currentUser.planLabel()}">Gratis</dd>
+                            <dd th:text="${usuarioActual.planLabel()}">Gratis</dd>
                         </div>
                         <div>
                             <dt>Acceso a cursos</dt>
-                            <dd th:text="${currentUser.premium()} ? 'Catálogo completo' : 'Cursos gratuitos'">
+                            <dd th:text="${usuarioActual.premium()} ? 'Catálogo completo' : 'Cursos gratuitos'">
                                 Cursos gratuitos
                             </dd>
                         </div>
@@ -135,42 +135,42 @@
                 <section class="panel-card" id="contrasena" aria-labelledby="titulo-contrasena">
                     <h2 id="titulo-contrasena">Contraseña</h2>
                     <form class="panel-form auth-form" th:action="@{/panel/perfil/contrasena}"
-                          th:object="${passwordForm}" method="post">
+                          th:object="${contrasenaFormulario}" method="post">
                         <div class="field">
                             <label for="currentPassword">Contraseña actual</label>
                             <input id="currentPassword" name="currentPassword" type="password"
                                    autocomplete="current-password"
-                                   th:classappend="${#fields.hasErrors('currentPassword')} ? 'is-invalid' : ''"
-                                   th:attr="aria-invalid=${#fields.hasErrors('currentPassword')} ? 'true' : null,
-                                            aria-describedby=${#fields.hasErrors('currentPassword')} ? 'error-currentPassword' : null">
+                                   th:classappend="${#fields.hasErrors('actualContrasena')} ? 'is-invalid' : ''"
+                                   th:attr="aria-invalid=${#fields.hasErrors('actualContrasena')} ? 'true' : null,
+                                            aria-describedby=${#fields.hasErrors('actualContrasena')} ? 'error-currentPassword' : null">
                             <p class="field-error" id="error-currentPassword"
-                               th:if="${#fields.hasErrors('currentPassword')}"
-                               th:errors="*{currentPassword}">Revisá este dato.</p>
+                               th:if="${#fields.hasErrors('actualContrasena')}"
+                               th:errors="*{actualContrasena}">Revisá este dato.</p>
                         </div>
 
                         <div class="field">
                             <label for="newPassword">Contraseña nueva</label>
                             <input id="newPassword" name="newPassword" type="password"
                                    autocomplete="new-password"
-                                   th:classappend="${#fields.hasErrors('newPassword')} ? 'is-invalid' : ''"
-                                   th:attr="aria-invalid=${#fields.hasErrors('newPassword')} ? 'true' : null,
-                                            aria-describedby=${#fields.hasErrors('newPassword')} ? 'hint-newPassword error-newPassword' : 'hint-newPassword'">
+                                   th:classappend="${#fields.hasErrors('newContrasena')} ? 'is-invalid' : ''"
+                                   th:attr="aria-invalid=${#fields.hasErrors('newContrasena')} ? 'true' : null,
+                                            aria-describedby=${#fields.hasErrors('newContrasena')} ? 'hint-newPassword error-newPassword' : 'hint-newPassword'">
                             <p class="field-hint" id="hint-newPassword">Entre 8 y 72 caracteres.</p>
                             <p class="field-error" id="error-newPassword"
-                               th:if="${#fields.hasErrors('newPassword')}"
-                               th:errors="*{newPassword}">Revisá este dato.</p>
+                               th:if="${#fields.hasErrors('newContrasena')}"
+                               th:errors="*{newContrasena}">Revisá este dato.</p>
                         </div>
 
                         <div class="field">
                             <label for="confirmPassword">Repetí la contraseña nueva</label>
                             <input id="confirmPassword" name="confirmPassword" type="password"
                                    autocomplete="new-password"
-                                   th:classappend="${#fields.hasErrors('confirmPassword')} ? 'is-invalid' : ''"
-                                   th:attr="aria-invalid=${#fields.hasErrors('confirmPassword')} ? 'true' : null,
-                                            aria-describedby=${#fields.hasErrors('confirmPassword')} ? 'error-confirmPassword' : null">
+                                   th:classappend="${#fields.hasErrors('confirmContrasena')} ? 'is-invalid' : ''"
+                                   th:attr="aria-invalid=${#fields.hasErrors('confirmContrasena')} ? 'true' : null,
+                                            aria-describedby=${#fields.hasErrors('confirmContrasena')} ? 'error-confirmPassword' : null">
                             <p class="field-error" id="error-confirmPassword"
-                               th:if="${#fields.hasErrors('confirmPassword')}"
-                               th:errors="*{confirmPassword}">Revisá este dato.</p>
+                               th:if="${#fields.hasErrors('confirmContrasena')}"
+                               th:errors="*{confirmContrasena}">Revisá este dato.</p>
                         </div>
 
                         <button class="btn btn-dark" type="submit">Actualizar contraseña</button>
@@ -185,15 +185,15 @@
                 </div>
 
                 <p class="panel-progress-copy">
-                    Tu plan actual es <strong th:text="${currentUser.planLabel()}">Gratis</strong>.
+                    Tu plan actual es <strong th:text="${usuarioActual.planLabel()}">Gratis</strong>.
                     Los cursos de paga y los certificados se habilitan cuando se confirma un pago:
                     el plan nunca se cambia a mano desde el perfil.
                 </p>
 
-                <p class="panel-note" th:if="${currentUser.premium() and !subscriptionEndLabel.isEmpty()}">
-                    Acceso pagado hasta el <strong th:text="${subscriptionEndLabel}">fecha</strong>.
+                <p class="panel-note" th:if="${usuarioActual.premium() and !subscriptionFinLabel.isEmpty()}">
+                    Acceso pagado hasta el <strong th:text="${subscriptionFinLabel}">fecha</strong>.
                 </p>
-                <p class="panel-note" th:if="${cancelAtPeriodEnd}">
+                <p class="panel-note" th:if="${cancelAtPeriodFin}">
                     Tu suscripción está en cancelación: conservás el acceso hasta el final del período pagado.
                 </p>
 

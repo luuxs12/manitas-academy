@@ -1,16 +1,16 @@
 package com.mundomanitas.api.service.admin;
 
-import com.mundomanitas.api.dto.admin.AdminCourseForm;
-import com.mundomanitas.api.dto.admin.AdminCourseRow;
-import com.mundomanitas.api.dto.admin.AdminExerciseForm;
-import com.mundomanitas.api.dto.admin.AdminModuleForm;
-import com.mundomanitas.api.dto.admin.AdminOption;
-import com.mundomanitas.api.dto.admin.AdminUserForm;
-import com.mundomanitas.api.dto.admin.AdminUserRow;
-import com.mundomanitas.api.dto.admin.AdminVideoForm;
-import com.mundomanitas.api.dto.admin.ExerciseRow;
-import com.mundomanitas.api.dto.admin.ModuleRow;
-import com.mundomanitas.api.dto.admin.VideoRow;
+import com.mundomanitas.api.dto.admin.AdminCursoFormulario;
+import com.mundomanitas.api.dto.admin.AdminFilaCurso;
+import com.mundomanitas.api.dto.admin.AdminEjercicioFormulario;
+import com.mundomanitas.api.dto.admin.AdminModuloFormulario;
+import com.mundomanitas.api.dto.admin.AdminOpcion;
+import com.mundomanitas.api.dto.admin.AdminUsuarioFormulario;
+import com.mundomanitas.api.dto.admin.AdminFilaUsuario;
+import com.mundomanitas.api.dto.admin.AdminVideoFormulario;
+import com.mundomanitas.api.dto.admin.FilaEjercicio;
+import com.mundomanitas.api.dto.admin.FilaModulo;
+import com.mundomanitas.api.dto.admin.FilaVideo;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -22,82 +22,82 @@ import java.util.UUID;
 public interface AdminCatalogService {
 
     /** Mejoras pendientes de un curso ya visible; nunca bloquean la publicación. */
-    record PublishChecklist(List<String> missing, boolean canPublish) {
+    record PublicarLista(List<String> missing, boolean canPublicar) {
     }
 
     /** Impacto real de borrar un curso, calculado desde la base. */
-    record DeletionImpact(int modules, int videos, int exercises,
+    record EliminacionImpacto(int modules, int videos, int exercises,
                           long enrollments, long certificates) {
     }
 
-    String slugFromTitle(String title);
+    String slugFromTitulo(String titulo);
 
-    Page<AdminUserRow> users(String role, String term, Pageable pageable, UUID currentId);
+    Page<AdminFilaUsuario> users(String rol, String term, Pageable pageable, UUID actualId);
 
-    AdminUserForm userForm(UUID id);
+    AdminUsuarioFormulario usuarioFormulario(UUID id);
 
-    void updateUser(UUID id, AdminUserForm form, UUID actor);
+    void updateUsuario(UUID id, AdminUsuarioFormulario formulario, UUID actor);
 
-    Page<AdminCourseRow> courses(String term, Pageable pageable);
+    Page<AdminFilaCurso> courses(String term, Pageable pageable);
 
-    AdminCourseForm courseForm(UUID id);
+    AdminCursoFormulario cursoFormulario(UUID id);
 
-    UUID createCourse(AdminCourseForm form, UUID actor);
+    UUID createCurso(AdminCursoFormulario formulario, UUID actor);
 
-    void updateCourse(UUID id, AdminCourseForm form, UUID actor);
+    void updateCurso(UUID id, AdminCursoFormulario formulario, UUID actor);
 
     /** Guarda la portada local y devuelve la ruta anterior para limpiar el archivo. */
-    String updateCourseCover(UUID id, String image, UUID actor);
+    String updateCursoPortada(UUID id, String imagen, UUID actor);
 
-    PublishChecklist publishChecklist(UUID id);
+    PublicarLista publicarLista(UUID id);
 
-    String courseStatus(UUID id);
+    String cursoEstado(UUID id);
 
     void setPublished(UUID id, boolean published, UUID actor);
 
-    DeletionImpact deletionImpact(UUID id);
+    EliminacionImpacto eliminacionImpacto(UUID id);
 
-    void deleteCourse(UUID id, UUID actor);
+    void deleteCurso(UUID id, UUID actor);
 
-    int lessonCount(UUID courseId);
+    int leccionContar(UUID cursoId);
 
-    void moveModule(UUID id, boolean up, UUID actor);
+    void moveModulo(UUID id, boolean up, UUID actor);
 
     void moveVideo(UUID id, boolean up, UUID actor);
 
-    Page<ModuleRow> modules(UUID courseId, String term, Pageable pageable);
+    Page<FilaModulo> modules(UUID cursoId, String term, Pageable pageable);
 
-    AdminModuleForm moduleForm(UUID id);
+    AdminModuloFormulario moduloFormulario(UUID id);
 
-    UUID createModule(AdminModuleForm form, UUID actor);
+    UUID createModulo(AdminModuloFormulario formulario, UUID actor);
 
-    void updateModule(UUID id, AdminModuleForm form, UUID actor);
+    void updateModulo(UUID id, AdminModuloFormulario formulario, UUID actor);
 
-    void deleteModule(UUID id, UUID actor);
+    void deleteModulo(UUID id, UUID actor);
 
-    Page<VideoRow> videos(UUID moduleId, String term, Pageable pageable);
+    Page<FilaVideo> videos(UUID moduloId, String term, Pageable pageable);
 
-    AdminVideoForm videoForm(UUID id);
+    AdminVideoFormulario videoFormulario(UUID id);
 
-    UUID createVideo(AdminVideoForm form, UUID actor);
+    UUID createVideo(AdminVideoFormulario formulario, UUID actor);
 
-    void updateVideo(UUID id, AdminVideoForm form, UUID actor);
+    void updateVideo(UUID id, AdminVideoFormulario formulario, UUID actor);
 
     void deleteVideo(UUID id, UUID actor);
 
-    Page<ExerciseRow> exercises(UUID moduleId, String term, Pageable pageable);
+    Page<FilaEjercicio> exercises(UUID moduloId, String term, Pageable pageable);
 
-    AdminExerciseForm exerciseForm(UUID id);
+    AdminEjercicioFormulario ejercicioFormulario(UUID id);
 
-    UUID createExercise(AdminExerciseForm form, UUID actor);
+    UUID createEjercicio(AdminEjercicioFormulario formulario, UUID actor);
 
-    void updateExercise(UUID id, AdminExerciseForm form, UUID actor);
+    void updateEjercicio(UUID id, AdminEjercicioFormulario formulario, UUID actor);
 
-    void deleteExercise(UUID id, UUID actor);
+    void deleteEjercicio(UUID id, UUID actor);
 
-    List<AdminOption> courseOptions();
+    List<AdminOpcion> cursoOptions();
 
-    List<AdminOption> moduleOptions();
+    List<AdminOpcion> moduloOptions();
 
-    Map<UUID, String> userNames();
+    Map<UUID, String> usuarioNames();
 }

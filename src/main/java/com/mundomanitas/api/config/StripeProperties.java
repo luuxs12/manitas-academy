@@ -12,8 +12,8 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties(prefix = "app.stripe")
 public class StripeProperties {
 
-    private String secretKey = "";
-    private String publishableKey = "";
+    private String secretClave = "";
+    private String publishableClave = "";
     private String webhookSecret = "";
     private String monthlyPriceId = "";
     private String annualPriceId = "";
@@ -21,20 +21,20 @@ public class StripeProperties {
     private String apiVersion = "2026-11-18.endive";
     private String customerPortalUrl = "";
 
-    public String getSecretKey() {
-        return secretKey;
+    public String getSecretClave() {
+        return secretClave;
     }
 
-    public void setSecretKey(String secretKey) {
-        this.secretKey = secretKey;
+    public void setSecretClave(String secretClave) {
+        this.secretClave = secretClave;
     }
 
-    public String getPublishableKey() {
-        return publishableKey;
+    public String getPublishableClave() {
+        return publishableClave;
     }
 
-    public void setPublishableKey(String publishableKey) {
-        this.publishableKey = publishableKey;
+    public void setPublishableClave(String publishableClave) {
+        this.publishableClave = publishableClave;
     }
 
     public String getWebhookSecret() {
@@ -86,7 +86,7 @@ public class StripeProperties {
     }
 
     public boolean isEnabled() {
-        return !secretKey.isBlank()
+        return !secretClave.isBlank()
                 && !monthlyPriceId.isBlank()
                 && !annualPriceId.isBlank();
     }

@@ -1,6 +1,6 @@
 package com.mundomanitas.api.controller;
 
-import com.mundomanitas.api.service.CurrentUserService;
+import com.mundomanitas.api.service.ActualUsuarioService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.csrf.CsrfToken;
@@ -14,18 +14,18 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 @ControllerAdvice
 public class GlobalModelAdvice {
 
-    private final CurrentUserService currentUser;
+    private final ActualUsuarioService usuarioActual;
 
-    public GlobalModelAdvice(CurrentUserService currentUser) {
-        this.currentUser = currentUser;
+    public GlobalModelAdvice(ActualUsuarioService usuarioActual) {
+        this.usuarioActual = usuarioActual;
     }
 
     @ModelAttribute
-    public void addSession(Authentication authentication, Model model) {
-        CurrentUserService.SessionView session = currentUser.load(authentication);
-        model.addAttribute("currentUser", session.currentUser());
-        model.addAttribute("unreadCount", session.unreadCount());
-        model.addAttribute("recentNotifications", session.recentNotifications());
+    public void addSesion(Authentication authentication, Model model) {
+        ActualUsuarioService.SesionVista session = usuarioActual.load(authentication);
+        model.addAttribute("usuarioActual", session.usuarioActual());
+        model.addAttribute("unreadContar", session.unreadContar());
+        model.addAttribute("recienteNotifications", session.recienteNotifications());
     }
 
     /**

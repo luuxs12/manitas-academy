@@ -1,7 +1,7 @@
 package com.mundomanitas.api.config;
 
-import com.mundomanitas.api.repository.UserRepository;
-import com.mundomanitas.api.security.AuthenticatedUser;
+import com.mundomanitas.api.repository.UsuarioRepository;
+import com.mundomanitas.api.security.AutenticadoUsuario;
 import com.mundomanitas.api.security.InMemoryRateLimiter;
 import com.mundomanitas.api.security.RateLimiter;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,14 +34,14 @@ import java.time.Duration;
 public class SecurityConfig {
 
     @Bean
-    PasswordEncoder passwordEncoder() {
+    PasswordEncoder contrasenaEncoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    UserDetailsService userDetailsService(UserRepository users) {
-        return email -> users.findByEmailIgnoreCase(email)
-                .map(AuthenticatedUser::new)
+    UserDetailsService userDetailsService(UsuarioRepository users) {
+        return email -> users.buscarPorEmailIgnorandoMayusculas(email)
+                .map(AutenticadoUsuario::new)
                 .orElseThrow(() -> new UsernameNotFoundException(
                         "No existe una cuenta con ese correo"));
     }
@@ -49,18 +49,18 @@ public class SecurityConfig {
     @Bean
     RateLimiter rateLimiter(
             @Value("${app.rate-limit.max-attempts:10}") int maxAttempts,
-            @Value("${app.rate-limit.window-seconds:60}") int windowSeconds
+            @Value("${app.rate-limit.window-seconds:60}") int ventanaSegundos
     ) {
-        return new InMemoryRateLimiter(maxAttempts, Duration.ofSeconds(windowSeconds));
+        return new InMemoryRateLimiter(maxAttempts, Duration.ofSeconds(ventanaSegundos));
     }
 
     @Bean
     AuthenticationManager authenticationManager(
             UserDetailsService userDetailsService,
-            PasswordEncoder passwordEncoder
+            PasswordEncoder contrasenaEncoder
     ) {
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider(userDetailsService);
-        provider.setPasswordEncoder(passwordEncoder);
+        provider.setPasswordEncoder(contrasenaEncoder);
         return new ProviderManager(provider);
     }
 
@@ -68,7 +68,7 @@ public class SecurityConfig {
     SecurityFilterChain securityFilterChain(
             HttpSecurity http,
             UserDetailsService userDetailsService,
-            @Value("${app.security.remember-me-key:mundo-manitas-dev}") String rememberMeKey
+            @Value("${app.security.remember-me-key:mundo-manitas-dev}") String rememberMeClave
     ) throws Exception {
         http
                 .authorizeHttpRequests(auth -> auth
@@ -79,7 +79,7 @@ public class SecurityConfig {
                         // Paneles aislados: ADMIN nunca entra al área de estudiante.
                         .requestMatchers("/panel", "/panel/**").hasRole("STUDENT")
                         .anyRequest().permitAll())
-                .formLogin(form -> form
+                .formLogin(formulario -> formulario
                         .loginPage("/?login")
                         .loginProcessingUrl("/login")
                         .successHandler((request, response, authentication) -> {
@@ -96,7 +96,7 @@ public class SecurityConfig {
                         .logoutSuccessUrl("/?login")
                         .permitAll())
                 .rememberMe(remember -> remember
-                        .key(rememberMeKey)
+                        .key(rememberMeClave)
                         .tokenValiditySeconds(60 * 60 * 24 * 14)
                         .userDetailsService(userDetailsService))
                 .headers(headers -> headers

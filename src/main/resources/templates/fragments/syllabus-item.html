@@ -13,56 +13,56 @@
         <article class="syllabus-item"
                  th:id="'syllabus-' + ${item.id()}"
                  th:attr="aria-labelledby='syllabus-title-' + ${item.id()}"
-                 th:classappend="${((selectedId != null and item.sourceId() != null and selectedId == item.sourceId()) or (selectedItemId != null and item.id() == selectedItemId) ? ' is-active' : '') + (item.seen() ? ' is-done' : '')}">
+                 th:classappend="${((selectedId != null and item.origenId() != null and selectedId == item.origenId()) or (selectedItemId != null and item.id() == selectedItemId) ? ' is-activo' : '') + (item.visto() ? ' is-done' : '')}">
             <div class="syllabus-item-top">
                 <span class="syllabus-item-type" th:text="${item.type()}"></span>
                 <span class="syllabus-state"
-                      th:text="${item.locked() ? 'Requiere Premium' : (item.seen() ? 'Visto' : 'Pendiente')}"></span>
+                      th:text="${item.bloqueado() ? 'Requiere Premium' : (item.visto() ? 'Visto' : 'Pendiente')}"></span>
             </div>
 
             <h5 class="syllabus-title" th:id="'syllabus-title-' + ${item.id()}"
-                th:text="${item.title()}"></h5>
+                th:text="${item.titulo()}"></h5>
 
             <p class="syllabus-description"
-               th:if="${item.description() != null}"
-               th:attr="title=${item.description()}"
-               th:text="${item.description()}"></p>
+               th:if="${item.descripcion() != null}"
+               th:attr="title=${item.descripcion()}"
+               th:text="${item.descripcion()}"></p>
 
             <p class="syllabus-meta">
-                <span th:if="${item.type() == 'VIDEO'}" th:text="${item.durationLabel()}"></span>
+                <span th:if="${item.type() == 'VIDEO'}" th:text="${item.duracionLabel()}"></span>
                 <span th:unless="${item.type() == 'VIDEO'}">Sin fecha límite</span>
             </p>
 
-            <div class="syllabus-item-actions" th:if="${!item.locked()}">
+            <div class="syllabus-item-actions" th:if="${!item.bloqueado()}">
                 <a class="btn btn-dark syllabus-action"
-                   th:if="${item.type() == 'VIDEO' and item.sourceId() != null}"
-                   th:href="@{/panel/cursos/{slug}(slug=${enrollment.course.slug},video=${item.sourceId()})}"
-                   th:attr="aria-label='Abrir la clase ' + ${item.title()}">Abrir clase</a>
+                   th:if="${item.type() == 'VIDEO' and item.origenId() != null}"
+                   th:href="@{/panel/cursos/{slug}(slug=${inscripcion.curso.slug},video=${item.origenId()})}"
+                   th:attr="aria-label='Abrir la clase ' + ${item.titulo()}">Abrir clase</a>
                 <a class="btn btn-dark syllabus-action"
                    th:if="${item.type() == 'MATERIAL' and item.url() != null and !item.downloadable()}"
                    th:href="${item.url()}" target="_blank"
                    rel="noopener noreferrer"
-                   th:attr="aria-label='Abrir el material ' + ${item.title()} + ' (abre en pestaña nueva)'">Abrir material</a>
+                   th:attr="aria-label='Abrir el material ' + ${item.titulo()} + ' (abre en pestaña nueva)'">Abrir material</a>
                 <a class="btn btn-dark syllabus-action"
-                   th:if="${item.type() == 'MATERIAL' and item.downloadable() and item.fileName() != null and #strings.endsWith(#strings.toLowerCase(item.fileName()), '.pdf')}"
-                   th:href="@{/panel/cursos/{slug}/materiales/{itemId}/ver(slug=${enrollment.course.slug},itemId=${item.id()})}"
-                   th:attr="aria-label='Abrir el PDF ' + ${item.title()}">Ver material</a>
+                   th:if="${item.type() == 'MATERIAL' and item.downloadable() and item.nombreArchivo() != null and #strings.endsWith(#strings.toLowerCase(item.nombreArchivo()), '.pdf')}"
+                   th:href="@{/panel/cursos/{slug}/materiales/{itemId}/ver(slug=${inscripcion.curso.slug},itemId=${item.id()})}"
+                   th:attr="aria-label='Abrir el PDF ' + ${item.titulo()}">Ver material</a>
                 <a class="btn btn-dark syllabus-action"
                    th:if="${item.type() == 'MATERIAL' and item.downloadable()}"
-                   th:href="@{/panel/cursos/{slug}/materiales/{itemId}/descargar(slug=${enrollment.course.slug},itemId=${item.id()})}"
-                   th:attr="aria-label='Descargar el documento ' + ${item.title()}">Descargar documento</a>
+                   th:href="@{/panel/cursos/{slug}/materiales/{itemId}/descargar(slug=${inscripcion.curso.slug},itemId=${item.id()})}"
+                   th:attr="aria-label='Descargar el documento ' + ${item.titulo()}">Descargar documento</a>
                 <a class="btn btn-dark syllabus-action"
                    th:if="${item.type() == 'EJERCICIO'}"
-                   th:href="@{/panel/cursos/{slug}/ejercicios/{itemId}(slug=${enrollment.course.slug},itemId=${item.id()})}"
-                   th:attr="aria-label='Abrir el cuestionario ' + ${item.title()}"
-                   th:text="${item.quizDone()} ? 'Ver resultado' : 'Rendir cuestionario'"></a>
+                   th:href="@{/panel/cursos/{slug}/ejercicios/{itemId}(slug=${inscripcion.curso.slug},itemId=${item.id()})}"
+                   th:attr="aria-label='Abrir el cuestionario ' + ${item.titulo()}"
+                   th:text="${item.cuestionarioDone()} ? 'Ver resultado' : 'Rendir cuestionario'"></a>
                 <form class="syllabus-mark-form"
                       th:if="${item.type() != 'EJERCICIO'}"
-                      th:action="@{/panel/cursos/{slug}/items/{itemId}/visto(slug=${enrollment.course.slug},itemId=${item.id()})}"
+                      th:action="@{/panel/cursos/{slug}/items/{itemId}/visto(slug=${inscripcion.curso.slug},itemId=${item.id()})}"
                       method="post">
-                    <input type="hidden" name="seen" th:value="${!item.seen()}">
+                    <input type="hidden" name="visto" th:value="${!item.visto()}">
                     <button class="btn btn-ghost syllabus-action" type="submit"
-                            th:text="${item.seen()} ? 'Marcar como pendiente' : 'Marcar como visto'">
+                            th:text="${item.visto()} ? 'Marcar como pendiente' : 'Marcar como visto'">
                     </button>
                 </form>
             </div>

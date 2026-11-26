@@ -8,7 +8,7 @@
     <meta name="theme-color" content="#FFFFFF">
     <meta name="description"
           content="Cursos de tecnología en Lengua de Señas Peruana, con intérprete y subtítulos en cada clase. Empezá gratis y avanzá a tu ritmo.">
-    <title th:text="${title} + ' · Mundo Manitas'">Mundo Manitas</title>
+    <title th:text="${titulo} + ' · Mundo Manitas'">Mundo Manitas</title>
     <link rel="icon" type="image/png" th:href="@{/img/brand/favicon.png}">
     <script th:src="@{/js/theme.js}"></script>
     <link rel="stylesheet" th:href="@{/css/styles.css}">
@@ -72,19 +72,19 @@
             </svg>
         </button>
 
-        <div class="nav-actions" th:if="${currentUser == null}">
+        <div class="nav-actions" th:if="${usuarioActual == null}">
             <a class="nav-login" th:href="@{/} + '?login'" data-auth-open="login">Iniciar sesión</a>
             <a class="btn btn-nav" th:href="@{/registro}" data-auth-open="register">Crear cuenta</a>
         </div>
 
-        <div class="nav-actions nav-actions--account" th:if="${currentUser != null}">
+        <div class="nav-actions nav-actions--account" th:if="${usuarioActual != null}">
             <a class="nav-user"
-               th:href="${currentUser.admin()} ? @{/admin} : @{/panel}"
-               th:aria-label="${currentUser.admin()} ? 'Ir al panel administrativo' : 'Ir a mi panel'">
+               th:href="${usuarioActual.admin()} ? @{/admin} : @{/panel}"
+               th:aria-label="${usuarioActual.admin()} ? 'Ir al panel administrativo' : 'Ir a mi panel'">
                 <span class="nav-avatar" aria-hidden="true"
-                      th:text="${currentUser.initials()}">AQ</span>
+                      th:text="${usuarioActual.initials()}">AQ</span>
                 <span class="nav-user-name">
-                    Hola, <span th:text="${currentUser.firstName()}">Ana</span>
+                    Hola, <span th:text="${usuarioActual.nombreCompleto()}">Ana</span>
                 </span>
             </a>
             <form class="nav-logout" th:action="@{/logout}" method="post">
@@ -141,10 +141,10 @@
                 <li><a th:href="@{/nosotros}">Nosotros</a></li>
                 <li><a th:href="@{/terminos}">Términos</a></li>
                 <li><a th:href="@{/privacidad}">Privacidad</a></li>
-                <li th:if="${currentUser == null}">
+                <li th:if="${usuarioActual == null}">
                     <a th:href="@{/} + '?login'" data-auth-open="login">Iniciar sesión</a>
                 </li>
-                <li th:if="${currentUser != null}">
+                <li th:if="${usuarioActual != null}">
                     <a href="mailto:hola@mundomanitas.com">Escribinos</a>
                 </li>
             </ul>

@@ -1,7 +1,7 @@
 package com.mundomanitas.api.service.admin;
 
-import com.mundomanitas.api.model.User;
-import com.mundomanitas.api.repository.UserRepository;
+import com.mundomanitas.api.model.Usuario;
+import com.mundomanitas.api.repository.UsuarioRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -22,58 +22,58 @@ import static org.mockito.Mockito.when;
 @DisplayName("Bootstrap de la cuenta administradora")
 class AdminBootstrapServiceTest {
 
-    private final UserRepository users = mock(UserRepository.class);
+    private final UsuarioRepository users = mock(UsuarioRepository.class);
     private final PasswordEncoder encoder = mock(PasswordEncoder.class);
     private final AdminBootstrapService service = new AdminBootstrapServiceImpl(users, encoder);
 
     @Test
     @DisplayName("crea el admin con el correo normalizado y la clave cifrada")
     void createsAdminWhenMissing() {
-        when(users.findByEmailIgnoreCase("admin@damianprint.com")).thenReturn(Optional.empty());
+        when(users.buscarPorEmailIgnorandoMayusculas("admin@damianprint.com")).thenReturn(Optional.empty());
         when(encoder.encode("Clave12345!")).thenReturn("hash-bcrypt");
 
         service.ensureAdmin(" ADMIN@DamianPrint.com ", "Clave12345!");
 
-        ArgumentCaptor<User> saved = ArgumentCaptor.forClass(User.class);
+        ArgumentCaptor<Usuario> saved = ArgumentCaptor.forClass(Usuario.class);
         verify(users).save(saved.capture());
         assertThat(saved.getValue().getEmail()).isEqualTo("admin@damianprint.com");
-        assertThat(saved.getValue().getPasswordHash()).isEqualTo("hash-bcrypt");
-        assertThat(saved.getValue().getFullName()).isEqualTo("Administrador");
-        assertThat(saved.getValue().getRole()).isEqualTo("ADMIN");
-        assertThat(saved.getValue().isActive()).isTrue();
+        assertThat(saved.getValue().getContrasenaHash()).isEqualTo("hash-bcrypt");
+        assertThat(saved.getValue().getNombreCompleto()).isEqualTo("Administrador");
+        assertThat(saved.getValue().getRol()).isEqualTo("ADMIN");
+        assertThat(saved.getValue().isActivo()).isTrue();
     }
 
     @Test
     @DisplayName("promueve una cuenta existente sin cambiar su clave")
-    void promotesExistingStudent() {
-        User existing = new User("admin@damianprint.com", "hash-viejo", "Administrador");
-        when(users.findByEmailIgnoreCase("admin@damianprint.com")).thenReturn(Optional.of(existing));
+    void promotesExistingEstudiante() {
+        Usuario existing = new Usuario("admin@damianprint.com", "hash-viejo", "Administrador");
+        when(users.buscarPorEmailIgnorandoMayusculas("admin@damianprint.com")).thenReturn(Optional.of(existing));
 
         service.ensureAdmin("admin@damianprint.com", "Clave12345!");
 
         verify(users).save(existing);
-        assertThat(existing.getRole()).isEqualTo("ADMIN");
-        assertThat(existing.getPasswordHash()).isEqualTo("hash-viejo");
+        assertThat(existing.getRol()).isEqualTo("ADMIN");
+        assertThat(existing.getContrasenaHash()).isEqualTo("hash-viejo");
         verifyNoInteractions(encoder);
     }
 
     @Test
     @DisplayName("no toca una cuenta que ya es administradora")
     void leavesExistingAdminUntouched() {
-        User existing = new User("admin@damianprint.com", "hash-viejo", "Administrador");
-        existing.changeRole("ADMIN");
-        when(users.findByEmailIgnoreCase("admin@damianprint.com")).thenReturn(Optional.of(existing));
+        Usuario existing = new Usuario("admin@damianprint.com", "hash-viejo", "Administrador");
+        existing.changeRol("ADMIN");
+        when(users.buscarPorEmailIgnorandoMayusculas("admin@damianprint.com")).thenReturn(Optional.of(existing));
 
         service.ensureAdmin("admin@damianprint.com", "OtraClave123!");
 
-        verify(users, never()).save(any(User.class));
-        assertThat(existing.getPasswordHash()).isEqualTo("hash-viejo");
+        verify(users, never()).save(any(Usuario.class));
+        assertThat(existing.getContrasenaHash()).isEqualTo("hash-viejo");
         verifyNoInteractions(encoder);
     }
 
     @Test
     @DisplayName("rechaza una contraseña vacía antes de tocar la base")
-    void rejectsBlankPassword() {
+    void rejectsBlankContrasena() {
         assertThatThrownBy(() -> service.ensureAdmin("admin@damianprint.com", "   "))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessage("La contraseña del administrador no puede estar vacía.");

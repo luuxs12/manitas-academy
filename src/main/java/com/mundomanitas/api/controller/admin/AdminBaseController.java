@@ -1,7 +1,7 @@
 package com.mundomanitas.api.controller.admin;
 
-import com.mundomanitas.api.security.AuthenticatedUser;
-import com.mundomanitas.api.service.admin.AdminNotificationService;
+import com.mundomanitas.api.security.AutenticadoUsuario;
+import com.mundomanitas.api.service.admin.AdminNotificacionService;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.ui.Model;
 
@@ -12,31 +12,31 @@ import java.util.UUID;
 /** Datos comunes de la cabecera del panel administrativo. */
 public abstract class AdminBaseController {
 
-    private final AdminNotificationService notifications;
+    private final AdminNotificacionService notifications;
 
-    protected AdminBaseController(AdminNotificationService notifications) {
+    protected AdminBaseController(AdminNotificacionService notifications) {
         this.notifications = notifications;
     }
 
-    protected void common(Model model, String active, String title) {
+    protected void common(Model model, String activo, String titulo) {
         OffsetDateTime since = OffsetDateTime.now().minusHours(24);
-        model.addAttribute("active", active);
-        model.addAttribute("title", title);
-        model.addAttribute("adminSince", since);
-        model.addAttribute("adminEvents", notifications.recent(since));
+        model.addAttribute("activo", activo);
+        model.addAttribute("titulo", titulo);
+        model.addAttribute("adminDesde", since);
+        model.addAttribute("adminEvents", notifications.reciente(since));
         model.addAttribute("adminUnread", notifications.unread(since));
     }
 
-    protected UUID actorId(@AuthenticationPrincipal AuthenticatedUser principal) {
+    protected UUID actorId(@AuthenticationPrincipal AutenticadoUsuario principal) {
         return principal.getId();
     }
 
     /** Página de confirmación compartida: el POST lo envía el formulario con CSRF. */
-    protected String confirmation(Model model, String active, String title,
+    protected String confirmation(Model model, String activo, String titulo,
                                   String message, String action, String label,
                                   String cancelUrl, List<String> details) {
-        common(model, active, title);
-        model.addAttribute("confirmTitle", title);
+        common(model, activo, titulo);
+        model.addAttribute("confirmTitulo", titulo);
         model.addAttribute("confirmMessage", message);
         model.addAttribute("confirmAction", action);
         model.addAttribute("confirmLabel", label);

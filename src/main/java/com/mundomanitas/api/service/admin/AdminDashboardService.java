@@ -1,23 +1,23 @@
 package com.mundomanitas.api.service.admin;
 
-import com.mundomanitas.api.dto.admin.ActivityChart;
-import com.mundomanitas.api.dto.admin.DayCount;
-import com.mundomanitas.api.dto.admin.IncomeChart;
-import com.mundomanitas.api.dto.admin.KpiCard;
-import com.mundomanitas.api.dto.admin.PopularCourse;
-import com.mundomanitas.api.dto.admin.RecentUser;
-import com.mundomanitas.api.dto.admin.ReportSummary;
-import com.mundomanitas.api.dto.admin.SystemCheck;
-import com.mundomanitas.api.model.Course;
-import com.mundomanitas.api.model.Enrollment;
-import com.mundomanitas.api.model.User;
+import com.mundomanitas.api.dto.admin.GraficoActividad;
+import com.mundomanitas.api.dto.admin.ConteoDia;
+import com.mundomanitas.api.dto.admin.GraficoIngresos;
+import com.mundomanitas.api.dto.admin.TarjetaKpi;
+import com.mundomanitas.api.dto.admin.CursoPopular;
+import com.mundomanitas.api.dto.admin.UsuarioReciente;
+import com.mundomanitas.api.dto.admin.ResumenReporte;
+import com.mundomanitas.api.dto.admin.VerificacionSistema;
+import com.mundomanitas.api.model.Curso;
+import com.mundomanitas.api.model.Inscripcion;
+import com.mundomanitas.api.model.Usuario;
 import com.mundomanitas.api.repository.AdminStatsRepository;
-import com.mundomanitas.api.repository.CertificateRepository;
-import com.mundomanitas.api.repository.CourseRepository;
-import com.mundomanitas.api.repository.EnrollmentRepository;
-import com.mundomanitas.api.repository.LessonProgressRepository;
-import com.mundomanitas.api.repository.PaymentRepository;
-import com.mundomanitas.api.repository.UserRepository;
+import com.mundomanitas.api.repository.CertificadoRepository;
+import com.mundomanitas.api.repository.CursoRepository;
+import com.mundomanitas.api.repository.InscripcionRepository;
+import com.mundomanitas.api.repository.LeccionProgresoRepository;
+import com.mundomanitas.api.repository.PagoRepository;
+import com.mundomanitas.api.repository.UsuarioRepository;
 import org.springframework.boot.SpringBootVersion;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -48,24 +48,24 @@ public class AdminDashboardService {
     private static final String ICON_CERTIFICATES =
             "M12 4a5 5 0 1 0 0 10 5 5 0 0 0 0-10M8.5 14l-1 7 4.5-2.5 4.5 2.5-1-7";
 
-    private final UserRepository users;
-    private final CourseRepository courses;
-    private final EnrollmentRepository enrollments;
-    private final LessonProgressRepository lessons;
-    private final CertificateRepository certificates;
-    private final PaymentRepository payments;
+    private final UsuarioRepository users;
+    private final CursoRepository courses;
+    private final InscripcionRepository enrollments;
+    private final LeccionProgresoRepository lessons;
+    private final CertificadoRepository certificates;
+    private final PagoRepository payments;
     private final AdminStatsRepository stats;
-    private final AdminFormat format;
+    private final AdminFormato format;
 
     public AdminDashboardService(
-            UserRepository users,
-            CourseRepository courses,
-            EnrollmentRepository enrollments,
-            LessonProgressRepository lessons,
-            CertificateRepository certificates,
-            PaymentRepository payments,
+            UsuarioRepository users,
+            CursoRepository courses,
+            InscripcionRepository enrollments,
+            LeccionProgresoRepository lessons,
+            CertificadoRepository certificates,
+            PagoRepository payments,
             AdminStatsRepository stats,
-            AdminFormat format
+            AdminFormato format
     ) {
         this.users = users;
         this.courses = courses;
@@ -78,163 +78,163 @@ public class AdminDashboardService {
     }
 
     @Transactional(readOnly = true)
-    public List<KpiCard> kpis() {
+    public List<TarjetaKpi> kpis() {
         OffsetDateTime now = OffsetDateTime.now();
         OffsetDateTime from = now.minusDays(30);
         OffsetDateTime previousFrom = from.minusDays(30);
 
-        long userCount = users.count();
-        long courseCount = courses.count();
-        long lessonCount = lessons.count();
-        long certificateCount = certificates.countByRevokedAtIsNull();
+        long usuarioContar = users.count();
+        long cursoContar = courses.count();
+        long leccionContar = lessons.count();
+        long certificadoContar = certificates.contarPorFechaRevocacionEsNulo();
 
         return List.of(
-                new KpiCard("Usuarios registrados", String.valueOf(userCount),
-                        trend(users.countByCreatedAtBetween(from, now),
-                                users.countByCreatedAtBetween(previousFrom, from)),
+                new TarjetaKpi("Usuarios registrados", String.valueOf(usuarioContar),
+                        trend(users.contarPorFechaCreacionEntre(from, now),
+                                users.contarPorFechaCreacionEntre(previousFrom, from)),
                         ICON_USERS, "Altas en los últimos 30 días"),
-                new KpiCard("Cursos publicados", String.valueOf(courseCount),
-                        trend(courses.countByCreatedAtBetween(from, now),
-                                courses.countByCreatedAtBetween(previousFrom, from)),
+                new TarjetaKpi("Cursos publicados", String.valueOf(cursoContar),
+                        trend(courses.contarPorFechaCreacionEntre(from, now),
+                                courses.contarPorFechaCreacionEntre(previousFrom, from)),
                         ICON_COURSES, "Fichas activas del catálogo"),
-                new KpiCard("Lecciones vistas", String.valueOf(lessonCount),
-                        trend(lessons.countByCompletedAtBetween(from, now),
-                                lessons.countByCompletedAtBetween(previousFrom, from)),
+                new TarjetaKpi("Lecciones vistas", String.valueOf(leccionContar),
+                        trend(lessons.contarPorFechaFinalizacionEntre(from, now),
+                                lessons.contarPorFechaFinalizacionEntre(previousFrom, from)),
                         ICON_LESSONS, "Lecciones completadas por el alumnado"),
-                new KpiCard("Certificados emitidos", String.valueOf(certificateCount),
-                        trend(certificates.countByIssuedAtBetween(from, now),
-                                certificates.countByIssuedAtBetween(previousFrom, from)),
+                new TarjetaKpi("Certificados emitidos", String.valueOf(certificadoContar),
+                        trend(certificates.contarPorFechaEmisionEntre(from, now),
+                                certificates.contarPorFechaEmisionEntre(previousFrom, from)),
                         ICON_CERTIFICATES, "Emitidos y vigentes")
         );
     }
 
     @Transactional(readOnly = true)
-    public ActivityChart activity(int requestedDays) {
+    public GraficoActividad actividad(int requestedDays) {
         int days = requestedDays == 7 || requestedDays == 90 ? requestedDays : 30;
         LocalDate today = LocalDate.now();
         LocalDate from = today.minusDays(days - 1L);
         OffsetDateTime fromTime = from.atStartOfDay().atOffset(OffsetDateTime.now().getOffset());
 
-        Map<LocalDate, Long> userSeries = toMap(stats.usersByDay(fromTime));
-        Map<LocalDate, Long> courseSeries = toMap(stats.coursesByDay(fromTime));
+        Map<LocalDate, Long> usuarioSeries = toMap(stats.usersPorDia(fromTime));
+        Map<LocalDate, Long> cursoSeries = toMap(stats.coursesPorDia(fromTime));
 
         int max = 1;
-        for (long value : userSeries.values()) max = (int) Math.max(max, value);
-        for (long value : courseSeries.values()) max = (int) Math.max(max, value);
+        for (long value : usuarioSeries.values()) max = (int) Math.max(max, value);
+        for (long value : cursoSeries.values()) max = (int) Math.max(max, value);
 
-        List<String> labels = new ArrayList<>();
-        List<String> userPoints = new ArrayList<>();
-        List<String> coursePoints = new ArrayList<>();
+        List<String> etiquetas = new ArrayList<>();
+        List<String> usuarioPoints = new ArrayList<>();
+        List<String> cursoPoints = new ArrayList<>();
         int step = days == 7 ? 1 : days == 30 ? 5 : 15;
         int last = days - 1;
         for (int index = 0; index < days; index++) {
-            LocalDate day = from.plusDays(index);
-            labels.add(index % step == 0 || index == last ? day.format(LABEL) : "");
-            userPoints.add(point(index, userSeries.getOrDefault(day, 0L), max, last));
-            coursePoints.add(point(index, courseSeries.getOrDefault(day, 0L), max, last));
+            LocalDate dia = from.plusDays(index);
+            etiquetas.add(index % step == 0 || index == last ? dia.format(LABEL) : "");
+            usuarioPoints.add(point(index, usuarioSeries.getOrDefault(dia, 0L), max, last));
+            cursoPoints.add(point(index, cursoSeries.getOrDefault(dia, 0L), max, last));
         }
-        return new ActivityChart(days, from, today, labels, userPoints, coursePoints, max,
-                userSeries.values().stream().mapToLong(Long::longValue).sum(),
-                courseSeries.values().stream().mapToLong(Long::longValue).sum());
+        return new GraficoActividad(days, from, today, etiquetas, usuarioPoints, cursoPoints, max,
+                usuarioSeries.values().stream().mapToLong(Long::longValue).sum(),
+                cursoSeries.values().stream().mapToLong(Long::longValue).sum());
     }
 
     @Transactional(readOnly = true)
-    public IncomeChart income(int requestedDays) {
+    public GraficoIngresos ingresos(int requestedDays) {
         int days = requestedDays == 7 || requestedDays == 90 ? requestedDays : 30;
         LocalDate today = LocalDate.now();
         LocalDate from = today.minusDays(days - 1L);
         OffsetDateTime fromTime = from.atStartOfDay().atOffset(OffsetDateTime.now().getOffset());
 
-        Map<LocalDate, Long> values = toMap(stats.revenueByDay(fromTime));
+        Map<LocalDate, Long> values = toMap(stats.revenuePorDia(fromTime));
         long max = 1;
         for (long value : values.values()) max = Math.max(max, value);
         long total = values.values().stream().mapToLong(Long::longValue).sum();
 
         int step = days == 7 ? 1 : days == 30 ? 5 : 15;
         int last = days - 1;
-        List<String> labels = new ArrayList<>();
+        List<String> etiquetas = new ArrayList<>();
         List<String> points = new ArrayList<>();
         for (int index = 0; index < days; index++) {
-            LocalDate day = from.plusDays(index);
-            labels.add(index % step == 0 || index == last ? day.format(LABEL) : "");
-            long value = values.getOrDefault(day, 0L);
+            LocalDate dia = from.plusDays(index);
+            etiquetas.add(index % step == 0 || index == last ? dia.format(LABEL) : "");
+            long value = values.getOrDefault(dia, 0L);
             int x = last == 0 ? 40 : 40 + (int) Math.round(index * 820.0 / last);
             int y = 210 - (int) Math.round(value * 170.0 / max);
             points.add(x + "," + y);
         }
-        return new IncomeChart(from, today, labels, points, total, max);
+        return new GraficoIngresos(from, today, etiquetas, points, total, max);
     }
 
     @Transactional(readOnly = true)
-    public List<PopularCourse> popular() {
-        Map<Course, List<Enrollment>> grouped = enrollments.findAll().stream()
-                .collect(Collectors.groupingBy(Enrollment::getCourse, LinkedHashMap::new,
+    public List<CursoPopular> popular() {
+        Map<Curso, List<Inscripcion>> grouped = enrollments.findAll().stream()
+                .collect(Collectors.groupingBy(Inscripcion::getCurso, LinkedHashMap::new,
                         Collectors.toList()));
         return grouped.entrySet().stream()
                 .map(entry -> {
-                    Course course = entry.getKey();
+                    Curso curso = entry.getKey();
                     long count = entry.getValue().size();
-                    long completedLessons = entry.getValue().stream()
-                            .mapToLong(enrollment -> lessons.countByEnrollmentId(enrollment.getId()))
+                    long finalizadoLessons = entry.getValue().stream()
+                            .mapToLong(inscripcion -> lessons.contarPorInscripcionId(inscripcion.getId()))
                             .sum();
-                    long possible = (long) course.getLessons() * count;
+                    long possible = (long) curso.getLessons() * count;
                     int percent = possible == 0 ? 0
-                            : (int) Math.min(100, Math.round(completedLessons * 100.0 / possible));
-                    return new PopularCourse(course.getId(), course.getSlug(), course.getTitle(),
-                            course.getImage(), count, percent);
+                            : (int) Math.min(100, Math.round(finalizadoLessons * 100.0 / possible));
+                    return new CursoPopular(curso.getId(), curso.getSlug(), curso.getTitulo(),
+                            curso.getImagen(), count, percent);
                 })
-                .sorted(Comparator.comparingLong(PopularCourse::enrolled).reversed())
+                .sorted(Comparator.comparingLong(CursoPopular::inscripto).reversed())
                 .limit(3)
                 .toList();
     }
 
     @Transactional(readOnly = true)
-    public List<RecentUser> recentUsers() {
-        return users.findTop5ByOrderByCreatedAtDesc().stream()
-                .map(user -> new RecentUser(user.getId(), user.getFullName(), user.getEmail(),
-                        user.getRole(), format.initials(user.getFullName()),
-                        format.relative(user.getCreatedAt())))
+    public List<UsuarioReciente> recienteUsers() {
+        return users.buscarTop5PorOrdenarPorFechaCreacionDesc().stream()
+                .map(usuario -> new UsuarioReciente(usuario.getId(), usuario.getNombreCompleto(), usuario.getEmail(),
+                        usuario.getRol(), format.initials(usuario.getNombreCompleto()),
+                        format.relative(usuario.getFechaCreacion())))
                 .toList();
     }
 
     @Transactional(readOnly = true)
-    public List<SystemCheck> system() {
-        List<SystemCheck> checks = new ArrayList<>();
+    public List<VerificacionSistema> sistema() {
+        List<VerificacionSistema> checks = new ArrayList<>();
         try {
             long total = users.count();
-            checks.add(new SystemCheck("Base de datos", total + " cuentas respondiendo", true));
+            checks.add(new VerificacionSistema("Base de datos", total + " cuentas respondiendo", true));
         } catch (Exception exception) {
-            checks.add(new SystemCheck("Base de datos", "Sin respuesta de PostgreSQL", false));
+            checks.add(new VerificacionSistema("Base de datos", "Sin respuesta de PostgreSQL", false));
         }
         long hours = ManagementFactory.getRuntimeMXBean().getUptime() / 3_600_000;
-        checks.add(new SystemCheck("Servidor", "activo desde hace " + hours + " h", true));
-        checks.add(new SystemCheck("Plataforma", "Spring Boot " + SpringBootVersion.getVersion()
+        checks.add(new VerificacionSistema("Servidor", "activo desde hace " + hours + " h", true));
+        checks.add(new VerificacionSistema("Plataforma", "Spring Boot " + SpringBootVersion.getVersion()
                 + " · Java " + System.getProperty("java.version"), true));
 
         String lastUpdate = users.findAll().stream()
-                .map(User::getUpdatedAt)
+                .map(Usuario::getFechaActualizacion)
                 .filter(java.util.Objects::nonNull)
                 .max(Comparator.naturalOrder())
-                .map(format::full)
+                .map(format::completo)
                 .orElse("Sin actualizaciones registradas");
-        checks.add(new SystemCheck("Última actualización", lastUpdate, true));
+        checks.add(new VerificacionSistema("Última actualización", lastUpdate, true));
         return checks;
     }
 
     @Transactional(readOnly = true)
-    public ReportSummary reports() {
+    public ResumenReporte reports() {
         long total = enrollments.count();
-        long completed = enrollments.countByCompletedAtIsNotNull();
-        long active = stats.activeUsersSince(OffsetDateTime.now().minusDays(30));
+        long finalizado = enrollments.contarPorFechaFinalizacionNoEsNulo();
+        long activo = stats.activoUsersSince(OffsetDateTime.now().minusDays(30));
         long allUsers = users.count();
-        return new ReportSummary(
+        return new ResumenReporte(
                 total,
-                completed,
-                percent(completed, total),
-                payments.paidTotalCents(),
-                active,
+                finalizado,
+                percent(finalizado, total),
+                payments.pagadoTotalCents(),
+                activo,
                 allUsers,
-                percent(active, allUsers));
+                percent(activo, allUsers));
     }
 
     public int days(String value) {
@@ -252,9 +252,9 @@ public class AdminDashboardService {
         return x + "," + y;
     }
 
-    private Map<LocalDate, Long> toMap(List<DayCount> rows) {
+    private Map<LocalDate, Long> toMap(List<ConteoDia> rows) {
         Map<LocalDate, Long> map = new HashMap<>();
-        for (DayCount row : rows) map.put(row.day(), row.total());
+        for (ConteoDia row : rows) map.put(row.dia(), row.total());
         return map;
     }
 
@@ -262,9 +262,9 @@ public class AdminDashboardService {
         return total == 0 ? 0 : (int) Math.min(100, Math.round(part * 100.0 / total));
     }
 
-    private String trend(long current, long previous) {
-        if (previous == 0) return current == 0 ? "0%" : "nuevo";
-        long change = Math.round((current - previous) * 100.0 / previous);
+    private String trend(long actual, long previous) {
+        if (previous == 0) return actual == 0 ? "0%" : "nuevo";
+        long change = Math.round((actual - previous) * 100.0 / previous);
         return (change > 0 ? "+" : "") + change + "%";
     }
 }

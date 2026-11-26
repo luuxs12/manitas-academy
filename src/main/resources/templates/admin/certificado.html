@@ -14,15 +14,15 @@
         <main id="panel-main" class="panel-main admin-main">
             <div class="admin-certificate-page">
                 <p class="admin-status admin-cert-status" role="status"
-                   th:classappend="${preview.active()} ? ' is-ok' : ' is-bad'"
-                   th:text="${preview.active()} ? 'Vigente' : 'Revocado'">Vigente</p>
+                   th:classappend="${vistaprevia.activo()} ? ' is-ok' : ' is-bad'"
+                   th:text="${vistaprevia.activo()} ? 'Vigente' : 'Revocado'">Vigente</p>
 
                 <nav class="certificate-actions" aria-label="Acciones del certificado">
                     <a th:href="@{/admin/certificados}">← Volver a certificados</a>
                     <button type="button" class="btn btn-dark" data-print>Imprimir o guardar en PDF</button>
                 </nav>
 
-                <div th:replace="~{fragments/certificate-document :: document(${preview.person()}, ${preview.courseTitle()}, ${preview.videoCount()}, ${preview.issuedAt()}, ${preview.code()})}"></div>
+                <div th:replace="~{fragments/certificate-document :: document(${vistaprevia.person()}, ${vistaprevia.cursoTitulo()}, ${vistaprevia.videoContar()}, ${vistaprevia.fechaEmision()}, ${vistaprevia.code()})}"></div>
             </div>
         </main>
     </div>

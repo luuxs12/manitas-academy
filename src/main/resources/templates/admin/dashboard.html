@@ -13,7 +13,7 @@
         <header th:replace="~{admin/fragments/admin-nav :: topbar('Panel Administrativo', 'Gestión integral de Mundo Manitas', '')}"></header>
 
         <main id="panel-main" class="panel-main admin-main"
-              th:attr="data-admin-since=${adminSince}">
+              th:attr="data-admin-since=${adminDesde}">
 
             <section class="admin-hero" aria-labelledby="admin-hero-title">
                 <div class="admin-hero-copy">
@@ -58,12 +58,12 @@
                     </div>
                     <p class="admin-chart-legend">
                         <span><i class="admin-dot admin-dot--users" aria-hidden="true"></i>Usuarios
-                            <strong th:text="${chart.usersTotal()}">0</strong></span>
+                            <strong th:text="${grafico.usersTotal()}">0</strong></span>
                         <span><i class="admin-dot admin-dot--courses" aria-hidden="true"></i>Cursos
-                            <strong th:text="${chart.coursesTotal()}">0</strong></span>
+                            <strong th:text="${grafico.coursesTotal()}">0</strong></span>
                     </p>
                     <svg class="admin-chart" viewBox="0 0 900 250" role="img"
-                         th:attr="aria-label=${'Usuarios y cursos entre el ' + #temporals.format(chart.from(), 'dd/MM/yyyy') + ' y el ' + #temporals.format(chart.to(), 'dd/MM/yyyy')}">
+                         th:attr="aria-label=${'Usuarios y cursos entre el ' + #temporals.format(grafico.from(), 'dd/MM/yyyy') + ' y el ' + #temporals.format(grafico.to(), 'dd/MM/yyyy')}">
                         <g class="admin-chart-grid" aria-hidden="true">
                             <line x1="40" y1="40" x2="860" y2="40"></line>
                             <line x1="40" y1="90" x2="860" y2="90"></line>
@@ -72,20 +72,20 @@
                             <line x1="40" y1="210" x2="860" y2="210"></line>
                         </g>
                         <g class="admin-axis-y" aria-hidden="true">
-                            <text x="8" y="44" th:text="${chart.max()}">1</text>
-                            <text x="8" y="94" th:text="${#numbers.formatInteger(chart.max() * 3 / 4, 0)}">1</text>
-                            <text x="8" y="144" th:text="${#numbers.formatInteger(chart.max() / 2, 0)}">0</text>
-                            <text x="8" y="194" th:text="${#numbers.formatInteger(chart.max() / 4, 0)}">0</text>
+                            <text x="8" y="44" th:text="${grafico.max()}">1</text>
+                            <text x="8" y="94" th:text="${#numbers.formatInteger(grafico.max() * 3 / 4, 0)}">1</text>
+                            <text x="8" y="144" th:text="${#numbers.formatInteger(grafico.max() / 2, 0)}">0</text>
+                            <text x="8" y="194" th:text="${#numbers.formatInteger(grafico.max() / 4, 0)}">0</text>
                             <text x="18" y="214">0</text>
                         </g>
                         <polyline class="admin-line admin-line--users"
-                                  th:attr="points=${#strings.listJoin(chart.usersPoints(), ' ')}"></polyline>
+                                  th:attr="points=${#strings.listJoin(grafico.usersPoints(), ' ')}"></polyline>
                         <polyline class="admin-line admin-line--courses"
-                                  th:attr="points=${#strings.listJoin(chart.coursesPoints(), ' ')}"></polyline>
+                                  th:attr="points=${#strings.listJoin(grafico.coursesPoints(), ' ')}"></polyline>
                         <g class="admin-axis-x" aria-hidden="true">
-                            <text th:each="label, iter : ${chart.labels()}" th:if="${label != ''}"
+                            <text th:each="label, iter : ${grafico.etiquetas()}" th:if="${label != ''}"
                                   th:text="${label}"
-                                  th:attr="x=${40 + iter.index * 820 / (chart.days() - 1)}, y=${235}">01/01</text>
+                                  th:attr="x=${40 + iter.index * 820 / (grafico.days() - 1)}, y=${235}">01/01</text>
                         </g>
                     </svg>
                 </section>
@@ -98,17 +98,17 @@
                             <a th:href="@{/admin/cursos}">Ver todos</a>
                         </div>
                         <ul class="admin-popular" th:if="${!#lists.isEmpty(popular)}">
-                            <li class="admin-popular-item" th:each="course, iter : ${popular}">
-                                <img th:src="${!#strings.isEmpty(course.image()) ? course.image() : '/img/course-placeholder.svg'}" alt="" width="960" height="600" loading="lazy">
+                            <li class="admin-popular-item" th:each="curso, iter : ${popular}">
+                                <img th:src="${!#strings.isEmpty(curso.imagen()) ? curso.imagen() : '/img/curso-placeholder.svg'}" alt="" width="960" height="600" loading="lazy">
                                 <div class="admin-popular-body">
-                                    <strong th:text="${course.title()}">Curso</strong>
-                                    <span th:text="${course.enrolled() + ' inscriptos'}">0 inscriptos</span>
+                                    <strong th:text="${curso.titulo()}">Curso</strong>
+                                    <span th:text="${curso.inscripto() + ' inscriptos'}">0 inscriptos</span>
                                     <div class="panel-progress panel-progress--sm" role="img"
-                                         th:attr="aria-label=${'Avance ' + course.percent() + '%'}">
-                                        <span th:style="${'width:' + course.percent() + '%'}"></span>
+                                         th:attr="aria-label=${'Avance ' + curso.percent() + '%'}">
+                                        <span th:style="${'width:' + curso.percent() + '%'}"></span>
                                     </div>
                                 </div>
-                                <b th:text="${course.percent() + '%'}">0%</b>
+                                <b th:text="${curso.percent() + '%'}">0%</b>
                             </li>
                         </ul>
                         <p class="admin-empty" th:if="${#lists.isEmpty(popular)}">
@@ -122,20 +122,20 @@
                             <span class="panel-rule" aria-hidden="true"></span>
                             <a th:href="@{/admin/usuarios}">Ver todos</a>
                         </div>
-                        <ul class="admin-recent" th:if="${!#lists.isEmpty(recentUsers)}">
-                            <li th:each="user : ${recentUsers}">
-                                <span class="panel-avatar" aria-hidden="true" th:text="${user.initials()}">LF</span>
+                        <ul class="admin-recent" th:if="${!#lists.isEmpty(recienteUsers)}">
+                            <li th:each="usuario : ${recienteUsers}">
+                                <span class="panel-avatar" aria-hidden="true" th:text="${usuario.initials()}">LF</span>
                                 <span class="admin-recent-name">
-                                    <strong th:text="${user.fullName()}">Nombre</strong>
-                                    <small th:text="${user.email()}">correo</small>
+                                    <strong th:text="${usuario.nombreCompleto()}">Nombre</strong>
+                                    <small th:text="${usuario.email()}">correo</small>
                                 </span>
                                 <span class="admin-recent-meta">
-                                    <small th:text="${user.role() == 'ADMIN' ? 'Admin' : 'Estudiante'}">Rol</small>
-                                    <small th:text="${user.when()}">hace 1 día</small>
+                                    <small th:text="${usuario.rol() == 'ADMIN' ? 'Admin' : 'Estudiante'}">Rol</small>
+                                    <small th:text="${usuario.when()}">hace 1 día</small>
                                 </span>
                             </li>
                         </ul>
-                        <p class="admin-empty" th:if="${#lists.isEmpty(recentUsers)}">No hay cuentas registradas.</p>
+                        <p class="admin-empty" th:if="${#lists.isEmpty(recienteUsers)}">No hay cuentas registradas.</p>
                     </section>
                 </div>
             </div>
@@ -161,10 +161,10 @@
                         <span class="admin-online"><i aria-hidden="true"></i>En línea</span>
                     </div>
                     <ul class="admin-checks">
-                        <li th:each="check : ${system}">
-                            <span th:classappend="${check.ok()} ? ' is-ok' : ' is-bad'" aria-hidden="true">✓</span>
-                            <strong th:text="${check.name()}">Base de Datos</strong>
-                            <small th:text="${check.detail()}">Detalle</small>
+                        <li th:each="verificacion : ${sistema}">
+                            <span th:classappend="${verificacion.ok()} ? ' is-ok' : ' is-bad'" aria-hidden="true">✓</span>
+                            <strong th:text="${verificacion.name()}">Base de Datos</strong>
+                            <small th:text="${verificacion.detail()}">Detalle</small>
                         </li>
                     </ul>
                 </section>

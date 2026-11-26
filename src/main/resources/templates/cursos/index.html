@@ -45,24 +45,24 @@
         </nav>
 
         <div class="courses" th:if="${!#lists.isEmpty(courses)}">
-            <a class="course" th:each="course : ${courses}"
-               th:href="@{/cursos/{slug}(slug=${course.slug})}">
+            <a class="course" th:each="curso : ${courses}"
+               th:href="@{/cursos/{slug}(slug=${curso.slug})}">
 
                 <figure class="course-media">
-                    <img th:src="${!#strings.isEmpty(course.image) ? course.image : '/img/course-placeholder.svg'}" alt="" width="960" height="600"
+                    <img th:src="${!#strings.isEmpty(curso.imagen) ? curso.imagen : '/img/curso-placeholder.svg'}" alt="" width="960" height="600"
                          loading="lazy" decoding="async">
-                    <span class="course-badge" th:text="${course.category}">Programación</span>
-                    <span class="course-level" th:text="${course.level}">Nivel inicial</span>
+                    <span class="course-badge" th:text="${curso.categoria}">Programación</span>
+                    <span class="course-level" th:text="${curso.nivel}">Nivel inicial</span>
                 </figure>
 
                 <div class="course-body">
                     <span class="course-meta">
-                        <span th:text="${course.lessons}">32</span> lecciones
+                        <span th:text="${curso.lessons}">32</span> lecciones
                     </span>
-                    <h2 class="course-title" th:text="${course.title}">Nombre del curso</h2>
-                    <p class="course-text" th:text="${course.summary}">Descripción del curso.</p>
+                    <h2 class="course-title" th:text="${curso.titulo}">Nombre del curso</h2>
+                    <p class="course-text" th:text="${curso.resumen}">Descripción del curso.</p>
                     <div class="course-foot">
-                        <span class="course-price" th:text="${course.priceLabel()}">Gratis</span>
+                        <span class="course-price" th:text="${curso.priceLabel()}">Gratis</span>
                         <span class="course-go">Ver curso <span aria-hidden="true">→</span></span>
                     </div>
                 </div>

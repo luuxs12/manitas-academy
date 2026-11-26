@@ -1,19 +1,19 @@
 package com.mundomanitas.api.service.admin;
 
-import com.mundomanitas.api.dto.admin.AdminCourseForm;
-import com.mundomanitas.api.dto.admin.AdminExerciseForm;
-import com.mundomanitas.api.dto.admin.AdminModuleForm;
-import com.mundomanitas.api.dto.admin.AdminVideoForm;
-import com.mundomanitas.api.model.Course;
-import com.mundomanitas.api.model.CourseModule;
-import com.mundomanitas.api.model.Exercise;
+import com.mundomanitas.api.dto.admin.AdminCursoFormulario;
+import com.mundomanitas.api.dto.admin.AdminEjercicioFormulario;
+import com.mundomanitas.api.dto.admin.AdminModuloFormulario;
+import com.mundomanitas.api.dto.admin.AdminVideoFormulario;
+import com.mundomanitas.api.model.Curso;
+import com.mundomanitas.api.model.CursoModulo;
+import com.mundomanitas.api.model.Ejercicio;
 import com.mundomanitas.api.model.Video;
-import com.mundomanitas.api.repository.CertificateRepository;
-import com.mundomanitas.api.repository.CourseModuleRepository;
-import com.mundomanitas.api.repository.CourseRepository;
-import com.mundomanitas.api.repository.EnrollmentRepository;
-import com.mundomanitas.api.repository.ExerciseRepository;
-import com.mundomanitas.api.repository.UserRepository;
+import com.mundomanitas.api.repository.CertificadoRepository;
+import com.mundomanitas.api.repository.CursoModuloRepository;
+import com.mundomanitas.api.repository.CursoRepository;
+import com.mundomanitas.api.repository.InscripcionRepository;
+import com.mundomanitas.api.repository.EjercicioRepository;
+import com.mundomanitas.api.repository.UsuarioRepository;
 import com.mundomanitas.api.repository.VideoRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -45,16 +45,16 @@ class AdminCatalogServiceTest {
     private static final String NEW_COVER =
             "/uploads/covers/22222222-2222-2222-2222-222222222222.webp";
 
-    @Mock private UserRepository users;
-    @Mock private CourseRepository courses;
-    @Mock private CourseModuleRepository modules;
+    @Mock private UsuarioRepository users;
+    @Mock private CursoRepository courses;
+    @Mock private CursoModuloRepository modules;
     @Mock private VideoRepository videos;
-    @Mock private ExerciseRepository exercises;
-    @Mock private EnrollmentRepository enrollments;
-    @Mock private CertificateRepository certificates;
+    @Mock private EjercicioRepository exercises;
+    @Mock private InscripcionRepository enrollments;
+    @Mock private CertificadoRepository certificates;
     @Mock private PasswordEncoder encoder;
-    @Mock private AdminAuditService audit;
-    @Mock private AdminFormat format;
+    @Mock private AdminAuditoriaService auditoria;
+    @Mock private AdminFormato format;
 
     private AdminCatalogService service;
 
@@ -62,82 +62,82 @@ class AdminCatalogServiceTest {
     void setUp() {
         service = new AdminCatalogServiceImpl(
                 users, courses, modules, videos, exercises, enrollments, certificates,
-                encoder, audit, format);
+                encoder, auditoria, format);
     }
 
     @Test
     @DisplayName("genera el identificador desde el título")
-    void slugFromTitle() {
-        assertThat(service.slugFromTitle("  ¡Hola, Mundo LSP!  ")).isEqualTo("hola-mundo-lsp");
+    void slugFromTitulo() {
+        assertThat(service.slugFromTitulo("  ¡Hola, Mundo LSP!  ")).isEqualTo("hola-mundo-lsp");
     }
 
     @Test
     @DisplayName("crea el curso publicado sin lecciones escritas a mano")
-    void createsPublishedCourse() {
-        when(courses.findBySlug("python-desde-cero")).thenReturn(Optional.empty());
+    void createsPublishedCurso() {
+        when(courses.buscarPorSlug("python-desde-cero")).thenReturn(Optional.empty());
 
-        service.createCourse(form(), UUID.randomUUID());
+        service.createCurso(formulario(), UUID.randomUUID());
 
-        ArgumentCaptor<Course> captor = ArgumentCaptor.forClass(Course.class);
+        ArgumentCaptor<Curso> captor = ArgumentCaptor.forClass(Curso.class);
         verify(courses).save(captor.capture());
-        assertThat(captor.getValue().getStatus()).isEqualTo("PUBLICADO");
+        assertThat(captor.getValue().getEstado()).isEqualTo("PUBLICADO");
         assertThat(captor.getValue().getLessons()).isZero();
     }
 
     @Test
     @DisplayName("el checklist informa mejoras sin bloquear la publicación")
-    void publishChecklist() {
+    void publicarLista() {
         UUID id = UUID.randomUUID();
-        Course course = course();
-        when(courses.findById(id)).thenReturn(Optional.of(course));
-        when(modules.findByCourseIdOrderByPositionAsc(id))
-                .thenReturn(List.of(new CourseModule(id, "Módulo", 1)));
+        Curso curso = curso();
+        when(courses.findById(id)).thenReturn(Optional.of(curso));
+        when(modules.buscarPorCursoIdOrdenarPorPosicionAsc(id))
+                .thenReturn(List.of(new CursoModulo(id, "Módulo", 1)));
 
-        AdminCatalogService.PublishChecklist check = service.publishChecklist(id);
+        AdminCatalogService.PublicarLista verificacion = service.publicarLista(id);
 
-        assertThat(check.missing()).contains("resumen", "portada", "video");
-        assertThat(check.canPublish()).isTrue();
+        assertThat(verificacion.missing()).contains("resumen", "portada", "video");
+        assertThat(verificacion.canPublicar()).isTrue();
     }
 
     @Test
     @DisplayName("publica un curso aunque todavía no tenga portada ni videos")
-    void publishesCourseWithoutExtras() {
+    void publishesCursoWithoutExtras() {
         UUID id = UUID.randomUUID();
-        Course course = course();
-        when(courses.findById(id)).thenReturn(Optional.of(course));
+        Curso curso = curso();
+        when(courses.findById(id)).thenReturn(Optional.of(curso));
 
         service.setPublished(id, true, UUID.randomUUID());
 
-        assertThat(course.getStatus()).isEqualTo("PUBLICADO");
+        assertThat(curso.getEstado()).isEqualTo("PUBLICADO");
     }
 
     @Test
     @DisplayName("informa el impacto real antes de borrar")
-    void deletionImpact() {
+    void eliminacionImpacto() {
         UUID id = UUID.randomUUID();
-        when(courses.findById(id)).thenReturn(Optional.of(course()));
-        CourseModule module = new CourseModule(id, "Módulo", 1);
-        when(modules.findByCourseIdOrderByPositionAsc(id)).thenReturn(List.of(module));
-        when(videos.countByCourseId(id)).thenReturn(4);
-        when(exercises.findByModuleIdOrderByPositionAsc(module.getId())).thenReturn(List.of());
-        when(enrollments.countByCourseId(id)).thenReturn(3L);
-        when(certificates.countByCourseId(id)).thenReturn(2L);
+        when(courses.findById(id)).thenReturn(Optional.of(curso()));
+        CursoModulo modulo = new CursoModulo(id, "Módulo", 1);
+        when(modules.buscarPorCursoIdOrdenarPorPosicionAsc(id)).thenReturn(List.of(modulo));
+        when(videos.contarPorCursoId(id)).thenReturn(4);
+        when(exercises.buscarPorModuloIdOrdenarPorPosicionAsc(modulo.getId())).thenReturn(List.of());
+        when(enrollments.contarPorCursoId(id)).thenReturn(3L);
+        when(certificates.contarPorCursoId(id)).thenReturn(2L);
 
-        AdminCatalogService.DeletionImpact impact = service.deletionImpact(id);
+        AdminCatalogService.EliminacionImpacto impacto = service.eliminacionImpacto(id);
 
-        assertThat(impact.videos()).isEqualTo(4);
-        assertThat(impact.enrollments()).isEqualTo(3L);
-        assertThat(impact.certificates()).isEqualTo(2L);
+        assertThat(impacto.videos()).isEqualTo(4);
+        assertThat(impacto.enrollments()).isEqualTo(3L);
+        assertThat(impacto.certificates()).isEqualTo(2L);
     }
 
     @Test
     @DisplayName("no borra un curso con inscritos")
-    void refusesToDeleteCourseWithEnrollments() {
+    void refusesToDeleteCursoWithEnrollments() {
         UUID id = UUID.randomUUID();
-        when(courses.findById(id)).thenReturn(Optional.of(course()));
-        when(enrollments.countByCourseId(id)).thenReturn(1L);
+        when(courses.findById(id)).thenReturn(Optional.of(curso()));
+        when(enrollments.contarPorCursoId(id)).thenReturn(1L);
 
-        assertThatThrownBy(() -> service.deleteCourse(id, UUID.randomUUID()))
+        assertThatThrownBy(() -> service.deleteCurso(id, UUID.randomUUID()))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("inscritos");
         verify(courses, never()).delete(any());
@@ -145,62 +145,62 @@ class AdminCatalogServiceTest {
 
     @Test
     @DisplayName("intercambia posiciones de módulos de forma transaccional")
-    void movesModuleDown() {
-        CourseModule first = new CourseModule(UUID.randomUUID(), "Uno", 1);
-        CourseModule second = new CourseModule(UUID.randomUUID(), "Dos", 2);
+    void movesModuloDown() {
+        CursoModulo first = new CursoModulo(UUID.randomUUID(), "Uno", 1);
+        CursoModulo second = new CursoModulo(UUID.randomUUID(), "Dos", 2);
         when(modules.findById(first.getId())).thenReturn(Optional.of(first));
-        when(modules.findByCourseIdOrderByPositionAsc(first.getCourseId()))
+        when(modules.buscarPorCursoIdOrdenarPorPosicionAsc(first.getCursoId()))
                 .thenReturn(List.of(first, second));
 
-        service.moveModule(first.getId(), false, UUID.randomUUID());
+        service.moveModulo(first.getId(), false, UUID.randomUUID());
 
-        assertThat(first.getPosition()).isEqualTo(2);
-        assertThat(second.getPosition()).isEqualTo(1);
+        assertThat(first.getPosicion()).isEqualTo(2);
+        assertThat(second.getPosicion()).isEqualTo(1);
     }
 
     @Test
     @DisplayName("cuenta las lecciones desde los videos de la base")
-    void lessonCount() {
+    void leccionContar() {
         UUID id = UUID.randomUUID();
-        when(videos.countByCourseId(id)).thenReturn(6);
-        assertThat(service.lessonCount(id)).isEqualTo(6);
+        when(videos.contarPorCursoId(id)).thenReturn(6);
+        assertThat(service.leccionContar(id)).isEqualTo(6);
     }
 
     @Test
     @DisplayName("informa el estado real del curso")
-    void courseStatus() {
+    void cursoEstado() {
         UUID id = UUID.randomUUID();
-        Course course = course();
-        when(courses.findById(id)).thenReturn(Optional.of(course));
+        Curso curso = curso();
+        when(courses.findById(id)).thenReturn(Optional.of(curso));
 
-        assertThat(service.courseStatus(id)).isEqualTo("BORRADOR");
-        course.publish();
-        assertThat(service.courseStatus(id)).isEqualTo("PUBLICADO");
+        assertThat(service.cursoEstado(id)).isEqualTo("BORRADOR");
+        curso.publicar();
+        assertThat(service.cursoEstado(id)).isEqualTo("PUBLICADO");
     }
 
     @Test
     @DisplayName("cambia la portada local y devuelve la anterior")
-    void updateCourseCover() {
+    void updateCursoPortada() {
         UUID id = UUID.randomUUID();
         UUID actor = UUID.randomUUID();
-        Course course = course();
-        course.update("curso", "Curso", "Inicial", false, "Programación", "Resumen",
+        Curso curso = curso();
+        curso.update("curso", "Curso", "Inicial", false, "Programación", "Resumen",
                 OLD_COVER, 1);
-        when(courses.findById(id)).thenReturn(Optional.of(course));
+        when(courses.findById(id)).thenReturn(Optional.of(curso));
 
-        String previous = service.updateCourseCover(id, NEW_COVER, actor);
+        String previous = service.updateCursoPortada(id, NEW_COVER, actor);
 
         assertThat(previous).isEqualTo(OLD_COVER);
-        assertThat(course.getImage()).isEqualTo(NEW_COVER);
-        verify(audit).record(actor, "UPDATE", "CURSO", id, "PORTADA");
+        assertThat(curso.getImagen()).isEqualTo(NEW_COVER);
+        verify(auditoria).record(actor, "UPDATE", "CURSO", id, "PORTADA");
     }
 
     @Test
     @DisplayName("rechaza una portada que no está en disco local")
-    void rejectsRemoteCover() {
+    void rejectsRemotePortada() {
         UUID id = UUID.randomUUID();
 
-        assertThatThrownBy(() -> service.updateCourseCover(
+        assertThatThrownBy(() -> service.updateCursoPortada(
                 id, "https://ejemplo.com/portada.jpg", UUID.randomUUID()))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("local");
@@ -209,11 +209,11 @@ class AdminCatalogServiceTest {
     @Test
     @DisplayName("guarda solo el identificador de YouTube")
     void storesOnlyYouTubeId() {
-        UUID moduleId = UUID.randomUUID();
-        when(modules.findById(moduleId)).thenReturn(Optional.of(mockModule()));
+        UUID moduloId = UUID.randomUUID();
+        when(modules.findById(moduloId)).thenReturn(Optional.of(mockModulo()));
 
-        service.createVideo(new AdminVideoForm(
-                moduleId, "Clase 1", 1, "https://youtu.be/dQw4w9WgXcQ?t=15"), UUID.randomUUID());
+        service.createVideo(new AdminVideoFormulario(
+                moduloId, "Clase 1", 1, "https://youtu.be/dQw4w9WgXcQ?t=15"), UUID.randomUUID());
 
         ArgumentCaptor<Video> captor = ArgumentCaptor.forClass(Video.class);
         verify(videos).save(captor.capture());
@@ -222,13 +222,13 @@ class AdminCatalogServiceTest {
 
     @Test
     @DisplayName("rechaza un enlace que no es de YouTube")
-    void rejectsForeignLink() {
-        UUID moduleId = UUID.randomUUID();
-        when(modules.findById(moduleId)).thenReturn(Optional.of(mockModule()));
-        AdminVideoForm form = new AdminVideoForm(
-                moduleId, "Clase", 1, "https://ejemplo.com/watch?v=dQw4w9WgXcQ");
+    void rejectsForeignEnlace() {
+        UUID moduloId = UUID.randomUUID();
+        when(modules.findById(moduloId)).thenReturn(Optional.of(mockModulo()));
+        AdminVideoFormulario formulario = new AdminVideoFormulario(
+                moduloId, "Clase", 1, "https://ejemplo.com/watch?v=dQw4w9WgXcQ");
 
-        assertThatThrownBy(() -> service.createVideo(form, UUID.randomUUID()))
+        assertThatThrownBy(() -> service.createVideo(formulario, UUID.randomUUID()))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("YouTube");
         verify(videos, never()).save(any());
@@ -236,92 +236,92 @@ class AdminCatalogServiceTest {
 
     @Test
     @DisplayName("crea un módulo apoyado en un curso real y registra la auditoría")
-    void createsModule() {
-        UUID courseId = UUID.randomUUID();
+    void createsModulo() {
+        UUID cursoId = UUID.randomUUID();
         UUID actor = UUID.randomUUID();
-        when(courses.findById(courseId)).thenReturn(Optional.of(course()));
+        when(courses.findById(cursoId)).thenReturn(Optional.of(curso()));
 
-        service.createModule(new AdminModuleForm(courseId, "  Unidad 1  ", 2), actor);
+        service.createModulo(new AdminModuloFormulario(cursoId, "  Unidad 1  ", 2), actor);
 
-        ArgumentCaptor<CourseModule> captor = ArgumentCaptor.forClass(CourseModule.class);
+        ArgumentCaptor<CursoModulo> captor = ArgumentCaptor.forClass(CursoModulo.class);
         verify(modules).save(captor.capture());
-        assertThat(captor.getValue().getCourseId()).isEqualTo(courseId);
-        assertThat(captor.getValue().getTitle()).isEqualTo("Unidad 1");
-        assertThat(captor.getValue().getPosition()).isEqualTo(2);
-        verify(audit).record(actor, "CREATE", "MODULO", captor.getValue().getId(), "Unidad 1");
+        assertThat(captor.getValue().getCursoId()).isEqualTo(cursoId);
+        assertThat(captor.getValue().getTitulo()).isEqualTo("Unidad 1");
+        assertThat(captor.getValue().getPosicion()).isEqualTo(2);
+        verify(auditoria).record(actor, "CREATE", "MODULO", captor.getValue().getId(), "Unidad 1");
     }
 
     @Test
     @DisplayName("crea un ejercicio con su consigna sin contarlo como lección")
-    void createsExercise() {
-        UUID moduleId = UUID.randomUUID();
+    void createsEjercicio() {
+        UUID moduloId = UUID.randomUUID();
         UUID actor = UUID.randomUUID();
-        when(modules.findById(moduleId))
-                .thenReturn(Optional.of(new CourseModule(UUID.randomUUID(), "Unidad 1", 0)));
+        when(modules.findById(moduloId))
+                .thenReturn(Optional.of(new CursoModulo(UUID.randomUUID(), "Unidad 1", 0)));
 
-        service.createExercise(new AdminExerciseForm(
-                moduleId, " Práctica 1 ", " Contá las señas ", 1), actor);
+        service.createEjercicio(new AdminEjercicioFormulario(
+                moduloId, " Práctica 1 ", " Contá las señas ", 1), actor);
 
-        ArgumentCaptor<Exercise> captor = ArgumentCaptor.forClass(Exercise.class);
+        ArgumentCaptor<Ejercicio> captor = ArgumentCaptor.forClass(Ejercicio.class);
         verify(exercises).save(captor.capture());
-        assertThat(captor.getValue().getModuleId()).isEqualTo(moduleId);
-        assertThat(captor.getValue().getTitle()).isEqualTo("Práctica 1");
+        assertThat(captor.getValue().getModuloId()).isEqualTo(moduloId);
+        assertThat(captor.getValue().getTitulo()).isEqualTo("Práctica 1");
         assertThat(captor.getValue().getPrompt()).isEqualTo("Contá las señas");
-        verify(audit).record(actor, "CREATE", "EJERCICIO", captor.getValue().getId(), "Práctica 1");
+        verify(auditoria).record(actor, "CREATE", "EJERCICIO", captor.getValue().getId(), "Práctica 1");
         verify(videos, never()).save(any());
     }
 
     @Test
     @DisplayName("publica y despublica un curso completo con auditoría")
-    void publishesAndUnpublishesCompleteCourse() {
-        UUID courseId = UUID.randomUUID();
-        UUID moduleId = UUID.randomUUID();
+    void publishesAndUnpublishesCompleteCurso() {
+        UUID cursoId = UUID.randomUUID();
+        UUID moduloId = UUID.randomUUID();
         UUID actor = UUID.randomUUID();
-        Course course = new Course("taller-lsp", "Taller de LSP", "Inicial", 1, true,
+        Curso curso = new Curso("taller-lsp", "Taller de LSP", "Inicial", 1, true,
                 "Comunicación", "Resumen real", "/uploads/covers/aaaa.jpg", 1);
-        when(courses.findById(courseId)).thenReturn(Optional.of(course));
+        when(courses.findById(cursoId)).thenReturn(Optional.of(curso));
 
-        service.setPublished(courseId, true, actor);
+        service.setPublished(cursoId, true, actor);
 
-        assertThat(course.getStatus()).isEqualTo("PUBLICADO");
-        verify(audit).record(actor, "UPDATE", "CURSO", courseId, "PUBLICADO");
+        assertThat(curso.getEstado()).isEqualTo("PUBLICADO");
+        verify(auditoria).record(actor, "UPDATE", "CURSO", cursoId, "PUBLICADO");
 
-        service.setPublished(courseId, false, actor);
+        service.setPublished(cursoId, false, actor);
 
-        assertThat(course.getStatus()).isEqualTo("BORRADOR");
-        verify(audit).record(actor, "UPDATE", "CURSO", courseId, "BORRADOR");
+        assertThat(curso.getEstado()).isEqualTo("BORRADOR");
+        verify(auditoria).record(actor, "UPDATE", "CURSO", cursoId, "BORRADOR");
     }
 
     @Test
     @DisplayName("el contador de lecciones se recalcula desde los videos al crear uno")
-    void refreshesLessonsWhenVideoIsCreated() {
-        UUID courseId = UUID.randomUUID();
-        UUID moduleId = UUID.randomUUID();
+    void refreshesLessonsWhenVideoIsCreado() {
+        UUID cursoId = UUID.randomUUID();
+        UUID moduloId = UUID.randomUUID();
         UUID actor = UUID.randomUUID();
-        Course course = course();
-        when(modules.findById(moduleId))
-                .thenReturn(Optional.of(new CourseModule(courseId, "Unidad 1", 0)));
-        when(courses.findById(courseId)).thenReturn(Optional.of(course));
-        when(videos.countByCourseId(any())).thenReturn(3);
+        Curso curso = curso();
+        when(modules.findById(moduloId))
+                .thenReturn(Optional.of(new CursoModulo(cursoId, "Unidad 1", 0)));
+        when(courses.findById(cursoId)).thenReturn(Optional.of(curso));
+        when(videos.contarPorCursoId(any())).thenReturn(3);
 
-        service.createVideo(new AdminVideoForm(moduleId, "Clase 1", 0,
+        service.createVideo(new AdminVideoFormulario(moduloId, "Clase 1", 0,
                 "https://youtu.be/dQw4w9WgXcQ"), actor);
 
-        assertThat(course.getLessons()).isEqualTo(3);
-        verify(audit).record(eq(actor), eq("CREATE"), eq("VIDEO"), any(), eq("Clase 1"));
+        assertThat(curso.getLessons()).isEqualTo(3);
+        verify(auditoria).record(eq(actor), eq("CREATE"), eq("VIDEO"), any(), eq("Clase 1"));
     }
 
-    private static CourseModule mockModule() {
-        return new CourseModule(UUID.randomUUID(), "Módulo", 1);
+    private static CursoModulo mockModulo() {
+        return new CursoModulo(UUID.randomUUID(), "Módulo", 1);
     }
 
-    private static Course course() {
-        return new Course("curso", "Curso", "Inicial", 0, false,
+    private static Curso curso() {
+        return new Curso("curso", "Curso", "Inicial", 0, false,
                 "Programación", "", "", 1);
     }
 
-    private static AdminCourseForm form() {
-        return new AdminCourseForm("python-desde-cero", "Python desde cero", "Inicial", true,
+    private static AdminCursoFormulario formulario() {
+        return new AdminCursoFormulario("python-desde-cero", "Python desde cero", "Inicial", true,
                 "Programación", "Variables y ciclos", "/img/cursos/python.jpg", 1);
     }
 }

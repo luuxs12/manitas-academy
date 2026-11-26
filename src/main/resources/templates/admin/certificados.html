@@ -23,39 +23,39 @@
             <section class="panel-card admin-card admin-issue" aria-labelledby="admin-issue-title">
                 <h2 id="admin-issue-title">Emitir certificado</h2>
                 <p class="admin-muted">Solo cuentas Premium con el curso finalizado. La revocación conserva el historial.</p>
-                <form th:action="@{/admin/certificados/emitir}" th:object="${adminCertificateForm}" method="post"
+                <form th:action="@{/admin/certificados/emitir}" th:object="${adminCertificadoFormulario}" method="post"
                       data-confirm-form
                       data-confirm-message="¿Emitir el certificado para la persona y el curso elegidos?">
                     <div class="admin-form-grid">
                         <label>Persona
-                            <select th:field="*{userId}" required>
+                            <select th:field="*{usuarioId}" required>
                                 <option value="">Elegí una persona</option>
-                                <option th:each="o : ${userOptions}" th:value="${o.id()}" th:text="${o.label()}"></option>
+                                <option th:each="o : ${usuarioOptions}" th:value="${o.id()}" th:text="${o.label()}"></option>
                             </select>
                         </label>
                         <label>Curso
-                            <select th:field="*{courseId}" required>
+                            <select th:field="*{cursoId}" required>
                                 <option value="">Elegí un curso</option>
-                                <option th:each="o : ${courseOptions}" th:value="${o.id()}" th:text="${o.label()}"></option>
+                                <option th:each="o : ${cursoOptions}" th:value="${o.id()}" th:text="${o.label()}"></option>
                             </select>
                         </label>
                     </div>
                     <button class="btn btn-admin" type="submit">Emitir certificado</button>
                 </form>
-                <p class="admin-hint" th:if="${!#lists.isEmpty(eligible)}">
+                <p class="admin-hint" th:if="${!#lists.isEmpty(elegible)}">
                     Listos para emitir:
-                    <span th:each="e, iter : ${eligible}">
-                        <strong th:text="${e.userName()}">Nombre</strong> · <span th:text="${e.courseTitle()}">Curso</span><span th:if="${!iter.last}">; </span>
+                    <span th:each="e, iter : ${elegible}">
+                        <strong th:text="${e.usuarioNombre()}">Nombre</strong> · <span th:text="${e.cursoTitulo()}">Curso</span><span th:if="${!iter.last}">; </span>
                     </span>
                 </p>
-                <p class="admin-hint" th:if="${#lists.isEmpty(eligible)}">No hay matrículas finalizadas de cuentas Premium pendientes de emisión.</p>
+                <p class="admin-hint" th:if="${#lists.isEmpty(elegible)}">No hay matrículas finalizadas de cuentas Premium pendientes de emisión.</p>
             </section>
 
             <form class="admin-filters admin-filters--full" method="get" th:action="@{/admin/certificados}">
                 <label class="sr-only" for="filtro-cert">Buscar certificados</label>
                 <input id="filtro-cert" name="q" type="search" th:value="${query}" placeholder="Código, persona o curso…">
                 <label class="admin-check admin-check--inline"><input type="checkbox" name="incluirRevocados" value="true"
-                      th:checked="${includeRevoked}"> Incluir revocados</label>
+                      th:checked="${includeRevocado}"> Incluir revocados</label>
                 <button class="btn btn-admin" type="submit">Filtrar</button>
             </form>
 
@@ -66,15 +66,15 @@
                     <tbody>
                     <tr th:each="item : ${page.content}">
                         <td><strong th:text="${item.code()}">MM-XXX-00000000</strong></td>
-                        <td th:text="${item.userName()}">Nombre</td>
-                        <td th:text="${item.courseTitle()}">Curso</td>
-                        <td th:text="${item.issued()}">01/01/2026</td>
-                        <td><span class="admin-status" th:classappend="${item.active()} ? ' is-ok' : ' is-bad'"
-                                  th:text="${item.active()} ? 'Vigente' : 'Revocado'">Vigente</span></td>
+                        <td th:text="${item.usuarioNombre()}">Nombre</td>
+                        <td th:text="${item.cursoTitulo()}">Curso</td>
+                        <td th:text="${item.emitido()}">01/01/2026</td>
+                        <td><span class="admin-status" th:classappend="${item.activo()} ? ' is-ok' : ' is-bad'"
+                                  th:text="${item.activo()} ? 'Vigente' : 'Revocado'">Vigente</span></td>
                         <td class="admin-row-actions">
                             <a th:href="@{/admin/certificados/{id}/ver(id=${item.id()})}"
                                th:attr="aria-label='Ver certificado ' + ${item.code()}">Ver</a>
-                            <button th:if="${item.active()}" type="button" class="admin-confirm-link"
+                            <button th:if="${item.activo()}" type="button" class="admin-confirm-link"
                                     th:attr="data-confirm-url=@{/admin/certificados/{id}/revocar(id=${item.id()}, code=${item.code()})}, aria-label='Revocar ' + ${item.code()}">Revocar</button>
                         </td>
                     </tr>
@@ -83,9 +83,9 @@
                 </table>
             </div>
             <nav class="admin-pager" th:if="${page.totalPages > 1}" aria-label="Paginación de certificados">
-                <a th:if="${!page.first}" th:href="@{/admin/certificados(page=${page.number - 1}, q=${query}, incluirRevocados=${includeRevoked})}">← Anterior</a>
+                <a th:if="${!page.first}" th:href="@{/admin/certificados(page=${page.number - 1}, q=${query}, incluirRevocados=${includeRevocado})}">← Anterior</a>
                 <span th:text="${'Página ' + (page.number + 1) + ' de ' + page.totalPages}">Página 1</span>
-                <a th:if="${!page.last}" th:href="@{/admin/certificados(page=${page.number + 1}, q=${query}, incluirRevocados=${includeRevoked})}">Siguiente →</a>
+                <a th:if="${!page.last}" th:href="@{/admin/certificados(page=${page.number + 1}, q=${query}, incluirRevocados=${includeRevocado})}">Siguiente →</a>
             </nav>
         </main>
     </div>

@@ -26,12 +26,12 @@ class RequestIdFilterTest {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addHeader("X-Request-Id", "req-123");
         MockHttpServletResponse response = new MockHttpServletResponse();
-        String[] seen = new String[1];
-        FilterChain chain = (req, res) -> seen[0] = MDC.get("requestId");
+        String[] visto = new String[1];
+        FilterChain chain = (req, res) -> visto[0] = MDC.get("requestId");
 
         filter.doFilter(request, response, chain);
 
-        assertThat(seen[0]).isEqualTo("req-123");
+        assertThat(visto[0]).isEqualTo("req-123");
         assertThat(response.getHeader("X-Request-Id")).isEqualTo("req-123");
         assertThat(MDC.get("requestId")).isNull();
     }
@@ -41,12 +41,12 @@ class RequestIdFilterTest {
     void generatesRequestIdWhenMissing() throws Exception {
         MockHttpServletRequest request = new MockHttpServletRequest();
         MockHttpServletResponse response = new MockHttpServletResponse();
-        String[] seen = new String[1];
+        String[] visto = new String[1];
 
-        filter.doFilter(request, response, (req, res) -> seen[0] = MDC.get("requestId"));
+        filter.doFilter(request, response, (req, res) -> visto[0] = MDC.get("requestId"));
 
-        assertThat(seen[0]).matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
-        assertThat(response.getHeader("X-Request-Id")).isEqualTo(seen[0]);
+        assertThat(visto[0]).matches("[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}");
+        assertThat(response.getHeader("X-Request-Id")).isEqualTo(visto[0]);
     }
 
     @Test
@@ -55,13 +55,13 @@ class RequestIdFilterTest {
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.addHeader("X-Request-Id", "malformed id with spaces\nand newline");
         MockHttpServletResponse response = new MockHttpServletResponse();
-        String[] seen = new String[1];
+        String[] visto = new String[1];
 
-        filter.doFilter(request, response, (req, res) -> seen[0] = MDC.get("requestId"));
+        filter.doFilter(request, response, (req, res) -> visto[0] = MDC.get("requestId"));
 
-        assertThat(seen[0]).isNotEqualTo(request.getHeader("X-Request-Id"));
-        assertThat(seen[0]).matches("[0-9a-f-]{36}");
-        assertThat(response.getHeader("X-Request-Id")).isEqualTo(seen[0]);
+        assertThat(visto[0]).isNotEqualTo(request.getHeader("X-Request-Id"));
+        assertThat(visto[0]).matches("[0-9a-f-]{36}");
+        assertThat(response.getHeader("X-Request-Id")).isEqualTo(visto[0]);
     }
 
     @Test

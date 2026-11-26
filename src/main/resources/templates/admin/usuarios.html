@@ -32,8 +32,8 @@
                 <label class="sr-only" for="filtro-rol">Filtrar por rol</label>
                 <select id="filtro-rol" name="rol">
                     <option value="">Todos los roles</option>
-                    <option value="STUDENT" th:selected="${role == 'STUDENT'}">Estudiante</option>
-                    <option value="ADMIN" th:selected="${role == 'ADMIN'}">Administrador</option>
+                    <option value="STUDENT" th:selected="${rol == 'STUDENT'}">Estudiante</option>
+                    <option value="ADMIN" th:selected="${rol == 'ADMIN'}">Administrador</option>
                 </select>
                 <button class="btn btn-admin" type="submit">Filtrar</button>
             </form>
@@ -42,17 +42,17 @@
                 <table class="admin-table">
                     <thead><tr><th>Nombre</th><th>Correo</th><th>Rol</th><th>Plan</th><th>Estado</th><th>Alta</th><th>Acciones</th></tr></thead>
                     <tbody>
-                    <tr th:each="user : ${page.content}">
-                        <td><strong th:text="${user.fullName()}">Nombre</strong></td>
-                        <td th:text="${user.email()}">correo</td>
-                        <td th:text="${user.role() == 'ADMIN' ? 'Admin' : 'Estudiante'}">Rol</td>
-                        <td th:text="${user.plan()}">Plan</td>
-                        <td><span class="admin-status" th:classappend="${user.active()} ? ' is-ok' : ' is-bad'"
-                                  th:text="${user.active()} ? 'Activo' : 'Inactivo'">Activo</span></td>
-                        <td th:text="${user.created()}">01/01/2026</td>
+                    <tr th:each="usuario : ${page.content}">
+                        <td><strong th:text="${usuario.nombreCompleto()}">Nombre</strong></td>
+                        <td th:text="${usuario.email()}">correo</td>
+                        <td th:text="${usuario.rol() == 'ADMIN' ? 'Admin' : 'Estudiante'}">Rol</td>
+                        <td th:text="${usuario.plan()}">Plan</td>
+                        <td><span class="admin-status" th:classappend="${usuario.activo()} ? ' is-ok' : ' is-bad'"
+                                  th:text="${usuario.activo()} ? 'Activo' : 'Inactivo'">Activo</span></td>
+                        <td th:text="${usuario.creado()}">01/01/2026</td>
                         <td class="admin-row-actions">
-                            <a th:href="@{/admin/usuarios/{id}/editar(id=${user.id()})}">Editar</a>
-                            <span th:if="${user.current()}" class="admin-muted">Tu cuenta</span>
+                            <a th:href="@{/admin/usuarios/{id}/editar(id=${usuario.id()})}">Editar</a>
+                            <span th:if="${usuario.actual()}" class="admin-muted">Tu cuenta</span>
                         </td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(page.content)}">
@@ -62,9 +62,9 @@
                 </table>
             </div>
             <nav class="admin-pager" th:if="${page.totalPages > 1}" aria-label="Paginación de usuarios">
-                <a th:if="${!page.first}" th:href="@{/admin/usuarios(page=${page.number - 1}, q=${query}, rol=${role})}">← Anterior</a>
+                <a th:if="${!page.first}" th:href="@{/admin/usuarios(page=${page.number - 1}, q=${query}, rol=${rol})}">← Anterior</a>
                 <span th:text="${'Página ' + (page.number + 1) + ' de ' + page.totalPages}">Página 1</span>
-                <a th:if="${!page.last}" th:href="@{/admin/usuarios(page=${page.number + 1}, q=${query}, rol=${role})}">Siguiente →</a>
+                <a th:if="${!page.last}" th:href="@{/admin/usuarios(page=${page.number + 1}, q=${query}, rol=${rol})}">Siguiente →</a>
             </nav>
         </main>
     </div>

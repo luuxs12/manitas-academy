@@ -1,33 +1,33 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="~{admin/fragments/admin-head :: adminHead(${courseId != null} ? 'Editar curso' : 'Nuevo curso')}"></head>
+<head th:replace="~{admin/fragments/admin-head :: adminHead(${cursoId != null} ? 'Editar curso' : 'Nuevo curso')}"></head>
 
 <body class="panel-body admin-body">
 <a class="skip-link" href="#panel-main">Saltar al contenido</a>
 <div class="panel admin">
     <aside th:replace="~{admin/fragments/admin-nav :: sidebar('cursos')}"></aside>
     <div class="panel-shell">
-        <header th:replace="~{admin/fragments/admin-nav :: topbar('Cursos', ${courseId != null} ? 'Editar ficha' : 'Nueva ficha', '')}"></header>
+        <header th:replace="~{admin/fragments/admin-nav :: topbar('Cursos', ${cursoId != null} ? 'Editar ficha' : 'Nueva ficha', '')}"></header>
         <main id="panel-main" class="panel-main admin-main">
 
             <div class="admin-page-head">
-                <div><h1 th:text="${courseId != null} ? 'Editar curso' : 'Nuevo curso'">Curso</h1>
+                <div><h1 th:text="${cursoId != null} ? 'Editar curso' : 'Nuevo curso'">Curso</h1>
                     <p>La ficha se guarda en PostgreSQL; la portada se sube al servidor.</p></div>
                 <a class="admin-back" th:href="@{/admin/cursos}">← Volver a cursos</a>
             </div>
 
-            <form class="panel-card admin-card admin-form" th:action="${courseId != null} ? @{/admin/cursos/{id}(id=${courseId})} : @{/admin/cursos}"
-                  th:object="${adminCourseForm}" method="post" novalidate data-confirm-form
-                  th:attr="data-confirm-message=${courseId != null} ? '¿Guardar los cambios del curso?' : '¿Crear el curso con estos datos?'">
-                <input type="hidden" th:field="*{image}">
+            <form class="panel-card admin-card admin-form" th:action="${cursoId != null} ? @{/admin/cursos/{id}(id=${cursoId})} : @{/admin/cursos}"
+                  th:object="${adminCursoFormulario}" method="post" novalidate data-confirm-form
+                  th:attr="data-confirm-message=${cursoId != null} ? '¿Guardar los cambios del curso?' : '¿Crear el curso con estos datos?'">
+                <input type="hidden" th:field="*{imagen}">
                 <div class="admin-form-grid">
                     <div class="admin-field">
                         <label for="curso-titulo">Título</label>
-                        <input id="curso-titulo" type="text" th:field="*{title}" maxlength="140" required
-                               th:attr="aria-invalid=${#fields.hasErrors('title')} ? 'true' : null,
-                                        aria-describedby=${#fields.hasErrors('title')} ? 'error-titulo' : null">
-                        <small id="error-titulo" class="admin-error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></small>
+                        <input id="curso-titulo" type="text" th:field="*{titulo}" maxlength="140" required
+                               th:attr="aria-invalid=${#fields.hasErrors('titulo')} ? 'true' : null,
+                                        aria-describedby=${#fields.hasErrors('titulo')} ? 'error-titulo' : null">
+                        <small id="error-titulo" class="admin-error" th:if="${#fields.hasErrors('titulo')}" th:errors="*{titulo}"></small>
                     </div>
                     <div class="admin-field">
                         <label for="curso-slug">Identificador (slug)</label>
@@ -39,47 +39,47 @@
                     </div>
                     <div class="admin-field">
                         <label for="curso-nivel">Nivel</label>
-                        <input id="curso-nivel" type="text" th:field="*{level}" maxlength="60" required
-                               th:attr="aria-invalid=${#fields.hasErrors('level')} ? 'true' : null,
-                                        aria-describedby=${#fields.hasErrors('level')} ? 'error-nivel' : null">
-                        <small id="error-nivel" class="admin-error" th:if="${#fields.hasErrors('level')}" th:errors="*{level}"></small>
+                        <input id="curso-nivel" type="text" th:field="*{nivel}" maxlength="60" required
+                               th:attr="aria-invalid=${#fields.hasErrors('nivel')} ? 'true' : null,
+                                        aria-describedby=${#fields.hasErrors('nivel')} ? 'error-nivel' : null">
+                        <small id="error-nivel" class="admin-error" th:if="${#fields.hasErrors('nivel')}" th:errors="*{nivel}"></small>
                     </div>
                     <div class="admin-field">
                         <label for="curso-categoria">Categoría</label>
-                        <input id="curso-categoria" type="text" th:field="*{category}" maxlength="60" required
-                               th:attr="aria-invalid=${#fields.hasErrors('category')} ? 'true' : null,
-                                        aria-describedby=${#fields.hasErrors('category')} ? 'error-categoria' : null">
-                        <small id="error-categoria" class="admin-error" th:if="${#fields.hasErrors('category')}" th:errors="*{category}"></small>
+                        <input id="curso-categoria" type="text" th:field="*{categoria}" maxlength="60" required
+                               th:attr="aria-invalid=${#fields.hasErrors('categoria')} ? 'true' : null,
+                                        aria-describedby=${#fields.hasErrors('categoria')} ? 'error-categoria' : null">
+                        <small id="error-categoria" class="admin-error" th:if="${#fields.hasErrors('categoria')}" th:errors="*{categoria}"></small>
                     </div>
                     <div class="admin-field">
                         <label for="curso-posicion">Posición</label>
-                        <input id="curso-posicion" type="number" th:field="*{position}" min="0" max="9999"
-                               th:attr="aria-invalid=${#fields.hasErrors('position')} ? 'true' : null,
-                                        aria-describedby=${#fields.hasErrors('position')} ? 'error-posicion' : null">
-                        <small id="error-posicion" class="admin-error" th:if="${#fields.hasErrors('position')}" th:errors="*{position}"></small>
+                        <input id="curso-posicion" type="number" th:field="*{posicion}" min="0" max="9999"
+                               th:attr="aria-invalid=${#fields.hasErrors('posicion')} ? 'true' : null,
+                                        aria-describedby=${#fields.hasErrors('posicion')} ? 'error-posicion' : null">
+                        <small id="error-posicion" class="admin-error" th:if="${#fields.hasErrors('posicion')}" th:errors="*{posicion}"></small>
                     </div>
                     <div class="admin-field admin-span-2">
                         <label for="curso-resumen">Resumen</label>
-                        <textarea id="curso-resumen" th:field="*{summary}" rows="3" maxlength="320" required
-                                  th:attr="aria-invalid=${#fields.hasErrors('summary')} ? 'true' : null,
-                                           aria-describedby=${#fields.hasErrors('summary')} ? 'error-resumen' : null"></textarea>
-                        <small id="error-resumen" class="admin-error" th:if="${#fields.hasErrors('summary')}" th:errors="*{summary}"></small>
+                        <textarea id="curso-resumen" th:field="*{resumen}" rows="3" maxlength="320" required
+                                  th:attr="aria-invalid=${#fields.hasErrors('resumen')} ? 'true' : null,
+                                           aria-describedby=${#fields.hasErrors('resumen')} ? 'error-resumen' : null"></textarea>
+                        <small id="error-resumen" class="admin-error" th:if="${#fields.hasErrors('resumen')}" th:errors="*{resumen}"></small>
                     </div>
                 </div>
                 <input type="hidden" name="_free" value="false">
                 <label class="admin-check"><input type="checkbox" th:field="*{free}"> Curso gratuito (sin plan Premium)</label>
                 <div class="admin-form-actions">
-                    <button class="btn btn-admin" type="submit" th:text="${courseId != null} ? 'Guardar cambios' : 'Crear curso'">Guardar</button>
+                    <button class="btn btn-admin" type="submit" th:text="${cursoId != null} ? 'Guardar cambios' : 'Crear curso'">Guardar</button>
                     <a class="admin-back" th:href="@{/admin/cursos}">Cancelar</a>
                 </div>
             </form>
 
-            <section id="portada" class="panel-card admin-card admin-cover" th:if="${courseId != null}"
+            <section id="portada" class="panel-card admin-card admin-cover" th:if="${cursoId != null}"
                      aria-labelledby="portada-title">
                 <h2 id="portada-title">Portada local</h2>
-                <p class="admin-muted" th:text="${adminCourseForm.image() != null and !#strings.isEmpty(adminCourseForm.image())
-                        ? 'Ruta actual: ' + adminCourseForm.image() : 'Todavía no hay portada.'}">Sin portada.</p>
-                <form th:action="@{/admin/cursos/{id}/portada(id=${courseId})}" method="post" enctype="multipart/form-data">
+                <p class="admin-muted" th:text="${adminCursoFormulario.imagen() != null and !#strings.isEmpty(adminCursoFormulario.imagen())
+                        ? 'Ruta actual: ' + adminCursoFormulario.imagen() : 'Todavía no hay portada.'}">Sin portada.</p>
+                <form th:action="@{/admin/cursos/{id}/portada(id=${cursoId})}" method="post" enctype="multipart/form-data">
                     <div class="admin-field">
                         <label for="portada-archivo">Archivo JPG, PNG o WebP (hasta 2 MB)</label>
                         <input id="portada-archivo" name="portada" type="file"
@@ -91,26 +91,26 @@
                 </form>
             </section>
 
-            <section class="panel-card admin-card admin-publication" th:if="${courseId != null}"
+            <section class="panel-card admin-card admin-publication" th:if="${cursoId != null}"
                      aria-labelledby="publicacion-title">
                 <h2 id="publicacion-title">Publicación</h2>
                 <p>Estado actual:
-                    <span class="admin-status" th:classappend="${courseStatus == 'PUBLICADO'} ? ' is-ok' : ' is-bad'"
-                          th:text="${courseStatus == 'PUBLICADO'} ? 'Publicado' : 'Borrador'">Borrador</span>
+                    <span class="admin-status" th:classappend="${cursoEstado == 'PUBLICADO'} ? ' is-ok' : ' is-bad'"
+                          th:text="${cursoEstado == 'PUBLICADO'} ? 'Publicado' : 'Borrador'">Borrador</span>
                 </p>
                 <p id="checklist-help" class="admin-muted">El curso se publica al crearse. Estas mejoras son opcionales y se calculan desde la base.</p>
                 <ul id="checklist" class="admin-checklist">
-                    <li th:each="missing : ${checklist.missing()}" th:text="'Podés agregar ' + ${missing}"></li>
-                    <li th:if="${checklist.canPublish() and #lists.isEmpty(checklist.missing())}">Sin mejoras pendientes.</li>
+                    <li th:each="missing : ${lista.missing()}" th:text="'Podés agregar ' + ${missing}"></li>
+                    <li th:if="${lista.canPublicar() and #lists.isEmpty(lista.missing())}">Sin mejoras pendientes.</li>
                 </ul>
                 <div class="admin-form-actions">
-                    <form th:if="${courseStatus != 'PUBLICADO'}"
-                          th:action="@{/admin/cursos/{id}/publicar(id=${courseId})}" method="post"
+                    <form th:if="${cursoEstado != 'PUBLICADO'}"
+                          th:action="@{/admin/cursos/{id}/publicar(id=${cursoId})}" method="post"
                           data-confirm-form data-confirm-message="¿Publicar el curso?">
                         <button class="btn btn-admin" type="submit" aria-describedby="checklist-help checklist">Publicar curso</button>
                     </form>
-                    <form th:if="${courseStatus == 'PUBLICADO'}"
-                          th:action="@{/admin/cursos/{id}/despublicar(id=${courseId})}" method="post"
+                    <form th:if="${cursoEstado == 'PUBLICADO'}"
+                          th:action="@{/admin/cursos/{id}/despublicar(id=${cursoId})}" method="post"
                           data-confirm-form data-confirm-message="¿Pasar el curso a borrador?">
                         <button class="btn btn-ghost" type="submit">Pasar a borrador</button>
                     </form>

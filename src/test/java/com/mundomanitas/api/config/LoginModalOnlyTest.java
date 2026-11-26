@@ -72,8 +72,8 @@ class LoginModalOnlyTest {
                 .doesNotContain("url.pathname === \"/login\"");
     }
 
-    private static String read(Resource resource) throws IOException {
-        try (var stream = resource.getInputStream()) {
+    private static String read(Resource recurso) throws IOException {
+        try (var stream = recurso.getInputStream()) {
             return new String(stream.readAllBytes(), StandardCharsets.UTF_8);
         }
     }

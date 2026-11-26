@@ -30,7 +30,7 @@
 
                 <div class="panel-profile-grid">
                     <form class="panel-card panel-form auth-form" th:action="@{/panel/accesibilidad}"
-                          th:object="${accessibilityForm}" method="post">
+                          th:object="${accesibilidadFormulario}" method="post">
                         <div class="field field--check">
                             <label for="signLanguageEnabled">
                                 <input id="signLanguageEnabled" type="checkbox"
@@ -75,13 +75,13 @@
 
                         <div class="field">
                             <label for="playbackSpeed">Velocidad de reproducción</label>
-                            <select id="playbackSpeed" th:field="*{playbackSpeed}"
-                                    th:classappend="${#fields.hasErrors('playbackSpeed')} ? 'is-invalid' : ''">
+                            <select id="playbackSpeed" th:field="*{reproduccionSpeed}"
+                                    th:classappend="${#fields.hasErrors('reproduccionSpeed')} ? 'is-invalid' : ''">
                                 <option th:each="speed : ${speeds}" th:value="${speed}"
                                         th:text="${speed + '×'}">1×</option>
                             </select>
-                            <p class="field-error" th:if="${#fields.hasErrors('playbackSpeed')}"
-                               th:errors="*{playbackSpeed}">Revisá este dato.</p>
+                            <p class="field-error" th:if="${#fields.hasErrors('reproduccionSpeed')}"
+                               th:errors="*{reproduccionSpeed}">Revisá este dato.</p>
                         </div>
 
                         <button class="btn btn-dark" type="submit">Guardar preferencias</button>
@@ -100,13 +100,13 @@
                         <dl class="panel-data panel-data--compact">
                             <div>
                                 <dt>Lengua de señas</dt>
-                                <dd th:text="${accessibilityForm.signLanguageEnabled} ? 'Activada' : 'Desactivada'">
+                                <dd th:text="${accesibilidadFormulario.signLanguageEnabled} ? 'Activada' : 'Desactivada'">
                                     Desactivada
                                 </dd>
                             </div>
                             <div>
                                 <dt>Subtítulos</dt>
-                                <dd th:text="${accessibilityForm.captionsEnabled} ? 'Activados' : 'Desactivados'">
+                                <dd th:text="${accesibilidadFormulario.captionsEnabled} ? 'Activados' : 'Desactivados'">
                                     Activados
                                 </dd>
                             </div>

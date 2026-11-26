@@ -1,6 +1,6 @@
 package com.mundomanitas.api.repository;
 
-import com.mundomanitas.api.dto.admin.DayCount;
+import com.mundomanitas.api.dto.admin.ConteoDia;
 import jakarta.persistence.EntityManager;
 import org.springframework.stereotype.Repository;
 
@@ -29,15 +29,15 @@ public class AdminStatsRepository {
         this.entityManager = entityManager;
     }
 
-    public List<DayCount> usersByDay(OffsetDateTime from) {
+    public List<ConteoDia> usersPorDia(OffsetDateTime from) {
         return daily(USERS, from);
     }
 
-    public List<DayCount> coursesByDay(OffsetDateTime from) {
+    public List<ConteoDia> coursesPorDia(OffsetDateTime from) {
         return daily(COURSES, from);
     }
 
-    public List<DayCount> revenueByDay(OffsetDateTime from) {
+    public List<ConteoDia> revenuePorDia(OffsetDateTime from) {
         String sql = """
                 select cast(date_trunc('day', paid_at) as date) as day,
                        sum(amount_cents) as total
@@ -49,7 +49,7 @@ public class AdminStatsRepository {
     }
 
     /** Personas con movimiento real en el período (matrícula o avance). */
-    public long activeUsersSince(OffsetDateTime from) {
+    public long activoUsersSince(OffsetDateTime from) {
         String sql = """
                 select count(distinct user_id) from (
                     select user_id from enrollments where enrolled_at >= :from
@@ -66,12 +66,12 @@ public class AdminStatsRepository {
     }
 
     @SuppressWarnings("unchecked")
-    private List<DayCount> daily(String sql, OffsetDateTime from) {
+    private List<ConteoDia> daily(String sql, OffsetDateTime from) {
         List<Object[]> rows = entityManager.createNativeQuery(sql)
                 .setParameter("from", from)
                 .getResultList();
         return rows.stream()
-                .map(row -> new DayCount(
+                .map(row -> new ConteoDia(
                         toDate(row[0]),
                         row[1] instanceof Number number ? number.longValue() : 0L))
                 .toList();

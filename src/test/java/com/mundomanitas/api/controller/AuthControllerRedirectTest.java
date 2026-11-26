@@ -1,7 +1,7 @@
 package com.mundomanitas.api.controller;
 
 import com.mundomanitas.api.service.AuthService;
-import com.mundomanitas.api.service.MailService;
+import com.mundomanitas.api.service.CorreoService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -27,21 +27,21 @@ class AuthControllerRedirectTest {
         controller = new AuthController(
                 mock(AuthService.class),
                 mock(AuthenticationManager.class),
-                mock(MailService.class)
+                mock(CorreoService.class)
         );
     }
 
     @Test
     @DisplayName("un administrador con sesión vuelve al panel administrativo")
     void adminReturnsToAdminPanel() {
-        assertThat(controller.register(auth("ADMIN"), new ExtendedModelMap()))
+        assertThat(controller.registro(auth("ADMIN"), new ExtendedModelMap()))
                 .isEqualTo("redirect:/admin");
     }
 
     @Test
     @DisplayName("un estudiante con sesión vuelve a su panel")
-    void studentReturnsToStudentPanel() {
-        assertThat(controller.register(auth("STUDENT"), new ExtendedModelMap()))
+    void estudianteReturnsToEstudiantePanel() {
+        assertThat(controller.registro(auth("STUDENT"), new ExtendedModelMap()))
                 .isEqualTo("redirect:/panel");
     }
 
@@ -53,8 +53,8 @@ class AuthControllerRedirectTest {
         assertThat(controller.legacyLogin(auth("STUDENT"))).isEqualTo("redirect:/panel");
     }
 
-    private static Authentication auth(String role) {
+    private static Authentication auth(String rol) {
         return new UsernamePasswordAuthenticationToken(
-                "usuario", "clave", List.of(new SimpleGrantedAuthority("ROLE_" + role)));
+                "usuario", "clave", List.of(new SimpleGrantedAuthority("ROLE_" + rol)));
     }
 }

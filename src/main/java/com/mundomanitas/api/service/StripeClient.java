@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.mundomanitas.api.config.StripeProperties;
 import com.mundomanitas.api.model.Plan;
-import com.mundomanitas.api.model.User;
+import com.mundomanitas.api.model.Usuario;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpHeaders;
@@ -43,53 +43,53 @@ public class StripeClient {
     }
 
     /** Devuelve la URL de pago y el id de sesión (flujo heredado). */
-    public Session createCheckoutSession(User user, Plan plan, String successUrl, String cancelUrl) {
-        MultiValueMap<String, String> form = baseSessionForm(user, plan);
-        form.add("success_url", successUrl);
-        form.add("cancel_url", cancelUrl);
+    public Sesion createCheckoutSesion(Usuario usuario, Plan plan, String successUrl, String cancelUrl) {
+        MultiValueMap<String, String> formulario = baseSesionFormulario(usuario, plan);
+        formulario.add("success_url", successUrl);
+        formulario.add("cancel_url", cancelUrl);
 
-        JsonNode json = postSession(form);
-        return new Session(json.path("id").asText(), json.path("url").asText());
+        JsonNode json = postSesion(formulario);
+        return new Sesion(json.path("id").asText(), json.path("url").asText());
     }
 
     /**
      * Checkout embebido: Stripe devuelve un client_secret que se monta dentro
      * del panel, sin sacar a la persona de la plataforma.
      */
-    public EmbeddedSession createEmbeddedCheckoutSession(User user, Plan plan, String returnUrl) {
-        MultiValueMap<String, String> form = baseSessionForm(user, plan);
-        form.add("ui_mode", "embedded_page");
-        form.add("return_url", returnUrl);
+    public EmbeddedSesion createEmbeddedCheckoutSesion(Usuario usuario, Plan plan, String returnUrl) {
+        MultiValueMap<String, String> formulario = baseSesionFormulario(usuario, plan);
+        formulario.add("ui_mode", "embedded_page");
+        formulario.add("return_url", returnUrl);
 
-        JsonNode json = postSession(form);
-        return new EmbeddedSession(
+        JsonNode json = postSesion(formulario);
+        return new EmbeddedSesion(
                 json.path("id").asText(),
                 json.path("client_secret").asText()
         );
     }
 
-    private MultiValueMap<String, String> baseSessionForm(User user, Plan plan) {
-        MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
-        form.add("mode", "subscription");
-        form.add("line_items[0][price]", properties.priceId(plan));
-        form.add("line_items[0][quantity]", "1");
-        form.add("client_reference_id", user.getId().toString());
-        form.add("customer_email", user.getEmail());
-        form.add("metadata[user_id]", user.getId().toString());
-        form.add("metadata[plan]", plan.name());
-        form.add("locale", "es");
-        if (user.getStripeCustomerId() != null && !user.getStripeCustomerId().isBlank()) {
-            form.add("customer", user.getStripeCustomerId());
+    private MultiValueMap<String, String> baseSesionFormulario(Usuario usuario, Plan plan) {
+        MultiValueMap<String, String> formulario = new LinkedMultiValueMap<>();
+        formulario.add("mode", "subscription");
+        formulario.add("line_items[0][price]", properties.priceId(plan));
+        formulario.add("line_items[0][quantity]", "1");
+        formulario.add("client_reference_id", usuario.getId().toString());
+        formulario.add("customer_email", usuario.getEmail());
+        formulario.add("metadata[user_id]", usuario.getId().toString());
+        formulario.add("metadata[plan]", plan.name());
+        formulario.add("locale", "es");
+        if (usuario.getStripeCustomerId() != null && !usuario.getStripeCustomerId().isBlank()) {
+            formulario.add("customer", usuario.getStripeCustomerId());
         }
-        return form;
+        return formulario;
     }
 
-    private JsonNode postSession(MultiValueMap<String, String> form) {
+    private JsonNode postSesion(MultiValueMap<String, String> formulario) {
         String response = client.post()
                 .uri("/v1/checkout/sessions")
                 .headers(this::authorize)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .body(form)
+                .body(formulario)
                 .retrieve()
                 .body(String.class);
         try {
@@ -99,8 +99,8 @@ public class StripeClient {
         }
     }
 
-    public JsonNode retrieveSession(String sessionId) {
-        return get("/v1/checkout/sessions/" + sessionId);
+    public JsonNode retrieveSesion(String sesionId) {
+        return get("/v1/checkout/sessions/" + sesionId);
     }
 
     public JsonNode retrieveSubscription(String subscriptionId) {
@@ -108,14 +108,14 @@ public class StripeClient {
     }
 
     /** Cancela al final del período pagado; Stripe conserva el acceso hasta ahí. */
-    public void cancelSubscriptionAtPeriodEnd(String subscriptionId) {
-        MultiValueMap<String, String> form = new LinkedMultiValueMap<>();
-        form.add("cancel_at_period_end", "true");
+    public void cancelSubscriptionAtPeriodFin(String subscriptionId) {
+        MultiValueMap<String, String> formulario = new LinkedMultiValueMap<>();
+        formulario.add("cancel_at_period_end", "true");
         client.post()
                 .uri("/v1/subscriptions/" + subscriptionId)
                 .headers(this::authorize)
                 .contentType(MediaType.APPLICATION_FORM_URLENCODED)
-                .body(form)
+                .body(formulario)
                 .retrieve()
                 .toBodilessEntity();
     }
@@ -134,7 +134,7 @@ public class StripeClient {
     }
 
     private void authorize(HttpHeaders headers) {
-        headers.setBearerAuth(properties.getSecretKey());
+        headers.setBearerAuth(properties.getSecretClave());
         if (!properties.getApiVersion().isBlank()) {
             headers.set("Stripe-Version", properties.getApiVersion());
         }
@@ -184,9 +184,9 @@ public class StripeClient {
         }
     }
 
-    public record Session(String id, String url) {
+    public record Sesion(String id, String url) {
     }
 
-    public record EmbeddedSession(String id, String clientSecret) {
+    public record EmbeddedSesion(String id, String clientSecret) {
     }
 }

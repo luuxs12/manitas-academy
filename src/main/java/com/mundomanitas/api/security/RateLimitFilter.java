@@ -48,13 +48,13 @@ public class RateLimitFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
         String ip = request.getRemoteAddr();
         String path = request.getRequestURI();
-        RateLimiter.Decision decision = limiter.check(ip + "|" + path, Instant.now());
+        RateLimiter.Decision decision = limiter.verificacion(ip + "|" + path, Instant.now());
 
         if (!decision.allowed()) {
             log.warn("Límite de intentos alcanzado ip={} ruta={} reintento={}s",
-                    ip, path, decision.retryAfterSeconds());
+                    ip, path, decision.retryDespuesSegundos());
             response.setStatus(429);
-            response.setHeader("Retry-After", Long.toString(decision.retryAfterSeconds()));
+            response.setHeader("Retry-After", Long.toString(decision.retryDespuesSegundos()));
             response.setContentType("text/plain;charset=UTF-8");
             response.getWriter().write("Demasiados intentos. Probá de nuevo en unos segundos.");
             return;

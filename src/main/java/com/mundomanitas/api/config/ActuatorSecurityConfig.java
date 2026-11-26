@@ -30,18 +30,18 @@ public class ActuatorSecurityConfig {
     @Order(1)
     SecurityFilterChain actuatorSecurityFilterChain(
             HttpSecurity http,
-            PasswordEncoder passwordEncoder,
+            PasswordEncoder contrasenaEncoder,
             @Value("${app.monitoring.username:monitor}") String username,
-            @Value("${app.monitoring.password}") String password
+            @Value("${app.monitoring.password}") String contrasena
     ) throws Exception {
         UserDetailsService monitoringUsers = new InMemoryUserDetailsManager(
                 User.withUsername(username)
-                        .password(passwordEncoder.encode(password))
+                        .password(contrasenaEncoder.encode(contrasena))
                         .roles("MONITOR")
                         .build()
         );
         DaoAuthenticationProvider provider = new DaoAuthenticationProvider(monitoringUsers);
-        provider.setPasswordEncoder(passwordEncoder);
+        provider.setPasswordEncoder(contrasenaEncoder);
 
         http
                 .securityMatcher("/actuator/**")

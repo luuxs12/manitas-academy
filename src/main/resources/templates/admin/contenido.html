@@ -1,21 +1,21 @@
 <!DOCTYPE html>
 <html lang="es" xmlns:th="http://www.thymeleaf.org">
 
-<head th:replace="~{admin/fragments/admin-head :: adminHead('Contenido de ' + ${courseTitle})}"></head>
+<head th:replace="~{admin/fragments/admin-head :: adminHead('Contenido de ' + ${cursoTitulo})}"></head>
 
 <body class="panel-body admin-body">
 <a class="skip-link" href="#panel-main">Saltar al contenido</a>
 <div class="panel admin">
     <aside th:replace="~{admin/fragments/admin-nav :: sidebar('cursos')}"></aside>
     <div class="panel-shell">
-        <header th:replace="~{admin/fragments/admin-nav :: topbar('Cursos', 'Contenido del curso', ${courseTitle})}"></header>
+        <header th:replace="~{admin/fragments/admin-nav :: topbar('Cursos', 'Contenido del curso', ${cursoTitulo})}"></header>
         <main id="panel-main" class="panel-main admin-main">
 
             <div class="admin-page-head">
                 <div>
-                    <h1 th:text="'Contenido de ' + ${courseTitle}">Contenido del curso</h1>
-                    <p th:text="${outline.totalItems()} + (${outline.totalItems()} == 1 ? ' ítem' : ' ítems') + ' · '
-                                + ${outline.doneItems()} + (${outline.doneItems()} == 1 ? ' visto' : ' vistos')
+                    <h1 th:text="'Contenido de ' + ${cursoTitulo}">Contenido del curso</h1>
+                    <p th:text="${esquema.totalItems()} + (${esquema.totalItems()} == 1 ? ' ítem' : ' ítems') + ' · '
+                                + ${esquema.doneItems()} + (${esquema.doneItems()} == 1 ? ' visto' : ' vistos')
                                 + ' · vista previa con ocultos'">0 ítems</p>
                 </div>
                 <a class="admin-back" th:href="@{/admin/cursos}">← Volver a cursos</a>
@@ -27,59 +27,59 @@
                     <p>Los módulos se cargan desde Módulos. Acá se ordenan las secciones y las clases de cada uno.</p>
                 </div>
 
-                <article class="admin-module" th:each="module, i : ${outline.modules()}"
-                         th:id="'modulo-' + ${module.id()}"
-                         th:attr="aria-labelledby='titulo-' + ${module.id()}">
+                <article class="admin-module" th:each="modulo, i : ${esquema.modules()}"
+                         th:id="'modulo-' + ${modulo.id()}"
+                         th:attr="aria-labelledby='titulo-' + ${modulo.id()}">
                     <div class="admin-module-head">
-                        <h3 th:id="'titulo-' + ${module.id()}">
+                        <h3 th:id="'titulo-' + ${modulo.id()}">
                             <span class="admin-module-number" th:text="'Módulo ' + ${i.count}">Módulo 1</span>
-                            <span class="admin-module-name" th:text="${module.title()}">Nombre del módulo</span>
+                            <span class="admin-module-name" th:text="${modulo.titulo()}">Nombre del módulo</span>
                         </h3>
-                        <span class="admin-status" th:classappend="${module.visible()} ? ' is-ok' : ' is-bad'"
-                              th:text="${module.visible()} ? 'Visible' : 'Oculta'">Visible</span>
+                        <span class="admin-status" th:classappend="${modulo.visible()} ? ' is-ok' : ' is-bad'"
+                              th:text="${modulo.visible()} ? 'Visible' : 'Oculta'">Visible</span>
                         <a class="btn btn-admin admin-session-download"
-                           th:href="@{/admin/exportar/sesion/modulos/{m}/pdf(m=${module.id()})}"
-                           th:attr="aria-label='Descargar PDF de la sesión ' + ${module.title()}">Descargar PDF de la sesión</a>
+                           th:href="@{/admin/exportar/sesion/modulos/{m}/pdf(m=${modulo.id()})}"
+                           th:attr="aria-label='Descargar PDF de la sesión ' + ${modulo.titulo()}">Descargar PDF de la sesión</a>
                     </div>
-                    <p class="admin-muted" th:text="${!module.visible()} ? 'Oculto para el estudiante' : 'Visible para el estudiante'">Visible</p>
+                    <p class="admin-muted" th:text="${!modulo.visible()} ? 'Oculto para el estudiante' : 'Visible para el estudiante'">Visible</p>
 
-                    <p class="admin-empty" th:if="${#lists.isEmpty(module.sections()) and #lists.isEmpty(module.items())}">
+                    <p class="admin-empty" th:if="${#lists.isEmpty(modulo.sections()) and #lists.isEmpty(modulo.items())}">
                         Este módulo todavía no tiene secciones ni ítems.
                     </p>
 
-                    <div class="admin-section" th:each="section : ${module.sections()}">
+                    <div class="admin-section" th:each="seccion : ${modulo.sections()}">
                         <div class="admin-section-head">
-                            <h4 th:text="${section.title()}">Sección</h4>
-                            <span class="admin-status" th:classappend="${section.visible()} ? ' is-ok' : ' is-bad'"
-                                  th:text="${section.visible()} ? 'Visible' : 'Oculta'">Visible</span>
+                            <h4 th:text="${seccion.titulo()}">Sección</h4>
+                            <span class="admin-status" th:classappend="${seccion.visible()} ? ' is-ok' : ' is-bad'"
+                                  th:text="${seccion.visible()} ? 'Visible' : 'Oculta'">Visible</span>
                         </div>
                         <ul class="admin-content-list">
-                            <th:block th:each="item : ${section.items()}">
-                                <li th:replace="~{fragments/admin-content-item :: row(${item}, ${section})}"></li>
+                            <th:block th:each="item : ${seccion.items()}">
+                                <li th:replace="~{fragments/admin-content-item :: row(${item}, ${seccion})}"></li>
                             </th:block>
                         </ul>
                         <div class="admin-row-actions admin-section-actions">
-                            <form method="post" th:action="@{/admin/cursos/{c}/contenido/secciones/{s}/mover(c=${courseId},s=${section.id()})}">
+                            <form method="post" th:action="@{/admin/cursos/{c}/contenido/secciones/{s}/mover(c=${cursoId},s=${seccion.id()})}">
                                 <input type="hidden" name="up" value="true">
-                                <button class="admin-move" type="submit" th:attr="aria-label='Subir sección ' + ${section.title()}">↑</button>
+                                <button class="admin-move" type="submit" th:attr="aria-label='Subir sección ' + ${seccion.titulo()}">↑</button>
                             </form>
-                            <form method="post" th:action="@{/admin/cursos/{c}/contenido/secciones/{s}/mover(c=${courseId},s=${section.id()})}">
+                            <form method="post" th:action="@{/admin/cursos/{c}/contenido/secciones/{s}/mover(c=${cursoId},s=${seccion.id()})}">
                                 <input type="hidden" name="up" value="false">
-                                <button class="admin-move" type="submit" th:attr="aria-label='Bajar sección ' + ${section.title()}">↓</button>
+                                <button class="admin-move" type="submit" th:attr="aria-label='Bajar sección ' + ${seccion.titulo()}">↓</button>
                             </form>
                             <button type="button" class="admin-confirm-link"
-                                    th:attr="data-confirm-url=@{/admin/cursos/{c}/contenido/secciones/{s}/eliminar(c=${courseId},s=${section.id()})}, aria-label='Eliminar sección ' + ${section.title()}">Eliminar sección</button>
+                                    th:attr="data-confirm-url=@{/admin/cursos/{c}/contenido/secciones/{s}/eliminar(c=${cursoId},s=${seccion.id()})}, aria-label='Eliminar sección ' + ${seccion.titulo()}">Eliminar sección</button>
                         </div>
                     </div>
 
-                    <ul class="admin-content-list" th:if="${!#lists.isEmpty(module.items())}">
-                        <th:block th:each="item : ${module.items()}" th:with="section=${null}">
-                            <li th:replace="~{fragments/admin-content-item :: row(${item}, ${section})}"></li>
+                    <ul class="admin-content-list" th:if="${!#lists.isEmpty(modulo.items())}">
+                        <th:block th:each="item : ${modulo.items()}" th:with="seccion=${null}">
+                            <li th:replace="~{fragments/admin-content-item :: row(${item}, ${seccion})}"></li>
                         </th:block>
                     </ul>
                 </article>
 
-                <p class="admin-empty" th:if="${#lists.isEmpty(outline.modules())}">
+                <p class="admin-empty" th:if="${#lists.isEmpty(esquema.modules())}">
                     Todavía no hay módulos cargados en este curso.
                 </p>
             </section>
@@ -91,29 +91,29 @@
                 <details class="admin-inline-form">
                     <summary>Nueva sección</summary>
                     <form class="admin-form" method="post" novalidate
-                          th:action="@{/admin/cursos/{c}/contenido/secciones(c=${courseId})}"
-                          th:object="${adminSectionForm}">
+                          th:action="@{/admin/cursos/{c}/contenido/secciones(c=${cursoId})}"
+                          th:object="${adminSeccionFormulario}">
                         <div class="admin-form-grid">
                             <div class="admin-field">
                                 <label for="seccion-modulo">Módulo</label>
-                                <select id="seccion-modulo" th:field="*{moduleId}" required
-                                        th:attr="aria-invalid=${#fields.hasErrors('moduleId')} ? 'true' : null,
-                                                 aria-describedby=${#fields.hasErrors('moduleId')} ? 'error-seccion-modulo' : null">
+                                <select id="seccion-modulo" th:field="*{moduloId}" required
+                                        th:attr="aria-invalid=${#fields.hasErrors('moduloId')} ? 'true' : null,
+                                                 aria-describedby=${#fields.hasErrors('moduloId')} ? 'error-seccion-modulo' : null">
                                     <option value="">Elegí un módulo</option>
-                                    <option th:each="o : ${moduleOptions}" th:value="${o.id()}" th:text="${o.label()}"></option>
+                                    <option th:each="o : ${moduloOptions}" th:value="${o.id()}" th:text="${o.label()}"></option>
                                 </select>
-                                <small id="error-seccion-modulo" class="admin-error" th:if="${#fields.hasErrors('moduleId')}" th:errors="*{moduleId}"></small>
+                                <small id="error-seccion-modulo" class="admin-error" th:if="${#fields.hasErrors('moduloId')}" th:errors="*{moduloId}"></small>
                             </div>
                             <div class="admin-field">
                                 <label for="seccion-titulo">Título</label>
-                                <input id="seccion-titulo" type="text" th:field="*{title}" maxlength="140" required
-                                       th:attr="aria-invalid=${#fields.hasErrors('title')} ? 'true' : null,
-                                                aria-describedby=${#fields.hasErrors('title')} ? 'error-seccion-titulo' : null">
-                                <small id="error-seccion-titulo" class="admin-error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></small>
+                                <input id="seccion-titulo" type="text" th:field="*{titulo}" maxlength="140" required
+                                       th:attr="aria-invalid=${#fields.hasErrors('titulo')} ? 'true' : null,
+                                                aria-describedby=${#fields.hasErrors('titulo')} ? 'error-seccion-titulo' : null">
+                                <small id="error-seccion-titulo" class="admin-error" th:if="${#fields.hasErrors('titulo')}" th:errors="*{titulo}"></small>
                             </div>
                             <div class="admin-field">
                                 <label for="seccion-posicion">Posición</label>
-                                <input id="seccion-posicion" type="number" th:field="*{position}" min="0" max="9999">
+                                <input id="seccion-posicion" type="number" th:field="*{posicion}" min="0" max="9999">
                                 <small class="admin-hint">0 para ponerla primero.</small>
                             </div>
                             <label class="admin-check admin-check--inline" for="seccion-visible">
@@ -129,23 +129,23 @@
                 <details class="admin-inline-form">
                     <summary>Nuevo ítem (video, material o ejercicio)</summary>
                     <form class="admin-form" method="post" novalidate
-                          th:action="@{/admin/cursos/{c}/contenido/items(c=${courseId})}"
-                          th:object="${adminItemForm}">
+                          th:action="@{/admin/cursos/{c}/contenido/items(c=${cursoId})}"
+                          th:object="${adminItemFormulario}">
                         <div class="admin-form-grid">
                             <div class="admin-field">
                                 <label for="item-modulo">Módulo</label>
-                                <select id="item-modulo" th:field="*{moduleId}" required
-                                        th:attr="aria-invalid=${#fields.hasErrors('moduleId')} ? 'true' : null,
-                                                 aria-describedby=${#fields.hasErrors('moduleId')} ? 'error-item-modulo' : null">
+                                <select id="item-modulo" th:field="*{moduloId}" required
+                                        th:attr="aria-invalid=${#fields.hasErrors('moduloId')} ? 'true' : null,
+                                                 aria-describedby=${#fields.hasErrors('moduloId')} ? 'error-item-modulo' : null">
                                     <option value="">Elegí un módulo</option>
-                                    <option th:each="o : ${moduleOptions}" th:value="${o.id()}" th:text="${o.label()}"></option>
+                                    <option th:each="o : ${moduloOptions}" th:value="${o.id()}" th:text="${o.label()}"></option>
                                 </select>
-                                <small id="error-item-modulo" class="admin-error" th:if="${#fields.hasErrors('moduleId')}" th:errors="*{moduleId}"></small>
+                                <small id="error-item-modulo" class="admin-error" th:if="${#fields.hasErrors('moduloId')}" th:errors="*{moduloId}"></small>
                             </div>
                             <div class="admin-field">
                                 <label for="item-seccion">Sección</label>
-                                <select id="item-seccion" th:field="*{sectionId}">
-                                    <option th:each="o : ${sectionOptions}" th:value="${o.id()}" th:text="${o.label()}"></option>
+                                <select id="item-seccion" th:field="*{seccionId}">
+                                    <option th:each="o : ${seccionOptions}" th:value="${o.id()}" th:text="${o.label()}"></option>
                                 </select>
                                 <small class="admin-hint">Si no elegís una, queda como “Sin sección”.</small>
                             </div>
@@ -159,14 +159,14 @@
                             </div>
                             <div class="admin-field">
                                 <label for="item-titulo">Título</label>
-                                <input id="item-titulo" type="text" th:field="*{title}" maxlength="140" required
-                                       th:attr="aria-invalid=${#fields.hasErrors('title')} ? 'true' : null,
-                                                aria-describedby=${#fields.hasErrors('title')} ? 'error-item-titulo' : null">
-                                <small id="error-item-titulo" class="admin-error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></small>
+                                <input id="item-titulo" type="text" th:field="*{titulo}" maxlength="140" required
+                                       th:attr="aria-invalid=${#fields.hasErrors('titulo')} ? 'true' : null,
+                                                aria-describedby=${#fields.hasErrors('titulo')} ? 'error-item-titulo' : null">
+                                <small id="error-item-titulo" class="admin-error" th:if="${#fields.hasErrors('titulo')}" th:errors="*{titulo}"></small>
                             </div>
                             <div class="admin-field admin-span-2">
                                 <label for="item-descripcion">Descripción o consigna</label>
-                                <textarea id="item-descripcion" th:field="*{description}" maxlength="4000"></textarea>
+                                <textarea id="item-descripcion" th:field="*{descripcion}" maxlength="4000"></textarea>
                                 <small class="admin-hint">En un ejercicio se usa como consigna.</small>
                             </div>
                             <div class="admin-field">
@@ -185,11 +185,11 @@
                             </div>
                             <div class="admin-field">
                                 <label for="item-duracion">Duración del video (segundos)</label>
-                                <input id="item-duracion" type="number" th:field="*{durationSeconds}" min="0" max="86400">
+                                <input id="item-duracion" type="number" th:field="*{duracionSegundos}" min="0" max="86400">
                             </div>
                             <div class="admin-field">
                                 <label for="item-posicion">Posición</label>
-                                <input id="item-posicion" type="number" th:field="*{position}" min="0" max="9999">
+                                <input id="item-posicion" type="number" th:field="*{posicion}" min="0" max="9999">
                             </div>
                             <label class="admin-check admin-check--inline" for="item-visible">
                                 <input id="item-visible" type="checkbox" th:field="*{visible}"> Visible
@@ -204,36 +204,36 @@
                 <details class="admin-inline-form">
                     <summary>Nuevo documento</summary>
                     <form class="admin-form" method="post" enctype="multipart/form-data" novalidate
-                          th:action="@{/admin/cursos/{c}/contenido/documentos(c=${courseId})}"
-                          th:object="${adminDocumentForm}">
+                          th:action="@{/admin/cursos/{c}/contenido/documentos(c=${cursoId})}"
+                          th:object="${adminDocumentoFormulario}">
                         <div class="admin-form-grid">
                             <div class="admin-field">
                                 <label for="documento-modulo">Módulo</label>
-                                <select id="documento-modulo" th:field="*{moduleId}" required
-                                        th:attr="aria-invalid=${#fields.hasErrors('moduleId')} ? 'true' : null,
-                                                 aria-describedby=${#fields.hasErrors('moduleId')} ? 'error-documento-modulo' : null">
+                                <select id="documento-modulo" th:field="*{moduloId}" required
+                                        th:attr="aria-invalid=${#fields.hasErrors('moduloId')} ? 'true' : null,
+                                                 aria-describedby=${#fields.hasErrors('moduloId')} ? 'error-documento-modulo' : null">
                                     <option value="">Elegí un módulo</option>
-                                    <option th:each="o : ${moduleOptions}" th:value="${o.id()}" th:text="${o.label()}"></option>
+                                    <option th:each="o : ${moduloOptions}" th:value="${o.id()}" th:text="${o.label()}"></option>
                                 </select>
-                                <small id="error-documento-modulo" class="admin-error" th:if="${#fields.hasErrors('moduleId')}" th:errors="*{moduleId}"></small>
+                                <small id="error-documento-modulo" class="admin-error" th:if="${#fields.hasErrors('moduloId')}" th:errors="*{moduloId}"></small>
                             </div>
                             <div class="admin-field">
                                 <label for="documento-seccion">Sección</label>
-                                <select id="documento-seccion" th:field="*{sectionId}">
-                                    <option th:each="o : ${sectionOptions}" th:value="${o.id()}" th:text="${o.label()}"></option>
+                                <select id="documento-seccion" th:field="*{seccionId}">
+                                    <option th:each="o : ${seccionOptions}" th:value="${o.id()}" th:text="${o.label()}"></option>
                                 </select>
                                 <small class="admin-hint">Si no elegís una, queda como “Sin sección”.</small>
                             </div>
                             <div class="admin-field">
                                 <label for="documento-titulo">Título</label>
-                                <input id="documento-titulo" type="text" th:field="*{title}" maxlength="140" required
-                                       th:attr="aria-invalid=${#fields.hasErrors('title')} ? 'true' : null,
-                                                aria-describedby=${#fields.hasErrors('title')} ? 'error-documento-titulo' : null">
-                                <small id="error-documento-titulo" class="admin-error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></small>
+                                <input id="documento-titulo" type="text" th:field="*{titulo}" maxlength="140" required
+                                       th:attr="aria-invalid=${#fields.hasErrors('titulo')} ? 'true' : null,
+                                                aria-describedby=${#fields.hasErrors('titulo')} ? 'error-documento-titulo' : null">
+                                <small id="error-documento-titulo" class="admin-error" th:if="${#fields.hasErrors('titulo')}" th:errors="*{titulo}"></small>
                             </div>
                             <div class="admin-field admin-span-2">
                                 <label for="documento-descripcion">Descripción</label>
-                                <textarea id="documento-descripcion" th:field="*{description}" maxlength="4000"></textarea>
+                                <textarea id="documento-descripcion" th:field="*{descripcion}" maxlength="4000"></textarea>
                                 <small class="admin-hint">Se muestra debajo del botón de descarga.</small>
                             </div>
                             <div class="admin-field admin-span-2">
@@ -247,7 +247,7 @@
                             </div>
                             <div class="admin-field">
                                 <label for="documento-posicion">Posición</label>
-                                <input id="documento-posicion" type="number" th:field="*{position}" min="0" max="9999">
+                                <input id="documento-posicion" type="number" th:field="*{posicion}" min="0" max="9999">
                             </div>
                             <label class="admin-check admin-check--inline" for="documento-visible">
                                 <input id="documento-visible" type="checkbox" th:field="*{visible}"> Visible
@@ -262,13 +262,13 @@
 
             <section class="panel-card admin-card admin-structure" id="syllabus" aria-labelledby="syllabus-titulo">
                 <h2 id="syllabus-titulo">Sílabo</h2>
-                <p class="admin-muted" th:text="${syllabus.summary()} ?: 'Sin resumen cargado en la ficha del curso'">Resumen del curso</p>
+                <p class="admin-muted" th:text="${silabo.resumen()} ?: 'Sin resumen cargado en la ficha del curso'">Resumen del curso</p>
 
                 <details class="admin-inline-form">
                     <summary>Editar objetivos y requisitos</summary>
                     <form class="admin-form" method="post" novalidate
-                          th:action="@{/admin/cursos/{c}/contenido/syllabus(c=${courseId})}"
-                          th:object="${adminSyllabusForm}">
+                          th:action="@{/admin/cursos/{c}/contenido/syllabus(c=${cursoId})}"
+                          th:object="${adminSilaboFormulario}">
                         <div class="admin-form-grid">
                             <div class="admin-field admin-span-2">
                                 <label for="syllabus-objetivos">Objetivos</label>
@@ -286,36 +286,36 @@
                 </details>
 
                 <h3>Recursos complementarios</h3>
-                <ul class="admin-content-list" th:if="${!#lists.isEmpty(syllabus.resources())}">
-                    <li class="admin-content-item" th:each="resource : ${syllabus.resources()}">
+                <ul class="admin-content-list" th:if="${!#lists.isEmpty(silabo.resources())}">
+                    <li class="admin-content-item" th:each="recurso : ${silabo.resources()}">
                         <div class="admin-content-copy">
-                            <strong th:text="${resource.title()}">Recurso</strong>
-                            <small><a th:href="${resource.url()}" target="_blank" rel="noopener noreferrer"
-                                      th:attr="aria-label='Abrir el enlace de ' + ${resource.title()} + ' en pestaña nueva'"
-                                      th:text="${resource.url()}">Enlace</a></small>
+                            <strong th:text="${recurso.titulo()}">Recurso</strong>
+                            <small><a th:href="${recurso.url()}" target="_blank" rel="noopener noreferrer"
+                                      th:attr="aria-label='Abrir el enlace de ' + ${recurso.titulo()} + ' en pestaña nueva'"
+                                      th:text="${recurso.url()}">Enlace</a></small>
                         </div>
                         <div class="admin-row-actions">
                             <form method="post"
-                                  th:action="@{/admin/cursos/{c}/contenido/recursos/{r}/eliminar(c=${courseId},r=${resource.id()})}">
-                                <button type="submit" th:attr="aria-label='Quitar ' + ${resource.title()}">Quitar</button>
+                                  th:action="@{/admin/cursos/{c}/contenido/recursos/{r}/eliminar(c=${cursoId},r=${recurso.id()})}">
+                                <button type="submit" th:attr="aria-label='Quitar ' + ${recurso.titulo()}">Quitar</button>
                             </form>
                         </div>
                     </li>
                 </ul>
-                <p class="admin-empty" th:if="${#lists.isEmpty(syllabus.resources())}">Todavía no hay recursos cargados.</p>
+                <p class="admin-empty" th:if="${#lists.isEmpty(silabo.resources())}">Todavía no hay recursos cargados.</p>
 
                 <details class="admin-inline-form">
                     <summary>Agregar recurso</summary>
                     <form class="admin-form" method="post" novalidate
-                          th:action="@{/admin/cursos/{c}/contenido/recursos(c=${courseId})}"
-                          th:object="${adminResourceForm}">
+                          th:action="@{/admin/cursos/{c}/contenido/recursos(c=${cursoId})}"
+                          th:object="${adminRecursoFormulario}">
                         <div class="admin-form-grid">
                             <div class="admin-field">
                                 <label for="recurso-titulo">Título</label>
-                                <input id="recurso-titulo" type="text" th:field="*{title}" maxlength="140" required
-                                       th:attr="aria-invalid=${#fields.hasErrors('title')} ? 'true' : null,
-                                                aria-describedby=${#fields.hasErrors('title')} ? 'error-recurso-titulo' : null">
-                                <small id="error-recurso-titulo" class="admin-error" th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></small>
+                                <input id="recurso-titulo" type="text" th:field="*{titulo}" maxlength="140" required
+                                       th:attr="aria-invalid=${#fields.hasErrors('titulo')} ? 'true' : null,
+                                                aria-describedby=${#fields.hasErrors('titulo')} ? 'error-recurso-titulo' : null">
+                                <small id="error-recurso-titulo" class="admin-error" th:if="${#fields.hasErrors('titulo')}" th:errors="*{titulo}"></small>
                             </div>
                             <div class="admin-field">
                                 <label for="recurso-url">Enlace https</label>
@@ -326,7 +326,7 @@
                             </div>
                             <div class="admin-field">
                                 <label for="recurso-posicion">Posición</label>
-                                <input id="recurso-posicion" type="number" th:field="*{position}" min="0" max="9999">
+                                <input id="recurso-posicion" type="number" th:field="*{posicion}" min="0" max="9999">
                             </div>
                         </div>
                         <div class="admin-form-actions">

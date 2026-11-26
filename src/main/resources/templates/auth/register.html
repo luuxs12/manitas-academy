@@ -23,19 +23,19 @@
                 </header>
 
                 <form class="auth-form" th:action="@{/registro}" method="post"
-                      th:object="${form}">
+                      th:object="${formulario}">
 
                     <div class="field">
                         <label for="fullName">Nombre completo</label>
-                        <input id="fullName" type="text" th:field="*{fullName}"
-                               th:classappend="${#fields.hasErrors('fullName')} ? ' is-invalid' : ''"
-                               th:attr="aria-invalid=${#fields.hasErrors('fullName')} ? 'true' : null,
-                                        aria-describedby=${#fields.hasErrors('fullName')} ? 'fullName-error' : null"
+                        <input id="fullName" type="text" th:field="*{nombreCompleto}"
+                               th:classappend="${#fields.hasErrors('nombreCompleto')} ? ' is-invalid' : ''"
+                               th:attr="aria-invalid=${#fields.hasErrors('nombreCompleto')} ? 'true' : null,
+                                        aria-describedby=${#fields.hasErrors('nombreCompleto')} ? 'fullName-error' : null"
                                autocomplete="name" placeholder="Ana Quispe"
                                maxlength="120" required autofocus>
                         <p class="field-error" id="fullName-error"
-                           th:if="${#fields.hasErrors('fullName')}"
-                           th:errors="*{fullName}" role="alert"></p>
+                           th:if="${#fields.hasErrors('nombreCompleto')}"
+                           th:errors="*{nombreCompleto}" role="alert"></p>
                     </div>
 
                     <div class="field">
@@ -59,11 +59,11 @@
                                     aria-controls="password"
                                     aria-pressed="false">Mostrar</button>
                         </div>
-                        <input id="password" type="password" th:field="*{password}"
+                        <input id="password" type="password" th:field="*{contrasena}"
                                data-password-input
-                               th:classappend="${#fields.hasErrors('password')} ? ' is-invalid' : ''"
-                               th:attr="aria-invalid=${#fields.hasErrors('password')} ? 'true' : null,
-                                        aria-describedby=${#fields.hasErrors('password')} ? 'password-hint password-error' : 'password-hint'"
+                               th:classappend="${#fields.hasErrors('contrasena')} ? ' is-invalid' : ''"
+                               th:attr="aria-invalid=${#fields.hasErrors('contrasena')} ? 'true' : null,
+                                        aria-describedby=${#fields.hasErrors('contrasena')} ? 'password-hint password-error' : 'password-hint'"
                                autocomplete="new-password" placeholder="Mínimo 8 caracteres"
                                minlength="8" maxlength="72" required>
                         <div class="password-meter" data-password-meter data-score="0"
@@ -75,22 +75,22 @@
                             Mínimo 8 caracteres. Mezclá letras y números.
                         </p>
                         <p class="field-error" id="password-error"
-                           th:if="${#fields.hasErrors('password')}"
-                           th:errors="*{password}" role="alert"></p>
+                           th:if="${#fields.hasErrors('contrasena')}"
+                           th:errors="*{contrasena}" role="alert"></p>
                     </div>
 
                     <div class="field">
                         <label for="confirmPassword">Repetí la contraseña</label>
                         <input id="confirmPassword" type="password"
-                               th:field="*{confirmPassword}"
-                               th:classappend="${#fields.hasErrors('confirmPassword')} ? ' is-invalid' : ''"
-                               th:attr="aria-invalid=${#fields.hasErrors('confirmPassword')} ? 'true' : null,
-                                        aria-describedby=${#fields.hasErrors('confirmPassword')} ? 'confirmPassword-error' : null"
+                               th:field="*{confirmContrasena}"
+                               th:classappend="${#fields.hasErrors('confirmContrasena')} ? ' is-invalid' : ''"
+                               th:attr="aria-invalid=${#fields.hasErrors('confirmContrasena')} ? 'true' : null,
+                                        aria-describedby=${#fields.hasErrors('confirmContrasena')} ? 'confirmPassword-error' : null"
                                autocomplete="new-password" placeholder="La misma de arriba"
                                minlength="8" maxlength="72" required>
                         <p class="field-error" id="confirmPassword-error"
-                           th:if="${#fields.hasErrors('confirmPassword')}"
-                           th:errors="*{confirmPassword}" role="alert"></p>
+                           th:if="${#fields.hasErrors('confirmContrasena')}"
+                           th:errors="*{confirmContrasena}" role="alert"></p>
                     </div>
 
                     <div class="auth-terms">

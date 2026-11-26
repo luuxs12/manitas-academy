@@ -31,11 +31,11 @@
                     <span>Inscripciones</span>
                 </li>
                 <li class="panel-kpi">
-                    <strong th:text="${videoTotals.completed()}"></strong>
+                    <strong th:text="${videoTotals.finalizado()}"></strong>
                     <span>Videos terminados</span>
                 </li>
                 <li class="panel-kpi">
-                    <strong th:text="${completed}"></strong>
+                    <strong th:text="${finalizado}"></strong>
                     <span>Cursos terminados</span>
                 </li>
                 <li class="panel-kpi">
@@ -51,49 +51,49 @@
                 </div>
 
                 <div class="panel-course-grid" th:if="${!#lists.isEmpty(enrollments)}">
-                    <article class="panel-course" th:each="enrollment : ${enrollments}">
-                        <img th:src="${!#strings.isEmpty(enrollment.course.image) ? enrollment.course.image : '/img/course-placeholder.svg'}" alt=""
+                    <article class="panel-course" th:each="inscripcion : ${enrollments}">
+                        <img th:src="${!#strings.isEmpty(inscripcion.curso.imagen) ? inscripcion.curso.imagen : '/img/curso-placeholder.svg'}" alt=""
                              width="960" height="600" loading="lazy">
                         <div class="panel-course-body">
-                            <h3 th:text="${enrollment.course.title}"></h3>
-                            <span class="panel-chip" th:text="${enrollment.course.category}"></span>
-                            <p class="panel-course-summary" th:text="${enrollment.course.summary}"></p>
+                            <h3 th:text="${inscripcion.curso.titulo}"></h3>
+                            <span class="panel-chip" th:text="${inscripcion.curso.categoria}"></span>
+                            <p class="panel-course-summary" th:text="${inscripcion.curso.resumen}"></p>
                             <span class="panel-course-status"
-                                  th:classappend="${enrollment.completed} ? ' is-done' : ''"
-                                  th:text="${enrollment.completed} ? 'Completado' : 'En curso'">
+                                  th:classappend="${inscripcion.finalizado} ? ' is-done' : ''"
+                                  th:text="${inscripcion.finalizado} ? 'Completado' : 'En curso'">
                                 En curso
                             </span>
 
                             <p class="panel-lesson-label"
-                               th:text="${doneCounts[enrollment.id] + ' de ' + videoCounts[enrollment.id] + ' videos terminados'}">
+                               th:text="${doneCounts[inscripcion.id] + ' de ' + videoCounts[inscripcion.id] + ' videos terminados'}">
                             </p>
                             <div class="panel-lesson-track" role="img"
-                                 th:attr="aria-label=${doneCounts[enrollment.id] + ' de ' + videoCounts[enrollment.id] + ' videos terminados'}">
-                                <span th:style="${'width: ' + videoProgress[enrollment.id] + '%'}"></span>
+                                 th:attr="aria-label=${doneCounts[inscripcion.id] + ' de ' + videoCounts[inscripcion.id] + ' videos terminados'}">
+                                <span th:style="${'width: ' + videoProgreso[inscripcion.id] + '%'}"></span>
                             </div>
 
                             <div class="panel-course-actions">
                                 <a class="panel-inline-btn"
-                                   th:href="@{/panel/cursos/{slug}(slug=${enrollment.course.slug})}">
+                                   th:href="@{/panel/cursos/{slug}(slug=${inscripcion.curso.slug})}">
                                     Ver clases
                                 </a>
-                                <form th:action="@{/panel/cursos/{slug}/completar(slug=${enrollment.course.slug})}"
-                                      method="post" th:if="${!enrollment.completed}" data-confirm-form
+                                <form th:action="@{/panel/cursos/{slug}/completar(slug=${inscripcion.curso.slug})}"
+                                      method="post" th:if="${!inscripcion.finalizado}" data-confirm-form
                                       data-confirm-message="¿Marcar el curso como terminado? Se emitirá tu certificado si corresponde.">
                                     <button class="panel-inline-btn" type="submit">Ya terminé el curso</button>
                                 </form>
                                 <a class="panel-inline-btn"
-                                   th:if="${enrollment.completed and #lists.contains(certificateSlugs, enrollment.course.slug)}"
-                                   th:href="@{/panel/certificados/{slug}(slug=${enrollment.course.slug})}">
+                                   th:if="${inscripcion.finalizado and #lists.contains(certificadoSlugs, inscripcion.curso.slug)}"
+                                   th:href="@{/panel/certificados/{slug}(slug=${inscripcion.curso.slug})}">
                                     Ver certificado
                                 </a>
                                 <span class="panel-chip"
-                                      th:if="${enrollment.completed and currentUser.premium()
-                                          and !#lists.contains(certificateSlugs, enrollment.course.slug)}">
+                                      th:if="${inscripcion.finalizado and usuarioActual.premium()
+                                          and !#lists.contains(certificadoSlugs, inscripcion.curso.slug)}">
                                     Certificado en preparación
                                 </span>
                                 <a class="panel-inline-btn"
-                                   th:if="${enrollment.completed and !currentUser.premium()}"
+                                   th:if="${inscripcion.finalizado and !usuarioActual.premium()}"
                                    th:href="@{/panel/facturacion}">Certificado con Premium</a>
                             </div>
                         </div>

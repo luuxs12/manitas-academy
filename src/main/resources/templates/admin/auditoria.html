@@ -22,11 +22,11 @@
                 <table class="admin-table">
                     <thead><tr><th>Fecha</th><th>Quién</th><th>Acción</th><th>Entidad / detalle</th></tr></thead>
                     <tbody>
-                    <tr th:each="event : ${page.content}">
-                        <td th:text="${event.when()}">01/01/2026 10:00</td>
-                        <td th:text="${event.title()}">Administrador</td>
-                        <td><span class="admin-status" th:text="${event.kind()}">CREATE</span></td>
-                        <td th:text="${event.detail()}">USUARIO: correo</td>
+                    <tr th:each="evento : ${page.content}">
+                        <td th:text="${evento.when()}">01/01/2026 10:00</td>
+                        <td th:text="${evento.titulo()}">Administrador</td>
+                        <td><span class="admin-status" th:text="${evento.kind()}">CREATE</span></td>
+                        <td th:text="${evento.detail()}">USUARIO: correo</td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(page.content)}"><td colspan="4" class="admin-empty">Todavía no hay acciones registradas. Se registran altas, ediciones, bajas y emisiones.</td></tr>
                     </tbody>

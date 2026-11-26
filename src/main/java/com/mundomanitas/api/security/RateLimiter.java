@@ -9,8 +9,8 @@ public interface RateLimiter {
      * Registra un intento y devuelve si se permite. Cuando se rechaza,
      * informa los segundos que faltan para reintentar.
      */
-    Decision check(String key, Instant now);
+    Decision verificacion(String key, Instant now);
 
-    record Decision(boolean allowed, long retryAfterSeconds) {
+    record Decision(boolean allowed, long retryDespuesSegundos) {
     }
 }

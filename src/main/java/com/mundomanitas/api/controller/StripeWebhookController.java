@@ -1,7 +1,7 @@
 package com.mundomanitas.api.controller;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.mundomanitas.api.service.PaymentService;
+import com.mundomanitas.api.service.PagoService;
 import com.mundomanitas.api.service.StripeClient;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,9 +15,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class StripeWebhookController {
 
     private final StripeClient stripe;
-    private final PaymentService payments;
+    private final PagoService payments;
 
-    public StripeWebhookController(StripeClient stripe, PaymentService payments) {
+    public StripeWebhookController(StripeClient stripe, PagoService payments) {
         this.stripe = stripe;
         this.payments = payments;
     }
@@ -30,13 +30,13 @@ public class StripeWebhookController {
         if (!stripe.validSignature(body, signature)) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Firma inválida");
         }
-        JsonNode event;
+        JsonNode evento;
         try {
-            event = stripe.parse(new String(body, java.nio.charset.StandardCharsets.UTF_8));
+            evento = stripe.parse(new String(body, java.nio.charset.StandardCharsets.UTF_8));
         } catch (IllegalArgumentException exception) {
             return ResponseEntity.badRequest().body("Cuerpo inválido");
         }
-        payments.handleEvent(event);
+        payments.handleEvento(evento);
         return ResponseEntity.ok("ok");
     }
 }

@@ -50,12 +50,12 @@
                    th:if="${featured != null}">
 
                 <span class="hero-card-media" aria-hidden="true">
-                    <span class="hero-card-level" th:text="${featured.level}"></span>
+                    <span class="hero-card-level" th:text="${featured.nivel}"></span>
                 </span>
 
                 <p class="hero-card-tag">Curso destacado</p>
                 <h2 class="hero-card-title" id="curso-destacado"
-                    th:text="${featured.title}"></h2>
+                    th:text="${featured.titulo}"></h2>
                 <p class="hero-card-text" th:text="${featured.lessons + ' lecciones'}"></p>
                 <p class="hero-card-foot">
                     <span class="hero-card-price" th:text="${featured.priceLabel()}"></span>
@@ -87,25 +87,25 @@
 
             <div class="courses">
 
-                <a class="course" th:each="course : ${courses}"
-                   th:href="@{/cursos/{slug}(slug=${course.slug})}">
+                <a class="course" th:each="curso : ${courses}"
+                   th:href="@{/cursos/{slug}(slug=${curso.slug})}">
 
                     <figure class="course-media">
-                        <img th:src="${!#strings.isEmpty(course.image) ? course.image : '/img/course-placeholder.svg'}" alt="" width="960" height="600"
+                        <img th:src="${!#strings.isEmpty(curso.imagen) ? curso.imagen : '/img/curso-placeholder.svg'}" alt="" width="960" height="600"
                              loading="lazy" decoding="async">
-                        <span class="course-badge" th:text="${course.category}"></span>
+                        <span class="course-badge" th:text="${curso.categoria}"></span>
                         <span class="course-price-tag"
-                              th:classappend="${course.free} ? ' course-price-tag--free' : ''"
-                              th:text="${course.priceLabel()}"></span>
+                              th:classappend="${curso.free} ? ' course-price-tag--free' : ''"
+                              th:text="${curso.priceLabel()}"></span>
                     </figure>
 
                     <div class="course-body">
-                        <h3 class="course-title" th:text="${course.title}"></h3>
-                        <p class="course-text" th:text="${course.summary}"></p>
+                        <h3 class="course-title" th:text="${curso.titulo}"></h3>
+                        <p class="course-text" th:text="${curso.resumen}"></p>
                         <div class="course-foot">
                             <span class="course-tags">
-                                <span th:text="${course.level}"></span>
-                                <span th:text="${course.lessons} + ' lecciones'"></span>
+                                <span th:text="${curso.nivel}"></span>
+                                <span th:text="${curso.lessons} + ' lecciones'"></span>
                             </span>
                             <span class="course-arrow" aria-hidden="true">
                                 <svg class="ico" viewBox="0 0 24 24" focusable="false">

@@ -29,13 +29,13 @@
                 </div>
 
                 <form class="panel-card panel-form auth-form" th:action="@{/panel/preferencias}"
-                      th:object="${preferencesForm}" method="post">
+                      th:object="${preferenciasFormulario}" method="post">
                     <div class="field">
                         <label for="theme">Tema del panel</label>
                         <select id="theme" th:field="*{theme}">
-                            <option th:each="option : ${themes}" th:value="${option}"
-                                    th:text="${option == 'SYSTEM' ? 'Del sistema' :
-                                              (option == 'LIGHT' ? 'Claro' : 'Oscuro')}">
+                            <option th:each="opcion : ${themes}" th:value="${opcion}"
+                                    th:text="${opcion == 'SYSTEM' ? 'Del sistema' :
+                                              (opcion == 'LIGHT' ? 'Claro' : 'Oscuro')}">
                                 Del sistema
                             </option>
                         </select>
@@ -79,7 +79,7 @@
                     No se puede deshacer. Escribí <strong>ELIMINAR</strong> para confirmar.
                 </p>
                 <form th:action="@{/panel/preferencias/eliminar}" method="post"
-                      th:object="${deleteForm}" data-confirm-form
+                      th:object="${deleteFormulario}" data-confirm-form
                       data-confirm-message="¿Eliminar tu cuenta y todos tus datos?">
                     <div class="field">
                         <label for="confirmation">Confirmación</label>

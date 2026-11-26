@@ -16,7 +16,7 @@
                 <h2>Usuarios</h2>
                 <ul class="admin-search-list">
                     <li th:each="u : ${users.content}"><a th:href="@{/admin/usuarios/{id}/editar(id=${u.id()})}"
-                        th:text="${u.fullName() + ' · ' + u.email()}">Usuario</a></li>
+                        th:text="${u.nombreCompleto() + ' · ' + u.email()}">Usuario</a></li>
                 </ul>
                 <p class="admin-empty" th:if="${#lists.isEmpty(users.content)}">Sin coincidencias.</p>
             </section>
@@ -25,7 +25,7 @@
                 <h2>Cursos</h2>
                 <ul class="admin-search-list">
                     <li th:each="c : ${courses.content}"><a th:href="@{/admin/cursos/{id}/editar(id=${c.id()})}"
-                        th:text="${c.title() + ' · ' + c.slug()}">Curso</a></li>
+                        th:text="${c.titulo() + ' · ' + c.slug()}">Curso</a></li>
                 </ul>
                 <p class="admin-empty" th:if="${#lists.isEmpty(courses.content)}">Sin coincidencias.</p>
             </section>
@@ -34,11 +34,11 @@
                 <h2>Módulos, videos y ejercicios</h2>
                 <ul class="admin-search-list">
                     <li th:each="m : ${modules.content}"><a th:href="@{/admin/modulos/{id}/editar(id=${m.id()})}"
-                        th:text="${'Módulo · ' + m.title()}">Módulo</a></li>
+                        th:text="${'Módulo · ' + m.titulo()}">Módulo</a></li>
                     <li th:each="v : ${videos.content}"><a th:href="@{/admin/videos/{id}/editar(id=${v.id()})}"
-                        th:text="${'Video · ' + v.title()}">Video</a></li>
+                        th:text="${'Video · ' + v.titulo()}">Video</a></li>
                     <li th:each="e : ${exercises.content}"><a th:href="@{/admin/ejercicios/{id}/editar(id=${e.id()})}"
-                        th:text="${'Ejercicio · ' + e.title()}">Ejercicio</a></li>
+                        th:text="${'Ejercicio · ' + e.titulo()}">Ejercicio</a></li>
                 </ul>
                 <p class="admin-empty" th:if="${#lists.isEmpty(modules.content) and #lists.isEmpty(videos.content) and #lists.isEmpty(exercises.content)}">Sin coincidencias.</p>
             </section>

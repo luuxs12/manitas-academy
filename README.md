@@ -367,30 +367,30 @@ no aparezca un destello blanco. Los tokens y las reglas están en
 | Prueba | Qué cubre |
 |---|---|
 | `ApiApplicationTests` | El contexto de Spring arranca con la base y las migraciones |
-| `CourseCatalogTest` | Búsqueda, filtros, slugs y fichas del catálogo |
-| `AuthServiceTest`, `CurrentUserServiceTest` | Registro y usuario de la sesión |
-| `LessonProgressServiceTest`, `EnrollmentServiceTest`, `CertificateIssuerServiceTest` | Progreso, matrículas y certificados |
-| `PaymentServiceTest` | Checkout, webhook y confirmación de pago |
+| `CursoCatalogTest` | Búsqueda, filtros, slugs y fichas del catálogo |
+| `AuthServiceTest`, `ActualUsuarioServiceTest` | Registro y usuario de la sesión |
+| `LeccionProgresoServiceTest`, `InscripcionServiceTest`, `CertificadoEmisorServiceTest` | Progreso, matrículas y certificados |
+| `PagoServiceTest` | Checkout, webhook y confirmación de pago |
 | `AdminCatalogServiceTest`, `AdminMethodSecurityTest` | CRUD admin y exigencia de `ROLE_ADMIN` |
 | `SecurityAccessTest` | Autenticación, autorización por roles, CSRF y `UserDetailsService` contra PostgreSQL |
 | `InputValidationTest` | Bean Validation, enlaces `https`/YouTube, escape de markup y errores sin 500 |
-| `DataExposureAndRateLimitTest` | Rutas públicas y privadas, cabeceras de seguridad, cookie `SameSite`, Actuator, firma del webhook y límite de intentos por IP |
-| `SoftwareFlowTest` | Calidad de software: componentes, integración y autenticación de un flujo real de alta, curso y avance |
-| `CourseContentServiceTest`, `CourseContentDatabaseTest` | Temario estructurado, edición, orden, borrado, sílabo y progreso sin perder datos |
-| `AdminCourseStructureFlowTest`, `AdminContentTemplateTest` | Rutas del panel de contenido y render con datos reales de PostgreSQL |
-| `AdminDesignViewTest` | Jerarquía y espaciado del temario admin y del listado de cursos |
-| `AccessibilityViewTest` | Avisos con `aria-live`, ayuda y errores enlazados en el perfil, y región viva del fin de video |
-| `StudentContentFlowTest`, `StudentDashboardViewTest`, `StudentCourseViewTest`, `StudentCourseTemplateTest` | Vista del alumno, avance real del panel, avance por ítem y render contra la matrícula real |
+| `DatosExposureAndRateLimitTest` | Rutas públicas y privadas, cabeceras de seguridad, cookie `SameSite`, Actuator, firma del webhook y límite de intentos por IP |
+| `SoftwareFlujoTest` | Calidad de software: componentes, integración y autenticación de un flujo real de alta, curso y avance |
+| `CursoContenidoServiceTest`, `CursoContenidoBaseTest` | Temario estructurado, edición, orden, borrado, sílabo y progreso sin perder datos |
+| `AdminCursoEstructuraFlujoTest`, `AdminContenidoPlantillaTest` | Rutas del panel de contenido y render con datos reales de PostgreSQL |
+| `AdminDesignVistaTest` | Jerarquía y espaciado del temario admin y del listado de cursos |
+| `AccesibilidadVistaTest` | Avisos con `aria-live`, ayuda y errores enlazados en el perfil, y región viva del fin de video |
+| `EstudianteContenidoFlujoTest`, `EstudianteDashboardVistaTest`, `EstudianteCursoVistaTest`, `EstudianteCursoPlantillaTest` | Vista del alumno, avance real del panel, avance por ítem y render contra la matrícula real |
 | `DashboardPerformanceTest` | Avance del panel en consultas constantes, medido con estadísticas de Hibernate contra PostgreSQL |
-| `StudentCertificateServiceTest`, `StudentCertificateDatabaseTest` | Certificados vigentes reales, código emitido y respeto de revocaciones |
-| `StudentCertificateViewTest` | Diseño del listado y la ficha de certificados, con enlaces solo a certificados existentes |
-| `AdminCertificatePreviewServiceTest`, `AdminCertificatePreviewDatabaseTest` | Vista previa admin con datos reales de persona, curso y videos, incluidos los revocados |
-| `AdminPanelFlowTest`, `AdminDesignViewTest` | Apertura de la vista previa por id, documento compartido entre alumno y admin |
-| `CertificateTemplateTest` | Render real del documento compartido para la vista previa admin y la ficha del alumno |
-| `PasswordResetServiceTest` | Hash del token, vencimiento, un solo uso y correo |
+| `EstudianteCertificadoServiceTest`, `EstudianteCertificadoBaseTest` | Certificados vigentes reales, código emitido y respeto de revocaciones |
+| `EstudianteCertificadoVistaTest` | Diseño del listado y la ficha de certificados, con enlaces solo a certificados existentes |
+| `AdminCertificadoVistapreviaServiceTest`, `AdminCertificadoVistapreviaBaseTest` | Vista previa admin con datos reales de persona, curso y videos, incluidos los revocados |
+| `AdminPanelFlujoTest`, `AdminDesignVistaTest` | Apertura de la vista previa por id, documento compartido entre alumno y admin |
+| `CertificadoPlantillaTest` | Render real del documento compartido para la vista previa admin y la ficha del alumno |
+| `ContrasenaRestablecerServiceTest` | Hash del token, vencimiento, un solo uso y correo |
 | `RequestIdFilterTest` | `X-Request-Id`, validación y limpieza del MDC |
 | `ActuatorSecurityTest`, `BusinessMetricsTest` | Acceso a Actuator y contadores `mundomanitas_*` |
-| `PaymentHealthIndicatorTest` | Estado de la pasarela de pago |
+| `PagoHealthIndicatorTest` | Estado de la pasarela de pago |
 
 Resultado actual: **308 de 308 en verde**. El detalle de monitoreo está en
 [`docs/plan-de-monitoreo.md`](docs/plan-de-monitoreo.md).

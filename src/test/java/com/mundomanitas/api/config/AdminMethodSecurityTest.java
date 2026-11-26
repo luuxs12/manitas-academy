@@ -1,17 +1,17 @@
 package com.mundomanitas.api.config;
 
-import com.mundomanitas.api.controller.admin.AdminAuditController;
-import com.mundomanitas.api.controller.admin.AdminCertificateController;
-import com.mundomanitas.api.controller.admin.AdminContentController;
+import com.mundomanitas.api.controller.admin.AdminAuditoriaController;
+import com.mundomanitas.api.controller.admin.AdminCertificadoController;
+import com.mundomanitas.api.controller.admin.AdminContenidoController;
 import com.mundomanitas.api.controller.admin.AdminController;
-import com.mundomanitas.api.controller.admin.AdminCourseController;
-import com.mundomanitas.api.controller.admin.AdminExportController;
-import com.mundomanitas.api.controller.admin.AdminNotificationApiController;
-import com.mundomanitas.api.controller.admin.AdminQuizController;
-import com.mundomanitas.api.controller.admin.AdminReportController;
+import com.mundomanitas.api.controller.admin.AdminCursoController;
+import com.mundomanitas.api.controller.admin.AdminExportacionController;
+import com.mundomanitas.api.controller.admin.AdminNotificacionApiController;
+import com.mundomanitas.api.controller.admin.AdminCuestionarioController;
+import com.mundomanitas.api.controller.admin.AdminReporteController;
 import com.mundomanitas.api.controller.admin.AdminSearchController;
-import com.mundomanitas.api.controller.admin.AdminSessionPdfController;
-import com.mundomanitas.api.controller.admin.AdminUserController;
+import com.mundomanitas.api.controller.admin.AdminSesionPdfController;
+import com.mundomanitas.api.controller.admin.AdminUsuarioController;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -26,17 +26,17 @@ class AdminMethodSecurityTest {
 
     private static final List<Class<?>> ADMIN_CONTROLLERS = List.of(
             AdminController.class,
-            AdminUserController.class,
-            AdminCourseController.class,
-            AdminContentController.class,
-            AdminCertificateController.class,
-            AdminAuditController.class,
-            AdminReportController.class,
-            AdminExportController.class,
+            AdminUsuarioController.class,
+            AdminCursoController.class,
+            AdminContenidoController.class,
+            AdminCertificadoController.class,
+            AdminAuditoriaController.class,
+            AdminReporteController.class,
+            AdminExportacionController.class,
             AdminSearchController.class,
-            AdminNotificationApiController.class,
-            AdminQuizController.class,
-            AdminSessionPdfController.class
+            AdminNotificacionApiController.class,
+            AdminCuestionarioController.class,
+            AdminSesionPdfController.class
     );
 
     @Test
@@ -47,7 +47,7 @@ class AdminMethodSecurityTest {
 
     @Test
     @DisplayName("cada controlador administrativo exige ROLE_ADMIN")
-    void everyAdminControllerRequiresAdminRole() {
+    void everyAdminControllerRequiresAdminRol() {
         assertThat(ADMIN_CONTROLLERS).allSatisfy(controller -> {
             PreAuthorize annotation = controller.getAnnotation(PreAuthorize.class);
             assertThat(annotation)

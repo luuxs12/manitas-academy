@@ -45,15 +45,15 @@
 
                 <ul class="panel-notification-list" th:if="${!#lists.isEmpty(notifications)}">
                     <li class="panel-notification-item" th:each="notice : ${notifications}"
-                        th:classappend="${notice.read} ? '' : 'is-unread'">
+                        th:classappend="${notice.leido} ? '' : 'is-unread'">
                         <div>
                             <h3>
-                                <span class="panel-notify-dot" th:if="${!notice.read}" aria-hidden="true"></span>
-                                <span th:text="${notice.title}">Aviso</span>
+                                <span class="panel-notify-dot" th:if="${!notice.leido}" aria-hidden="true"></span>
+                                <span th:text="${notice.titulo}">Aviso</span>
                             </h3>
                             <p th:text="${notice.message}">Mensaje del aviso.</p>
-                            <time th:datetime="${notice.createdAt}"
-                                  th:text="${#temporals.format(notice.createdAt, 'dd/MM/yyyy HH:mm')}">
+                            <time th:datetime="${notice.fechaCreacion}"
+                                  th:text="${#temporals.format(notice.fechaCreacion, 'dd/MM/yyyy HH:mm')}">
                                 01/01/2026 12:00
                             </time>
                         </div>
@@ -61,7 +61,7 @@
                             <a class="panel-inline-btn" th:if="${notice.targetUrl != null}"
                                th:href="${notice.targetUrl}">Abrir <span aria-hidden="true">→</span></a>
                             <form th:action="@{/panel/notificaciones/{id}/leer(id=${notice.id})}"
-                                  method="post" th:if="${!notice.read}">
+                                  method="post" th:if="${!notice.leido}">
                                 <button class="panel-inline-btn" type="submit">Marcar como leído</button>
                             </form>
                         </div>

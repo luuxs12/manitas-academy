@@ -12,7 +12,7 @@
         <button type="button" class="btn btn-dark" data-print>Imprimir o guardar en PDF</button>
     </nav>
 
-    <div th:replace="~{fragments/certificate-document :: document(${account.fullName}, ${certificate.courseTitle()}, ${certificate.videoCount()}, ${certificate.issuedAt()}, ${certificate.code()})}"></div>
+    <div th:replace="~{fragments/certificate-document :: document(${cuenta.nombreCompleto}, ${certificado.cursoTitulo()}, ${certificado.videoContar()}, ${certificado.fechaEmision()}, ${certificado.code()})}"></div>
 </main>
 
 <script defer th:src="@{/js/panel.js}"></script>

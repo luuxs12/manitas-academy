@@ -23,10 +23,10 @@
                 <div class="panel-welcome-copy">
                     <div class="panel-welcome-line">
                         <h1 id="titulo-panel">
-                            ¡Hola, <span class="panel-name" th:text="${currentUser.firstName()}">Lucía</span>!
+                            ¡Hola, <span class="panel-name" th:text="${usuarioActual.nombreCompleto()}">Lucía</span>!
                         </h1>
                         <a class="panel-plan" th:href="@{/panel/perfil} + '#plan'"
-                           th:text="${'Plan ' + currentUser.planLabel()}"
+                           th:text="${'Plan ' + usuarioActual.planLabel()}"
                            title="Ver mi tipo de cuenta">Plan gratis</a>
                     </div>
                     <p>Continuá aprendiendo a tu ritmo.</p>
@@ -34,36 +34,36 @@
             </section>
 
             <section class="panel-continue" th:if="${next != null}"
-                     th:with="course=${next.course}" aria-labelledby="titulo-continuar">
-                <img class="panel-continue-media" th:src="${!#strings.isEmpty(course.image) ? course.image : '/img/course-placeholder.svg'}" alt=""
+                     th:with="curso=${next.curso}" aria-labelledby="titulo-continuar">
+                <img class="panel-continue-media" th:src="${!#strings.isEmpty(curso.imagen) ? curso.imagen : '/img/curso-placeholder.svg'}" alt=""
                      width="960" height="600">
                 <div class="panel-continue-copy">
                     <p class="panel-eyebrow">Tu próximo curso</p>
-                    <h2 id="titulo-continuar" th:text="${course.title}"></h2>
+                    <h2 id="titulo-continuar" th:text="${curso.titulo}"></h2>
                     <p class="panel-continue-meta">
-                        <span th:text="${course.level}"></span>
+                        <span th:text="${curso.nivel}"></span>
                         ·
-                        <span th:text="${course.lessons + ' lecciones'}"></span>
+                        <span th:text="${curso.lessons + ' lecciones'}"></span>
                     </p>
                     <p class="panel-progress-label">Listo para continuar</p>
                 </div>
                 <a class="btn btn-dark panel-continue-cta"
-                   th:href="@{/panel/cursos/{slug}(slug=${next.course.slug})}">
+                   th:href="@{/panel/cursos/{slug}(slug=${next.curso.slug})}">
                     Continuar curso <span aria-hidden="true">→</span>
                 </a>
             </section>
 
             <ul class="panel-kpis" aria-label="Resumen de aprendizaje">
                 <li class="panel-kpi">
-                    <strong th:text="${enrolled}"></strong>
+                    <strong th:text="${inscripto}"></strong>
                     <span>Cursos inscriptos</span>
                 </li>
                 <li class="panel-kpi">
-                    <strong th:text="${videoTotals.completed()}"></strong>
+                    <strong th:text="${videoTotals.finalizado()}"></strong>
                     <span>Videos terminados</span>
                 </li>
                 <li class="panel-kpi">
-                    <strong th:text="${completed}"></strong>
+                    <strong th:text="${finalizado}"></strong>
                     <span>Cursos terminados</span>
                 </li>
                 <li class="panel-kpi">
@@ -81,27 +81,27 @@
                     </div>
 
                     <div class="panel-course-grid" th:if="${!#lists.isEmpty(enrollments)}">
-                        <article class="panel-course" th:each="enrollment : ${enrollments}">
-                            <img th:src="${!#strings.isEmpty(enrollment.course.image) ? enrollment.course.image : '/img/course-placeholder.svg'}" alt=""
+                        <article class="panel-course" th:each="inscripcion : ${enrollments}">
+                            <img th:src="${!#strings.isEmpty(inscripcion.curso.imagen) ? inscripcion.curso.imagen : '/img/curso-placeholder.svg'}" alt=""
                                  width="960" height="600" loading="lazy">
                             <div class="panel-course-body">
-                                <h3 th:text="${enrollment.course.title}"></h3>
+                                <h3 th:text="${inscripcion.curso.titulo}"></h3>
                                 <span class="panel-chip"
-                                      th:text="${enrollment.course.category}"></span>
+                                      th:text="${inscripcion.curso.categoria}"></span>
                                 <span class="panel-course-status"
-                                      th:classappend="${enrollment.completed} ? ' is-done' : ''"
-                                      th:text="${enrollment.completed} ? 'Completado' : 'En curso'">
+                                      th:classappend="${inscripcion.finalizado} ? ' is-done' : ''"
+                                      th:text="${inscripcion.finalizado} ? 'Completado' : 'En curso'">
                                     En curso
                                 </span>
                                 <p class="panel-lesson-label"
-                                    th:text="${doneCounts[enrollment.id] + ' de ' + videoCounts[enrollment.id] + ' videos terminados'}">
+                                    th:text="${doneCounts[inscripcion.id] + ' de ' + videoCounts[inscripcion.id] + ' videos terminados'}">
                                 </p>
                                 <div class="panel-lesson-track" role="img"
-                                     th:attr="aria-label=${doneCounts[enrollment.id] + ' de ' + videoCounts[enrollment.id] + ' videos terminados'}">
-                                    <span th:style="${'width: ' + videoProgress[enrollment.id] + '%'}"></span>
+                                     th:attr="aria-label=${doneCounts[inscripcion.id] + ' de ' + videoCounts[inscripcion.id] + ' videos terminados'}">
+                                    <span th:style="${'width: ' + videoProgreso[inscripcion.id] + '%'}"></span>
                                 </div>
                                 <a class="panel-course-cta"
-                                   th:href="@{/panel/cursos/{slug}(slug=${enrollment.course.slug})}">
+                                   th:href="@{/panel/cursos/{slug}(slug=${inscripcion.curso.slug})}">
                                     Ver clases <span aria-hidden="true">→</span>
                                 </a>
                             </div>
@@ -125,15 +125,15 @@
 
                 <aside class="panel-progress-card" aria-labelledby="titulo-progreso">
                     <h2 id="titulo-progreso">Tu progreso</h2>
-                    <div class="panel-donut" th:style="${'--value: ' + progress}"
-                         role="img" th:attr="aria-label=${'Cursos terminados: ' + progress + ' por ciento'}">
-                        <span th:text="${progress + '%'}"></span>
+                    <div class="panel-donut" th:style="${'--value: ' + progreso}"
+                         role="img" th:attr="aria-label=${'Cursos terminados: ' + progreso + ' por ciento'}">
+                        <span th:text="${progreso + '%'}"></span>
                     </div>
-                    <p class="panel-progress-title" th:text="${enrolled == 0 ? 'Empezá con un curso' : 'Vas avanzando'}">
+                    <p class="panel-progress-title" th:text="${inscripto == 0 ? 'Empezá con un curso' : 'Vas avanzando'}">
                         Empezá con un curso
                     </p>
                     <p class="panel-progress-copy"
-                       th:text="${enrolled} == 0
+                       th:text="${inscripto} == 0
                            ? 'Buscá un curso en el panel e inscribite para verlo acá.'
                            : completed + ' de ' + enrolled + ' cursos terminados.'">
                         Buscá un curso en el panel e inscribite para verlo acá.
@@ -151,20 +151,20 @@
                     <a th:href="@{/panel/explorar}">Ver el catálogo <span aria-hidden="true">→</span></a>
                 </div>
                 <div class="panel-course-grid panel-course-grid--compact">
-                    <article class="panel-course" th:each="course : ${recommended}">
-                        <img th:src="${!#strings.isEmpty(course.image) ? course.image : '/img/course-placeholder.svg'}" alt="" width="960" height="600" loading="lazy">
+                    <article class="panel-course" th:each="curso : ${recommended}">
+                        <img th:src="${!#strings.isEmpty(curso.imagen) ? curso.imagen : '/img/curso-placeholder.svg'}" alt="" width="960" height="600" loading="lazy">
                         <div class="panel-course-body">
-                            <h3 th:text="${course.title}"></h3>
-                            <span class="panel-chip" th:text="${course.category}"></span>
+                            <h3 th:text="${curso.titulo}"></h3>
+                            <span class="panel-chip" th:text="${curso.categoria}"></span>
                             <div class="panel-course-foot">
-                                <span class="panel-course-percent" th:text="${course.priceLabel()}"></span>
-                                <form th:action="@{/panel/cursos/{slug}/inscribir(slug=${course.slug})}"
-                                      method="post" th:if="${course.free or currentUser.premium()}"
+                                <span class="panel-course-percent" th:text="${curso.priceLabel()}"></span>
+                                <form th:action="@{/panel/cursos/{slug}/inscribir(slug=${curso.slug})}"
+                                      method="post" th:if="${curso.free or usuarioActual.premium()}"
                                       data-confirm-form
-                                      th:attr="data-confirm-message='¿Inscribirte en ' + ${course.title} + '?'">
+                                      th:attr="data-confirm-message='¿Inscribirte en ' + ${curso.titulo} + '?'">
                                     <button class="panel-inline-btn" type="submit">Inscribirme</button>
                                 </form>
-                                <a class="panel-inline-btn" th:if="${!course.free and !currentUser.premium()}"
+                                <a class="panel-inline-btn" th:if="${!curso.free and !usuarioActual.premium()}"
                                    th:href="@{/panel/facturacion}">Requiere Premium</a>
                             </div>
                         </div>

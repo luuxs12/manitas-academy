@@ -13,52 +13,53 @@ import java.util.UUID;
 
 public interface VideoRepository extends JpaRepository<Video, UUID> {
 
-    List<Video> findByModuleIdOrderByPositionAsc(UUID moduleId);
+    @Query("""
+            select x from Video x where x.moduloId = ?1 order by x.posicion asc
+    """)
+    List<Video> buscarPorModuloIdOrdenarPorPosicionAsc(UUID moduloId);
 
     /** Evita servir un video de un curso ajeno a la matrícula. */
     @Query("""
             select case when count(v) > 0 then true else false end
-            from Video v, CourseModule m
-            where v.id = :videoId and v.moduleId = m.id and m.courseId = :courseId
+            from Video v, CursoModulo m
+            where v.id = :videoId and v.moduloId = m.id and m.cursoId = :cursoId
             """)
-    boolean existsInCourse(@Param("videoId") UUID videoId, @Param("courseId") UUID courseId);
+    boolean existeInCurso(@Param("videoId") UUID videoId, @Param("cursoId") UUID cursoId);
 
     /** Total real de videos del curso, para calcular el avance. */
     @Query("""
-            select count(v) from Video v, CourseModule m
-            where v.moduleId = m.id and m.courseId = :courseId
+            select count(v) from Video v, CursoModulo m
+            where v.moduloId = m.id and m.cursoId = :cursoId
             """)
-    int countByCourseId(@Param("courseId") UUID courseId);
+    int contarPorCursoId(@Param("cursoId") UUID cursoId);
 
     /** Videos del curso en orden de reproducción, sin depender del número de lección. */
     @Query("""
-            select v.id from Video v, CourseModule m
-            where v.moduleId = m.id and m.courseId = :courseId
-            order by m.position, v.position, v.title
+            select v.id from Video v, CursoModulo m
+            where v.moduloId = m.id and m.cursoId = :cursoId
+            order by m.posicion, v.posicion, v.titulo
             """)
-    List<UUID> findIdsByCourseId(@Param("courseId") UUID courseId);
+    List<UUID> buscarIdsPorCursoId(@Param("cursoId") UUID cursoId);
 
     /** Videos de varios cursos en una sola consulta, para el avance en lote. */
     @Query("""
-            select m.courseId as courseId, v.id as videoId
-            from Video v, CourseModule m
-            where v.moduleId = m.id and m.courseId in :courseIds
+            select m.cursoId as cursoId, v.id as videoId
+            from Video v, CursoModulo m
+            where v.moduloId = m.id and m.cursoId in :cursoIds
             """)
-    List<CourseVideo> findCourseVideos(@Param("courseIds") Collection<UUID> courseIds);
+    List<CursoVideo> buscarCursoVideos(@Param("cursoIds") Collection<UUID> cursoIds);
 
-    interface CourseVideo {
-        UUID getCourseId();
+    interface CursoVideo {
+        UUID getCursoId();
 
         UUID getVideoId();
     }
 
     @Query("""
             select v from Video v
-            where (:moduleId is null or v.moduleId = :moduleId)
-              and (:term is null or lower(v.title) like lower(concat('%', cast(:term as string), '%')))
-            order by v.position, v.title
+            where (:moduloId is null or v.moduloId = :moduloId)
+              and (:term is null or lower(v.titulo) like lower(concat('%', cast(:term as string), '%')))
+            order by v.posicion, v.titulo
             """)
-    Page<Video> search(@Param("moduleId") UUID moduleId,
-                       @Param("term") String term,
-                       Pageable pageable);
+    Page<Video> search(@Param("moduloId") UUID moduloId, @Param("term") String term, Pageable pageable);
 }

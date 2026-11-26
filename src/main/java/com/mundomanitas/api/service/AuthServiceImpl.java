@@ -1,9 +1,9 @@
 package com.mundomanitas.api.service;
 
-import com.mundomanitas.api.dto.RegisterForm;
-import com.mundomanitas.api.exception.DuplicateEmailException;
-import com.mundomanitas.api.model.User;
-import com.mundomanitas.api.repository.UserRepository;
+import com.mundomanitas.api.dto.RegistroFormulario;
+import com.mundomanitas.api.exception.DuplicadoEmailException;
+import com.mundomanitas.api.model.Usuario;
+import com.mundomanitas.api.repository.UsuarioRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,31 +19,31 @@ public class AuthServiceImpl implements AuthService {
 
     private static final Logger log = LoggerFactory.getLogger(AuthServiceImpl.class);
 
-    private final UserRepository users;
-    private final PasswordEncoder passwordEncoder;
+    private final UsuarioRepository users;
+    private final PasswordEncoder contrasenaEncoder;
 
-    public AuthServiceImpl(UserRepository users, PasswordEncoder passwordEncoder) {
+    public AuthServiceImpl(UsuarioRepository users, PasswordEncoder contrasenaEncoder) {
         this.users = users;
-        this.passwordEncoder = passwordEncoder;
+        this.contrasenaEncoder = contrasenaEncoder;
     }
 
     @Override
     @Transactional
-    public User register(RegisterForm form) {
-        String email = StringUtils.trimToEmpty(form.getEmail()).toLowerCase(Locale.ROOT);
+    public Usuario registro(RegistroFormulario formulario) {
+        String email = StringUtils.trimToEmpty(formulario.getEmail()).toLowerCase(Locale.ROOT);
 
-        if (users.existsByEmailIgnoreCase(email)) {
+        if (users.existePorEmailIgnorandoMayusculas(email)) {
             log.info("Registro rechazado: el correo ya existe");
-            throw new DuplicateEmailException(email);
+            throw new DuplicadoEmailException(email);
         }
 
-        User user = new User(
+        Usuario usuario = new Usuario(
                 email,
-                passwordEncoder.encode(form.getPassword()),
-                StringUtils.trimToEmpty(form.getFullName())
+                contrasenaEncoder.encode(formulario.getContrasena()),
+                StringUtils.trimToEmpty(formulario.getNombreCompleto())
         );
 
-        User saved = users.save(user);
+        Usuario saved = users.save(usuario);
         log.info("Cuenta registrada id={}", saved.getId());
         return saved;
     }

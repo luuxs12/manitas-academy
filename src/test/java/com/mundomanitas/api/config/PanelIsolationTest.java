@@ -19,34 +19,34 @@ class PanelIsolationTest {
 
     @Test
     @DisplayName("el panel administrativo no enlaza al área del estudiante")
-    void adminTemplatesDoNotLinkToStudentArea() throws IOException {
+    void adminTemplatesDoNotEnlaceToEstudianteArea() throws IOException {
         Resource[] templates = resolver.getResources("classpath*:templates/admin/**/*.html");
 
         assertThat(templates).isNotEmpty();
-        for (Resource template : templates) {
-            assertThat(html(template)).as(template.getFilename())
+        for (Resource plantilla : templates) {
+            assertThat(html(plantilla)).as(plantilla.getFilename())
                     .doesNotContain("@{/panel");
         }
     }
 
     @Test
     @DisplayName("el área del estudiante no enlaza al panel administrativo")
-    void studentTemplatesDoNotLinkToAdminArea() throws IOException {
+    void estudianteTemplatesDoNotEnlaceToAdminArea() throws IOException {
         Resource[] templates = resolver.getResources("classpath*:templates/student/**/*.html");
 
         assertThat(templates).isNotEmpty();
-        for (Resource template : templates) {
-            assertThat(html(template)).as(template.getFilename())
+        for (Resource plantilla : templates) {
+            assertThat(html(plantilla)).as(plantilla.getFilename())
                     .doesNotContain("@{/admin");
         }
     }
 
     @Test
     @DisplayName("el acceso público elige el panel según el rol")
-    void publicNavigationUsesTheRole() throws IOException {
+    void publicNavigationUsesTheRol() throws IOException {
         String header = html(resolver.getResource("classpath:templates/fragments/layout.html"));
 
-        assertThat(header).contains("currentUser.admin()")
+        assertThat(header).contains("usuarioActual.admin()")
                 .contains("panel-navigation.js")
                 .doesNotContain("th:href=\"@{/panel}\" aria-label=\"Ir a mi panel\"");
 
@@ -62,14 +62,14 @@ class PanelIsolationTest {
 
         String detalle = html(resolver.getResource("classpath:templates/cursos/detalle.html"));
 
-        assertThat(detalle).contains("!currentUser.admin()")
-                .doesNotContain("th:if=\"${signedIn and enrolled}\"")
-                .doesNotContain("th:if=\"${signedIn and !enrolled and canEnroll}\"")
-                .doesNotContain("th:if=\"${signedIn and !enrolled and !canEnroll}\"");
+        assertThat(detalle).contains("!usuarioActual.admin()")
+                .doesNotContain("th:if=\"${signedIn and inscripto}\"")
+                .doesNotContain("th:if=\"${signedIn and !inscripto and canEnroll}\"")
+                .doesNotContain("th:if=\"${signedIn and !inscripto and !canEnroll}\"");
     }
 
-    private static String html(Resource template) throws IOException {
-        try (var stream = template.getInputStream()) {
+    private static String html(Resource plantilla) throws IOException {
+        try (var stream = plantilla.getInputStream()) {
             return new String(stream.readAllBytes(), StandardCharsets.UTF_8);
         }
     }

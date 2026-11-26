@@ -16,20 +16,20 @@ public class BusinessMetrics {
 
     private final MeterRegistry registry;
     private final Counter paymentsFailed;
-    private final Counter enrollmentsCreated;
-    private final Counter certificatesIssued;
+    private final Counter enrollmentsCreado;
+    private final Counter certificatesEmitido;
 
     public BusinessMetrics(MeterRegistry registry) {
         this.registry = registry;
         this.paymentsFailed = counter(registry, "mundomanitas.payments.failed",
                 "Pagos fallidos o vencidos");
-        this.enrollmentsCreated = counter(registry, "mundomanitas.enrollments.created",
+        this.enrollmentsCreado = counter(registry, "mundomanitas.enrollments.created",
                 "Matrículas creadas");
-        this.certificatesIssued = counter(registry, "mundomanitas.certificates.issued",
+        this.certificatesEmitido = counter(registry, "mundomanitas.certificates.issued",
                 "Certificados emitidos");
     }
 
-    public void checkoutStarted(String plan) {
+    public void checkoutIniciado(String plan) {
         Counter.builder("mundomanitas.checkouts.started")
                 .description("Checkouts iniciados en la pasarela")
                 .tag("plan", plan == null ? "unknown" : plan)
@@ -37,7 +37,7 @@ public class BusinessMetrics {
                 .increment();
     }
 
-    public void paymentConfirmed(String plan) {
+    public void pagoConfirmed(String plan) {
         Counter.builder("mundomanitas.payments.confirmed")
                 .description("Pagos confirmados por la pasarela")
                 .tag("plan", plan == null ? "unknown" : plan)
@@ -45,19 +45,19 @@ public class BusinessMetrics {
                 .increment();
     }
 
-    public void paymentFailed() {
+    public void pagoFailed() {
         paymentsFailed.increment();
     }
 
-    public void enrollmentCreated() {
-        enrollmentsCreated.increment();
+    public void inscripcionCreado() {
+        enrollmentsCreado.increment();
     }
 
-    public void certificateIssued() {
-        certificatesIssued.increment();
+    public void certificadoEmitido() {
+        certificatesEmitido.increment();
     }
 
-    private static Counter counter(MeterRegistry registry, String name, String description) {
-        return Counter.builder(name).description(description).register(registry);
+    private static Counter counter(MeterRegistry registry, String name, String descripcion) {
+        return Counter.builder(name).description(descripcion).register(registry);
     }
 }

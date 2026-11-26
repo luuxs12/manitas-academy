@@ -14,7 +14,7 @@
 
     <nav class="panel-nav" aria-label="Panel administrativo">
         <a class="panel-nav-link" th:href="@{/admin}"
-           th:attr="aria-current=${active == 'inicio'} ? 'page' : null">
+           th:attr="aria-current=${activo == 'inicio'} ? 'page' : null">
             <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                 <path d="M4 10.5 12 4l8 6.5"></path><path d="M6 9.8V20h12V9.8"></path>
                 <path d="M10 20v-5h4v5"></path>
@@ -23,7 +23,7 @@
         </a>
 
         <a class="panel-nav-link" th:href="@{/admin/usuarios}"
-           th:attr="aria-current=${active == 'usuarios'} ? 'page' : null">
+           th:attr="aria-current=${activo == 'usuarios'} ? 'page' : null">
             <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                 <path d="M16 20v-1.5a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4V20"></path>
                 <circle cx="9.5" cy="7" r="3.5"></circle><path d="M17 4a3 3 0 0 1 0 6"></path>
@@ -32,7 +32,7 @@
         </a>
 
         <a class="panel-nav-link" th:href="@{/admin/cursos}"
-           th:attr="aria-current=${active == 'cursos'} ? 'page' : null">
+           th:attr="aria-current=${activo == 'cursos'} ? 'page' : null">
             <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                 <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"></path>
                 <path d="M4 20.5A2.5 2.5 0 0 1 6.5 18H20v3H6.5A2.5 2.5 0 0 1 4 20.5z"></path>
@@ -41,7 +41,7 @@
         </a>
 
         <a class="panel-nav-link" th:href="@{/admin/modulos}"
-           th:attr="aria-current=${active == 'modulos'} ? 'page' : null">
+           th:attr="aria-current=${activo == 'modulos'} ? 'page' : null">
             <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                 <rect x="3" y="4" width="7" height="7" rx="1.5"></rect>
                 <rect x="14" y="4" width="7" height="7" rx="1.5"></rect>
@@ -52,7 +52,7 @@
         </a>
 
         <a class="panel-nav-link" th:href="@{/admin/videos}"
-           th:attr="aria-current=${active == 'videos'} ? 'page' : null">
+           th:attr="aria-current=${activo == 'videos'} ? 'page' : null">
             <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                 <rect x="3" y="5" width="18" height="14" rx="2"></rect>
                 <path d="m10 9 5 3-5 3z"></path>
@@ -61,7 +61,7 @@
         </a>
 
         <a class="panel-nav-link" th:href="@{/admin/ejercicios}"
-           th:attr="aria-current=${active == 'ejercicios'} ? 'page' : null">
+           th:attr="aria-current=${activo == 'ejercicios'} ? 'page' : null">
             <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                 <path d="M5 4h14v16H5z"></path><path d="M8 9h8M8 13h8M8 17h5"></path>
             </svg>
@@ -69,7 +69,7 @@
         </a>
 
         <a class="panel-nav-link" th:href="@{/admin/certificados}"
-           th:attr="aria-current=${active == 'certificados'} ? 'page' : null">
+           th:attr="aria-current=${activo == 'certificados'} ? 'page' : null">
             <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                 <circle cx="12" cy="9" r="5"></circle>
                 <path d="m8.5 13-1 7 4.5-2.5 4.5 2.5-1-7"></path>
@@ -78,7 +78,7 @@
         </a>
 
         <a class="panel-nav-link" th:href="@{/admin/reportes}"
-           th:attr="aria-current=${active == 'reportes'} ? 'page' : null">
+           th:attr="aria-current=${activo == 'reportes'} ? 'page' : null">
             <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                 <path d="M4 20V10M10 20V4M16 20v-7M22 20H2"></path>
             </svg>
@@ -86,7 +86,7 @@
         </a>
 
         <a class="panel-nav-link" th:href="@{/admin/auditoria}"
-           th:attr="aria-current=${active == 'auditoria'} ? 'page' : null">
+           th:attr="aria-current=${activo == 'auditoria'} ? 'page' : null">
             <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                 <path d="M6 3h9l4 4v14H6z"></path><path d="M9 12h7M9 16h7M9 8h4"></path>
             </svg>
@@ -94,7 +94,7 @@
         </a>
 
         <a class="panel-nav-link" th:href="@{/admin/configuracion}"
-           th:attr="aria-current=${active == 'configuracion'} ? 'page' : null">
+           th:attr="aria-current=${activo == 'configuracion'} ? 'page' : null">
             <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
                 <circle cx="12" cy="12" r="3"></circle>
                 <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6V21h-4v-.2a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H3v-3h.2a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.6V3h4v.2a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v3h-.2a1.7 1.7 0 0 0-1.6 1z"></path>
@@ -147,10 +147,10 @@
             <div class="panel-menu-pop panel-notify-pop admin-notify-pop" data-admin-notify>
                 <p class="panel-menu-name">Actividad reciente</p>
                 <ul class="panel-notify-list" data-admin-events>
-                    <li class="panel-notify-item" th:each="event : ${adminEvents}">
-                        <strong th:text="${event.title()}">Actividad</strong>
-                        <span th:text="${event.detail()}">Detalle.</span>
-                        <span class="admin-event-when" th:text="${event.when()}">hace un momento</span>
+                    <li class="panel-notify-item" th:each="evento : ${adminEvents}">
+                        <strong th:text="${evento.titulo()}">Actividad</strong>
+                        <span th:text="${evento.detail()}">Detalle.</span>
+                        <span class="admin-event-when" th:text="${evento.when()}">hace un momento</span>
                     </li>
                 </ul>
                 <p class="panel-notify-empty" data-admin-empty
@@ -176,11 +176,11 @@
         <details class="panel-menu" data-panel-menu>
             <summary class="panel-menu-trigger" aria-label="Abrir menú de la cuenta">
                 <span class="panel-avatar" aria-hidden="true"
-                      th:classappend="${currentUser.hasAvatar()} ? ' panel-avatar--photo' : ''">
-                    <img th:if="${currentUser.hasAvatar()}"
-                         th:src="${currentUser.avatarPath()}" alt="">
-                    <span th:unless="${currentUser.hasAvatar()}"
-                          th:text="${currentUser.initials()}">LF</span>
+                      th:classappend="${usuarioActual.hasAvatar()} ? ' panel-avatar--photo' : ''">
+                    <img th:if="${usuarioActual.hasAvatar()}"
+                         th:src="${usuarioActual.avatarPath()}" alt="">
+                    <span th:unless="${usuarioActual.hasAvatar()}"
+                          th:text="${usuarioActual.initials()}">LF</span>
                 </span>
                 <svg class="ico panel-menu-chevron" viewBox="0 0 24 24"
                      aria-hidden="true" focusable="false">
@@ -188,9 +188,9 @@
                 </svg>
             </summary>
             <div class="panel-menu-pop">
-                <p class="panel-menu-name" th:text="${currentUser.fullName()}">Luis Fernando</p>
-                <p class="panel-menu-mail" th:text="${currentUser.email()}">admin@damianprint.com</p>
-                <p class="panel-menu-role" th:text="${currentUser.roleLabel()}">Administrador</p>
+                <p class="panel-menu-name" th:text="${usuarioActual.nombreCompleto()}">Luis Fernando</p>
+                <p class="panel-menu-mail" th:text="${usuarioActual.email()}">admin@damianprint.com</p>
+                <p class="panel-menu-role" th:text="${usuarioActual.rolLabel()}">Administrador</p>
                 <a th:href="@{/admin/configuracion}">Configuración</a>
                 <form th:action="@{/logout}" method="post">
                     <button type="submit">Cerrar sesión</button>

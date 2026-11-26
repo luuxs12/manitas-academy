@@ -16,7 +16,7 @@ class AdminBootstrapRunnerTest {
 
     @Test
     @DisplayName("crea o promueve el admin con la clave del entorno")
-    void runsWithConfiguredPassword() {
+    void runsWithConfiguredContrasena() {
         new AdminBootstrapRunner(bootstrap, "admin@damianprint.com", "Clave12345!").run(null);
 
         verify(bootstrap).ensureAdmin("admin@damianprint.com", "Clave12345!");
@@ -24,7 +24,7 @@ class AdminBootstrapRunnerTest {
 
     @Test
     @DisplayName("no hace nada si no hay clave configurada")
-    void skipsWithoutPassword() {
+    void skipsWithoutContrasena() {
         new AdminBootstrapRunner(bootstrap, "admin@damianprint.com", "   ").run(null);
 
         verifyNoInteractions(bootstrap);

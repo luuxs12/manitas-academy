@@ -1,9 +1,9 @@
 package com.mundomanitas.api.controller.admin;
 
-import com.mundomanitas.api.service.MailService;
-import com.mundomanitas.api.service.PaymentService;
+import com.mundomanitas.api.service.CorreoService;
+import com.mundomanitas.api.service.PagoService;
 import com.mundomanitas.api.service.admin.AdminDashboardService;
-import com.mundomanitas.api.service.admin.AdminNotificationService;
+import com.mundomanitas.api.service.admin.AdminNotificacionService;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -17,14 +17,14 @@ import org.springframework.web.bind.annotation.RequestParam;
 public class AdminController extends AdminBaseController {
 
     private final AdminDashboardService dashboard;
-    private final MailService mail;
-    private final PaymentService payments;
+    private final CorreoService correo;
+    private final PagoService payments;
 
-    public AdminController(AdminNotificationService notifications, AdminDashboardService dashboard,
-                           MailService mail, PaymentService payments) {
+    public AdminController(AdminNotificacionService notifications, AdminDashboardService dashboard,
+                           CorreoService correo, PagoService payments) {
         super(notifications);
         this.dashboard = dashboard;
-        this.mail = mail;
+        this.correo = correo;
         this.payments = payments;
     }
 
@@ -34,10 +34,10 @@ public class AdminController extends AdminBaseController {
         int selected = dashboard.days(days);
         common(model, "inicio", "Panel Administrativo");
         model.addAttribute("kpis", dashboard.kpis());
-        model.addAttribute("chart", dashboard.activity(selected));
+        model.addAttribute("grafico", dashboard.actividad(selected));
         model.addAttribute("popular", dashboard.popular());
-        model.addAttribute("recentUsers", dashboard.recentUsers());
-        model.addAttribute("system", dashboard.system());
+        model.addAttribute("recienteUsers", dashboard.recienteUsers());
+        model.addAttribute("sistema", dashboard.sistema());
         model.addAttribute("selectedDays", selected);
         return "admin/dashboard";
     }
@@ -45,8 +45,8 @@ public class AdminController extends AdminBaseController {
     @GetMapping("/configuracion")
     public String configuration(Model model) {
         common(model, "configuracion", "Configuración");
-        model.addAttribute("system", dashboard.system());
-        model.addAttribute("mailEnabled", mail.isEnabled());
+        model.addAttribute("sistema", dashboard.sistema());
+        model.addAttribute("correoEnabled", correo.isEnabled());
         model.addAttribute("stripeEnabled", payments.isEnabled());
         return "admin/configuracion";
     }

@@ -30,7 +30,7 @@
                 <select id="filtro-modulo-ej" name="modulo">
                     <option value="">Todos los módulos</option>
                     <option th:each="o : ${options}" th:value="${o.id()}" th:text="${o.label()}"
-                            th:selected="${moduleId != null and moduleId.toString() == o.id().toString()}"></option>
+                            th:selected="${moduloId != null and moduloId.toString() == o.id().toString()}"></option>
                 </select>
                 <button class="btn btn-admin" type="submit">Filtrar</button>
             </form>
@@ -41,15 +41,15 @@
                     <thead><tr><th scope="col">Ejercicio</th><th scope="col">Curso / Módulo</th><th scope="col">Consigna</th><th scope="col">Pos.</th><th scope="col">Acciones</th></tr></thead>
                     <tbody>
                     <tr th:each="item : ${page.content}">
-                        <td><strong th:text="${item.title()}">Ejercicio</strong></td>
-                        <td><small th:text="${item.courseTitle()}">Curso</small><br><small th:text="${item.moduleTitle()}">Módulo</small></td>
+                        <td><strong th:text="${item.titulo()}">Ejercicio</strong></td>
+                        <td><small th:text="${item.cursoTitulo()}">Curso</small><br><small th:text="${item.moduloTitulo()}">Módulo</small></td>
                         <td class="admin-clip" th:text="${item.prompt()}">Consigna</td>
-                        <td th:text="${item.position()}">0</td>
+                        <td th:text="${item.posicion()}">0</td>
                         <td class="admin-row-actions">
                             <a th:href="@{/admin/ejercicios/{id}/editar(id=${item.id()})}">Editar</a>
                             <a th:href="@{/admin/ejercicios/{id}/preguntas(id=${item.id()})}">Preguntas</a>
                             <button type="button" class="admin-confirm-link"
-                                    th:attr="data-confirm-url=@{/admin/ejercicios/{id}/eliminar(id=${item.id()})}, aria-label='Eliminar ' + ${item.title()}">Eliminar</button>
+                                    th:attr="data-confirm-url=@{/admin/ejercicios/{id}/eliminar(id=${item.id()})}, aria-label='Eliminar ' + ${item.titulo()}">Eliminar</button>
                         </td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(page.content)}"><td colspan="5" class="admin-empty">Todavía no hay ejercicios cargados.</td></tr>
@@ -57,9 +57,9 @@
                 </table>
             </div>
             <nav class="admin-pager" th:if="${page.totalPages > 1}" aria-label="Paginación de ejercicios">
-                <a th:if="${!page.first}" th:href="@{/admin/ejercicios(page=${page.number - 1}, q=${query}, modulo=${moduleId})}">← Anterior</a>
+                <a th:if="${!page.first}" th:href="@{/admin/ejercicios(page=${page.number - 1}, q=${query}, modulo=${moduloId})}">← Anterior</a>
                 <span th:text="${'Página ' + (page.number + 1) + ' de ' + page.totalPages}">Página 1</span>
-                <a th:if="${!page.last}" th:href="@{/admin/ejercicios(page=${page.number + 1}, q=${query}, modulo=${moduleId})}">Siguiente →</a>
+                <a th:if="${!page.last}" th:href="@{/admin/ejercicios(page=${page.number + 1}, q=${query}, modulo=${moduloId})}">Siguiente →</a>
             </nav>
         </main>
     </div>

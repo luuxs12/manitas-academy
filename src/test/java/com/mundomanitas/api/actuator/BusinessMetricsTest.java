@@ -15,11 +15,11 @@ class BusinessMetricsTest {
     @Test
     @DisplayName("todas las métricas usan el prefijo del proyecto")
     void publishesPrefixedCounters() {
-        metrics.checkoutStarted("MONTHLY");
-        metrics.paymentConfirmed("MONTHLY");
-        metrics.paymentFailed();
-        metrics.enrollmentCreated();
-        metrics.certificateIssued();
+        metrics.checkoutIniciado("MONTHLY");
+        metrics.pagoConfirmed("MONTHLY");
+        metrics.pagoFailed();
+        metrics.inscripcionCreado();
+        metrics.certificadoEmitido();
 
         assertThat(registry.get("mundomanitas.checkouts.started").counter().count()).isEqualTo(1);
         assertThat(registry.get("mundomanitas.payments.confirmed").counter().count()).isEqualTo(1);
@@ -32,9 +32,9 @@ class BusinessMetricsTest {
 
     @Test
     @DisplayName("separa las confirmaciones por plan sin revelar datos de la cuenta")
-    void tagsPaymentsByPlan() {
-        metrics.paymentConfirmed("MONTHLY");
-        metrics.paymentConfirmed("ANNUAL");
+    void tagsPaymentsPorPlan() {
+        metrics.pagoConfirmed("MONTHLY");
+        metrics.pagoConfirmed("ANNUAL");
 
         assertThat(registry.get("mundomanitas.payments.confirmed")
                 .tag("plan", "MONTHLY").counter().count()).isEqualTo(1);

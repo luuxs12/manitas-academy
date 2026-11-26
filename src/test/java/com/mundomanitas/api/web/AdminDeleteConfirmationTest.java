@@ -36,7 +36,7 @@ class AdminDeleteConfirmationTest {
 
     @Test
     @DisplayName("la página de confirmación sigue siendo el respaldo sin JS y conserva datos y CSRF")
-    void confirmationFallbackKeepsRealDataAndCsrf() throws IOException {
+    void confirmationFallbackKeepsRealDatosAndCsrf() throws IOException {
         String html = read("templates/admin/confirmar.html");
 
         assertThat(html).contains("id=\"confirm-panel\"")

@@ -20,7 +20,7 @@
                     <p>Se emiten al terminar un curso y están incluidos en los planes Premium.</p>
                 </div>
                 <a class="panel-plan panel-plan--link" th:href="@{/panel/facturacion}"
-                   th:text="${'Tu plan: ' + currentUser.planLabel()}">Tu plan: Gratis</a>
+                   th:text="${'Tu plan: ' + usuarioActual.planLabel()}">Tu plan: Gratis</a>
             </div>
 
 
@@ -31,7 +31,7 @@
                 </div>
 
                 <div class="panel-cert-grid" th:if="${!#lists.isEmpty(certificates)}">
-                    <article class="panel-cert" th:each="certificate : ${certificates}">
+                    <article class="panel-cert" th:each="certificado : ${certificates}">
                         <span class="panel-cert-icon" aria-hidden="true">
                             <svg class="ico" viewBox="0 0 24 24" focusable="false">
                                 <circle cx="12" cy="9" r="5"></circle>
@@ -39,20 +39,20 @@
                             </svg>
                         </span>
                         <div>
-                            <h3 th:text="${certificate.courseTitle()}"></h3>
-                            <p th:text="${certificate.videoCount() + ' videos · ' +
-                                #temporals.format(certificate.issuedAt(), 'dd/MM/yyyy')}">
+                            <h3 th:text="${certificado.cursoTitulo()}"></h3>
+                            <p th:text="${certificado.videoContar() + ' videos · ' +
+                                #temporals.format(certificado.fechaEmision(), 'dd/MM/yyyy')}">
                             </p>
-                            <span class="panel-cert-code" th:text="${certificate.code()}"></span>
+                            <span class="panel-cert-code" th:text="${certificado.code()}"></span>
                         </div>
                         <a class="btn btn-ghost"
-                           th:href="@{/panel/certificados/{slug}(slug=${certificate.courseSlug()})}">
+                           th:href="@{/panel/certificados/{slug}(slug=${certificado.cursoSlug()})}">
                             Ver certificado
                         </a>
                     </article>
                 </div>
 
-                <div class="panel-empty" th:if="${#lists.isEmpty(certificates) and currentUser.premium()}">
+                <div class="panel-empty" th:if="${#lists.isEmpty(certificates) and usuarioActual.premium()}">
                     <span class="panel-empty-icon" aria-hidden="true">
                         <svg class="ico" viewBox="0 0 24 24" focusable="false">
                             <circle cx="12" cy="9" r="5"></circle>
@@ -66,12 +66,12 @@
                     <a class="btn btn-ghost" th:href="@{/panel/cursos}">Ver mis cursos</a>
                 </div>
 
-                <div class="panel-upgrade" th:if="${!currentUser.premium()}">
-                    <strong th:if="${completed > 0}"
+                <div class="panel-upgrade" th:if="${!usuarioActual.premium()}">
+                    <strong th:if="${finalizado > 0}"
                             th:text="'Ya terminaste ' + completed + ' cursos. Los certificados son parte del plan Premium.'">
                         Ya terminaste cursos. Los certificados son parte del plan Premium.
                     </strong>
-                    <strong th:if="${completed == 0}">
+                    <strong th:if="${finalizado == 0}">
                         Los certificados se incluyen en los planes Premium.
                     </strong>
                     <a th:href="@{/panel/facturacion}">Ver planes</a>

@@ -1,10 +1,10 @@
 package com.mundomanitas.api.config;
 
-import com.mundomanitas.api.dto.RegisterForm;
-import com.mundomanitas.api.dto.admin.AdminCourseForm;
-import com.mundomanitas.api.dto.admin.AdminItemForm;
-import com.mundomanitas.api.dto.admin.AdminResourceForm;
-import com.mundomanitas.api.service.ContentLinks;
+import com.mundomanitas.api.dto.RegistroFormulario;
+import com.mundomanitas.api.dto.admin.AdminCursoFormulario;
+import com.mundomanitas.api.dto.admin.AdminItemFormulario;
+import com.mundomanitas.api.dto.admin.AdminRecursoFormulario;
+import com.mundomanitas.api.service.ContenidoEnlaces;
 import com.mundomanitas.api.service.YouTubeLink;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validator;
@@ -48,41 +48,41 @@ class InputValidationTest {
         @Test
         @DisplayName("Bean Validation rechaza campos vacíos, largos y con formato inválido")
         void beanValidationRejectsMalformedForms() {
-            RegisterForm registro = new RegisterForm();
-            registro.setFullName("a".repeat(121));
+            RegistroFormulario registro = new RegistroFormulario();
+            registro.setNombreCompleto("a".repeat(121));
             registro.setEmail("no-es-correo");
-            registro.setPassword("corta");
-            registro.setConfirmPassword("distinta");
+            registro.setContrasena("corta");
+            registro.setConfirmContrasena("distinta");
 
             assertThat(paths(validator.validate(registro)))
-                    .contains("fullName", "email", "password", "acceptTerms");
+                    .contains("nombreCompleto", "email", "contrasena", "acceptTerms");
 
-            AdminCourseForm course = new AdminCourseForm(
+            AdminCursoFormulario curso = new AdminCursoFormulario(
                     "Curso <script>", "Título", "Básico", false, "Programación",
                     "Resumen", "https://evil.example/portada.png", -1);
-            assertThat(paths(validator.validate(course)))
-                    .contains("slug", "image", "position");
+            assertThat(paths(validator.validate(curso)))
+                    .contains("slug", "imagen", "posicion");
 
-            AdminResourceForm resource = new AdminResourceForm(
+            AdminRecursoFormulario recurso = new AdminRecursoFormulario(
                     "Recurso", "javascript:alert(1)", 0);
-            assertThat(paths(validator.validate(resource))).contains("url");
+            assertThat(paths(validator.validate(recurso))).contains("url");
 
-            AdminItemForm item = new AdminItemForm(
+            AdminItemFormulario item = new AdminItemFormulario(
                     UUID.randomUUID(), null, "SCRIPT", "Ítem", null, null, null, -1, -1, false);
             assertThat(paths(validator.validate(item)))
-                    .contains("type", "durationSeconds", "position");
+                    .contains("type", "duracionSegundos", "posicion");
         }
 
         @Test
         @DisplayName("los enlaces solo aceptan https y YouTube valida el ID antes de embeder")
-        void linkHelpersRejectInjection() {
-            assertThat(ContentLinks.https("https://example.com/material", "enlace"))
+        void enlaceHelpersRejectInjection() {
+            assertThat(ContenidoEnlaces.https("https://example.com/material", "enlace"))
                     .isEqualTo("https://example.com/material");
-            assertThatThrownBy(() -> ContentLinks.https("javascript:alert(1)", "enlace"))
+            assertThatThrownBy(() -> ContenidoEnlaces.https("javascript:alert(1)", "enlace"))
                     .isInstanceOf(IllegalArgumentException.class);
-            assertThatThrownBy(() -> ContentLinks.https("http://example.com", "enlace"))
+            assertThatThrownBy(() -> ContenidoEnlaces.https("http://example.com", "enlace"))
                     .isInstanceOf(IllegalArgumentException.class);
-            assertThatThrownBy(() -> ContentLinks.https(
+            assertThatThrownBy(() -> ContenidoEnlaces.https(
                     "https://example.com/a\" onmouseover=\"alert(1)", "enlace"))
                     .isInstanceOf(IllegalArgumentException.class);
 
@@ -99,9 +99,9 @@ class InputValidationTest {
                     .getResources("classpath*:templates/**/*.html");
 
             assertThat(templates).isNotEmpty();
-            for (Resource template : templates) {
-                String html = new String(template.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
-                assertThat(html).as(template.getFilename()).doesNotContain("th:utext", "th:html");
+            for (Resource plantilla : templates) {
+                String html = new String(plantilla.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+                assertThat(html).as(plantilla.getFilename()).doesNotContain("th:utext", "th:html");
             }
         }
     }
@@ -112,23 +112,23 @@ class InputValidationTest {
 
         @Test
         @DisplayName("un registro sin contraseña muestra errores, no revienta")
-        void missingPasswordRendersErrors() throws Exception {
-            MvcResult result = registro("Ana Quispe", "ana@ejemplo.test", null, null);
+        void missingContrasenaRendersErrors() throws Exception {
+            MvcResult resultado = registro("Ana Quispe", "ana@ejemplo.test", null, null);
 
-            assertThat(result.getResponse().getStatus()).isEqualTo(200);
-            assertThat(result.getModelAndView().getViewName()).isEqualTo("auth/register");
-            assertThat(result.getResponse().getContentAsString())
+            assertThat(resultado.getResponse().getStatus()).isEqualTo(200);
+            assertThat(resultado.getModelAndView().getViewName()).isEqualTo("auth/register");
+            assertThat(resultado.getResponse().getContentAsString())
                     .contains("Elegí una contraseña.");
         }
 
         @Test
         @DisplayName("un restablecimiento sin contraseña muestra errores, no revienta")
-        void missingResetPasswordRendersErrors() throws Exception {
-            MvcResult result = restablecer(null, null);
+        void missingRestablecerContrasenaRendersErrors() throws Exception {
+            MvcResult resultado = restablecer(null, null);
 
-            assertThat(result.getResponse().getStatus()).isEqualTo(200);
-            assertThat(result.getModelAndView().getViewName()).isEqualTo("auth/reset-password");
-            assertThat(result.getResponse().getContentAsString())
+            assertThat(resultado.getResponse().getStatus()).isEqualTo(200);
+            assertThat(resultado.getModelAndView().getViewName()).isEqualTo("auth/reset-password");
+            assertThat(resultado.getResponse().getContentAsString())
                     .contains("Elegí una contraseña.");
         }
 
@@ -136,26 +136,26 @@ class InputValidationTest {
         @DisplayName("el markup enviado en el formulario se escapa en el HTML devuelto")
         void submittedMarkupIsEscaped() throws Exception {
             String payload = "<script>alert(1)</script>";
-            MvcResult result = registro(payload, "no-es-correo", "ClaveSegura2026!", "ClaveSegura2026!");
+            MvcResult resultado = registro(payload, "no-es-correo", "ClaveSegura2026!", "ClaveSegura2026!");
 
-            String html = result.getResponse().getContentAsString();
+            String html = resultado.getResponse().getContentAsString();
             assertThat(html).doesNotContain(payload);
             assertThat(html).contains("&lt;script&gt;alert(1)&lt;/script&gt;");
         }
     }
 
-    private MvcResult registro(String fullName, String email, String password, String confirmPassword)
+    private MvcResult registro(String nombreCompleto, String email, String contrasena, String confirmContrasena)
             throws Exception {
         MvcResult page = mvc.perform(get("/registro")).andReturn();
         MockHttpSession session = (MockHttpSession) page.getRequest().getSession(false);
         String token = csrfToken(page.getResponse().getContentAsString());
 
         var request = post("/registro").session(session).param("_csrf", token)
-                .param("fullName", fullName)
+                .param("nombreCompleto", nombreCompleto)
                 .param("email", email)
                 .param("acceptTerms", "true");
-        if (password != null) request.param("password", password);
-        if (confirmPassword != null) request.param("confirmPassword", confirmPassword);
+        if (contrasena != null) request.param("contrasena", contrasena);
+        if (confirmContrasena != null) request.param("confirmContrasena", confirmContrasena);
 
         return mvc.perform(request)
                 .andExpect(status().isOk())
@@ -163,7 +163,7 @@ class InputValidationTest {
                 .andReturn();
     }
 
-    private MvcResult restablecer(String password, String confirmPassword) throws Exception {
+    private MvcResult restablecer(String contrasena, String confirmContrasena) throws Exception {
         MvcResult page = mvc.perform(get("/registro")).andReturn();
         MockHttpSession session = (MockHttpSession) page.getRequest().getSession(false);
         String token = csrfToken(page.getResponse().getContentAsString());
@@ -171,8 +171,8 @@ class InputValidationTest {
         var request = post("/restablecer").session(session)
                 .param("_csrf", token)
                 .param("token", "token-de-prueba");
-        if (password != null) request.param("password", password);
-        if (confirmPassword != null) request.param("confirmPassword", confirmPassword);
+        if (contrasena != null) request.param("contrasena", contrasena);
+        if (confirmContrasena != null) request.param("confirmContrasena", confirmContrasena);
 
         return mvc.perform(request)
                 .andExpect(status().isOk())

@@ -1,8 +1,8 @@
 package com.mundomanitas.api.config;
 
-import com.mundomanitas.api.model.User;
-import com.mundomanitas.api.repository.UserRepository;
-import com.mundomanitas.api.security.AuthenticatedUser;
+import com.mundomanitas.api.model.Usuario;
+import com.mundomanitas.api.repository.UsuarioRepository;
+import com.mundomanitas.api.security.AutenticadoUsuario;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -36,9 +36,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class SecurityAccessTest {
 
     @Autowired private MockMvc mvc;
-    @Autowired private UserRepository users;
+    @Autowired private UsuarioRepository users;
     @Autowired private PasswordEncoder encoder;
-    @Autowired private UserDetailsService userDetails;
+    @Autowired private UserDetailsService usuarioDetails;
 
     @Nested
     @DisplayName("prueba de componentes")
@@ -46,17 +46,17 @@ class SecurityAccessTest {
 
         @Test
         @DisplayName("AuthenticatedUser publica el rol y respeta la cuenta activa")
-        void authoritiesFollowRole() {
-            User student = new User("componente@ejemplo.test", "hash", "Estudiante");
-            User admin = new User("componente-admin@ejemplo.test", "hash", "Administrador");
-            ReflectionTestUtils.setField(admin, "role", "ADMIN");
-            ReflectionTestUtils.setField(admin, "active", false);
+        void authoritiesFollowRol() {
+            Usuario estudiante = new Usuario("componente@ejemplo.test", "hash", "Estudiante");
+            Usuario admin = new Usuario("componente-admin@ejemplo.test", "hash", "Administrador");
+            ReflectionTestUtils.setField(admin, "rol", "ADMIN");
+            ReflectionTestUtils.setField(admin, "activo", false);
 
-            assertThat(new AuthenticatedUser(student).getAuthorities())
+            assertThat(new AutenticadoUsuario(estudiante).getAuthorities())
                     .extracting("authority").containsExactly("ROLE_STUDENT");
-            assertThat(new AuthenticatedUser(student).isEnabled()).isTrue();
+            assertThat(new AutenticadoUsuario(estudiante).isEnabled()).isTrue();
 
-            AuthenticatedUser inactiveAdmin = new AuthenticatedUser(admin);
+            AutenticadoUsuario inactiveAdmin = new AutenticadoUsuario(admin);
             assertThat(inactiveAdmin.getAuthorities())
                     .extracting("authority").containsExactly("ROLE_ADMIN");
             assertThat(inactiveAdmin.isEnabled()).isFalse();
@@ -69,12 +69,12 @@ class SecurityAccessTest {
 
         @Test
         @DisplayName("UserDetailsService lee cuentas reales sin distinguir mayúsculas")
-        void userDetailsReadsRealAccount() {
-            var found = userDetails.loadUserByUsername("ADMIN@damianprint.com");
+        void usuarioDetailsReadsRealCuenta() {
+            var found = usuarioDetails.loadUserByUsername("ADMIN@damianprint.com");
 
             assertThat(found.getAuthorities()).extracting("authority").contains("ROLE_ADMIN");
             assertThat(found.isEnabled()).isTrue();
-            assertThatThrownBy(() -> userDetails.loadUserByUsername("nadie@ejemplo.test"))
+            assertThatThrownBy(() -> usuarioDetails.loadUserByUsername("nadie@ejemplo.test"))
                     .isInstanceOf(UsernameNotFoundException.class);
         }
 
@@ -95,10 +95,10 @@ class SecurityAccessTest {
         @Test
         @DisplayName("los roles no se cruzan entre paneles")
         void rolesAreIsolated() throws Exception {
-            mvc.perform(get("/panel").with(authenticatedAs("STUDENT"))).andExpect(status().isOk());
-            mvc.perform(get("/admin").with(authenticatedAs("STUDENT"))).andExpect(status().isForbidden());
-            mvc.perform(get("/admin").with(authenticatedAs("ADMIN"))).andExpect(status().isOk());
-            mvc.perform(get("/panel").with(authenticatedAs("ADMIN"))).andExpect(status().isForbidden());
+            mvc.perform(get("/panel").with(autenticadoAs("STUDENT"))).andExpect(status().isOk());
+            mvc.perform(get("/admin").with(autenticadoAs("STUDENT"))).andExpect(status().isForbidden());
+            mvc.perform(get("/admin").with(autenticadoAs("ADMIN"))).andExpect(status().isOk());
+            mvc.perform(get("/panel").with(autenticadoAs("ADMIN"))).andExpect(status().isForbidden());
         }
 
         @Test
@@ -108,12 +108,12 @@ class SecurityAccessTest {
             MockHttpSession session = (MockHttpSession) page.getRequest().getSession(false);
             String token = csrfToken(page.getResponse().getContentAsString());
 
-            mvc.perform(post("/logout").session(session).with(authenticatedAs("ADMIN")))
+            mvc.perform(post("/logout").session(session).with(autenticadoAs("ADMIN")))
                     .andExpect(status().isForbidden());
 
             mvc.perform(post("/logout").session(session)
                             .param("_csrf", token)
-                            .with(authenticatedAs("ADMIN")))
+                            .with(autenticadoAs("ADMIN")))
                     .andExpect(status().is3xxRedirection());
         }
     }
@@ -124,10 +124,10 @@ class SecurityAccessTest {
 
         @Test
         @DisplayName("el login real lleva a cada panel según el rol de la cuenta")
-        void formLoginGrantsPanelByRole() throws Exception {
+        void formularioLoginGrantsPanelPorRol() throws Exception {
             String clave = "ClaveSegura2026!";
-            User estudiante = cuenta("seguridad-estudiante@ejemplo.test", clave, "STUDENT");
-            User administrador = cuenta("seguridad-admin@ejemplo.test", clave, "ADMIN");
+            Usuario estudiante = cuenta("seguridad-estudiante@ejemplo.test", clave, "STUDENT");
+            Usuario administrador = cuenta("seguridad-admin@ejemplo.test", clave, "ADMIN");
 
             assertThat(login(estudiante.getEmail(), clave)).isEqualTo("/panel");
             assertThat(login(administrador.getEmail(), clave)).isEqualTo("/admin");
@@ -136,16 +136,16 @@ class SecurityAccessTest {
         @Test
         @DisplayName("una clave incorrecta o una cuenta inexistente no abren sesión")
         void badCredentialsStayOut() throws Exception {
-            User estudiante = cuenta("seguridad-rechazo@ejemplo.test", "ClaveSegura2026!", "STUDENT");
+            Usuario estudiante = cuenta("seguridad-rechazo@ejemplo.test", "ClaveSegura2026!", "STUDENT");
 
             assertThat(login(estudiante.getEmail(), "Incorrecta123")).contains("login").contains("error");
             assertThat(login("nadie@ejemplo.test", "ClaveSegura2026!")).contains("login").contains("error");
         }
     }
 
-    private User cuenta(String email, String clave, String role) {
-        User cuenta = new User(email, encoder.encode(clave), "Prueba de seguridad");
-        ReflectionTestUtils.setField(cuenta, "role", role);
+    private Usuario cuenta(String email, String clave, String rol) {
+        Usuario cuenta = new Usuario(email, encoder.encode(clave), "Prueba de seguridad");
+        ReflectionTestUtils.setField(cuenta, "rol", rol);
         return users.save(cuenta);
     }
 
@@ -154,13 +154,13 @@ class SecurityAccessTest {
         MockHttpSession session = (MockHttpSession) page.getRequest().getSession(false);
         String token = csrfToken(page.getResponse().getContentAsString());
 
-        MvcResult result = mvc.perform(post("/login").session(session)
+        MvcResult resultado = mvc.perform(post("/login").session(session)
                         .param("_csrf", token)
                         .param("username", email)
                         .param("password", clave))
                 .andExpect(status().is3xxRedirection())
                 .andReturn();
-        return result.getResponse().getRedirectedUrl();
+        return resultado.getResponse().getRedirectedUrl();
     }
 
     private String redirectOf(org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder request)
@@ -176,12 +176,12 @@ class SecurityAccessTest {
         return matcher.group(1);
     }
 
-    private RequestPostProcessor authenticatedAs(String role) {
-        String email = "ADMIN".equals(role)
+    private RequestPostProcessor autenticadoAs(String rol) {
+        String email = "ADMIN".equals(rol)
                 ? "admin@damianprint.com"
                 : "luisfernandocastrodamian8@gmail.com";
-        AuthenticatedUser principal = users.findByEmailIgnoreCase(email)
-                .map(AuthenticatedUser::new)
+        AutenticadoUsuario principal = users.buscarPorEmailIgnorandoMayusculas(email)
+                .map(AutenticadoUsuario::new)
                 .orElseThrow(() -> new AssertionError("falta la cuenta de prueba " + email));
 
         return request -> {

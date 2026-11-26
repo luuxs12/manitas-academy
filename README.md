@@ -145,6 +145,10 @@ La base se crea una sola vez; las tablas las crea Flyway al arrancar.
 Se pueden pisar con variables de entorno: `DATABASE_URL`, `DB_USER`,
 `DB_PASSWORD` y `REMEMBER_ME_KEY`.
 
+Con `ADMIN_PASSWORD` (y opcionalmente `ADMIN_EMAIL`) la app crea al arrancar la
+cuenta ADMIN si no existe; si ya existe con otro rol la promueve, sin cambiarle
+la clave. Sin esa variable no se crea ni se modifica ninguna cuenta.
+
 Las migraciones van de `V1__accounts.sql` a
 `V14__estructura_contenido.sql`: cuentas, recuperación, cursos e inscripciones,
 módulos de cuenta, administración, videos privados, progreso, publicación y la

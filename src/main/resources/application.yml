@@ -36,6 +36,9 @@ server:
         same-site: lax
 
 app:
+  admin:
+    email: ${ADMIN_EMAIL:admin@damianprint.com}
+    password: ${ADMIN_PASSWORD:}
   security:
     remember-me-key: ${REMEMBER_ME_KEY:mundo-manitas-dev-key}
   rate-limit:

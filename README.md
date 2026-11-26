@@ -399,13 +399,11 @@ consigna. La guía de carga está en
 
 Falta: intérprete en LSP y subtítulos propios sincronizados dentro del
 reproductor; la velocidad y el tamaño de subtítulos son preferencias guardadas,
-pero YouTube controla su presentación. El reparto de tareas está en
-[`REGLAS-EQUIPO.txt`](REGLAS-EQUIPO.txt).
+pero YouTube controla su presentación.
 
 ## Para contribuir
 
-1. Leé [`REGLAS-EQUIPO.txt`](REGLAS-EQUIPO.txt) y
-   [`docs/git-conventions.md`](docs/git-conventions.md).
+1. Leé [`docs/git-conventions.md`](docs/git-conventions.md).
 2. Trabajá en una rama `feature/...` o `fix/...`; `main` queda siempre estable.
 3. Antes de abrir el merge: `.\mvnw.cmd test` y una mirada al render en 1440 px y
    390 px.

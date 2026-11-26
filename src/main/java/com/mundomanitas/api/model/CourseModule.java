@@ -63,10 +63,6 @@ public class CourseModule {
         return visible;
     }
 
-    public void setVisible(boolean visible) {
-        this.visible = visible;
-    }
-
     public OffsetDateTime getCreatedAt() {
         return createdAt;
     }

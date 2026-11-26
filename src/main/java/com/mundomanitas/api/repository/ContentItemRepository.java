@@ -12,8 +12,6 @@ public interface ContentItemRepository extends JpaRepository<ContentItem, UUID> 
 
     List<ContentItem> findByModuleIdOrderByPositionAsc(UUID moduleId);
 
-    List<ContentItem> findBySectionIdOrderByPositionAsc(UUID sectionId);
-
     ContentItem findBySourceTypeAndSourceId(String sourceType, UUID sourceId);
 
     @Query("""

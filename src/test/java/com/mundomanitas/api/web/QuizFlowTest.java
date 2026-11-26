@@ -2,7 +2,6 @@ package com.mundomanitas.api.web;
 
 import com.mundomanitas.api.dto.admin.AdminCourseForm;
 import com.mundomanitas.api.dto.admin.AdminModuleForm;
-import com.mundomanitas.api.model.ContentItem;
 import com.mundomanitas.api.model.Enrollment;
 import com.mundomanitas.api.model.User;
 import com.mundomanitas.api.repository.ContentItemRepository;

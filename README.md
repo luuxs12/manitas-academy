@@ -13,7 +13,7 @@ Aprendé a tu ritmo, con intérprete y subtítulos en cada clase.
 ![Thymeleaf](https://img.shields.io/badge/Thymeleaf-3-0d0d0d)
 ![PostgreSQL 18](https://img.shields.io/badge/PostgreSQL-18-0d0d0d)
 ![Flyway](https://img.shields.io/badge/Flyway-migraciones-0d0d0d)
-![Tests](https://img.shields.io/badge/tests-308_en_verde-00a63e)
+![Tests](https://img.shields.io/badge/tests-328_en_verde-00a63e)
 
 </div>
 
@@ -418,12 +418,13 @@ puede pasar el marcado a manual desde `/admin/ejercicios`. La guía de carga est
 en [`docs/guia-administrador-contenido.md`](docs/guia-administrador-contenido.md).
 
 El sidebar incluye **Monitoreo**, entre Reportes y Auditoría. Es una consola
-operativa con reloj en vivo, sondeo cada 2 segundos, KPIs con tendencia y
-sparklines, tráfico apilado por tipo de respuesta, bandas p50/p95/p99, mapa de
-calor por minuto, feed de respuestas recientes, rutas calientes, caídas con su
-`requestId` y actividad real de PostgreSQL. La vista consulta
-`/admin/api/monitoreo`; el JSON sale del buffer de peticiones del servidor, no
-de un `fetch` a Actuator desde el navegador.
+operativa con reloj en vivo, sondeo cada 2 segundos, CPU y memoria reales del
+proceso con curvas que se desplazan como el Administrador de tareas, KPIs con
+tendencia, tráfico en áreas apiladas, bandas p50/p95/p99, mapa de calor por
+minuto, feed de respuestas recientes, rutas calientes, caídas con su `requestId`
+y actividad real de PostgreSQL. La vista consulta `/admin/api/monitoreo`; el
+JSON sale del buffer de peticiones del servidor, no de un `fetch` a Actuator
+desde el navegador.
 
 Falta: intérprete en LSP y subtítulos propios sincronizados dentro del
 reproductor; los videos en señas son ítems independientes y la velocidad y el

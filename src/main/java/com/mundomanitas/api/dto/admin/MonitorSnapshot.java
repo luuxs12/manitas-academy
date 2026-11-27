@@ -37,6 +37,10 @@ public record MonitorSnapshot(
         List<Servicio> servicios,
         List<Evento> eventos,
         List<Evento> recientes,
+        double cpu,
+        double memoria,
+        List<Double> serieCpu,
+        List<Double> serieMemoria,
         Actividad actividad,
         List<ActividadDia> actividadDiaria
 ) {

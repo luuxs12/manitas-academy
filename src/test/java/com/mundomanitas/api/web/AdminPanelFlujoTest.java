@@ -694,6 +694,7 @@ class AdminPanelFlujoTest {
                 List.of(new MonitorSnapshot.Servicio(
                         "Base de datos", "PostgreSQL responde", true)),
                 List.of(), List.of(),
+                12.5, 35.5, List.of(10.0, 12.5), List.of(34.0, 35.5),
                 new MonitorSnapshot.Actividad(6, 3, 5, 7, 2, 1, 4, 1),
                 List.of(new MonitorSnapshot.ActividadDia("26/11", 5, 4, 1)));
     }

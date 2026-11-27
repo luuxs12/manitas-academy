@@ -10,6 +10,7 @@ import com.mundomanitas.api.service.PagoService;
 import org.springframework.stereotype.Service;
 
 import java.lang.management.ManagementFactory;
+import java.lang.management.ThreadMXBean;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.OffsetDateTime;
@@ -34,6 +35,7 @@ public class MonitorService {
 
     private static final int VENTANA_MINUTOS = 30;
     private static final int MAX_MUESTRAS = 5000;
+    private static final int MAX_RECURSOS = 60;
     private static final int CACHE_SEGUNDOS = 10;
     private static final DateTimeFormatter HORA = DateTimeFormatter.ofPattern("HH:mm:ss");
     private static final DateTimeFormatter ETIQUETA = DateTimeFormatter.ofPattern("HH:mm");
@@ -43,6 +45,10 @@ public class MonitorService {
     private final PagoService pagos;
     private final CorreoService correo;
     private final ConcurrentLinkedQueue<MonitorMuestra> muestras = new ConcurrentLinkedQueue<>();
+    private final ConcurrentLinkedQueue<RecursoMuestra> recursos = new ConcurrentLinkedQueue<>();
+    private final ThreadMXBean threads = ManagementFactory.getThreadMXBean();
+    private volatile long cpuTiempoAnterior = -1;
+    private volatile Instant cpuInstanteAnterior;
 
     private volatile DatosBase cache;
     private volatile Instant cacheHasta = Instant.EPOCH;
@@ -63,6 +69,14 @@ public class MonitorService {
     public MonitorSnapshot snapshot() {
         Instant ahora = Instant.now();
         recortar(ahora);
+
+        // Cada sondeo añade una muestra real de CPU y memoria para el gráfico en vivo.
+        double cpu = cpu();
+        double memoria = memoriaUso();
+        recursos.add(new RecursoMuestra(ahora, redondear(cpu), redondear(memoria)));
+        recortarRecursos(ahora);
+        List<Double> serieCpu = recursos.stream().map(RecursoMuestra::cpu).toList();
+        List<Double> serieMemoria = recursos.stream().map(RecursoMuestra::memoria).toList();
 
         // Media ventana alineada al minuto: cada barra del gráfico es un minuto real.
         Instant desde = ahora.truncatedTo(ChronoUnit.MINUTES)
@@ -171,9 +185,13 @@ public class MonitorService {
                 serieLatenciaP99,
                 rutas(ventana),
                 incidentes,
-                servicios(ahora, dbOk),
+                servicios(ahora, dbOk, cpu, memoria),
                 eventos(ventana),
                 recientes(ventana),
+                redondear(cpu),
+                redondear(memoria),
+                serieCpu,
+                serieMemoria,
                 new MonitorSnapshot.Actividad(base.activos(),
                         base.conteos().altas(), base.conteos().matriculas(), base.conteos().lecciones(),
                         base.conteos().cuestionariosAprobados(), base.conteos().certificados(),
@@ -243,11 +261,11 @@ public class MonitorService {
         return resultado;
     }
 
-    private List<MonitorSnapshot.Servicio> servicios(Instant ahora, boolean dbOk) {
-        Runtime runtime = Runtime.getRuntime();
-        long maxMb = runtime.maxMemory() / (1024 * 1024);
-        long usedMb = (runtime.totalMemory() - runtime.freeMemory()) / (1024 * 1024);
-        int usoMemoria = maxMb == 0 ? 0 : (int) Math.min(100, Math.round(usedMb * 100.0 / maxMb));
+    private List<MonitorSnapshot.Servicio> servicios(Instant ahora, boolean dbOk,
+                                                     double cpu, double memoria) {
+        long maxMb = Runtime.getRuntime().maxMemory() / (1024 * 1024);
+        int usoCpu = (int) Math.round(cpu);
+        int usoMemoria = (int) Math.round(memoria);
         long horas = ManagementFactory.getRuntimeMXBean().getUptime() / 3_600_000;
 
         return List.of(
@@ -257,6 +275,9 @@ public class MonitorService {
                         pagos.isEnabled() ? "Stripe configurado" : "Stripe sin configurar", true),
                 new MonitorSnapshot.Servicio("Correo",
                         correo.isEnabled() ? "Resend configurado" : "Resend sin configurar", true),
+                new MonitorSnapshot.Servicio("CPU del proceso",
+                        usoCpu + "% sobre " + Runtime.getRuntime().availableProcessors() + " núcleos",
+                        usoCpu < 95),
                 new MonitorSnapshot.Servicio("Memoria",
                         usoMemoria + "% de " + maxMb + " MB en uso", usoMemoria < 90),
                 new MonitorSnapshot.Servicio("Servidor", "Activo desde hace " + horas + " h", true));
@@ -325,6 +346,57 @@ public class MonitorService {
         }
     }
 
+    private void recortarRecursos(Instant ahora) {
+        Instant limite = ahora.minus(2, ChronoUnit.MINUTES);
+        recursos.removeIf(muestra -> muestra.tiempo().isBefore(limite));
+        while (recursos.size() > MAX_RECURSOS && recursos.poll() != null) {
+            // Se conserva solo el último minuto de muestreo en vivo.
+        }
+    }
+
+    /** CPU real del proceso: tiempo de CPU de todos los hilos entre dos sondeos. */
+    private double cpu() {
+        if (!threads.isThreadCpuTimeSupported()) return 0;
+        if (!threads.isThreadCpuTimeEnabled()) {
+            try {
+                threads.setThreadCpuTimeEnabled(true);
+            } catch (SecurityException exception) {
+                return 0;
+            }
+        }
+        long tiempo = 0;
+        for (long id : threads.getAllThreadIds()) {
+            try {
+                long parcial = threads.getThreadCpuTime(id);
+                if (parcial > 0) tiempo += parcial;
+            } catch (IllegalArgumentException | SecurityException exception) {
+                // El hilo terminó entre la lectura de ids y su tiempo: se ignora.
+            }
+        }
+        Instant ahora = Instant.now();
+        long anterior = cpuTiempoAnterior;
+        Instant instanteAnterior = cpuInstanteAnterior;
+        cpuTiempoAnterior = tiempo;
+        cpuInstanteAnterior = ahora;
+        if (anterior < 0 || instanteAnterior == null) return 0;
+        long transcurrido = instanteAnterior.until(ahora, ChronoUnit.NANOS);
+        if (transcurrido <= 0) return 0;
+        double nucleos = Math.max(1, Runtime.getRuntime().availableProcessors());
+        return Math.max(0, Math.min(100, (tiempo - anterior) * 100.0 / transcurrido / nucleos));
+    }
+
+    /** Porcentaje real de la memoria JVM asignada respecto al máximo disponible. */
+    private double memoriaUso() {
+        long maximo = Runtime.getRuntime().maxMemory();
+        if (maximo <= 0) return 0;
+        long usada = Runtime.getRuntime().totalMemory() - Runtime.getRuntime().freeMemory();
+        return Math.max(0, Math.min(100, usada * 100.0 / maximo));
+    }
+
+    private double redondear(double valor) {
+        return Math.round(valor * 10) / 10.0;
+    }
+
     private long contar(List<MonitorMuestra> muestras, int desde, int hasta) {
         return muestras.stream()
                 .filter(muestra -> muestra.estado() >= desde && muestra.estado() < hasta)
@@ -361,6 +433,9 @@ public class MonitorService {
     }
 
     private record Clave(String metodo, String ruta) {
+    }
+
+    private record RecursoMuestra(Instant tiempo, double cpu, double memoria) {
     }
 
     private record DatosBase(ConteoMonitor conteos, long activos,

@@ -133,9 +133,10 @@ anterior no se pierde.
 
 En el sidebar, entre **Reportes** y **Auditoría**, está **Monitoreo**. Esa vista
 es una consola en vivo: reloj y sondeo cada 2 segundos, disponibilidad, ritmo
-actual, tráfico por tipo de respuesta, latencia p50/p95/p99, mapa de calor por
-minuto, rutas más solicitadas, feed de respuestas y actividad real (altas,
-matrículas, lecciones, cuestionarios aprobados, certificados y pagos). Las caídas
+actual, CPU y memoria del proceso con curvas que se desplazan, tráfico por tipo
+de respuesta, latencia p50/p95/p99, mapa de calor por minuto, rutas más
+solicitadas, feed de respuestas y actividad real (altas, matrículas, lecciones,
+cuestionarios aprobados, certificados y pagos). Las caídas
 se detectan por respuestas `5xx` o por fallo de PostgreSQL, y los eventos
 conservan el `requestId` de los logs.
 

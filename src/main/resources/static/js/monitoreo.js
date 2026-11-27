@@ -7,14 +7,28 @@
 
     const SVG = "http://www.w3.org/2000/svg";
     const INTERVALO = 2000;
-    const IZQUIERDA = 48;
-    const DERECHA = 930;
-    const ARRIBA = 30;
-    const ABAJO = 210;
+    const CONFIG = { izquierda: 48, derecha: 930, arriba: 30, abajo: 210 };
+    const CONFIG_ACTIVIDAD = { izquierda: 40, derecha: 860, arriba: 40, abajo: 210 };
+    const CONFIG_RECURSO = { izquierda: 8, derecha: 292, arriba: 12, abajo: 112 };
+    const MUESTRAS_RECURSO = 60;
+    const SELECTORES_RECURSO = {
+        cpu: {
+            area: "[data-area-cpu]", linea: "[data-linea-cpu]",
+            grafico: "[data-grafico-cpu]", crosshair: "[data-crosshair-cpu]",
+            campo: "serieCpu", nombre: "CPU del proceso"
+        },
+        memoria: {
+            area: "[data-area-memoria]", linea: "[data-linea-memoria]",
+            grafico: "[data-grafico-memoria]", crosshair: "[data-crosshair-memoria]",
+            campo: "serieMemoria", nombre: "Memoria JVM"
+        }
+    };
     const uno = (selector) => root.querySelector(selector);
+    const f = (valor) => numero(valor).toFixed(1);
     let busy = false;
     let pausado = false;
     let ultimaCarga = 0;
+    let instantanea = null;
 
     const numero = (valor) => {
         const parsed = Number(valor);
@@ -68,30 +82,56 @@
         badge.className = "monitor-live-badge is-" + nivel;
     };
 
-    const xDe = (indice, total) => IZQUIERDA + indice * (DERECHA - IZQUIERDA) / Math.max(1, total - 1);
+    const alinear = (valores, total) => Array.from(
+            { length: total }, (_, indice) => numero(Array.isArray(valores) ? valores[indice] : 0));
 
-    const puntosDe = (valores, tope) => valores.map((valor, indice) =>
-            xDe(indice, valores.length).toFixed(1) + "," + (ABAJO - valor * (ABAJO - ARRIBA) / tope).toFixed(1)
-    ).join(" ");
+    const xEn = (indice, total, config) => config.izquierda
+            + indice * (config.derecha - config.izquierda) / Math.max(1, total - 1);
 
-    const areaDe = (valores, tope) => {
-        if (!valores.length) return "";
-        const puntos = valores.map((valor, indice) =>
-                xDe(indice, valores.length).toFixed(1) + " "
-                + (ABAJO - valor * (ABAJO - ARRIBA) / tope).toFixed(1));
-        return "M " + puntos[0] + " L " + puntos.slice(1).join(" L ")
-                + " L " + xDe(valores.length - 1, valores.length).toFixed(1) + " " + ABAJO
-                + " L " + IZQUIERDA + " " + ABAJO + " Z";
+    const coordsDe = (valores, tope, config) => valores.map((valor, indice) => ({
+        x: xEn(indice, valores.length, config),
+        y: config.abajo - valor * (config.abajo - config.arriba) / tope
+    }));
+
+    const curva = (puntos, inicial = "M") => {
+        if (!puntos.length) return "";
+        if (puntos.length === 1) return inicial + " " + f(puntos[0].x) + " " + f(puntos[0].y);
+        let trazo = inicial + " " + f(puntos[0].x) + " " + f(puntos[0].y);
+        for (let indice = 0; indice < puntos.length - 1; indice++) {
+            const anterior = puntos[indice - 1] || puntos[indice];
+            const actual = puntos[indice];
+            const siguiente = puntos[indice + 1];
+            const posterior = puntos[indice + 2] || siguiente;
+            trazo += " C "
+                    + f(actual.x + (siguiente.x - anterior.x) / 6) + " "
+                    + f(actual.y + (siguiente.y - anterior.y) / 6) + " "
+                    + f(siguiente.x - (posterior.x - actual.x) / 6) + " "
+                    + f(siguiente.y - (posterior.y - actual.y) / 6) + " "
+                    + f(siguiente.x) + " " + f(siguiente.y);
+        }
+        return trazo;
     };
 
-    const ejeX = (grupo, etiquetas) => {
+    const areaDe = (puntos, config) => {
+        if (!puntos.length) return "";
+        const primero = puntos[0];
+        const ultimo = puntos[puntos.length - 1];
+        return curva(puntos) + " L " + f(ultimo.x) + " " + config.abajo
+                + " L " + f(primero.x) + " " + config.abajo + " Z";
+    };
+
+    const bandaDe = (superior, inferior) => superior.length
+            ? curva(superior) + " " + curva([...inferior].reverse(), "L") + " Z"
+            : "";
+
+    const ejeX = (grupo, etiquetas, config = CONFIG) => {
         if (!grupo) return;
         grupo.replaceChildren();
         etiquetas.forEach((etiqueta, indice) => {
             if (indice % 5 !== 0 && indice !== etiquetas.length - 1) return;
             const textoEje = svg("text", {
-                x: xDe(indice, etiquetas.length).toFixed(1),
-                y: 238
+                x: f(xEn(indice, etiquetas.length, config)),
+                y: config === CONFIG_ACTIVIDAD ? 235 : 238
             });
             textoEje.textContent = etiqueta;
             grupo.append(textoEje);
@@ -113,106 +153,94 @@
     };
 
     const trafico = (datos) => {
-        const grupo = uno("[data-barras-trafico]");
-        const linea = uno("[data-linea-trafico]");
-        const area = uno("[data-area-trafico]");
-        const puntos = uno("[data-puntos-trafico]");
-        if (!grupo) return;
-
         const etiquetas = Array.isArray(datos.etiquetas) ? datos.etiquetas : [];
-        const exitosas = serie(datos.serieExitosas);
-        const redirecciones = serie(datos.serieRedirecciones);
-        const cliente = serie(datos.serieErroresCliente);
-        const servidor = serie(datos.serieErroresServidor);
-        const totales = etiquetas.map((_, indice) => [
-            numero(exitosas[indice]), numero(redirecciones[indice]),
-            numero(cliente[indice]), numero(servidor[indice])
-        ].reduce((suma, valor) => suma + valor, 0));
-        const tope = Math.max(1, ...totales);
-        const escala = (ABAJO - ARRIBA) / tope;
-        const ancho = (DERECHA - IZQUIERDA) / Math.max(1, etiquetas.length);
-        const barra = Math.min(22, ancho * .62);
+        const total = etiquetas.length;
+        const exito = alinear(datos.serieExitosas, total);
+        const redirect = alinear(datos.serieRedirecciones, total);
+        const cliente = alinear(datos.serieErroresCliente, total);
+        const servidor = alinear(datos.serieErroresServidor, total);
+        const tope = Math.max(1, ...exito, ...redirect, ...cliente, ...servidor);
 
-        grupo.replaceChildren();
-        if (puntos) puntos.replaceChildren();
-        etiquetas.forEach((etiqueta, indice) => {
-            const centro = IZQUIERDA + ancho * (indice + .5);
-            const segmentos = [
-                [exitosas[indice], "ok", "2xx"],
-                [redirecciones[indice], "redirect", "3xx"],
-                [cliente[indice], "warn", "4xx"],
-                [servidor[indice], "bad", "5xx"]
-            ];
-            let acumulado = 0;
-            for (const [valor, nivel, nombre] of segmentos) {
-                const cantidad = numero(valor);
-                if (cantidad <= 0) continue;
-                const altura = Math.max(1.5, cantidad * escala);
-                const rect = svg("rect", {
-                    x: (centro - barra / 2).toFixed(1),
-                    y: (ABAJO - (acumulado + cantidad) * escala).toFixed(1),
-                    width: barra.toFixed(1),
-                    height: altura.toFixed(1),
-                    rx: 2,
-                    "class": "monitor-barra is-" + nivel
-                });
-                rect.append(titulo(etiqueta + " · " + nombre + ": " + cantidad));
-                grupo.append(rect);
-                acumulado += cantidad;
+        let inferior = new Array(total).fill(0);
+        for (const capa of [
+            ["ok", exito], ["redirect", redirect], ["warn", cliente], ["bad", servidor]
+        ]) {
+            const superior = inferior.map((base, indice) => base + capa[1][indice]);
+            const path = uno('[data-capa-trafico="' + capa[0] + '"]');
+            if (path) {
+                path.setAttribute("d", bandaDe(
+                        coordsDe(superior, tope, CONFIG), coordsDe(inferior, tope, CONFIG)));
             }
-            if (totales[indice] > 0 && puntos) {
+            inferior = superior;
+        }
+        const totales = inferior;
+        const puntosCurva = coordsDe(totales, tope, CONFIG);
+        const linea = uno("[data-linea-trafico]");
+        if (linea) linea.setAttribute("d", curva(puntosCurva));
+
+        const puntos = uno("[data-puntos-trafico]");
+        if (puntos) {
+            puntos.replaceChildren();
+            puntosCurva.forEach((punto, indice) => {
+                if (totales[indice] <= 0) return;
                 const circulo = svg("circle", {
-                    cx: centro.toFixed(1),
-                    cy: (ABAJO - totales[indice] * escala).toFixed(1),
-                    r: 3.2,
-                    "class": "monitor-punto"
+                    cx: f(punto.x), cy: f(punto.y), r: 3, "class": "monitor-punto"
                 });
-                circulo.append(titulo(etiqueta + " · " + totales[indice] + " peticiones"));
+                circulo.append(titulo((etiquetas[indice] || "") + " · " + totales[indice] + " peticiones"));
                 puntos.append(circulo);
-            }
-        });
+            });
+        }
 
-        if (linea) linea.setAttribute("points", puntosDe(totales, tope));
-        if (area) area.setAttribute("d", areaDe(totales, tope));
         texto("[data-eje-trafico-max]", tope + " req/min");
         ejeX(uno("[data-eje-trafico]"), etiquetas);
         const grafico = uno("[data-grafico-trafico]");
         if (grafico) {
-            grafico.setAttribute("aria-label", "Peticiones por minuto en los últimos 30 minutos. Máximo "
+            grafico.setAttribute("aria-label", "Flujo de peticiones por minuto en los últimos 30 minutos. Máximo "
                     + tope + " por minuto.");
         }
     };
 
     const latencia = (datos) => {
         const etiquetas = Array.isArray(datos.etiquetas) ? datos.etiquetas : [];
-        const p50 = serie(datos.serieLatenciaP50);
-        const p95 = serie(datos.serieLatencia);
-        const p99 = serie(datos.serieLatenciaP99);
+        const total = etiquetas.length;
+        const p50 = alinear(datos.serieLatenciaP50, total);
+        const p95 = alinear(datos.serieLatencia, total);
+        const p99 = alinear(datos.serieLatenciaP99, total);
         const tope = Math.max(1, ...p50, ...p95, ...p99);
-        const puntos = uno("[data-puntos-latencia]");
+        const curvas = {
+            p50: coordsDe(p50, tope, CONFIG),
+            p95: coordsDe(p95, tope, CONFIG),
+            p99: coordsDe(p99, tope, CONFIG)
+        };
 
-        for (const [selector, valores] of [
-            ["[data-linea-latencia-p50]", p50],
-            ["[data-linea-latencia]", p95],
-            ["[data-linea-latencia-p99]", p99]
+        for (const [selector, nombre] of [
+            ["[data-banda-p50-p95]", "p50-p95"], ["[data-banda-p95-p99]", "p95-p99"]
+        ]) {
+            const banda = uno(selector);
+            if (banda) {
+                const [inferior, superior] = nombre.split("-");
+                banda.setAttribute("d", bandaDe(curvas[superior], curvas[inferior]));
+            }
+        }
+        for (const [selector, nombre] of [
+            ["[data-linea-latencia-p50]", "p50"],
+            ["[data-linea-latencia]", "p95"],
+            ["[data-linea-latencia-p99]", "p99"]
         ]) {
             const linea = uno(selector);
-            if (linea) linea.setAttribute("points", puntosDe(valores, tope));
+            if (linea) linea.setAttribute("d", curva(curvas[nombre]));
         }
-        const area = uno("[data-area-latencia]");
-        if (area) area.setAttribute("d", areaDe(p95, tope));
 
+        const puntos = uno("[data-puntos-latencia]");
         if (puntos) {
             puntos.replaceChildren();
-            p95.forEach((valor, indice) => {
-                if (valor <= 0) return;
+            curvas.p95.forEach((punto, indice) => {
+                if (p95[indice] <= 0) return;
                 const circulo = svg("circle", {
-                    cx: xDe(indice, p95.length).toFixed(1),
-                    cy: (ABAJO - valor * (ABAJO - ARRIBA) / tope).toFixed(1),
-                    r: 3.2,
+                    cx: f(punto.x), cy: f(punto.y), r: 3.1,
                     "class": "monitor-punto monitor-punto--latencia"
                 });
-                circulo.append(titulo((etiquetas[indice] || "") + " · p95 " + valor + " ms"));
+                circulo.append(titulo((etiquetas[indice] || "") + " · p95 " + p95[indice] + " ms"));
                 puntos.append(circulo);
             });
         }
@@ -221,7 +249,7 @@
         ejeX(uno("[data-eje-latencia]"), etiquetas);
         const grafico = uno("[data-grafico-latencia]");
         if (grafico) {
-            grafico.setAttribute("aria-label", "Percentiles de latencia por minuto en los últimos 30 minutos. Máximo "
+            grafico.setAttribute("aria-label", "Dispersión de latencia por minuto en los últimos 30 minutos. Máximo "
                     + tope + " milisegundos.");
         }
     };
@@ -241,14 +269,16 @@
             const fallos = numero(errores[indice]);
             const latencia = numero(latencias[indice]);
             const nivel = fallos > 0 ? "bad" : latencia > 2000 ? "warn" : cantidad > 0 ? "ok" : "idle";
+            const intensidad = Math.min(5, Math.max(1, Math.ceil(cantidad * 5 / tope)));
             const franja = document.createElement("span");
-            franja.className = "admin-franja is-" + nivel;
-            franja.style.setProperty("--altura", Math.max(8, Math.round(cantidad * 100 / tope)) + "%");
+            franja.className = "admin-franja is-" + nivel
+                    + (nivel === "idle" ? "" : " is-n" + intensidad);
+            franja.textContent = cantidad > 0 ? String(cantidad) : "·";
             franja.title = etiqueta + ": " + cantidad + " peticiones, " + fallos
                     + " errores 5xx, p95 " + latencia + " ms";
             contenedor.append(franja);
         });
-        contenedor.setAttribute("aria-label", "Estado por minuto durante los últimos "
+        contenedor.setAttribute("aria-label", "Intensidad por minuto durante los últimos "
                 + etiquetas.length + " minutos. Máximo " + tope + " peticiones por minuto.");
     };
 
@@ -353,48 +383,62 @@
     };
 
     const actividadDiaria = (dias) => {
-        const grupo = uno("[data-barras-actividad]");
         const eje = uno("[data-eje-actividad]");
         const maximo = uno("[data-eje-actividad-max]");
-        if (!grupo || !Array.isArray(dias)) return;
+        if (!Array.isArray(dias)) return;
 
-        grupo.replaceChildren();
-        if (eje) eje.replaceChildren();
-        const tope = Math.max(1, ...dias.flatMap((dia) => [
-            numero(dia.inscripciones), numero(dia.pagos), numero(dia.certificados)
-        ]));
+        const series = [
+            ["inscripciones", "Matrículas"],
+            ["pagos", "Pagos"],
+            ["certificados", "Certificados"]
+        ];
+        const tope = Math.max(1, ...dias.flatMap((dia) =>
+                series.map((serieDia) => numero(dia[serieDia[0]]))));
         if (maximo) maximo.textContent = String(tope);
 
-        const ancho = 820 / Math.max(1, dias.length);
-        const barra = Math.min(20, ancho / 4.5);
-        const series = [
-            ["inscripciones", "admin-bar--inscripciones"],
-            ["pagos", "admin-bar--pagos"],
-            ["certificados", "admin-bar--certificados"]
-        ];
+        for (const [clave, nombre] of series) {
+            const valores = alinear(dias.map((dia) => dia[clave]), dias.length);
+            const puntos = coordsDe(valores, tope, CONFIG_ACTIVIDAD);
+            const area = uno('[data-area-actividad="' + clave + '"]');
+            const linea = uno('[data-curva-actividad="' + clave + '"]');
+            if (area) area.setAttribute("d", areaDe(puntos, CONFIG_ACTIVIDAD));
+            if (linea) linea.setAttribute("d", curva(puntos));
+        }
 
-        dias.forEach((dia, indice) => {
-            const centro = 40 + ancho * (indice + .5);
-            series.forEach(([clave, clase], numeroSerie) => {
-                const valor = numero(dia[clave]);
-                const altura = valor * 170 / tope;
-                const rect = svg("rect", {
-                    x: (centro - barra * 1.5 + numeroSerie * barra).toFixed(1),
-                    y: (210 - altura).toFixed(1),
-                    width: barra.toFixed(1),
-                    height: altura.toFixed(1),
-                    rx: 2,
-                    "class": "admin-bar " + clase
+        const puntos = uno("[data-puntos-actividad]");
+        if (puntos) {
+            puntos.replaceChildren();
+            dias.forEach((dia, indice) => {
+                series.forEach(([clave, nombre]) => {
+                    const valor = numero(dia[clave]);
+                    const punto = coordsDe([valor], tope, CONFIG_ACTIVIDAD)[0];
+                    const circulo = svg("circle", {
+                        cx: f(xEn(indice, dias.length, CONFIG_ACTIVIDAD)),
+                        cy: f(punto.y),
+                        r: 3.2,
+                        "class": "monitor-punto monitor-punto--actividad is-" + clave
+                    });
+                    circulo.append(titulo((dia.etiqueta || "") + " · " + nombre + ": " + valor));
+                    puntos.append(circulo);
                 });
-                rect.append(titulo((dia.etiqueta || "") + " · " + clave + ": " + valor));
-                grupo.append(rect);
             });
-            if (eje) {
-                const etiqueta = svg("text", { x: centro.toFixed(1), y: 235 });
+        }
+
+        if (eje) {
+            eje.replaceChildren();
+            dias.forEach((dia, indice) => {
+                const etiqueta = svg("text", {
+                    x: f(xEn(indice, dias.length, CONFIG_ACTIVIDAD)), y: 235
+                });
                 etiqueta.textContent = dia.etiqueta || "";
                 eje.append(etiqueta);
-            }
-        });
+            });
+        }
+        const grafico = uno("[data-grafico-actividad]");
+        if (grafico) {
+            grafico.setAttribute("aria-label", "Tendencia de matrículas, pagos y certificados durante los últimos "
+                    + dias.length + " días.");
+        }
     };
 
     const rutas = (listaDatos) => {
@@ -428,7 +472,175 @@
         }
     };
 
+    const porcentaje = (valor) => Math.round(numero(valor)) + "%";
+
+    const recurso = (clave, valores, actual, nombre) => {
+        const reales = serie(valores);
+        const ultimos = reales.slice(-MUESTRAS_RECURSO);
+        const alineados = Array.from({ length: MUESTRAS_RECURSO }, (_, indice) => {
+            const posicion = indice - (MUESTRAS_RECURSO - ultimos.length);
+            return posicion < 0 ? 0 : ultimos[posicion];
+        });
+        const selectores = SELECTORES_RECURSO[clave];
+        const puntos = coordsDe(alineados, 100, CONFIG_RECURSO);
+        const area = uno(selectores.area);
+        const linea = uno(selectores.linea);
+        if (area) area.setAttribute("d", areaDe(puntos, CONFIG_RECURSO));
+        if (linea) linea.setAttribute("d", curva(puntos));
+
+        texto("[data-monitoreo-" + clave + "]", porcentaje(actual));
+        texto("[data-monitoreo-" + clave + "-min]", porcentaje(reales.length ? Math.min(...reales) : actual));
+        texto("[data-monitoreo-" + clave + "-max]", porcentaje(reales.length ? Math.max(...reales) : actual));
+        texto("[data-monitoreo-" + clave + "-prom]",
+                porcentaje(reales.length ? reales.reduce((suma, valor) => suma + valor, 0) / reales.length : actual));
+        const grafico = uno(selectores.grafico);
+        if (grafico) {
+            grafico.setAttribute("aria-label", nombre + " durante el último minuto. Máximo "
+                    + Math.round(numero(actual)) + "%.");
+        }
+    };
+
+    const recursos = (datos) => {
+        recurso("cpu", datos.serieCpu, datos.cpu, "Uso de CPU del proceso");
+        recurso("memoria", datos.serieMemoria, datos.memoria, "Uso de memoria JVM");
+    };
+
+    const indicePuntero = (evento, grafico, anchoVista, config, total) => {
+        if (!total || !grafico) return -1;
+        const rect = grafico.getBoundingClientRect();
+        if (!rect.width) return -1;
+        const x = (evento.clientX - rect.left) * anchoVista / rect.width;
+        return Math.max(0, Math.min(total - 1, Math.round(
+                (x - config.izquierda) / (config.derecha - config.izquierda) * (total - 1))));
+    };
+
+    const crosshair = (selector, indice, total, config) => {
+        const linea = uno(selector);
+        if (!linea || indice < 0) return;
+        const x = f(xEn(indice, total, config));
+        linea.setAttribute("x1", x);
+        linea.setAttribute("x2", x);
+        linea.classList.add("is-visible");
+    };
+
+    const ocultarCrosshair = (selector) => {
+        const linea = uno(selector);
+        if (linea) linea.classList.remove("is-visible");
+    };
+
+    const mostrarTooltip = (evento, lineas) => {
+        const tooltip = uno("[data-monitoreo-tooltip]");
+        if (!tooltip) return;
+        tooltip.textContent = lineas.filter(Boolean).join("\n");
+        tooltip.hidden = false;
+        tooltip.style.left = Math.max(8, Math.min(window.innerWidth - 240, evento.clientX + 16)) + "px";
+        tooltip.style.top = Math.max(8, evento.clientY - 10) + "px";
+    };
+
+    const ocultarTooltip = () => {
+        const tooltip = uno("[data-monitoreo-tooltip]");
+        if (tooltip) tooltip.hidden = true;
+    };
+
+    const configurarGraficos = () => {
+        const graficoTrafico = uno("[data-grafico-trafico]");
+        if (graficoTrafico) {
+            graficoTrafico.addEventListener("pointermove", (evento) => {
+                if (!instantanea) return;
+                const etiquetas = Array.isArray(instantanea.etiquetas) ? instantanea.etiquetas : [];
+                const indice = indicePuntero(evento, graficoTrafico, 960, CONFIG, etiquetas.length);
+                if (indice < 0) return;
+                crosshair("[data-crosshair-trafico]", indice, etiquetas.length, CONFIG);
+                const exito = alinear(instantanea.serieExitosas, etiquetas.length)[indice];
+                const redirect = alinear(instantanea.serieRedirecciones, etiquetas.length)[indice];
+                const cliente = alinear(instantanea.serieErroresCliente, etiquetas.length)[indice];
+                const servidor = alinear(instantanea.serieErroresServidor, etiquetas.length)[indice];
+                mostrarTooltip(evento, [
+                    etiquetas[indice] || "",
+                    exito + " correctas · " + redirect + " redirecciones",
+                    cliente + " errores 4xx · " + servidor + " errores 5xx",
+                    "Total " + (exito + redirect + cliente + servidor) + " peticiones"
+                ]);
+            });
+            graficoTrafico.addEventListener("pointerleave", () => {
+                ocultarCrosshair("[data-crosshair-trafico]");
+                ocultarTooltip();
+            });
+        }
+
+        const graficoLatencia = uno("[data-grafico-latencia]");
+        if (graficoLatencia) {
+            graficoLatencia.addEventListener("pointermove", (evento) => {
+                if (!instantanea) return;
+                const etiquetas = Array.isArray(instantanea.etiquetas) ? instantanea.etiquetas : [];
+                const indice = indicePuntero(evento, graficoLatencia, 960, CONFIG, etiquetas.length);
+                if (indice < 0) return;
+                crosshair("[data-crosshair-latencia]", indice, etiquetas.length, CONFIG);
+                const p50 = alinear(instantanea.serieLatenciaP50, etiquetas.length)[indice];
+                const p95 = alinear(instantanea.serieLatencia, etiquetas.length)[indice];
+                const p99 = alinear(instantanea.serieLatenciaP99, etiquetas.length)[indice];
+                mostrarTooltip(evento, [
+                    etiquetas[indice] || "",
+                    "p50 " + p50 + " ms · p95 " + p95 + " ms",
+                    "p99 " + p99 + " ms"
+                ]);
+            });
+            graficoLatencia.addEventListener("pointerleave", () => {
+                ocultarCrosshair("[data-crosshair-latencia]");
+                ocultarTooltip();
+            });
+        }
+
+        const graficoActividad = uno("[data-grafico-actividad]");
+        if (graficoActividad) {
+            graficoActividad.addEventListener("pointermove", (evento) => {
+                const dias = instantanea && Array.isArray(instantanea.actividadDiaria)
+                        ? instantanea.actividadDiaria : [];
+                const indice = indicePuntero(evento, graficoActividad, 900, CONFIG_ACTIVIDAD, dias.length);
+                if (indice < 0) return;
+                crosshair("[data-crosshair-actividad]", indice, dias.length, CONFIG_ACTIVIDAD);
+                const dia = dias[indice] || {};
+                mostrarTooltip(evento, [
+                    dia.etiqueta || "",
+                    "Matrículas " + numero(dia.inscripciones),
+                    "Pagos " + numero(dia.pagos),
+                    "Certificados " + numero(dia.certificados)
+                ]);
+            });
+            graficoActividad.addEventListener("pointerleave", () => {
+                ocultarCrosshair("[data-crosshair-actividad]");
+                ocultarTooltip();
+            });
+        }
+
+        for (const [clave, selectores] of Object.entries(SELECTORES_RECURSO)) {
+            const grafico = uno(selectores.grafico);
+            if (!grafico) continue;
+            grafico.addEventListener("pointermove", (evento) => {
+                if (!instantanea) return;
+                const valores = serie(instantanea[selectores.campo]);
+                const indice = indicePuntero(evento, grafico, 300, CONFIG_RECURSO, MUESTRAS_RECURSO);
+                const real = indice - (MUESTRAS_RECURSO - valores.length);
+                if (indice < 0 || real < 0 || real >= valores.length) {
+                    ocultarCrosshair(selectores.crosshair);
+                    ocultarTooltip();
+                    return;
+                }
+                crosshair(selectores.crosshair, indice, MUESTRAS_RECURSO, CONFIG_RECURSO);
+                mostrarTooltip(evento, [
+                    selectores.nombre + " " + Math.round(valores[real]) + "%",
+                    "Hace " + (valores.length - 1 - real) * 2 + " s"
+                ]);
+            });
+            grafico.addEventListener("pointerleave", () => {
+                ocultarCrosshair(selectores.crosshair);
+                ocultarTooltip();
+            });
+        }
+    };
+
     const render = (datos) => {
+        instantanea = datos;
         estado(datos.estado);
         const fecha = new Date(datos.servidor);
         texto("[data-monitoreo-reloj]", Number.isNaN(fecha.getTime())
@@ -469,6 +681,7 @@
         spark("disponibilidad", peticiones.map((cantidad, indice) => cantidad === 0
                 ? 100 : Math.max(0, (cantidad - numero(fallos[indice])) * 100 / cantidad)));
 
+        recursos(datos);
         trafico(datos);
         latencia(datos);
         franjas(datos);
@@ -533,6 +746,7 @@
         });
     }
 
+    configurarGraficos();
     refrescar();
     setInterval(refrescar, 2000);
     setInterval(reloj, 1000);

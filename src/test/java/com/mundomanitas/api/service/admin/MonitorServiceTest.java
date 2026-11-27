@@ -104,6 +104,14 @@ class MonitorServiceTest {
         assertThat(snapshot.actividadDiaria()).hasSize(7);
         assertThat(snapshot.servicios()).anySatisfy(servicio ->
                 assertThat(servicio.nombre()).isEqualTo("Base de datos"));
+        assertThat(snapshot.servicios()).anySatisfy(servicio ->
+                assertThat(servicio.nombre()).isEqualTo("CPU del proceso"));
+        assertThat(snapshot.cpu()).isBetween(0.0, 100.0);
+        assertThat(snapshot.memoria()).isBetween(0.0, 100.0);
+        assertThat(snapshot.serieCpu()).hasSize(1)
+                .allSatisfy(valor -> assertThat(valor).isBetween(0.0, 100.0));
+        assertThat(snapshot.serieMemoria()).hasSize(1)
+                .allSatisfy(valor -> assertThat(valor).isBetween(0.0, 100.0));
         verify(stats).ping();
     }
 
@@ -120,6 +128,8 @@ class MonitorServiceTest {
         assertThat(snapshot.eventos()).isEmpty();
         assertThat(snapshot.rutas()).isEmpty();
         assertThat(snapshot.seriePeticiones()).containsOnly(0L);
+        assertThat(snapshot.serieCpu()).hasSize(1);
+        assertThat(snapshot.serieMemoria()).hasSize(1);
     }
 
     @Test

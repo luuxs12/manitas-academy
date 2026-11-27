@@ -139,6 +139,94 @@
                     </article>
                 </section>
 
+                <div class="monitor-grid monitor-grid--resources" aria-label="Recursos del servidor en vivo">
+                    <section class="monitor-card monitor-card--resource" aria-labelledby="monitor-cpu">
+                        <header class="monitor-card-head">
+                            <div>
+                                <span class="monitor-card-kicker">Proceso</span>
+                                <h2 id="monitor-cpu">CPU en vivo</h2>
+                            </div>
+                            <span class="monitor-card-note">Muestreo cada 2 s</span>
+                        </header>
+                        <div class="monitor-resource">
+                            <div class="monitor-resource-value">
+                                <strong data-monitoreo-cpu th:text="${monitor.cpu() + '%'}">—</strong>
+                                <span>Uso del proceso</span>
+                            </div>
+                            <svg class="monitor-resource-chart" viewBox="0 0 300 130" role="img"
+                                 aria-label="Uso de CPU durante el último minuto"
+                                 data-grafico-cpu>
+                                <defs>
+                                    <linearGradient id="monitor-recurso-cpu" x1="0" y1="0" x2="0" y2="1">
+                                        <stop class="monitor-stop-ok" offset="0%" stop-opacity=".5"></stop>
+                                        <stop class="monitor-stop-ok" offset="100%" stop-opacity=".02"></stop>
+                                    </linearGradient>
+                                </defs>
+                                <g class="monitor-resource-grid" aria-hidden="true">
+                                    <line x1="8" y1="12" x2="292" y2="12"></line>
+                                    <line x1="8" y1="62" x2="292" y2="62"></line>
+                                    <line x1="8" y1="112" x2="292" y2="112"></line>
+                                </g>
+                                <path class="monitor-recurso-area is-cpu" data-area-cpu d=""></path>
+                                <path class="monitor-recurso-linea is-cpu" data-linea-cpu d=""></path>
+                                <line class="monitor-crosshair" data-crosshair-cpu
+                                      x1="8" y1="12" x2="8" y2="112"></line>
+                            </svg>
+                        </div>
+                        <footer class="monitor-card-foot">
+                            <span class="monitor-resource-range">
+                                <span>mín <b data-monitoreo-cpu-min>—</b></span>
+                                <span>máx <b data-monitoreo-cpu-max>—</b></span>
+                                <span>prom <b data-monitoreo-cpu-prom>—</b></span>
+                            </span>
+                            <span class="monitor-card-note">60 muestras</span>
+                        </footer>
+                    </section>
+
+                    <section class="monitor-card monitor-card--resource" aria-labelledby="monitor-memoria">
+                        <header class="monitor-card-head">
+                            <div>
+                                <span class="monitor-card-kicker">JVM</span>
+                                <h2 id="monitor-memoria">Memoria en vivo</h2>
+                            </div>
+                            <span class="monitor-card-note">Muestreo cada 2 s</span>
+                        </header>
+                        <div class="monitor-resource">
+                            <div class="monitor-resource-value">
+                                <strong data-monitoreo-memoria th:text="${monitor.memoria() + '%'}">—</strong>
+                                <span>Heap asignado</span>
+                            </div>
+                            <svg class="monitor-resource-chart" viewBox="0 0 300 130" role="img"
+                                 aria-label="Uso de memoria JVM durante el último minuto"
+                                 data-grafico-memoria>
+                                <defs>
+                                    <linearGradient id="monitor-recurso-memoria" x1="0" y1="0" x2="0" y2="1">
+                                        <stop class="monitor-stop-memory" offset="0%" stop-opacity=".5"></stop>
+                                        <stop class="monitor-stop-memory" offset="100%" stop-opacity=".02"></stop>
+                                    </linearGradient>
+                                </defs>
+                                <g class="monitor-resource-grid" aria-hidden="true">
+                                    <line x1="8" y1="12" x2="292" y2="12"></line>
+                                    <line x1="8" y1="62" x2="292" y2="62"></line>
+                                    <line x1="8" y1="112" x2="292" y2="112"></line>
+                                </g>
+                                <path class="monitor-recurso-area is-memoria" data-area-memoria d=""></path>
+                                <path class="monitor-recurso-linea is-memoria" data-linea-memoria d=""></path>
+                                <line class="monitor-crosshair" data-crosshair-memoria
+                                      x1="8" y1="12" x2="8" y2="112"></line>
+                            </svg>
+                        </div>
+                        <footer class="monitor-card-foot">
+                            <span class="monitor-resource-range">
+                                <span>mín <b data-monitoreo-memoria-min>—</b></span>
+                                <span>máx <b data-monitoreo-memoria-max>—</b></span>
+                                <span>prom <b data-monitoreo-memoria-prom>—</b></span>
+                            </span>
+                            <span class="monitor-card-note">60 muestras</span>
+                        </footer>
+                    </section>
+                </div>
+
                 <div class="monitor-grid monitor-grid--charts">
                     <section class="monitor-card monitor-card--traffic" aria-labelledby="monitor-trafico">
                         <header class="monitor-card-head">
@@ -155,9 +243,21 @@
                                  aria-label="Peticiones por minuto desglosadas por tipo de respuesta"
                                  data-grafico-trafico>
                                 <defs>
-                                    <linearGradient id="monitor-trafico-fill" x1="0" y1="0" x2="0" y2="1">
-                                        <stop class="monitor-stop-ok" offset="0%" stop-opacity=".32"></stop>
-                                        <stop class="monitor-stop-ok" offset="100%" stop-opacity="0"></stop>
+                                    <linearGradient id="monitor-capa-ok" x1="0" y1="0" x2="0" y2="1">
+                                        <stop class="monitor-stop-ok" offset="0%" stop-opacity=".46"></stop>
+                                        <stop class="monitor-stop-ok" offset="100%" stop-opacity=".08"></stop>
+                                    </linearGradient>
+                                    <linearGradient id="monitor-capa-redirect" x1="0" y1="0" x2="0" y2="1">
+                                        <stop class="monitor-stop-redirect" offset="0%" stop-opacity=".46"></stop>
+                                        <stop class="monitor-stop-redirect" offset="100%" stop-opacity=".08"></stop>
+                                    </linearGradient>
+                                    <linearGradient id="monitor-capa-warn" x1="0" y1="0" x2="0" y2="1">
+                                        <stop class="monitor-stop-warn" offset="0%" stop-opacity=".5"></stop>
+                                        <stop class="monitor-stop-warn" offset="100%" stop-opacity=".1"></stop>
+                                    </linearGradient>
+                                    <linearGradient id="monitor-capa-bad" x1="0" y1="0" x2="0" y2="1">
+                                        <stop class="monitor-stop-bad" offset="0%" stop-opacity=".58"></stop>
+                                        <stop class="monitor-stop-bad" offset="100%" stop-opacity=".12"></stop>
                                     </linearGradient>
                                 </defs>
                                 <g class="monitor-chart-grid" aria-hidden="true">
@@ -170,11 +270,16 @@
                                     <text x="40" y="34" data-eje-trafico-max>—</text>
                                     <text x="40" y="214">0</text>
                                 </g>
-                                <g data-barras-trafico></g>
-                                <path class="monitor-area" data-area-trafico d=""></path>
-                                <polyline class="admin-line admin-line--trafico" data-linea-trafico
-                                          points=""></polyline>
+                                <g data-capas-trafico>
+                                    <path class="monitor-capa is-ok" data-capa-trafico="ok" d=""></path>
+                                    <path class="monitor-capa is-redirect" data-capa-trafico="redirect" d=""></path>
+                                    <path class="monitor-capa is-warn" data-capa-trafico="warn" d=""></path>
+                                    <path class="monitor-capa is-bad" data-capa-trafico="bad" d=""></path>
+                                </g>
+                                <path class="admin-line admin-line--trafico" data-linea-trafico d=""></path>
                                 <g data-puntos-trafico></g>
+                                <line class="monitor-crosshair" data-crosshair-trafico
+                                      x1="48" y1="30" x2="48" y2="210"></line>
                                 <g class="admin-axis-x" aria-hidden="true" data-eje-trafico></g>
                             </svg>
                         </div>
@@ -185,7 +290,7 @@
                                 <span><i class="admin-dot admin-dot--warn"></i>4xx</span>
                                 <span><i class="admin-dot admin-dot--bad"></i>5xx</span>
                             </span>
-                            <span class="monitor-card-note">Pasa el cursor sobre una barra para ver el minuto</span>
+                            <span class="monitor-card-note">Pasa el cursor sobre el gráfico para ver el minuto</span>
                         </footer>
                     </section>
 
@@ -203,9 +308,13 @@
                                  aria-label="Percentiles p50, p95 y p99 de latencia por minuto"
                                  data-grafico-latencia>
                                 <defs>
-                                    <linearGradient id="monitor-latencia-fill" x1="0" y1="0" x2="0" y2="1">
-                                        <stop class="monitor-stop-warn" offset="0%" stop-opacity=".28"></stop>
-                                        <stop class="monitor-stop-warn" offset="100%" stop-opacity="0"></stop>
+                                    <linearGradient id="monitor-banda-interna" x1="0" y1="0" x2="0" y2="1">
+                                        <stop class="monitor-stop-ok" offset="0%" stop-opacity=".34"></stop>
+                                        <stop class="monitor-stop-ok" offset="100%" stop-opacity=".05"></stop>
+                                    </linearGradient>
+                                    <linearGradient id="monitor-banda-cola" x1="0" y1="0" x2="0" y2="1">
+                                        <stop class="monitor-stop-warn" offset="0%" stop-opacity=".38"></stop>
+                                        <stop class="monitor-stop-warn" offset="100%" stop-opacity=".06"></stop>
                                     </linearGradient>
                                 </defs>
                                 <g class="monitor-chart-grid" aria-hidden="true">
@@ -218,14 +327,14 @@
                                     <text x="40" y="34" data-eje-latencia-max>—</text>
                                     <text x="40" y="214">0</text>
                                 </g>
-                                <path class="monitor-area monitor-area--latencia" data-area-latencia d=""></path>
-                                <polyline class="admin-line admin-line--latencia-p99" data-linea-latencia-p99
-                                          points=""></polyline>
-                                <polyline class="admin-line admin-line--latencia" data-linea-latencia
-                                          points=""></polyline>
-                                <polyline class="admin-line admin-line--latencia-p50" data-linea-latencia-p50
-                                          points=""></polyline>
+                                <path class="monitor-banda monitor-banda--cola" data-banda-p95-p99 d=""></path>
+                                <path class="monitor-banda monitor-banda--interna" data-banda-p50-p95 d=""></path>
+                                <path class="admin-line admin-line--latencia-p99" data-linea-latencia-p99 d=""></path>
+                                <path class="admin-line admin-line--latencia" data-linea-latencia d=""></path>
+                                <path class="admin-line admin-line--latencia-p50" data-linea-latencia-p50 d=""></path>
                                 <g data-puntos-latencia></g>
+                                <line class="monitor-crosshair" data-crosshair-latencia
+                                      x1="48" y1="30" x2="48" y2="210"></line>
                                 <g class="admin-axis-x" aria-hidden="true" data-eje-latencia></g>
                             </svg>
                         </div>
@@ -247,7 +356,7 @@
                                 <span class="monitor-card-kicker">Salud</span>
                                 <h2 id="monitor-senal">Señal por minuto</h2>
                             </div>
-                            <span class="monitor-card-note">Cada columna es un minuto real</span>
+                            <span class="monitor-card-note">Cada celda es un minuto real</span>
                         </header>
                         <div class="monitor-heatmap" data-monitoreo-franjas role="img"
                              aria-label="Estado de cada minuto de los últimos 30 minutos"></div>
@@ -444,8 +553,22 @@
                         </ul>
                         <div class="monitor-business-chart">
                             <svg class="monitor-chart" viewBox="0 0 900 250" role="img"
-                                 aria-label="Matrículas, pagos y certificados por día durante los últimos siete días"
+                                 aria-label="Tendencia de matrículas, pagos y certificados durante los últimos siete días"
                                  data-grafico-actividad>
+                                <defs>
+                                    <linearGradient id="monitor-tendencia-inscripciones" x1="0" y1="0" x2="0" y2="1">
+                                        <stop class="monitor-stop-ok" offset="0%" stop-opacity=".36"></stop>
+                                        <stop class="monitor-stop-ok" offset="100%" stop-opacity="0"></stop>
+                                    </linearGradient>
+                                    <linearGradient id="monitor-tendencia-pagos" x1="0" y1="0" x2="0" y2="1">
+                                        <stop class="monitor-stop-warn" offset="0%" stop-opacity=".32"></stop>
+                                        <stop class="monitor-stop-warn" offset="100%" stop-opacity="0"></stop>
+                                    </linearGradient>
+                                    <linearGradient id="monitor-tendencia-certificados" x1="0" y1="0" x2="0" y2="1">
+                                        <stop class="monitor-stop-certificates" offset="0%" stop-opacity=".3"></stop>
+                                        <stop class="monitor-stop-certificates" offset="100%" stop-opacity="0"></stop>
+                                    </linearGradient>
+                                </defs>
                                 <g class="monitor-chart-grid" aria-hidden="true">
                                     <line x1="40" y1="40" x2="860" y2="40"></line>
                                     <line x1="40" y1="125" x2="860" y2="125"></line>
@@ -455,7 +578,23 @@
                                     <text x="8" y="44" data-eje-actividad-max>—</text>
                                     <text x="8" y="214">0</text>
                                 </g>
-                                <g data-barras-actividad></g>
+                                <g data-curvas-actividad>
+                                    <path class="monitor-area monitor-area--tendencia is-inscripciones"
+                                          data-area-actividad="inscripciones" d=""></path>
+                                    <path class="monitor-area monitor-area--tendencia is-pagos"
+                                          data-area-actividad="pagos" d=""></path>
+                                    <path class="monitor-area monitor-area--tendencia is-certificados"
+                                          data-area-actividad="certificados" d=""></path>
+                                    <path class="monitor-trazo is-inscripciones"
+                                          data-curva-actividad="inscripciones" d=""></path>
+                                    <path class="monitor-trazo is-pagos"
+                                          data-curva-actividad="pagos" d=""></path>
+                                    <path class="monitor-trazo is-certificados"
+                                          data-curva-actividad="certificados" d=""></path>
+                                    <g data-puntos-actividad></g>
+                                </g>
+                                <line class="monitor-crosshair" data-crosshair-actividad
+                                      x1="40" y1="40" x2="40" y2="210"></line>
                                 <g class="admin-axis-x" aria-hidden="true" data-eje-actividad></g>
                             </svg>
                             <p class="monitor-legend">
@@ -466,6 +605,7 @@
                         </div>
                     </div>
                 </section>
+                <div class="monitor-tooltip" data-monitoreo-tooltip role="tooltip" hidden></div>
             </div>
         </main>
     </div>

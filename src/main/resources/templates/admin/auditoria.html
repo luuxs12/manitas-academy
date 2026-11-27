@@ -12,11 +12,13 @@
         <main id="panel-main" class="panel-main admin-main">
             <div class="admin-page-head">
                 <div><h1>Logs de auditoría</h1><p th:text="${page.totalElements + ' acciones registradas'}">0 acciones</p></div>
-                <details class="admin-export"><summary>Exportar</summary><div class="panel-menu-pop">
-                    <a th:href="@{/admin/exportar/auditoria(formato='csv')}">CSV</a>
-                    <a th:href="@{/admin/exportar/auditoria(formato='xlsx')}">Excel (XLSX)</a>
-                    <a th:href="@{/admin/exportar/auditoria(formato='pdf')}">PDF</a>
-                </div></details>
+                <div class="admin-actions">
+                    <details class="admin-export"><summary>Exportar</summary><div class="panel-menu-pop">
+                        <a th:href="@{/admin/exportar/auditoria(formato='csv')}">CSV</a>
+                        <a th:href="@{/admin/exportar/auditoria(formato='xlsx')}">Excel (XLSX)</a>
+                        <a th:href="@{/admin/exportar/auditoria(formato='pdf')}">PDF</a>
+                    </div></details>
+                </div>
             </div>
             <div class="panel-card admin-card admin-table-wrap">
                 <table class="admin-table">

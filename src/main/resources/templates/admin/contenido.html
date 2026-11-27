@@ -35,11 +35,13 @@
                             <span class="admin-module-number" th:text="'Módulo ' + ${i.count}">Módulo 1</span>
                             <span class="admin-module-name" th:text="${modulo.titulo()}">Nombre del módulo</span>
                         </h3>
-                        <span class="admin-status" th:classappend="${modulo.visible()} ? ' is-ok' : ' is-bad'"
-                              th:text="${modulo.visible()} ? 'Visible' : 'Oculta'">Visible</span>
-                        <a class="btn btn-admin admin-session-download"
-                           th:href="@{/admin/exportar/sesion/modulos/{m}/pdf(m=${modulo.id()})}"
-                           th:attr="aria-label='Descargar PDF de la sesión ' + ${modulo.titulo()}">Descargar PDF de la sesión</a>
+                        <div class="admin-module-actions">
+                            <span class="admin-status" th:classappend="${modulo.visible()} ? ' is-ok' : ' is-bad'"
+                                  th:text="${modulo.visible()} ? 'Visible' : 'Oculta'">Visible</span>
+                            <a class="btn btn-admin admin-session-download"
+                               th:href="@{/admin/exportar/sesion/modulos/{m}/pdf(m=${modulo.id()})}"
+                               th:attr="aria-label='Descargar PDF de la sesión ' + ${modulo.titulo()}">Descargar PDF de la sesión</a>
+                        </div>
                     </div>
                     <p class="admin-muted" th:text="${!modulo.visible()} ? 'Oculto para el estudiante' : 'Visible para el estudiante'">Visible</p>
 

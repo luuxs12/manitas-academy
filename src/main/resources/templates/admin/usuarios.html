@@ -12,9 +12,12 @@
         <main id="panel-main" class="panel-main admin-main">
 
             <div class="admin-page-head">
-                <div><h1>Gestión de usuarios</h1><p th:text="${page.totalElements + ' cuentas registradas'}">0 cuentas</p></div>
-                <div class="admin-actions">
+                <div>
+                    <h1>Gestión de usuarios</h1>
+                    <p th:text="${page.totalElements + ' cuentas registradas'}">0 cuentas</p>
                     <p class="admin-muted">Las cuentas se crean desde el registro público; acá solo se administran.</p>
+                </div>
+                <div class="admin-actions">
                     <details class="admin-export">
                         <summary>Exportar</summary>
                         <div class="panel-menu-pop">

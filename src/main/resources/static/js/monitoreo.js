@@ -533,8 +533,10 @@
         if (!tooltip) return;
         tooltip.textContent = lineas.filter(Boolean).join("\n");
         tooltip.hidden = false;
-        tooltip.style.left = Math.max(8, Math.min(window.innerWidth - 240, evento.clientX + 16)) + "px";
-        tooltip.style.top = Math.max(8, evento.clientY - 10) + "px";
+        const ancho = tooltip.offsetWidth || 240;
+        const alto = tooltip.offsetHeight || 96;
+        tooltip.style.left = Math.max(8, Math.min(window.innerWidth - ancho - 8, evento.clientX + 16)) + "px";
+        tooltip.style.top = Math.max(8, Math.min(window.innerHeight - alto - 8, evento.clientY - 10)) + "px";
     };
 
     const ocultarTooltip = () => {

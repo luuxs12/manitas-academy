@@ -11,7 +11,7 @@
     <meta name="robots" content="noindex">
     <!-- Preferencia guardada en PostgreSQL; el ajuste manual del usuario gana. -->
     <meta name="account-theme" th:content="${usuarioActual != null ? usuarioActual.theme() : null}">
-    <title th:text="${titulo} + ' · Mundo Manitas'">Mi panel · Mundo Manitas</title>
+    <title th:text="${title} + ' · Mundo Manitas'">Mi panel · Mundo Manitas</title>
     <link rel="icon" type="image/png" th:href="@{/img/brand/favicon.png}">
     <script th:src="@{/js/theme.js}"></script>
     <script defer th:src="@{/js/panel-dialogs.js}"></script>

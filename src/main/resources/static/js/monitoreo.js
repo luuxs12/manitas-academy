@@ -699,9 +699,8 @@
         document.dispatchEvent(new CustomEvent("monitoreo:actualizado", { detail: datos }));
     };
 
-    const refrescar = async (manual = false) => {
+    const refrescar = async () => {
         if (busy) return;
-        if (!manual && ultimaCarga && Date.now() - ultimaCarga < 10000) return;
         busy = true;
         const inicio = Date.now();
         try {
@@ -727,7 +726,7 @@
     };
 
     const botonRefrescar = uno("[data-monitoreo-refrescar]");
-    if (botonRefrescar) botonRefrescar.addEventListener("click", () => refrescar(true));
+    if (botonRefrescar) botonRefrescar.addEventListener("click", () => refrescar());
 
     configurarGraficos();
     refrescar();

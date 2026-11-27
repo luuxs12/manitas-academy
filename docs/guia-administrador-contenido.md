@@ -92,16 +92,7 @@ son enlaces `https` con título y posición, y se muestran como apoyo del curso.
 Los recursos se agregan con “Agregar recurso” y se quitan con su botón “Quitar”,
 que también envía un POST con token CSRF.
 
-### 5. Descargar PDF de la sesión
-
-En el encabezado de cada módulo del temario hay un enlace **“Descargar PDF de la
-sesión”**. Es un GET a `/admin/exportar/sesion/modulos/{moduleId}/pdf` y genera un
-PDF con el curso, el título real del módulo, sus secciones y sus ítems con tipo y
-estado. Como la vista previa administrativa incluye los ocultos, el PDF también
-los incluye y los marca como “Oculta”. No se inventa contenido: todo sale de lo
-cargado en esta página.
-
-### 6. Publicar
+### 5. Publicar
 
 Un curso en `BORRADOR` no se muestra en el catálogo ni se puede inscribir.
 Cuando el temario y el sílabo estén listos, cambiá el estado a `PUBLICADO` desde
@@ -125,8 +116,8 @@ la ficha del curso en **Cursos**.
 
 ## Datos y auditoría
 
-Cada alta, movida, borrado, guardado de sílabo y descarga de un PDF de sesión
-registra una auditoría con el identificador de quien lo hizo y un mensaje en el
+Cada alta, movida, borrado y guardado de sílabo registra una auditoría con el
+identificador de quien lo hizo y un mensaje en el
 log. Los videos y ejercicios
 creados desde el alta clásica siguen sincronizados con los ítems mediante los
 triggers de la migración `V14__estructura_contenido.sql`, así que el progreso

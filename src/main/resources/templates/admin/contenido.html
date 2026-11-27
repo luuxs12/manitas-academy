@@ -65,9 +65,6 @@
                                     </form>
                                 </div>
                             </div>
-                            <a class="btn btn-admin admin-session-download"
-                               th:href="@{/admin/exportar/sesion/modulos/{m}/pdf(m=${modulo.id()})}"
-                               th:attr="aria-label='Descargar PDF de la sesión ' + ${modulo.titulo()}"><th:block th:replace="~{fragments/admin-icons :: download}"></th:block>Descargar PDF de la sesión</a>
                         </div>
                     </div>
 

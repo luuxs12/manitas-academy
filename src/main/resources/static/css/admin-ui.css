@@ -1,10 +1,10 @@
 /* Estilos compartidos de los paneles (admin y estudiante).
-   Se carga después de styles.css y usa solo sus variables: tablas sin
-   recuadros por celda, monitor sobrio y formularios compactos. */
+   Se carga después de styles.css y usa solo sus variables: cabeceras de
+   tabla con verde sólido de marca, monitor completo y formularios compactos. */
 
-/* Tablas: una sola línea por fila, con esquinas redondeadas de verdad. */
-.admin-table-wrap {
-    padding: .85rem 1rem 1rem;
+/* Tablas: cabecera verde sólida, filas con un solo separador y esquinas redondas. */
+.admin-body .admin-table-wrap {
+    padding: .7rem .85rem .85rem;
     border: 1px solid var(--line);
     border-radius: var(--radius);
     background: var(--surface);
@@ -17,30 +17,38 @@
     font-variant-numeric: tabular-nums;
 }
 
-.admin-table th,
-.admin-table td {
-    padding: .7rem .8rem;
+.admin-body .admin-table th,
+.admin-body .admin-table td {
+    padding: .6rem .7rem;
     border: 0;
     border-bottom: 1px solid var(--line);
     text-align: left;
     vertical-align: middle;
 }
 
-.admin-table thead th {
+.admin-body .admin-table thead th {
     position: sticky;
     top: 0;
     z-index: 1;
-    border-bottom: 1px solid var(--accent-line);
-    background: var(--surface-2);
-    color: var(--muted);
+    border: 0;
+    background: var(--accent);
+    box-shadow: none;
+    color: var(--on-accent);
+    font-size: .72rem;
+    font-weight: 700;
+    letter-spacing: .03em;
+    text-transform: uppercase;
 }
 
-.admin-table thead th:first-child { border-radius: var(--radius-sm) 0 0 0; }
-.admin-table thead th:last-child { border-radius: 0 var(--radius-sm) 0 0; }
+.admin-body .admin-table thead th:first-child { border-radius: var(--radius-sm) 0 0 0; }
+.admin-body .admin-table thead th:last-child { border-radius: 0 var(--radius-sm) 0 0; }
 .admin-table tbody tr:last-child td { border-bottom: 0; }
 .admin-table tbody tr:last-child td:first-child { border-radius: 0 0 0 var(--radius-sm); }
 .admin-table tbody tr:last-child td:last-child { border-radius: 0 0 var(--radius-sm) 0; }
 .admin-table tbody tr:hover td { background: var(--soft); }
+
+/* La columna de acciones no lleva separador inferior: los botones quedan limpios. */
+.admin-body .admin-table td.admin-row-actions { border-bottom: 0; }
 
 .admin-table .admin-clip { max-width: 18rem; }
 .admin-table .admin-url { max-width: 16rem; }
@@ -48,7 +56,7 @@
 .monitor-empty { background: var(--field); color: var(--muted); text-align: center; }
 
 .admin-status { border: 1px solid var(--line); }
-.admin-status.is-ok { border-color: var(--accent-line); }
+.admin-body .admin-status.is-ok { border-color: var(--accent); }
 
 .monitor-table th,
 .monitor-table td { padding: .65rem .8rem; }
@@ -63,24 +71,7 @@
 .panel-payments td { padding: .65rem .6rem; }
 .panel-payment-status { background: var(--field); }
 
-/* Monitor sobrio: una sola vista, sin réplicas técnicas del mismo dato. */
-.admin-monitor--simple .monitor-grid--resources,
-.admin-monitor--simple .monitor-grid--charts,
-.admin-monitor--simple .monitor-grid--signal,
-.admin-monitor--simple .monitor-kpi--window,
-.admin-monitor--simple .monitor-kpi--latency,
-.admin-monitor--simple .monitor-spark,
-.admin-monitor--simple .monitor-card--feed,
-.admin-monitor--simple .monitor-card--services,
-.admin-monitor--simple .monitor-business-chart,
-.admin-monitor--simple .monitor-funnel-row[data-funnel="altas"],
-.admin-monitor--simple .monitor-funnel-row[data-funnel="lecciones"],
-.admin-monitor--simple .monitor-funnel-row[data-funnel="cuestionarios"],
-.admin-monitor--simple .monitor-funnel-row[data-funnel="pagos-fallidos"] {
-    display: none;
-}
-
-/* Acciones de fila: solo el icono, sin caja ni fondo permanente. */
+/* Acciones de fila: solo el icono, sin caja ni subrayado permanente. */
 .admin-body .admin-row-actions,
 .admin-body .admin-module-actions,
 .admin-body .admin-section-actions { gap: .25rem; }
@@ -100,6 +91,7 @@
     background: transparent;
     box-shadow: none;
     color: var(--ink);
+    text-decoration: none;
 }
 
 .admin-body .admin-row-actions a:hover,
@@ -124,6 +116,28 @@
     outline: 2px solid var(--accent);
     outline-offset: 1px;
 }
+
+/* Inicio: indicadores compactos, con el verde de marca solo en los iconos. */
+.admin-body .admin-kpis--home { gap: .6rem; margin-bottom: 1rem; }
+.admin-body .admin-kpis--home .admin-kpi {
+    gap: .15rem;
+    padding: .7rem .8rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    box-shadow: none;
+}
+.admin-body .admin-kpis--home .admin-kpi-icon {
+    width: 30px;
+    height: 30px;
+    margin-bottom: .2rem;
+    border-radius: 9px;
+    background: var(--accent);
+    color: var(--on-accent);
+}
+.admin-body .admin-kpis--home .admin-kpi-icon svg { width: 17px; height: 17px; }
+.admin-body .admin-kpis--home .admin-kpi-label { font-size: .7rem; }
+.admin-body .admin-kpis--home .admin-kpi-value { font-size: 1.45rem; }
+.admin-body .admin-kpis--home .admin-kpi-foot { gap: .3rem; font-size: .66rem; }
 
 /* Formularios: campos y etiquetas con medida, sin bloques excesivos. */
 .admin-body .admin-form { max-width: 760px; }
@@ -150,19 +164,21 @@
 .admin-body .admin-field { gap: .35rem; }
 .admin-body .admin-form-actions { margin-top: 1.1rem; }
 
-/* Temario con aire entre módulos, secciones y acciones, sin cajas por celda. */
+/* Temario con aire entre módulos, secciones y acciones, con sus enmarcados. */
 .admin-body .admin-structure { gap: 1.4rem; }
 .admin-body .admin-module {
-    padding: 1.1rem;
-    border-color: var(--line);
+    padding: 1rem 1.1rem;
+    border: 1px solid var(--line-strong);
+    border-radius: var(--radius-sm);
+    background: var(--surface-2);
     box-shadow: none;
 }
 .admin-body .admin-module + .admin-module { margin-top: .35rem; }
 .admin-body .admin-section,
 .admin-body .admin-content-item {
-    padding: .85rem .95rem;
-    border: 0;
-    border-radius: var(--radius-sm);
+    padding: .8rem .9rem;
+    border: 1px solid var(--line);
+    border-radius: 12px;
     background: var(--surface-2);
 }
 .admin-body .admin-section + .admin-section { margin-top: 1.1rem; }
@@ -177,20 +193,47 @@
 .admin-body .admin-inline-form + .admin-inline-form { margin-top: .9rem; }
 .admin-body .admin-inline-form .admin-form { margin-top: 1.1rem; }
 
-/* Configuración: tarjetas de estado claras, sin aspecto de lista técnica. */
-.admin-body .admin-checks { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
-.admin-body .admin-checks li {
-    padding: .9rem 1rem;
+/* Configuración: una sola tarjeta con apartados compactos y ordenados. */
+.admin-body .admin-config { display: grid; gap: .9rem; max-width: 760px; }
+.admin-body .admin-config > div + div {
+    padding-top: .8rem;
+    border-top: 1px solid var(--line);
+}
+.admin-body .admin-config h2 {
+    margin: 0 0 .35rem;
+    font-size: 1rem;
+}
+.admin-body .admin-config p { margin: 0; }
+.admin-body .admin-config-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+    gap: .45rem;
+    margin: .55rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+.admin-body .admin-config-grid li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: .4rem;
+    padding: .45rem .6rem;
     border-radius: var(--radius-sm);
-    background: var(--surface-2);
+    background: var(--field);
+    font-size: .78rem;
+}
+.admin-body .admin-config-grid small {
+    flex-basis: 100%;
+    color: var(--muted);
+    font-size: .7rem;
 }
 
-/* Reportes: KPIs sobrios y con acento de la plataforma. */
+/* Reportes: KPIs con la identidad de la plataforma. */
 .admin-body .admin-kpis--report .admin-kpi {
     gap: .2rem;
     padding: .85rem 1rem;
     border: 1px solid var(--line);
-    border-top: 2px solid var(--accent-line);
+    border-top: 2px solid var(--accent);
     border-radius: var(--radius-sm);
     background: var(--surface-2);
     box-shadow: none;

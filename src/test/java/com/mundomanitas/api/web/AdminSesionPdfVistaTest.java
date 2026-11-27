@@ -10,26 +10,24 @@ import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DisplayName("Descarga de la sesión en la vista del temario")
+@DisplayName("El temario no ofrece la descarga de PDF de la sesión")
 class AdminSesionPdfVistaTest {
 
     @Test
-    @DisplayName("cada módulo ofrece su PDF con un enlace accesible y documentado")
-    void moduloHeadOffersSesionPdf() throws IOException {
+    @DisplayName("el encabezado del módulo queda sin enlace innecesario")
+    void moduloHeadDoesNotOfferSesionPdf() throws IOException {
         String content = read("src/main/resources/templates/admin/contenido.html");
         String css = read("src/main/resources/static/css/styles.css");
         String design = read("docs/design-system.md");
         String guide = read("docs/guia-administrador-contenido.md");
 
-        assertThat(content).contains("class=\"btn btn-admin admin-session-download\"")
-                .contains("@{/admin/exportar/sesion/modulos/{m}/pdf(m=${modulo.id()})}")
-                .contains("aria-label='Descargar PDF de la sesión ' + ${modulo.titulo()}")
-                .contains(">Descargar PDF de la sesión</a>");
-        assertThat(css).contains(".admin-session-download {")
-                .contains("align-self: flex-start;");
-        assertThat(design).contains("`.admin-session-download`");
-        assertThat(guide).contains("Descargar PDF de la sesión")
-                .contains("/admin/exportar/sesion/modulos/{moduleId}/pdf");
+        assertThat(content).doesNotContain("admin-session-download")
+                .doesNotContain("@{/admin/exportar/sesion/modulos/{m}/pdf(m=${modulo.id()})}")
+                .doesNotContain("Descargar PDF de la sesión");
+        assertThat(css).doesNotContain(".admin-session-download");
+        assertThat(design).doesNotContain("`.admin-session-download`");
+        assertThat(guide).doesNotContain("Descargar PDF de la sesión")
+                .doesNotContain("/admin/exportar/sesion/modulos/{moduleId}/pdf");
     }
 
     private String read(String path) throws IOException {

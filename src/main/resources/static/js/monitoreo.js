@@ -25,7 +25,6 @@
     const uno = (selector) => root.querySelector(selector);
     const f = (valor) => numero(valor).toFixed(1);
     let busy = false;
-    let pausado = false;
     let ultimaCarga = 0;
     let instantanea = null;
 
@@ -700,16 +699,9 @@
         document.dispatchEvent(new CustomEvent("monitoreo:actualizado", { detail: datos }));
     };
 
-    const reiniciarBarra = () => {
-        const barra = uno("[data-monitoreo-barra]");
-        if (!barra) return;
-        barra.style.animation = "none";
-        void barra.offsetWidth;
-        barra.style.animation = "";
-    };
-
     const refrescar = async (manual = false) => {
-        if (busy || (pausado && !manual)) return;
+        if (busy) return;
+        if (!manual && ultimaCarga && Date.now() - ultimaCarga < 10000) return;
         busy = true;
         const inicio = Date.now();
         try {
@@ -719,8 +711,7 @@
             });
             if (!respuesta.ok) throw new Error("respuesta no válida");
             render(await respuesta.json());
-            texto("[data-monitoreo-sonda]", "Sondeo " + (Date.now() - inicio) + " ms");
-            reiniciarBarra();
+            texto("[data-monitoreo-sonda]", "Actualizado en " + (Date.now() - inicio) + " ms");
         } catch (_) {
             estado("sin conexión");
             texto("[data-monitoreo-sonda]", "Sin conexión");
@@ -738,21 +729,11 @@
     const botonRefrescar = uno("[data-monitoreo-refrescar]");
     if (botonRefrescar) botonRefrescar.addEventListener("click", () => refrescar(true));
 
-    const botonPausa = uno("[data-monitoreo-pausa]");
-    if (botonPausa) {
-        botonPausa.addEventListener("click", () => {
-            pausado = !pausado;
-            botonPausa.textContent = pausado ? "Reanudar" : "Pausar";
-            texto("[data-monitoreo-sonda]", pausado ? "En pausa" : "Sondeo 2 s");
-            if (!pausado) refrescar();
-        });
-    }
-
     configurarGraficos();
     refrescar();
     setInterval(refrescar, 2000);
     setInterval(reloj, 1000);
     document.addEventListener("visibilitychange", () => {
-        if (!document.hidden && !pausado) refrescar();
+        if (!document.hidden) refrescar();
     });
 })();

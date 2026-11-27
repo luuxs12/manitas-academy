@@ -31,7 +31,7 @@
                                th:classappend="${#fields.hasErrors('nombreCompleto')} ? ' is-invalid' : ''"
                                th:attr="aria-invalid=${#fields.hasErrors('nombreCompleto')} ? 'true' : null,
                                         aria-describedby=${#fields.hasErrors('nombreCompleto')} ? 'fullName-error' : null"
-                               autocomplete="name" placeholder="Ana Quispe"
+                               autocomplete="name" placeholder="Nombre y apellido"
                                maxlength="120" required autofocus>
                         <p class="field-error" id="fullName-error"
                            th:if="${#fields.hasErrors('nombreCompleto')}"
@@ -86,7 +86,7 @@
                                th:classappend="${#fields.hasErrors('confirmContrasena')} ? ' is-invalid' : ''"
                                th:attr="aria-invalid=${#fields.hasErrors('confirmContrasena')} ? 'true' : null,
                                         aria-describedby=${#fields.hasErrors('confirmContrasena')} ? 'confirmPassword-error' : null"
-                               autocomplete="new-password" placeholder="La misma de arriba"
+                               autocomplete="new-password" placeholder="Repetí la contraseña"
                                minlength="8" maxlength="72" required>
                         <p class="field-error" id="confirmPassword-error"
                            th:if="${#fields.hasErrors('confirmContrasena')}"

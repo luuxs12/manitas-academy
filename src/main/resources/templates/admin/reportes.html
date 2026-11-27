@@ -8,10 +8,10 @@
 <div class="panel admin">
     <aside th:replace="~{admin/fragments/admin-nav :: sidebar('reportes')}"></aside>
     <div class="panel-shell">
-        <header th:replace="~{admin/fragments/admin-nav :: topbar('Reportes', 'Métricas reales', '')}"></header>
+        <header th:replace="~{admin/fragments/admin-nav :: topbar('Reportes', 'Resumen del período', '')}"></header>
         <main id="panel-main" class="panel-main admin-main">
             <div class="admin-page-head">
-                <div><h1>Reportes</h1><p>Solo datos reales.</p></div>
+                <div><h1>Reportes</h1><p>Cursos, matrículas e ingresos del período.</p></div>
                 <div class="admin-actions">
                     <form class="admin-filters" method="get" th:action="@{/admin/reportes}">
                         <label class="sr-only" for="report-days">Período</label>
@@ -48,17 +48,17 @@
                 <li class="admin-kpi">
                     <span class="admin-kpi-label">Ingresos cobrados</span>
                     <strong class="admin-kpi-value" th:text="${'S/ ' + reporte.revenueCents() / 100}">S/ 0</strong>
-                    <span class="admin-kpi-foot">Solo pagos confirmados por Stripe</span>
+                    <span class="admin-kpi-foot">Pagos confirmados</span>
                 </li>
                 <li class="admin-kpi">
-                    <span class="admin-kpi-label">Usuarios activos (30 días)</span>
+                    <span class="admin-kpi-label">Usuarios activos</span>
                     <strong class="admin-kpi-value" th:text="${reporte.activoUsers()}">0</strong>
-                    <span class="admin-kpi-foot">Con actividad reciente</span>
+                    <span class="admin-kpi-foot">Últimos 30 días</span>
                 </li>
                 <li class="admin-kpi">
                     <span class="admin-kpi-label">Retención</span>
                     <strong class="admin-kpi-value" th:text="${reporte.retentionPercent() + '%'}">0%</strong>
-                    <span class="admin-kpi-foot">Cuentas que vuelven</span>
+                    <span class="admin-kpi-foot">Que vuelven</span>
                 </li>
             </ul>
 

@@ -45,12 +45,12 @@
                         <small id="error-video-titulo" class="admin-error" th:if="${#fields.hasErrors('titulo')}" th:errors="*{titulo}"></small>
                     </div>
                     <div class="admin-field admin-span-2">
-                        <label for="video-youtube-url">Enlace de YouTube</label>
+                        <label for="video-youtube-url">Enlace YouTube</label>
                         <input id="video-youtube-url" type="url" th:field="*{youtubeUrl}" maxlength="300" required
-                               placeholder="https://www.youtube.com/watch?v=…"
+                               placeholder="https://youtu.be/…"
                                th:attr="aria-invalid=${#fields.hasErrors('youtubeUrl')} ? 'true' : null,
                                         aria-describedby=${#fields.hasErrors('youtubeUrl')} ? 'hint-youtube error-video-youtube' : 'hint-youtube'">
-                        <small id="hint-youtube" class="admin-hint">Se reproduce desde YouTube en modo sin cookies.</small>
+                        <small id="hint-youtube" class="admin-hint">Se reproduce sin cookies.</small>
                         <small id="error-video-youtube" class="admin-error" th:if="${#fields.hasErrors('youtubeUrl')}" th:errors="*{youtubeUrl}"></small>
                     </div>
                     <div class="admin-field">

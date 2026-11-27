@@ -1,0 +1,212 @@
+/* Estilos compartidos de los paneles (admin y estudiante).
+   Se carga después de styles.css y usa solo sus variables: tablas sin
+   recuadros por celda, monitor sobrio y formularios compactos. */
+
+/* Tablas: una sola línea por fila, con esquinas redondeadas de verdad. */
+.admin-table-wrap {
+    padding: .85rem 1rem 1rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--surface);
+    overflow-x: auto;
+}
+
+.admin-table {
+    border-collapse: separate;
+    border-spacing: 0;
+    font-variant-numeric: tabular-nums;
+}
+
+.admin-table th,
+.admin-table td {
+    padding: .7rem .8rem;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+    text-align: left;
+    vertical-align: middle;
+}
+
+.admin-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    border-bottom: 1px solid var(--accent-line);
+    background: var(--surface-2);
+    color: var(--muted);
+}
+
+.admin-table thead th:first-child { border-radius: var(--radius-sm) 0 0 0; }
+.admin-table thead th:last-child { border-radius: 0 var(--radius-sm) 0 0; }
+.admin-table tbody tr:last-child td { border-bottom: 0; }
+.admin-table tbody tr:last-child td:first-child { border-radius: 0 0 0 var(--radius-sm); }
+.admin-table tbody tr:last-child td:last-child { border-radius: 0 0 var(--radius-sm) 0; }
+.admin-table tbody tr:hover td { background: var(--soft); }
+
+.admin-table .admin-clip { max-width: 18rem; }
+.admin-table .admin-url { max-width: 16rem; }
+.admin-table .admin-empty,
+.monitor-empty { background: var(--field); color: var(--muted); text-align: center; }
+
+.admin-status { border: 1px solid var(--line); }
+.admin-status.is-ok { border-color: var(--accent-line); }
+
+.monitor-table th,
+.monitor-table td { padding: .65rem .8rem; }
+.monitor-table--compact td:nth-child(2) {
+    max-width: 20rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.panel-payments th,
+.panel-payments td { padding: .65rem .6rem; }
+.panel-payment-status { background: var(--field); }
+
+/* Monitor sobrio: una sola vista, sin réplicas técnicas del mismo dato. */
+.admin-monitor--simple .monitor-grid--resources,
+.admin-monitor--simple .monitor-grid--charts,
+.admin-monitor--simple .monitor-grid--signal,
+.admin-monitor--simple .monitor-kpi--window,
+.admin-monitor--simple .monitor-kpi--latency,
+.admin-monitor--simple .monitor-spark,
+.admin-monitor--simple .monitor-card--feed,
+.admin-monitor--simple .monitor-card--services,
+.admin-monitor--simple .monitor-business-chart,
+.admin-monitor--simple .monitor-funnel-row[data-funnel="altas"],
+.admin-monitor--simple .monitor-funnel-row[data-funnel="lecciones"],
+.admin-monitor--simple .monitor-funnel-row[data-funnel="cuestionarios"],
+.admin-monitor--simple .monitor-funnel-row[data-funnel="pagos-fallidos"] {
+    display: none;
+}
+
+/* Acciones de fila: solo el icono, sin caja ni fondo permanente. */
+.admin-body .admin-row-actions,
+.admin-body .admin-module-actions,
+.admin-body .admin-section-actions { gap: .25rem; }
+
+.admin-body .admin-row-actions a,
+.admin-body .admin-row-actions button,
+.admin-body .admin-module-actions button,
+.admin-body .admin-section-actions button,
+.admin-body .admin-move,
+.admin-body .admin-icon-action,
+.admin-body .admin-actions-trigger {
+    min-width: 30px;
+    min-height: 30px;
+    padding: .3rem;
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: transparent;
+    box-shadow: none;
+    color: var(--ink);
+}
+
+.admin-body .admin-row-actions a:hover,
+.admin-body .admin-module-actions button:hover,
+.admin-body .admin-section-actions button:hover,
+.admin-body .admin-move:hover,
+.admin-body .admin-icon-action:hover,
+.admin-body .admin-actions-trigger:hover {
+    border-color: transparent;
+    background: var(--soft);
+    color: var(--ink);
+}
+.admin-body .admin-row-actions button:hover { background: var(--danger-soft); color: var(--danger); }
+
+.admin-body .admin-row-actions a:focus-visible,
+.admin-body .admin-row-actions button:focus-visible,
+.admin-body .admin-module-actions button:focus-visible,
+.admin-body .admin-section-actions button:focus-visible,
+.admin-body .admin-move:focus-visible,
+.admin-body .admin-icon-action:focus-visible,
+.admin-body .admin-actions-trigger:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 1px;
+}
+
+/* Formularios: campos y etiquetas con medida, sin bloques excesivos. */
+.admin-body .admin-form { max-width: 760px; }
+.admin-body .admin-form-grid { gap: 1rem 1.1rem; }
+
+.admin-body .admin-form input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+.admin-body .admin-form select,
+.admin-body .admin-form textarea,
+.admin-body .admin-filters input,
+.admin-body .admin-filters select {
+    max-width: 28rem;
+    min-height: 32px;
+    padding: .4rem .55rem;
+    font-size: .8rem;
+}
+.admin-body .admin-form textarea {
+    max-width: 40rem;
+    min-height: 60px;
+    line-height: 1.35;
+}
+.admin-body .admin-form label,
+.admin-body .admin-issue label,
+.admin-body .admin-form-grid > label { font-size: .74rem; }
+.admin-body .admin-field { gap: .35rem; }
+.admin-body .admin-form-actions { margin-top: 1.1rem; }
+
+/* Temario con aire entre módulos, secciones y acciones, sin cajas por celda. */
+.admin-body .admin-structure { gap: 1.4rem; }
+.admin-body .admin-module {
+    padding: 1.1rem;
+    border-color: var(--line);
+    box-shadow: none;
+}
+.admin-body .admin-module + .admin-module { margin-top: .35rem; }
+.admin-body .admin-section,
+.admin-body .admin-content-item {
+    padding: .85rem .95rem;
+    border: 0;
+    border-radius: var(--radius-sm);
+    background: var(--surface-2);
+}
+.admin-body .admin-section + .admin-section { margin-top: 1.1rem; }
+.admin-body .admin-content-list { gap: .7rem; }
+.admin-body .admin-module-actions,
+.admin-body .admin-section-actions { row-gap: .6rem; }
+.admin-body .admin-inline-form {
+    padding: .9rem 1rem;
+    border-radius: var(--radius-sm);
+    background: var(--surface-2);
+}
+.admin-body .admin-inline-form + .admin-inline-form { margin-top: .9rem; }
+.admin-body .admin-inline-form .admin-form { margin-top: 1.1rem; }
+
+/* Configuración: tarjetas de estado claras, sin aspecto de lista técnica. */
+.admin-body .admin-checks { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.admin-body .admin-checks li {
+    padding: .9rem 1rem;
+    border-radius: var(--radius-sm);
+    background: var(--surface-2);
+}
+
+/* Reportes: KPIs sobrios y con acento de la plataforma. */
+.admin-body .admin-kpis--report .admin-kpi {
+    gap: .2rem;
+    padding: .85rem 1rem;
+    border: 1px solid var(--line);
+    border-top: 2px solid var(--accent-line);
+    border-radius: var(--radius-sm);
+    background: var(--surface-2);
+    box-shadow: none;
+}
+.admin-body .admin-kpis--report .admin-kpi-value { font-size: 1.4rem; }
+.admin-body .admin-kpis--report .admin-kpi-label { font-size: .72rem; }
+.admin-body .admin-kpis--report .admin-kpi-foot { font-size: .68rem; }
+
+@media (max-width: 720px) {
+    .admin-table { font-size: .78rem; }
+    .admin-table .admin-clip { max-width: 10rem; }
+    .admin-body .admin-row-actions { gap: .2rem; }
+}
+
+@media (max-width: 620px) {
+    .admin-body .admin-form input:not([type="checkbox"]):not([type="radio"]):not([type="file"]),
+    .admin-body .admin-form select,
+    .admin-body .admin-form textarea { max-width: none; }
+}

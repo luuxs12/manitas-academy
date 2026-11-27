@@ -12,7 +12,7 @@
         <main id="panel-main" class="panel-main admin-main">
 
             <div class="admin-page-head">
-                <div><h1>Gestión de certificados</h1><p th:text="${page.totalElements + ' certificados'}">0 certificados</p></div>
+                <div><h1>Certificados</h1><p th:text="${page.totalElements + ' certificados'}">0 certificados</p></div>
                 <div class="admin-actions">
                     <details class="admin-export"><summary>Exportar</summary><div class="panel-menu-pop">
                         <a th:href="@{/admin/exportar/certificados(formato='csv')}">CSV</a>
@@ -24,15 +24,15 @@
 
             <section class="panel-card admin-card admin-issue" aria-labelledby="admin-issue-title">
                 <h2 id="admin-issue-title">Emitir certificado</h2>
-                <p class="admin-muted">Premium con curso finalizado. La revocación guarda historial.</p>
+                <p class="admin-muted">Premium con curso finalizado.</p>
                 <form class="admin-form" th:action="@{/admin/certificados/emitir}" th:object="${adminCertificadoFormulario}"
                       method="post" novalidate data-confirm-form
-                      data-confirm-message="¿Emitir el certificado para la persona y el curso elegidos?">
+                      data-confirm-message="¿Emitir certificado?">
                     <div class="admin-form-grid">
                         <div class="admin-field">
                             <label for="certificado-persona">Persona</label>
                             <select id="certificado-persona" th:field="*{usuarioId}" required>
-                                <option value="">Elegí una persona</option>
+                                <option value="">Elegí persona</option>
                                 <option th:each="o : ${usuarioOptions}" th:value="${o.id()}" th:text="${o.label()}"></option>
                             </select>
                         </div>

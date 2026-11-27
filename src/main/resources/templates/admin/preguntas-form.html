@@ -20,8 +20,8 @@
 
             <form class="admin-form" th:action="@{/admin/ejercicios/{id}/preguntas(id=${itemId})}"
                   th:object="${adminCuestionarioFormulario}" method="post" novalidate data-confirm-form
-                  data-confirm-message="¿Reemplazar el cuestionario actual con estas diez preguntas?">
-                <p class="admin-hint">Diez preguntas, cuatro alternativas. Marcá la correcta. Cada acierto vale 2.</p>
+                  data-confirm-message="¿Reemplazar cuestionario?">
+                <p class="admin-hint">Diez preguntas, cuatro opciones. Marcá la correcta.</p>
                 <p class="admin-error" role="alert" th:if="${#fields.hasErrors('questions')}" th:errors="*{questions}"></p>
 
                 <section class="panel-card admin-card quiz-admin-question"
@@ -39,7 +39,7 @@
                     </div>
 
                     <fieldset class="quiz-admin-alternatives">
-                        <legend>Alternativas y respuesta correcta</legend>
+                        <legend>Opciones</legend>
                         <div class="quiz-admin-option"
                              th:each="alternativa, opcion : ${pregunta.alternatives}">
                             <input type="radio"
@@ -50,7 +50,7 @@
                                    th:for="|quiz-correct-${i.index}-${opcion.index}|"
                                    th:text="${'Correcta ' + (opcion.index + 1)}">Correcta 1</label>
                             <label class="sr-only" th:for="|quiz-alternative-${i.index}-${opcion.index}|"
-                                   th:text="${'Texto de la alternativa ' + (opcion.index + 1)}">Texto</label>
+                                   th:text="${'Alternativa ' + (opcion.index + 1)}">Alternativa</label>
                             <input type="text" maxlength="300" required
                                    th:id="|quiz-alternative-${i.index}-${opcion.index}|"
                                    th:field="*{questions[__${i.index}__].alternatives[__${opcion.index}__].label}"

@@ -21,7 +21,7 @@
                         Cuestionario:
                         <span class="admin-status"
                               th:classappend="${preguntasCount == 10} ? ' is-ok' : ' is-bad'"
-                              th:text="${preguntasCount == 10} ? '10/10 preguntas cargadas' : (${preguntasCount} + '/10 preguntas cargadas')">0/10</span>
+                              th:text="${preguntasCount == 10} ? '10/10' : (${preguntasCount} + '/10')">0/10</span>
                     </p>
                 </div>
                 <div class="admin-actions">
@@ -62,7 +62,7 @@
                     </div>
                     <div class="admin-field admin-span-2">
                         <label for="ejercicio-consigna">Consigna</label>
-                        <textarea id="ejercicio-consigna" th:field="*{prompt}" rows="4" maxlength="600" required
+                        <textarea id="ejercicio-consigna" th:field="*{prompt}" rows="3" maxlength="600" required
                                   th:attr="aria-invalid=${#fields.hasErrors('prompt')} ? 'true' : null,
                                            aria-describedby=${#fields.hasErrors('prompt')} ? 'error-ejercicio-consigna' : null"></textarea>
                         <small id="error-ejercicio-consigna" class="admin-error" th:if="${#fields.hasErrors('prompt')}" th:errors="*{prompt}"></small>
@@ -79,12 +79,9 @@
                             <input id="ejercicio-marcar" type="checkbox" name="marcarAlRendir"
                                    value="true" th:checked="*{marcarAlRendir}">
                             <input type="hidden" name="marcarAlRendir" value="false">
-                            Marcar como visto al rendir el cuestionario
+                            Marcar al rendir
                         </label>
-                        <small class="admin-hint">
-                            Sin tildar, el alumno lo marca a mano desde el temario.
-                            Las preguntas se cargan después de guardar.
-                        </small>
+                        <small class="admin-hint">Si no, se marca desde el temario.</small>
                     </div>
                 </div>
                 <div class="admin-form-actions">

@@ -10,17 +10,17 @@
     <aside th:replace="~{admin/fragments/admin-nav :: sidebar('monitoreo')}"></aside>
 
     <div class="panel-shell">
-        <header th:replace="~{admin/fragments/admin-nav :: topbar('Monitoreo', 'Señales en vivo', '')}"></header>
+        <header th:replace="~{admin/fragments/admin-nav :: topbar('Monitoreo', 'Estado de la plataforma', '')}"></header>
 
-        <main id="panel-main" class="panel-main admin-main admin-monitor" data-monitoreo
+        <main id="panel-main" class="panel-main admin-main admin-monitor admin-monitor--simple" data-monitoreo
               th:attr="data-admin-since=${adminDesde}">
 
             <div class="monitor-console">
                 <header class="monitor-console-head">
                     <div class="monitor-console-title">
-                        <span class="monitor-eyebrow">Centro de operaciones</span>
+                        <span class="monitor-eyebrow">Mundo Manitas</span>
                         <h1>Monitoreo</h1>
-                        <p>Datos reales. Actualización cada 2 s.</p>
+                        <p>Un vistazo claro a cursos, matrículas y pagos.</p>
                     </div>
                     <div class="monitor-live" role="status" aria-live="polite">
                         <div class="monitor-live-row">
@@ -32,17 +32,11 @@
                         <div class="monitor-live-meta">
                             <span>Último dato <time data-monitoreo-actualizado
                                                     th:text="${monitor.servidor()}">—</time></span>
-                            <span data-monitoreo-sonda>Sondeo 2 s</span>
-                        </div>
-                        <div class="monitor-live-track" aria-hidden="true">
-                            <span data-monitoreo-barra></span>
+                            <span data-monitoreo-sonda>Actualización periódica</span>
                         </div>
                         <div class="monitor-live-actions">
                             <button type="button" class="monitor-button" data-monitoreo-refrescar>
                                 Actualizar ahora
-                            </button>
-                            <button type="button" class="monitor-button monitor-button--ghost"
-                                    data-monitoreo-pausa>Pausar
                             </button>
                         </div>
                     </div>
@@ -81,7 +75,7 @@
                         <span class="monitor-kpi-foot">Peticiones en el último minuto</span>
                     </article>
 
-                    <article class="monitor-kpi monitor-kpi--traffic">
+                    <article class="monitor-kpi monitor-kpi--traffic monitor-kpi--window">
                         <div class="monitor-kpi-top">
                             <span class="monitor-kpi-label">Tráfico en ventana</span>
                             <span class="monitor-kpi-chip" th:text="${monitor.peticionesPorMinuto() + '/min'}">—</span>
@@ -111,7 +105,7 @@
                               th:text="${monitor.erroresCliente() + ' errores de cliente'}">—</span>
                     </article>
 
-                    <article class="monitor-kpi monitor-kpi--warn">
+                    <article class="monitor-kpi monitor-kpi--warn monitor-kpi--latency">
                         <div class="monitor-kpi-top">
                             <span class="monitor-kpi-label">Latencia p95</span>
                             <span class="monitor-kpi-chip" data-monitoreo-latencia-total
@@ -349,44 +343,6 @@
                     </section>
                 </div>
 
-                <div class="monitor-grid monitor-grid--echarts" aria-label="Comparativas rápidas">
-                    <section class="monitor-card" aria-labelledby="monitor-echart-recursos">
-                        <header class="monitor-card-head">
-                            <div>
-                                <span class="monitor-card-kicker">Proceso</span>
-                                <h2 id="monitor-echart-recursos">CPU y memoria</h2>
-                            </div>
-                            <span class="monitor-card-note">Último minuto</span>
-                        </header>
-                        <div class="monitor-echart" data-echarts="recursos" role="img"
-                             aria-label="Comparación de uso de CPU y memoria en el último minuto"></div>
-                    </section>
-
-                    <section class="monitor-card" aria-labelledby="monitor-echart-respuestas">
-                        <header class="monitor-card-head">
-                            <div>
-                                <span class="monitor-card-kicker">Tráfico</span>
-                                <h2 id="monitor-echart-respuestas">Respuestas por tipo</h2>
-                            </div>
-                            <span class="monitor-card-note">Últimos 30 minutos</span>
-                        </header>
-                        <div class="monitor-echart" data-echarts="respuestas" role="img"
-                             aria-label="Peticiones por minuto agrupadas por tipo de respuesta"></div>
-                    </section>
-
-                    <section class="monitor-card" aria-labelledby="monitor-echart-actividad">
-                        <header class="monitor-card-head">
-                            <div>
-                                <span class="monitor-card-kicker">Negocio</span>
-                                <h2 id="monitor-echart-actividad">Actividad semanal</h2>
-                            </div>
-                            <span class="monitor-card-note">Últimos 7 días</span>
-                        </header>
-                        <div class="monitor-echart" data-echarts="actividad" role="img"
-                             aria-label="Matrículas, pagos y certificados de los últimos siete días"></div>
-                    </section>
-                </div>
-
                 <div class="monitor-grid monitor-grid--signal">
                     <section class="monitor-card" aria-labelledby="monitor-senal">
                         <header class="monitor-card-head">
@@ -482,7 +438,7 @@
                             <header class="monitor-card-head">
                                 <div>
                                     <span class="monitor-card-kicker">Alertas</span>
-                                    <h2 id="monitor-incidentes">Caídas y avisos</h2>
+                                    <h2 id="monitor-incidentes">Estado del servicio</h2>
                                 </div>
                             </header>
                             <ul class="monitor-incidents" data-monitoreo-incidentes>
@@ -525,7 +481,7 @@
                             </div>
                         </section>
 
-                        <section class="monitor-card" aria-labelledby="monitor-servicios">
+                        <section class="monitor-card monitor-card--services" aria-labelledby="monitor-servicios">
                             <header class="monitor-card-head">
                                 <div>
                                     <span class="monitor-card-kicker">Dependencias</span>
@@ -548,7 +504,7 @@
                     <header class="monitor-card-head">
                         <div>
                             <span class="monitor-card-kicker">Negocio</span>
-                            <h2 id="monitor-actividad">Actividad real de PostgreSQL</h2>
+                            <h2 id="monitor-actividad">Actividad de la comunidad</h2>
                         </div>
                         <span class="monitor-card-note">Últimas 24 horas y últimos 7 días</span>
                     </header>
@@ -656,7 +612,5 @@
 <script defer th:src="@{/js/panel.js}"></script>
 <script defer th:src="@{/js/admin.js}"></script>
 <script defer th:src="@{/js/monitoreo.js}"></script>
-<script defer th:src="@{/vendor/echarts/echarts.min.js}"></script>
-<script defer th:src="@{/js/echarts-monitoreo.js}"></script>
 </body>
 </html>

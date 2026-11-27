@@ -8,12 +8,12 @@
 <div class="panel admin">
     <aside th:replace="~{admin/fragments/admin-nav :: sidebar('perfil')}"></aside>
     <div class="panel-shell">
-        <header th:replace="~{admin/fragments/admin-nav :: topbar('Mi perfil', 'Tu cuenta en el panel', '')}"></header>
+        <header th:replace="~{admin/fragments/admin-nav :: topbar('Mi perfil', 'Mi cuenta', '')}"></header>
         <main id="panel-main" class="panel-main admin-main">
             <div class="admin-page-head">
                 <div>
                     <h1>Mi perfil</h1>
-                    <p>Tu foto y tus datos de acceso en un solo lugar.</p>
+                    <p>Tus datos de acceso y tu foto.</p>
                 </div>
                 <a class="admin-back" th:href="@{/admin/configuracion}">← Configuración</a>
             </div>
@@ -29,8 +29,8 @@
                               th:text="${usuarioActual.initials()}">LF</span>
                     </span>
                     <div>
-                        <p>La misma foto aparece en la cabecera y en el menú de la cuenta.</p>
-                        <p class="admin-hint">JPG, PNG o WebP de hasta 2 MB. Si no subís una foto, se muestran tus iniciales.</p>
+                        <p>Aparece en la cabecera y en el menú.</p>
+                        <p class="admin-hint">JPG, PNG o WebP · 2 MB. Sin foto, se muestran tus iniciales.</p>
                     </div>
                 </div>
 
@@ -48,7 +48,7 @@
                             <small data-file-name>JPG, PNG o WebP · hasta 2 MB</small>
                         </span>
                     </label>
-                    <p class="admin-hint" id="hint-avatar-admin">La imagen se guarda solo en tu cuenta.</p>
+                    <p class="admin-hint" id="hint-avatar-admin">Solo afecta a tu cuenta.</p>
                     <div class="admin-form-actions">
                         <button class="btn btn-admin" type="submit">Subir foto</button>
                         <button class="btn btn-ghost" type="submit" th:if="${usuarioActual.hasAvatar()}"

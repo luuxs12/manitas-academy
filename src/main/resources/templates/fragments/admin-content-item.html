@@ -4,7 +4,8 @@
 <body>
 
 <!-- Fila compartida por los ítems con sección y los sueltos del temario admin. -->
-<li class="admin-content-item" th:fragment="row(item, section)">
+<li class="admin-content-item" th:fragment="row(item, section)"
+    th:id="'item-' + ${item.id()}">
     <div class="admin-content-copy">
         <div class="admin-content-top">
             <span class="admin-type" th:text="${item.type()}">VIDEO</span>
@@ -42,22 +43,40 @@
             <button class="admin-move" type="submit"
                     th:attr="aria-label='Bajar ' + ${item.titulo()}"><th:block th:replace="~{fragments/admin-icons :: arrowDown}"></th:block><span class="sr-only">Bajar</span></button>
         </form>
-        <form method="post"
-              th:action="@{/admin/cursos/{c}/contenido/items/{i}/visible(c=${cursoId},i=${item.id()})}">
-            <button class="admin-icon-action" type="submit"
-                    th:attr="aria-label=(${item.visible()} ? 'Ocultar ' : 'Mostrar ') + ${item.titulo()},
-                             title=(${item.visible()} ? 'Ocultar ítem' : 'Mostrar ítem')">
-                <th:block th:if="${item.visible()}">
-                    <th:block th:replace="~{fragments/admin-icons :: eyeOff}"></th:block>
-                </th:block>
-                <th:block th:unless="${item.visible()}">
-                    <th:block th:replace="~{fragments/admin-icons :: eye}"></th:block>
-                </th:block>
-                <span class="sr-only" th:text="${item.visible()} ? 'Ocultar' : 'Mostrar'">Ocultar</span>
-            </button>
-        </form>
-        <button type="button" class="admin-confirm-link"
-                th:attr="data-confirm-url=@{/admin/cursos/{c}/contenido/items/{i}/eliminar(c=${cursoId},i=${item.id()})}, aria-label='Eliminar ' + ${item.titulo()}"><th:block th:replace="~{fragments/admin-icons :: trash}"></th:block><span class="sr-only">Eliminar</span></button>
+
+        <div class="admin-action-menu" data-actions
+             th:attr="data-actions-title='Acciones de ' + ${item.titulo()},
+                      data-actions-message=(${item.visible()} ? 'Se ocultará del temario del estudiante.' : 'Volverá a mostrarse en el temario.')">
+            <button type="button" class="admin-icon-action admin-actions-trigger" data-actions-trigger
+                    th:attr="aria-label='Acciones de ' + ${item.titulo()}, title='Acciones de ' + ${item.titulo()}"><th:block th:replace="~{fragments/admin-icons :: more}"></th:block><span class="sr-only">Acciones</span></button>
+            <div class="admin-actions-source" hidden>
+                <button type="button" class="admin-action-option" data-action-label="Editar video"
+                        th:if="${(item.type() == 'VIDEO' or item.type() == 'VIDEO_LSP') and item.origenId() != null}"
+                        th:attr="data-action-href=@{/admin/videos/{v}/editar(v=${item.origenId()})}">Editar video</button>
+                <button type="button" class="admin-action-option" data-action-label="Editar ejercicio"
+                        th:if="${item.type() == 'EJERCICIO' and item.origenId() != null}"
+                        th:attr="data-action-href=@{/admin/ejercicios/{v}/editar(v=${item.origenId()})}">Editar ejercicio</button>
+                <form method="post" data-confirm-form th:id="'item-visible-' + ${item.id()}"
+                      th:attr="data-confirm-message=(${item.visible()} ? '¿Ocultar este ítem?' : '¿Volver a mostrar este ítem?')"
+                      th:action="@{/admin/cursos/{c}/contenido/items/{i}/visible(c=${cursoId},i=${item.id()})}">
+                    <button type="button" class="admin-action-option"
+                            data-action-confirm="form"
+                            th:attr="data-action-label=${item.visible()} ? 'Ocultar' : 'Mostrar',
+                                     data-action-form='item-visible-' + ${item.id()},
+                                     aria-label=(${item.visible()} ? 'Ocultar ' : 'Mostrar ') + ${item.titulo()}">
+                        <th:block th:if="${item.visible()}">
+                            <th:block th:replace="~{fragments/admin-icons :: eyeOff}"></th:block>
+                        </th:block>
+                        <th:block th:unless="${item.visible()}">
+                            <th:block th:replace="~{fragments/admin-icons :: eye}"></th:block>
+                        </th:block>
+                        <span class="sr-only" th:text="${item.visible()} ? 'Ocultar' : 'Mostrar'">Ocultar</span>
+                    </button>
+                </form>
+                <button type="button" class="admin-confirm-link" data-action-label="Eliminar"
+                        th:attr="data-confirm-url=@{/admin/cursos/{c}/contenido/items/{i}/eliminar(c=${cursoId},i=${item.id()})}, aria-label='Eliminar ' + ${item.titulo()}"><th:block th:replace="~{fragments/admin-icons :: trash}"></th:block><span class="sr-only">Eliminar</span></button>
+            </div>
+        </div>
     </div>
 </li>
 

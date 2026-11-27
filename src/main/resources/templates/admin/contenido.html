@@ -38,20 +38,33 @@
                         <div class="admin-module-actions">
                             <span class="admin-status" th:classappend="${modulo.visible()} ? ' is-ok' : ' is-bad'"
                                   th:text="${modulo.visible()} ? 'Visible' : 'Oculta'">Visible</span>
-                            <form method="post"
-                                  th:action="@{/admin/cursos/{c}/contenido/modulos/{m}/visible(c=${cursoId},m=${modulo.id()})}">
-                                <button class="admin-icon-action" type="submit"
-                                        th:attr="aria-label=(${modulo.visible()} ? 'Ocultar ' : 'Mostrar ') + ${modulo.titulo()},
-                                                 title=(${modulo.visible()} ? 'Ocultar módulo' : 'Mostrar módulo')">
-                                    <th:block th:if="${modulo.visible()}">
-                                        <th:block th:replace="~{fragments/admin-icons :: eyeOff}"></th:block>
-                                    </th:block>
-                                    <th:block th:unless="${modulo.visible()}">
-                                        <th:block th:replace="~{fragments/admin-icons :: eye}"></th:block>
-                                    </th:block>
-                                    <span class="sr-only" th:text="${modulo.visible()} ? 'Ocultar' : 'Mostrar'">Ocultar</span>
-                                </button>
-                            </form>
+                            <div class="admin-action-menu" data-actions
+                                 th:attr="data-actions-title='Acciones de ' + ${modulo.titulo()},
+                                          data-actions-message=(${modulo.visible()} ? 'Se ocultará del temario del estudiante.' : 'Volverá a mostrarse en el temario.')">
+                                <button type="button" class="admin-icon-action admin-actions-trigger" data-actions-trigger
+                                        th:attr="aria-label='Acciones de ' + ${modulo.titulo()}, title='Acciones de ' + ${modulo.titulo()}"><th:block th:replace="~{fragments/admin-icons :: more}"></th:block><span class="sr-only">Acciones</span></button>
+                                <div class="admin-actions-source" hidden>
+                                    <button type="button" class="admin-action-option" data-action-label="Editar módulo"
+                                            th:attr="data-action-href=@{/admin/modulos/{m}/editar(m=${modulo.id()})}">Editar módulo</button>
+                                    <form method="post" data-confirm-form th:id="'modulo-visible-' + ${modulo.id()}"
+                                          th:attr="data-confirm-message=(${modulo.visible()} ? '¿Ocultar este módulo?' : '¿Volver a mostrar este módulo?')"
+                                          th:action="@{/admin/cursos/{c}/contenido/modulos/{m}/visible(c=${cursoId},m=${modulo.id()})}">
+                                        <button type="button" class="admin-action-option"
+                                                data-action-confirm="form"
+                                                th:attr="data-action-label=${modulo.visible()} ? 'Ocultar' : 'Mostrar',
+                                                         data-action-form='modulo-visible-' + ${modulo.id()},
+                                                         aria-label=(${modulo.visible()} ? 'Ocultar ' : 'Mostrar ') + ${modulo.titulo()}">
+                                            <th:block th:if="${modulo.visible()}">
+                                                <th:block th:replace="~{fragments/admin-icons :: eyeOff}"></th:block>
+                                            </th:block>
+                                            <th:block th:unless="${modulo.visible()}">
+                                                <th:block th:replace="~{fragments/admin-icons :: eye}"></th:block>
+                                            </th:block>
+                                            <span class="sr-only" th:text="${modulo.visible()} ? 'Ocultar' : 'Mostrar'">Ocultar</span>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
                             <a class="btn btn-admin admin-session-download"
                                th:href="@{/admin/exportar/sesion/modulos/{m}/pdf(m=${modulo.id()})}"
                                th:attr="aria-label='Descargar PDF de la sesión ' + ${modulo.titulo()}"><th:block th:replace="~{fragments/admin-icons :: download}"></th:block>Descargar PDF de la sesión</a>
@@ -67,20 +80,33 @@
                             <h4 th:text="${seccion.titulo()}">Sección</h4>
                             <span class="admin-status" th:classappend="${seccion.visible()} ? ' is-ok' : ' is-bad'"
                                   th:text="${seccion.visible()} ? 'Visible' : 'Oculta'">Visible</span>
-                            <form method="post"
-                                  th:action="@{/admin/cursos/{c}/contenido/secciones/{s}/visible(c=${cursoId},s=${seccion.id()})}">
-                                <button class="admin-icon-action" type="submit"
-                                        th:attr="aria-label=(${seccion.visible()} ? 'Ocultar ' : 'Mostrar ') + ${seccion.titulo()},
-                                                 title=(${seccion.visible()} ? 'Ocultar sección' : 'Mostrar sección')">
-                                    <th:block th:if="${seccion.visible()}">
-                                        <th:block th:replace="~{fragments/admin-icons :: eyeOff}"></th:block>
-                                    </th:block>
-                                    <th:block th:unless="${seccion.visible()}">
-                                        <th:block th:replace="~{fragments/admin-icons :: eye}"></th:block>
-                                    </th:block>
-                                    <span class="sr-only" th:text="${seccion.visible()} ? 'Ocultar' : 'Mostrar'">Ocultar</span>
-                                </button>
-                            </form>
+                            <div class="admin-action-menu" data-actions
+                                 th:attr="data-actions-title='Acciones de ' + ${seccion.titulo()},
+                                          data-actions-message=(${seccion.visible()} ? 'Se ocultará del temario del estudiante.' : 'Volverá a mostrarse en el temario.')">
+                                <button type="button" class="admin-icon-action admin-actions-trigger" data-actions-trigger
+                                        th:attr="aria-label='Acciones de ' + ${seccion.titulo()}, title='Acciones de ' + ${seccion.titulo()}"><th:block th:replace="~{fragments/admin-icons :: more}"></th:block><span class="sr-only">Acciones</span></button>
+                                <div class="admin-actions-source" hidden>
+                                    <form method="post" data-confirm-form th:id="'seccion-visible-' + ${seccion.id()}"
+                                          th:attr="data-confirm-message=(${seccion.visible()} ? '¿Ocultar esta sección?' : '¿Volver a mostrar esta sección?')"
+                                          th:action="@{/admin/cursos/{c}/contenido/secciones/{s}/visible(c=${cursoId},s=${seccion.id()})}">
+                                        <button type="button" class="admin-action-option"
+                                                data-action-confirm="form"
+                                                th:attr="data-action-label=${seccion.visible()} ? 'Ocultar' : 'Mostrar',
+                                                         data-action-form='seccion-visible-' + ${seccion.id()},
+                                                         aria-label=(${seccion.visible()} ? 'Ocultar ' : 'Mostrar ') + ${seccion.titulo()}">
+                                            <th:block th:if="${seccion.visible()}">
+                                                <th:block th:replace="~{fragments/admin-icons :: eyeOff}"></th:block>
+                                            </th:block>
+                                            <th:block th:unless="${seccion.visible()}">
+                                                <th:block th:replace="~{fragments/admin-icons :: eye}"></th:block>
+                                            </th:block>
+                                            <span class="sr-only" th:text="${seccion.visible()} ? 'Ocultar' : 'Mostrar'">Ocultar</span>
+                                        </button>
+                                    </form>
+                                    <button type="button" class="admin-confirm-link" data-action-label="Eliminar sección"
+                                            th:attr="data-confirm-url=@{/admin/cursos/{c}/contenido/secciones/{s}/eliminar(c=${cursoId},s=${seccion.id()})}, aria-label='Eliminar sección ' + ${seccion.titulo()}"><th:block th:replace="~{fragments/admin-icons :: trash}"></th:block><span class="sr-only">Eliminar sección</span></button>
+                                </div>
+                            </div>
                         </div>
                         <ul class="admin-content-list">
                             <th:block th:each="item : ${seccion.items()}">
@@ -96,8 +122,6 @@
                                 <input type="hidden" name="up" value="false">
                                 <button class="admin-move" type="submit" th:attr="aria-label='Bajar sección ' + ${seccion.titulo()}"><th:block th:replace="~{fragments/admin-icons :: arrowDown}"></th:block><span class="sr-only">Bajar</span></button>
                             </form>
-                            <button type="button" class="admin-confirm-link"
-                                    th:attr="data-confirm-url=@{/admin/cursos/{c}/contenido/secciones/{s}/eliminar(c=${cursoId},s=${seccion.id()})}, aria-label='Eliminar sección ' + ${seccion.titulo()}"><th:block th:replace="~{fragments/admin-icons :: trash}"></th:block><span class="sr-only">Eliminar sección</span></button>
                         </div>
                     </div>
 
@@ -271,12 +295,20 @@
                                 <small class="admin-hint">Se muestra debajo del botón de descarga.</small>
                             </div>
                             <div class="admin-field admin-span-2">
-                                <label for="documento-archivo">Archivo</label>
-                                <input id="documento-archivo" type="file" th:field="*{file}"
-                                       accept=".pdf,.doc,.docx,.ppt,.pptx,.txt" required
-                                       th:attr="aria-invalid=${#fields.hasErrors('file')} ? 'true' : null,
-                                                aria-describedby=${#fields.hasErrors('file')} ? 'error-documento-archivo' : null">
-                                <small class="admin-hint">PDF, DOC, DOCX, PPT, PPTX o TXT. Hasta 10 MB.</small>
+                                <label class="admin-field-label" for="documento-archivo">Archivo</label>
+                                <label class="admin-file-drop" for="documento-archivo">
+                                    <input id="documento-archivo" class="admin-file-input" type="file" th:field="*{file}"
+                                           accept=".pdf,.doc,.docx,.ppt,.pptx,.txt" required
+                                           th:attr="aria-invalid=${#fields.hasErrors('file')} ? 'true' : null,
+                                                    aria-describedby=${#fields.hasErrors('file')} ? 'error-documento-archivo' : null">
+                                    <span class="admin-file-icon" aria-hidden="true">
+                                        <th:block th:replace="~{fragments/admin-icons :: upload}"></th:block>
+                                    </span>
+                                    <span class="admin-file-copy">
+                                        <strong>Elegir archivo</strong>
+                                        <small data-file-name>PDF, DOC, DOCX, PPT, PPTX o TXT · hasta 10 MB</small>
+                                    </span>
+                                </label>
                                 <small id="error-documento-archivo" class="admin-error" th:if="${#fields.hasErrors('file')}" th:errors="*{file}"></small>
                             </div>
                             <div class="admin-field">

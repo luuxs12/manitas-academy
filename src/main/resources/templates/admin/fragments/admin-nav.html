@@ -196,19 +196,40 @@
                     <path d="m6 9 6 6 6-6"></path>
                 </svg>
             </summary>
-            <div class="panel-menu-pop">
-                <p class="panel-menu-name" th:text="${usuarioActual.nombreCompleto()}">Luis Fernando</p>
-                <p class="panel-menu-mail" th:text="${usuarioActual.email()}">admin@damianprint.com</p>
-                <p class="panel-menu-role" th:text="${usuarioActual.rolLabel()}">Administrador</p>
-                <a th:href="@{/admin/configuracion}">Configuración</a>
+            <div class="panel-menu-pop panel-menu-pop--account">
+                <div class="panel-menu-identity">
+                    <span class="panel-avatar panel-avatar--menu" aria-hidden="true"
+                          th:classappend="${usuarioActual.hasAvatar()} ? ' panel-avatar--photo' : ''">
+                        <img th:if="${usuarioActual.hasAvatar()}"
+                             th:src="${usuarioActual.avatarPath()}" alt="">
+                        <span th:unless="${usuarioActual.hasAvatar()}"
+                              th:text="${usuarioActual.initials()}">LF</span>
+                    </span>
+                    <div>
+                        <p class="panel-menu-name" th:text="${usuarioActual.nombreCompleto()}">Luis Fernando</p>
+                        <p class="panel-menu-mail" th:text="${usuarioActual.email()}">admin@damianprint.com</p>
+                    </div>
+                </div>
+                <span class="panel-menu-role" th:text="${usuarioActual.rolLabel()}">Administrador</span>
+                <div class="panel-menu-divider"></div>
+                <a class="panel-menu-item" th:href="@{/admin/perfil}">
+                    <th:block th:replace="~{fragments/admin-icons :: user}"></th:block><span>Mi perfil</span>
+                </a>
+                <a class="panel-menu-item" th:href="@{/admin/configuracion}">
+                    <th:block th:replace="~{fragments/admin-icons :: clipboard}"></th:block><span>Configuración</span>
+                </a>
+                <div class="panel-menu-divider"></div>
                 <form th:action="@{/logout}" method="post">
-                    <button type="submit">Cerrar sesión</button>
+                    <button class="panel-menu-item panel-menu-item--exit" type="submit">
+                        <th:block th:replace="~{fragments/admin-icons :: logout}"></th:block><span>Cerrar sesión</span>
+                    </button>
                 </form>
             </div>
         </details>
     </div>
 
     <div th:replace="~{fragments/panel-dialogs :: confirm}"></div>
+    <div th:replace="~{fragments/panel-dialogs :: actions}"></div>
     <div th:replace="~{fragments/panel-dialogs :: notices}"></div>
 </header>
 

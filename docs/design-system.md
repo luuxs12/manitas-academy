@@ -284,6 +284,9 @@ perfil, cursos y panel de administración:
 | `.admin-inline-form` | formulario desplegable dentro de la página; no es un modal ni un overlay |
 | `.admin-card > h2` / `.admin-module-head h3` / `.admin-section-head h4` | jerarquía 2.1 → 1.5 → 1.2 → 1 rem en el panel; el título del módulo nunca queda más chico que el de la sección |
 | `.admin-row-actions a` / `.admin-row-actions button` | acciones de fila con `min-height: 2rem` para que se puedan tocar con el dedo |
+| `.admin-actions-trigger` / `.ui-dialog--actions` | un solo botón “Acciones” por fila; el modal lista las opciones reales de ese módulo, sección o ítem |
+| `.admin-file-drop` / `.admin-file-input` | área para elegir o arrastrar archivos; el `input` sigue siendo el que envía el formulario y el cuadro muestra el nombre elegido |
+| `.panel-menu-pop--account` / `.panel-menu-item` | menú de la cuenta del admin con avatar, Mi perfil, Configuración y Cerrar sesión |
 
 La misma regla de jerarquía se aplica al alumno: `h1` 2.1 rem, `h2` de la clase y del
 temario 1.5–1.25 rem, título del módulo 1.35 rem y título de la sección 1.0625 rem.

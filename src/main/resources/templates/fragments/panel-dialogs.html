@@ -17,6 +17,20 @@
     </div>
 </dialog>
 
+<!-- Acciones de una fila del temario: un solo botón abre este menú con lo que
+     se puede hacer con ese módulo, sección, ítem o recurso. -->
+<dialog th:fragment="actions" id="actions-dialog" class="ui-dialog ui-dialog--actions"
+        aria-labelledby="actions-dialog-title">
+    <div class="ui-dialog-card">
+        <h2 id="actions-dialog-title" class="ui-dialog-title" data-actions-title>Acciones</h2>
+        <p class="ui-dialog-message" data-actions-message></p>
+        <div class="ui-dialog-actions ui-dialog-actions--stack" data-actions-options></div>
+        <div class="ui-dialog-actions">
+            <button type="button" class="btn btn-ghost" data-dialog-close>Cancelar</button>
+        </div>
+    </div>
+</dialog>
+
 <th:block th:fragment="notices">
     <dialog th:if="${panelOk}" id="success-dialog" class="ui-dialog ui-dialog--success"
             aria-labelledby="success-dialog-title" aria-describedby="success-dialog-message">

@@ -6,6 +6,11 @@
     const confirm = document.getElementById("confirm-dialog");
     if (!confirm) return;
 
+    const actions = document.getElementById("actions-dialog");
+    const actionsTitle = actions?.querySelector("[data-actions-title]");
+    const actionsMessage = actions?.querySelector("[data-actions-message]");
+    const actionsOptions = actions?.querySelector("[data-actions-options]");
+
     const title = confirm.querySelector("[data-confirm-title]");
     const message = confirm.querySelector("[data-confirm-message]");
     const details = confirm.querySelector("[data-confirm-details]");
@@ -14,7 +19,7 @@
 
     const show = (dialog, trigger) => {
         if (!dialog || typeof dialog.showModal !== "function" || dialog.open) return;
-        lastTrigger = trigger ?? null;
+        if (trigger !== undefined) lastTrigger = trigger ?? null;
         dialog.showModal();
         dialog.querySelector("[data-dialog-close]")?.focus();
     };
@@ -38,7 +43,7 @@
     show(notice);
 
     // Borrados: la página de respaldo trae el impacto real, la acción y el CSRF.
-    const openDeletion = async (trigger) => {
+    const openDeletion = async (trigger, focusTarget = trigger) => {
         const url = trigger.dataset.confirmUrl;
         if (!url) return;
         try {
@@ -66,7 +71,7 @@
                 document.body.append(sender);
                 sender.submit();
             };
-            show(confirm, trigger);
+            show(confirm, focusTarget);
         } catch (error) {
             pending = null;
             window.location.assign(url);
@@ -89,7 +94,7 @@
             confirmedForm = form;
             form.requestSubmit();
         };
-        show(confirm, form.querySelector("button[type='submit']"));
+        show(confirm, form.querySelector("button[type='submit']") || undefined);
     });
 
     document.addEventListener("click", (event) => {
@@ -119,8 +124,69 @@
         const trigger = target.closest("[data-confirm-url]");
         if (trigger) {
             event.preventDefault();
-            openDeletion(trigger);
+            if (actions?.contains(trigger)) actions.close();
+            const origin = actions?.contains(trigger)
+                ? trigger.closest("[data-actions]")?.querySelector("[data-actions-trigger]") : trigger;
+            openDeletion(trigger, origin);
         }
+    });
+
+    // Acciones del temario: un disparador por fila y un modal con solo las
+    // opciones que esa fila tiene. Nada se envía hasta elegir una opción.
+    document.addEventListener("click", (event) => {
+        const trigger = event.target instanceof Element
+            ? event.target.closest("[data-actions-trigger]") : null;
+        if (!trigger || !actions || !actionsOptions) return;
+
+        event.preventDefault();
+        const container = trigger.closest("[data-actions]");
+        if (!container) return;
+
+        if (actionsTitle) actionsTitle.textContent = container.dataset.actionsTitle || "Acciones";
+        const message = container.dataset.actionsMessage || "";
+        if (actionsMessage) {
+            actionsMessage.textContent = message;
+            actionsMessage.hidden = !message;
+        }
+
+        actionsOptions.replaceChildren();
+        for (const option of container.querySelectorAll("[data-action-label]")) {
+            const label = option.dataset.actionLabel;
+            let button;
+            if (option.dataset.actionHref) {
+                button = document.createElement("a");
+                button.href = option.dataset.actionHref;
+                button.className = "btn btn-ghost";
+            } else {
+                button = document.createElement("button");
+                button.type = "button";
+                button.className = option.classList.contains("admin-confirm-link")
+                    ? "btn btn-danger" : "btn btn-ghost";
+                if (option.dataset.actionConfirm === "form") {
+                    button.dataset.actionConfirm = "form";
+                    button.dataset.actionForm = option.dataset.actionForm || "";
+                }
+                if (option.dataset.confirmUrl) button.dataset.confirmUrl = option.dataset.confirmUrl;
+            }
+            const icon = option.querySelector(".ico");
+            if (icon) button.append(icon.cloneNode(true));
+            const text = document.createElement("span");
+            text.textContent = label;
+            button.append(text);
+            const aria = option.getAttribute("aria-label");
+            if (aria) button.setAttribute("aria-label", aria);
+            actionsOptions.append(button);
+        }
+        show(actions, trigger);
+    });
+
+    document.addEventListener("click", (event) => {
+        const button = event.target instanceof Element
+            ? event.target.closest("[data-action-confirm='form']") : null;
+        if (!button || !actions.contains(button)) return;
+        event.preventDefault();
+        actions.close();
+        document.getElementById(button.dataset.actionForm)?.requestSubmit();
     });
 
     // Clic en el fondo cierra, igual que Escape en un <dialog> nativo.
@@ -130,7 +196,10 @@
 
     for (const dialog of document.querySelectorAll("dialog.ui-dialog")) {
         dialog.addEventListener("close", () => {
-            if (dialog !== confirm) return;
+            if (dialog !== confirm && dialog !== actions) return;
+            // Si el modal de acciones abrió una confirmación, el foco vuelve
+            // al botón de esa confirmación, no al disparador que ya se cerró.
+            if (document.querySelector("dialog[open]")) return;
             lastTrigger?.focus();
             lastTrigger = null;
         });

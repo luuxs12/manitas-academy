@@ -8172,3 +8172,212 @@ html[data-theme="dark"] .admin-row-actions button { color: #ff9e9e; }
 @media (max-width: 620px) {
     .admin-body .admin-row-actions { flex-wrap: wrap; }
 }
+
+/* Remate visual del panel: tarjetas delineadas, cabeceras verdes de la marca
+   y una sola acción por fila. Sin degradados ni adornos genéricos. */
+.admin-body .panel-card.admin-card,
+.admin-body .admin-card {
+    border: 1px solid var(--line-strong);
+    border-radius: 14px;
+}
+.admin-body .admin-table-wrap {
+    padding: .6rem;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface);
+}
+.admin-body .admin-table th,
+.admin-body .admin-table td {
+    padding: .55rem .7rem;
+    border: 1px solid var(--line);
+}
+.admin-body .admin-table thead th {
+    border-color: var(--accent-line);
+    background: var(--accent-soft);
+    box-shadow: inset 3px 0 0 var(--accent);
+    color: var(--ink);
+    font-weight: 700;
+    letter-spacing: .03em;
+    text-transform: uppercase;
+}
+.admin-body .admin-module {
+    border-color: var(--line-strong);
+    box-shadow: 0 1px 0 var(--accent-line);
+}
+.admin-body .admin-section,
+.admin-body .admin-content-item {
+    padding: .6rem .7rem;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--surface);
+}
+.admin-body .admin-section-head h4,
+.admin-body .admin-content-copy strong { letter-spacing: -.01em; }
+
+.admin-body .admin-icon-action,
+.admin-body .admin-move,
+.admin-body .admin-actions-trigger {
+    display: inline-grid;
+    place-items: center;
+    border: 1px solid var(--line-strong);
+    border-radius: 9px;
+    background: var(--surface);
+    color: var(--ink);
+    cursor: pointer;
+}
+.admin-body .admin-icon-action:hover,
+.admin-body .admin-move:hover,
+.admin-body .admin-actions-trigger:hover {
+    border-color: var(--accent-line);
+    background: var(--accent-soft);
+}
+.admin-body .admin-actions-trigger {
+    border-color: var(--accent-line);
+    background: var(--accent-soft);
+}
+.admin-body .admin-icon-action:focus-visible,
+.admin-body .admin-move:focus-visible,
+.admin-body .admin-actions-trigger:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+.admin-body .admin-row-actions button {
+    border-color: var(--line-strong);
+    color: var(--ink);
+}
+
+.admin-action-menu { display: inline-flex; }
+.admin-actions-source { display: none; }
+.ui-dialog--actions { max-width: 22rem; }
+.ui-dialog--actions .ui-dialog-card {
+    justify-items: stretch;
+    gap: .4rem;
+    text-align: left;
+}
+.ui-dialog--actions .ui-dialog-actions--stack {
+    flex-direction: column;
+    gap: .4rem;
+    margin-top: .5rem;
+}
+.ui-dialog--actions .ui-dialog-actions--stack .btn {
+    width: 100%;
+    min-height: 2.4rem;
+    justify-content: flex-start;
+    text-align: left;
+}
+.ui-dialog--actions .btn-danger {
+    border-color: rgba(211, 47, 47, .35);
+    background: transparent;
+    color: #b3261e;
+}
+html[data-theme="dark"] .ui-dialog--actions .btn-danger { color: #ff9e9e; }
+
+.admin-field-label {
+    display: block;
+    margin-bottom: .3rem;
+    font-size: .78rem;
+    font-weight: 650;
+}
+.admin-file-drop {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    width: 100%;
+    min-height: 64px;
+    padding: .7rem .8rem;
+    border: 1px dashed var(--line-strong);
+    border-radius: 12px;
+    background: var(--surface-2);
+    cursor: pointer;
+}
+.admin-file-drop:hover,
+.admin-file-drop.is-dragging {
+    border-color: var(--accent);
+    background: var(--accent-soft);
+}
+.admin-file-drop.has-file {
+    border-style: solid;
+    border-color: var(--accent-line);
+}
+.admin-file-drop:focus-within {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+.admin-file-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+.admin-file-icon {
+    display: grid;
+    place-items: center;
+    width: 38px;
+    height: 38px;
+    flex: 0 0 auto;
+    border-radius: 10px;
+    background: var(--accent-soft);
+}
+.admin-file-copy { display: grid; gap: .12rem; min-width: 0; }
+.admin-file-copy strong { font-size: .84rem; }
+.admin-file-copy small { color: var(--muted); font-size: .74rem; overflow-wrap: anywhere; }
+
+.panel-topbar { overflow: visible; }
+.panel-menu[open] .panel-menu-pop {
+    z-index: 60;
+    box-shadow: 0 14px 34px rgba(0, 0, 0, .18);
+}
+.panel-menu-pop--account { width: 268px; padding: .7rem; }
+.panel-menu-identity { display: flex; align-items: center; gap: .6rem; padding: .2rem .25rem .45rem; }
+.panel-menu-pop--account .panel-menu-mail { margin: 0; }
+.panel-avatar--menu { width: 38px; height: 38px; flex: 0 0 auto; }
+.panel-menu-role {
+    display: inline-block;
+    margin: 0 .25rem .45rem;
+    padding: .15rem .45rem;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    font-size: .66rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+.panel-menu-divider { height: 1px; margin: .25rem 0; background: var(--line); }
+.panel-menu-pop--account .panel-menu-item {
+    display: flex;
+    align-items: center;
+    gap: .55rem;
+    padding: .5rem .45rem;
+    border-radius: 9px;
+}
+.panel-menu-pop--account .panel-menu-item .ico { width: 16px; height: 16px; color: var(--muted); }
+.panel-menu-pop--account .panel-menu-item:hover { background: var(--accent-soft); }
+.panel-menu-pop--account .panel-menu-item:hover .ico { color: var(--ink); }
+.panel-menu-item--exit { color: #b3261e; }
+html[data-theme="dark"] .panel-menu-item--exit { color: #ff9e9e; }
+
+.admin-profile-photo { display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem; }
+.admin-profile-photo p { margin: 0 0 .25rem; }
+.panel-avatar--xl { width: 72px; height: 72px; font-size: 1.3rem; }
+.admin-profile-data {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    gap: .6rem;
+    margin: 0;
+}
+.admin-profile-data > div {
+    padding: .7rem .8rem;
+    border: 1px solid var(--line);
+    border-radius: 10px;
+    background: var(--surface-2);
+}
+.admin-profile-data dt {
+    color: var(--muted);
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .04em;
+    text-transform: uppercase;
+}
+.admin-profile-data dd { margin: .2rem 0 0; font-size: .9rem; font-weight: 600; overflow-wrap: anywhere; }

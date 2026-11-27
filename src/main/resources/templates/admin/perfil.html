@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+
+<head th:replace="~{admin/fragments/admin-head :: adminHead('Mi perfil')}"></head>
+
+<body class="panel-body admin-body">
+<a class="skip-link" href="#panel-main">Saltar al contenido</a>
+<div class="panel admin">
+    <aside th:replace="~{admin/fragments/admin-nav :: sidebar('perfil')}"></aside>
+    <div class="panel-shell">
+        <header th:replace="~{admin/fragments/admin-nav :: topbar('Mi perfil', 'Tu cuenta en el panel', '')}"></header>
+        <main id="panel-main" class="panel-main admin-main">
+            <div class="admin-page-head">
+                <div>
+                    <h1>Mi perfil</h1>
+                    <p>Tu foto y tus datos de acceso en un solo lugar.</p>
+                </div>
+                <a class="admin-back" th:href="@{/admin/configuracion}">← Configuración</a>
+            </div>
+
+            <section class="panel-card admin-card" id="foto" aria-labelledby="perfil-foto-titulo">
+                <div class="panel-section-head"><h2 id="perfil-foto-titulo">Foto de perfil</h2><span class="panel-rule" aria-hidden="true"></span></div>
+                <div class="admin-profile-photo">
+                    <span class="panel-avatar panel-avatar--xl" aria-hidden="true"
+                          th:classappend="${usuarioActual.hasAvatar()} ? ' panel-avatar--photo' : ''">
+                        <img th:if="${usuarioActual.hasAvatar()}"
+                             th:src="${usuarioActual.avatarPath()}" alt="">
+                        <span th:unless="${usuarioActual.hasAvatar()}"
+                              th:text="${usuarioActual.initials()}">LF</span>
+                    </span>
+                    <div>
+                        <p>La misma foto aparece en la cabecera y en el menú de la cuenta.</p>
+                        <p class="admin-hint">JPG, PNG o WebP de hasta 2 MB. Si no subís una foto, se muestran tus iniciales.</p>
+                    </div>
+                </div>
+
+                <form class="admin-form" method="post" enctype="multipart/form-data"
+                      th:action="@{/admin/perfil/foto}">
+                    <label class="admin-file-drop" for="avatar">
+                        <input id="avatar" class="admin-file-input" name="avatar" type="file"
+                               accept="image/jpeg,image/png,image/webp"
+                               aria-describedby="hint-avatar-admin">
+                        <span class="admin-file-icon" aria-hidden="true">
+                            <th:block th:replace="~{fragments/admin-icons :: camera}"></th:block>
+                        </span>
+                        <span class="admin-file-copy">
+                            <strong>Elegir imagen</strong>
+                            <small data-file-name>JPG, PNG o WebP · hasta 2 MB</small>
+                        </span>
+                    </label>
+                    <p class="admin-hint" id="hint-avatar-admin">La imagen se guarda solo en tu cuenta.</p>
+                    <div class="admin-form-actions">
+                        <button class="btn btn-admin" type="submit">Subir foto</button>
+                        <button class="btn btn-ghost" type="submit" th:if="${usuarioActual.hasAvatar()}"
+                                th:formaction="@{/admin/perfil/foto/eliminar}"
+                                formenctype="application/x-www-form-urlencoded"
+                                formnovalidate>Quitar foto</button>
+                    </div>
+                </form>
+            </section>
+
+            <section class="panel-card admin-card" aria-labelledby="perfil-datos-titulo">
+                <div class="panel-section-head"><h2 id="perfil-datos-titulo">Datos de la cuenta</h2><span class="panel-rule" aria-hidden="true"></span></div>
+                <dl class="admin-profile-data">
+                    <div><dt>Nombre</dt><dd th:text="${perfil.getNombreCompleto()}">Administrador</dd></div>
+                    <div><dt>Correo</dt><dd th:text="${perfil.getEmail()}">admin@damianprint.com</dd></div>
+                    <div><dt>Rol</dt><dd th:text="${perfil.getRol() == 'ADMIN'} ? 'Administrador' : 'Estudiante'">Administrador</dd></div>
+                </dl>
+            </section>
+        </main>
+    </div>
+</div>
+<script defer th:src="@{/js/panel.js}"></script>
+<script defer th:src="@{/js/admin.js}"></script>
+</body>
+</html>

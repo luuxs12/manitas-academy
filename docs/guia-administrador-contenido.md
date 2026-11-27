@@ -75,11 +75,12 @@ poder marcarlo como visto a mano desde el temario.
 ### 3. Ordenar y borrar
 
 Las flechas de cada sección y de cada ítem los suben o bajan dentro de su grupo.
-El ojo alterna la visibilidad de módulos, secciones e ítems; el cambio se guarda
-de inmediato y el alumno deja de ver ese bloque. Para borrar, primero se abre un
-**modal** con el título real; el borrado recién
-se ejecuta con un POST que conserva el token CSRF. Sin JavaScript se usa la
-página de confirmación. No se abren ventanas nuevas.
+El botón **“Acciones”** abre un modal con las opciones de esa fila: editar cuando
+corresponde, ocultar o mostrar y eliminar. La visibilidad se guarda recién
+después de confirmar, y el alumno deja de ver el bloque. Para borrar, el modal
+muestra el título real; el borrado recién se ejecuta con un POST que conserva el
+token CSRF. Sin JavaScript se usa la página de confirmación. No se abren
+ventanas nuevas.
 
 Al borrar una sección, sus ítems pasan a “Sin sección” y conservan su progreso.
 Al borrar un ítem, se borra también el avance asociado a ese ítem.
@@ -145,6 +146,16 @@ conservan el `requestId` de los logs.
 Los datos los sirve `/admin/api/monitoreo` cada 2 segundos. El navegador no
 consulta Actuator: las métricas recientes viven en un buffer acotado del
 servidor y los conteos de negocio se leen de PostgreSQL con cache corta.
+
+## Mi cuenta
+
+El menú de la derecha del encabezado muestra tu nombre, **Mi perfil**,
+**Configuración** y **Cerrar sesión**. En **Mi perfil** podés subir o quitar la
+foto que aparece en la cabecera y en ese mismo menú. El archivo se elige desde
+un área con icono de cámara: también se puede arrastrar una imagen encima.
+Acepta JPG, PNG o WebP de hasta 2 MB; si no hay foto, se muestran tus iniciales.
+El formulario de documentos usa el mismo tipo de área: elige o arrastra el
+archivo y el cuadro pasa a mostrar su nombre.
 
 Las migraciones ya ejecutadas **no se editan**: un cambio nuevo va en una
 migración posterior a `V17`.

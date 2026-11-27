@@ -64,3 +64,40 @@
     });
 })();
 
+/* Selector de archivos: el `<input>` sigue siendo el que envía el formulario;
+   la caja solo muestra qué se eligió y acepta arrastrar el archivo encima. */
+(() => {
+    for (const input of document.querySelectorAll(".admin-file-input")) {
+        const drop = input.closest(".admin-file-drop");
+        const name = drop?.querySelector("[data-file-name]");
+        const hint = name?.textContent?.trim() || "Elegí un archivo";
+
+        const sync = () => {
+            if (!name) return;
+            const file = input.files?.[0];
+            name.textContent = file ? file.name : hint;
+            drop.classList.toggle("has-file", Boolean(file));
+        };
+
+        input.addEventListener("change", sync);
+        if (!drop) continue;
+
+        for (const event of ["dragenter", "dragover"]) {
+            drop.addEventListener(event, (e) => {
+                e.preventDefault();
+                drop.classList.add("is-dragging");
+            });
+        }
+        for (const event of ["dragleave", "drop"]) {
+            drop.addEventListener(event, () => drop.classList.remove("is-dragging"));
+        }
+        drop.addEventListener("drop", (e) => {
+            e.preventDefault();
+            if (e.dataTransfer?.files?.length) {
+                input.files = e.dataTransfer.files;
+                sync();
+            }
+        });
+    }
+})();
+

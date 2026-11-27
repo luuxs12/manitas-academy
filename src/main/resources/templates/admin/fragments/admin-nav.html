@@ -215,9 +215,6 @@
                 <a class="panel-menu-item" th:href="@{/admin/perfil}">
                     <th:block th:replace="~{fragments/admin-icons :: user}"></th:block><span>Mi perfil</span>
                 </a>
-                <a class="panel-menu-item" th:href="@{/admin/configuracion}">
-                    <th:block th:replace="~{fragments/admin-icons :: clipboard}"></th:block><span>Configuración</span>
-                </a>
                 <div class="panel-menu-divider"></div>
                 <form th:action="@{/logout}" method="post">
                     <button class="panel-menu-item panel-menu-item--exit" type="submit">

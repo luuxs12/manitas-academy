@@ -35,7 +35,7 @@
 
             <section class="panel-continue" th:if="${next != null}"
                      th:with="curso=${next.curso}" aria-labelledby="titulo-continuar">
-                <img class="panel-continue-media" th:src="${!#strings.isEmpty(curso.imagen) ? curso.imagen : '/img/curso-placeholder.svg'}" alt=""
+                <img class="panel-continue-media" th:src="${!#strings.isEmpty(curso.imagen) ? curso.imagen : '/img/course-placeholder.svg'}" alt=""
                      width="960" height="600">
                 <div class="panel-continue-copy">
                     <p class="panel-eyebrow">Tu próximo curso</p>
@@ -82,7 +82,7 @@
 
                     <div class="panel-course-grid" th:if="${!#lists.isEmpty(enrollments)}">
                         <article class="panel-course" th:each="inscripcion : ${enrollments}">
-                            <img th:src="${!#strings.isEmpty(inscripcion.curso.imagen) ? inscripcion.curso.imagen : '/img/curso-placeholder.svg'}" alt=""
+                            <img th:src="${!#strings.isEmpty(inscripcion.curso.imagen) ? inscripcion.curso.imagen : '/img/course-placeholder.svg'}" alt=""
                                  width="960" height="600" loading="lazy">
                             <div class="panel-course-body">
                                 <h3 th:text="${inscripcion.curso.titulo}"></h3>
@@ -152,7 +152,7 @@
                 </div>
                 <div class="panel-course-grid panel-course-grid--compact">
                     <article class="panel-course" th:each="curso : ${recommended}">
-                        <img th:src="${!#strings.isEmpty(curso.imagen) ? curso.imagen : '/img/curso-placeholder.svg'}" alt="" width="960" height="600" loading="lazy">
+                        <img th:src="${!#strings.isEmpty(curso.imagen) ? curso.imagen : '/img/course-placeholder.svg'}" alt="" width="960" height="600" loading="lazy">
                         <div class="panel-course-body">
                             <h3 th:text="${curso.titulo}"></h3>
                             <span class="panel-chip" th:text="${curso.categoria}"></span>

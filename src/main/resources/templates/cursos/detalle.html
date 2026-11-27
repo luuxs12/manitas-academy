@@ -79,7 +79,7 @@
             </div>
 
             <div class="detail-media">
-                <img th:src="${!#strings.isEmpty(curso.imagen) ? curso.imagen : '/img/curso-placeholder.svg'}"
+                <img th:src="${!#strings.isEmpty(curso.imagen) ? curso.imagen : '/img/course-placeholder.svg'}"
                      th:alt="'Portada del curso ' + ${curso.titulo}"
                      width="960" height="600" fetchpriority="high" decoding="async">
                 <span class="course-badge" th:text="${curso.categoria}">Programación</span>

@@ -71,7 +71,6 @@
     --inverse: #000000;
     --inverse-hover: #262626;
     --on-inverse: #ffffff;
-    --hero-bg: #000000;
 
     /* Marca */
     --accent: #00ff00;
@@ -92,7 +91,6 @@
     --line-strong: rgba(0, 0, 0, .18);
     --line-hover: rgba(0, 0, 0, .34);
     --focus: #000000;
-    --scrollbar: rgba(0, 0, 0, .3);
 
     /* Sombras suaves */
     --shadow-sm: 0 1px 2px rgba(0, 0, 0, .05), 0 8px 24px rgba(0, 0, 0, .06);
@@ -138,7 +136,6 @@ html[data-theme="dark"] {
     --line-strong: rgba(255, 255, 255, .24);
     --line-hover: rgba(255, 255, 255, .42);
     --focus: #00ff00;
-    --scrollbar: rgba(255, 255, 255, .32);
 
     --ok: #4ce0c4;
     --ok-soft: rgba(76, 224, 196, .14);
@@ -153,7 +150,6 @@ html[data-theme="dark"] {
     color-scheme: dark;
 }
 
-/* ---- Base ---- */
 
 *,
 *::before,
@@ -265,7 +261,6 @@ textarea { caret-color: var(--ink); }
 
 main { scroll-margin-top: 90px; }
 
-/* ---- Accesibilidad ---- */
 
 .skip-link {
     position: absolute;
@@ -292,7 +287,6 @@ main { scroll-margin-top: 90px; }
     font-weight: 650;
 }
 
-/* ---- Cabecera ---- */
 
 .site-header {
     position: sticky;
@@ -563,7 +557,6 @@ html[data-theme="dark"] .theme-toggle .ico-sun { display: block; }
     height: 17px;
 }
 
-/* ---- Botones ---- */
 
 .btn {
     display: inline-flex;
@@ -638,7 +631,6 @@ html[data-theme="dark"] .theme-toggle .ico-sun { display: block; }
     color: var(--ink);
 }
 
-/* ---- Portada ---- */
 
 .hero {
     position: relative;
@@ -832,7 +824,6 @@ html[data-theme="dark"] .theme-toggle .ico-sun { display: block; }
     border-color: var(--ink);
 }
 
-/* ---- Secciones ---- */
 
 .section {
     max-width: var(--max);
@@ -922,7 +913,6 @@ html[data-theme="dark"] .theme-toggle .ico-sun { display: block; }
     text-wrap: pretty;
 }
 
-/* ---- Cursos ---- */
 
 .courses {
     display: grid;
@@ -1134,7 +1124,6 @@ html[data-theme="dark"] .theme-toggle .ico-sun { display: block; }
 
 .course:hover .course-go { color: var(--ink); }
 
-/* ---- Pasos ---- */
 
 .steps {
     display: grid;
@@ -1172,7 +1161,6 @@ html[data-theme="dark"] .theme-toggle .ico-sun { display: block; }
     line-height: 1.6;
 }
 
-/* ---- Características ---- */
 
 .split {
     display: grid;
@@ -1237,7 +1225,6 @@ html[data-theme="dark"] .theme-toggle .ico-sun { display: block; }
     line-height: 1.6;
 }
 
-/* ---- Accesibilidad: esquema de una lección ---- */
 
 .a11y-split .split-head { position: static; }
 
@@ -1313,7 +1300,6 @@ html[data-theme="dark"] .theme-toggle .ico-sun { display: block; }
     line-height: 1.5;
 }
 
-/* ---- Historias ---- */
 
 .stories-head {
     display: flex;
@@ -1381,19 +1367,6 @@ html[data-theme="dark"] .theme-toggle .ico-sun { display: block; }
     letter-spacing: .02em;
 }
 
-.who {
-    display: flex;
-    flex-direction: column;
-    line-height: 1.35;
-}
-
-.who strong { font-size: .9rem; }
-
-.who span {
-    color: var(--muted);
-    font-size: .78rem;
-}
-
 .stories-note {
     margin: 1.7rem 0 0;
     color: var(--muted);
@@ -1409,7 +1382,6 @@ html[data-theme="dark"] .theme-toggle .ico-sun { display: block; }
 
 .stories-note a:hover { text-decoration-color: var(--ink); }
 
-/* ---- Membresía ---- */
 
 .plans-head {
     max-width: 42rem;
@@ -1598,7 +1570,6 @@ html[data-theme="dark"] .theme-toggle .ico-sun { display: block; }
     line-height: 1.55;
 }
 
-/* ---- Llamado final ---- */
 
 .final-cta {
     text-align: center;
@@ -1631,7 +1602,6 @@ html[data-theme="dark"] .theme-toggle .ico-sun { display: block; }
     font-size: .84rem;
 }
 
-/* ---- Catálogo de cursos ---- */
 
 .catalog-head {
     max-width: 46rem;
@@ -1743,7 +1713,6 @@ html[data-theme="dark"] .theme-toggle .ico-sun { display: block; }
     font-weight: 650;
 }
 
-/* ---- Páginas legales ---- */
 
 .legal {
     max-width: 76rem;
@@ -1941,7 +1910,6 @@ html[data-theme="dark"] .theme-toggle .ico-sun { display: block; }
     font-size: .82rem;
 }
 
-/* ---- Detalle de curso ---- */
 
 .back-link {
     display: inline-block;
@@ -2079,7 +2047,6 @@ html[data-theme="dark"] .theme-toggle .ico-sun { display: block; }
 
 .detail-related { padding-top: .5rem; }
 
-/* ---- Nosotros ---- */
 
 .page-about { padding-top: 3.4rem; }
 
@@ -2392,7 +2359,6 @@ html[data-theme="dark"] .theme-toggle .ico-sun { display: block; }
     gap: .8rem;
 }
 
-/* ---- Páginas internas (login, registro, perfil) ---- */
 
 .page {
     max-width: var(--max);
@@ -2486,7 +2452,6 @@ html[data-theme="dark"] .theme-toggle .ico-sun { display: block; }
     color: var(--on-inverse);
 }
 
-/* ---- Campos ---- */
 
 .auth-form {
     display: grid;
@@ -2756,7 +2721,6 @@ html[data-theme="dark"] .field select {
     text-decoration-thickness: 1px;
 }
 
-/* ---- Panel de la derecha: foto, velo negro y propuesta encima ---- */
 
 .auth-aside {
     position: relative;
@@ -2866,7 +2830,6 @@ html[data-theme="dark"] .field select {
     letter-spacing: .02em;
 }
 
-/* ---- Modal de cuenta ---- */
 
 /* El diálogo es la capa; el panel repite las dos columnas de las páginas
    completas. El fondo de la página queda difuminado con ::backdrop. */
@@ -3057,7 +3020,6 @@ body.has-auth-dialog { overflow: hidden; }
     to { opacity: 1; }
 }
 
-/* ---- Pie ---- */
 
 .site-footer {
     position: relative;
@@ -3232,7 +3194,6 @@ body.has-auth-dialog { overflow: hidden; }
     text-decoration: none;
 }
 
-/* ---- Movimiento ---- */
 
 @keyframes fade-in {
     from { opacity: 0; }
@@ -3377,7 +3338,6 @@ body.has-auth-dialog { overflow: hidden; }
     .footer-mail:hover .footer-mail-arrow { translate: none; }
 }
 
-/* ---- Animación por scroll ---- */
 
 @keyframes enter-rise {
     from {
@@ -3421,7 +3381,6 @@ body.has-auth-dialog { overflow: hidden; }
     .feature:nth-child(4) { animation-range: entry 16% cover 40%; }
 }
 
-/* ---- Panel del estudiante ---- */
 
 .panel-body { background: var(--panel-bg); }
 
@@ -4409,7 +4368,6 @@ body.has-auth-dialog { overflow: hidden; }
     .panel-welcome h1 { font-size: 2.1rem; }
 }
 
-/* ---- Modo oscuro: ajustes por componente ---- */
 
 /* Sobre superficies oscuras (portada, pie, plan anual) los botones
    claros siguen siendo claros: el fondo no cambia de tema. */
@@ -4474,7 +4432,6 @@ html[data-theme="dark"] .panel-progress-card {
     box-shadow: none;
 }
 
-/* ---- Responsive ---- */
 
 @media (max-width: 1300px) {
     .nav { gap: 1.2rem; }
@@ -4992,7 +4949,6 @@ html[data-theme="dark"] .panel-progress-card {
     }
 }
 
-/* ---- Módulos del panel: cursos, matrículas, perfil y certificados ---- */
 
 .panel-page-head {
     display: flex;
@@ -5494,7 +5450,6 @@ html[data-theme="dark"] .panel-progress-card {
     }
 }
 
-/* ---- Módulos de cuenta: KPIs, tarjetas compactas y avisos ---- */
 
 /* Franja de KPIs: números grandes, etiquetas cortas y una sola fila. */
 .panel-kpis {
@@ -6141,7 +6096,6 @@ html[data-theme="dark"] .panel-progress-card {
 .admin-line--users { stroke: #00c2a8; }
 .admin-line--courses { stroke: #ffb020; }
 
-/* ---- Monitoreo: consola operativa con señales reales ---- */
 
 .admin-monitor {
     --monitor-grid: rgba(0, 0, 0, .07);
@@ -7734,7 +7688,6 @@ html[data-theme="dark"] .admin-row-actions button { color: #ff9e9e; }
     .course-stage { position: static; }
 }
 
-/* ---- Temario estructurado del estudiante ---- */
 
 .course-syllabus .panel-section-head h2 {
     font-size: 1.5rem;
@@ -7962,7 +7915,6 @@ html[data-theme="dark"] .admin-row-actions button { color: #ff9e9e; }
     .quiz-admin-option .admin-error { grid-column: 2; }
 }
 
-/* ---- Ajuste final del panel admin: densidad, alineación y sin huecos ---- */
 
 .admin-body .admin-topbar-title { flex: 1 1 300px; min-width: 0; }
 .admin-body .admin-subtitle { white-space: normal; overflow-wrap: anywhere; line-height: 1.3; }
@@ -8084,7 +8036,6 @@ html[data-theme="dark"] .admin-row-actions button { color: #ff9e9e; }
     .admin-body .admin-module-actions .admin-session-download { white-space: normal; text-align: center; }
 }
 
-/* ---- Formularios compactos, acciones con icono y títulos de marca ---- */
 
 .admin-body .admin-form-grid { align-items: start; }
 .admin-body .admin-form-grid > .admin-field,

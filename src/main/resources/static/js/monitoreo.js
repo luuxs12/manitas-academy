@@ -6,7 +6,6 @@
     if (!root) return;
 
     const SVG = "http://www.w3.org/2000/svg";
-    const INTERVALO = 2000;
     const CONFIG = { izquierda: 48, derecha: 930, arriba: 30, abajo: 210 };
     const CONFIG_ACTIVIDAD = { izquierda: 40, derecha: 860, arriba: 40, abajo: 210 };
     const CONFIG_RECURSO = { izquierda: 8, derecha: 292, arriba: 12, abajo: 112 };

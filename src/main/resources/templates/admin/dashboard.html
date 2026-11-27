@@ -99,7 +99,7 @@
                         </div>
                         <ul class="admin-popular" th:if="${!#lists.isEmpty(popular)}">
                             <li class="admin-popular-item" th:each="curso, iter : ${popular}">
-                                <img th:src="${!#strings.isEmpty(curso.imagen()) ? curso.imagen() : '/img/curso-placeholder.svg'}" alt="" width="960" height="600" loading="lazy">
+                                <img th:src="${!#strings.isEmpty(curso.imagen()) ? curso.imagen() : '/img/course-placeholder.svg'}" alt="" width="960" height="600" loading="lazy">
                                 <div class="admin-popular-body">
                                     <strong th:text="${curso.titulo()}">Curso</strong>
                                     <span th:text="${curso.inscripto() + ' inscriptos'}">0 inscriptos</span>

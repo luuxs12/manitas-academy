@@ -8,7 +8,7 @@
 <div class="panel admin">
     <aside th:replace="~{admin/fragments/admin-nav :: sidebar('certificados')}"></aside>
     <div class="panel-shell">
-        <header th:replace="~{admin/fragments/admin-nav :: topbar('Certificados', 'Emisión y revocación con reglas Premium', ${query})}"></header>
+        <header th:replace="~{admin/fragments/admin-nav :: topbar('Certificados', 'Emisión y revocación', ${query})}"></header>
         <main id="panel-main" class="panel-main admin-main">
 
             <div class="admin-page-head">
@@ -24,7 +24,7 @@
 
             <section class="panel-card admin-card admin-issue" aria-labelledby="admin-issue-title">
                 <h2 id="admin-issue-title">Emitir certificado</h2>
-                <p class="admin-muted">Solo cuentas Premium con el curso finalizado. La revocación conserva el historial.</p>
+                <p class="admin-muted">Premium con curso finalizado. La revocación guarda historial.</p>
                 <form class="admin-form" th:action="@{/admin/certificados/emitir}" th:object="${adminCertificadoFormulario}"
                       method="post" novalidate data-confirm-form
                       data-confirm-message="¿Emitir el certificado para la persona y el curso elegidos?">
@@ -52,7 +52,7 @@
                         <strong th:text="${e.usuarioNombre()}">Nombre</strong> · <span th:text="${e.cursoTitulo()}">Curso</span><span th:if="${!iter.last}">; </span>
                     </span>
                 </p>
-                <p class="admin-hint" th:if="${#lists.isEmpty(elegible)}">No hay matrículas finalizadas de cuentas Premium pendientes de emisión.</p>
+                <p class="admin-hint" th:if="${#lists.isEmpty(elegible)}">Sin emisiones pendientes.</p>
             </section>
 
             <form class="admin-filters admin-filters--full" method="get" th:action="@{/admin/certificados}">
@@ -65,7 +65,7 @@
 
             <div class="panel-card admin-card admin-table-wrap">
                 <table class="admin-table">
-                    <caption>Certificados emitidos desde la base, con su estado vigente o revocado.</caption>
+                    <caption>Certificados y estado.</caption>
                     <thead><tr><th scope="col">Código</th><th scope="col">Persona</th><th scope="col">Curso</th><th scope="col">Emisión</th><th scope="col">Estado</th><th scope="col">Acciones</th></tr></thead>
                     <tbody>
                     <tr th:each="item : ${page.content}">
@@ -82,7 +82,7 @@
                                     th:attr="data-confirm-url=@{/admin/certificados/{id}/revocar(id=${item.id()}, code=${item.code()})}, aria-label='Revocar ' + ${item.code()}"><th:block th:replace="~{fragments/admin-icons :: ban}"></th:block><span class="sr-only">Revocar</span></button>
                         </td>
                     </tr>
-                    <tr th:if="${#lists.isEmpty(page.content)}"><td colspan="6" class="admin-empty">Todavía no se emitieron certificados.</td></tr>
+                    <tr th:if="${#lists.isEmpty(page.content)}"><td colspan="6" class="admin-empty">Sin certificados.</td></tr>
                     </tbody>
                 </table>
             </div>

@@ -10,7 +10,7 @@
     <aside th:replace="~{admin/fragments/admin-nav :: sidebar('monitoreo')}"></aside>
 
     <div class="panel-shell">
-        <header th:replace="~{admin/fragments/admin-nav :: topbar('Monitoreo', 'Centro de operaciones de la plataforma', '')}"></header>
+        <header th:replace="~{admin/fragments/admin-nav :: topbar('Monitoreo', 'Señales en vivo', '')}"></header>
 
         <main id="panel-main" class="panel-main admin-main admin-monitor" data-monitoreo
               th:attr="data-admin-since=${adminDesde}">
@@ -20,7 +20,7 @@
                     <div class="monitor-console-title">
                         <span class="monitor-eyebrow">Centro de operaciones</span>
                         <h1>Monitoreo</h1>
-                        <p>Señales reales del servidor y de PostgreSQL. Refresco automático cada 2 segundos.</p>
+                        <p>Datos reales. Actualización cada 2 s.</p>
                     </div>
                     <div class="monitor-live" role="status" aria-live="polite">
                         <div class="monitor-live-row">
@@ -290,7 +290,7 @@
                                 <span><i class="admin-dot admin-dot--warn"></i>4xx</span>
                                 <span><i class="admin-dot admin-dot--bad"></i>5xx</span>
                             </span>
-                            <span class="monitor-card-note">Pasa el cursor sobre el gráfico para ver el minuto</span>
+                            <span class="monitor-card-note">Pasa el cursor para ver el minuto.</span>
                         </footer>
                     </section>
 
@@ -356,7 +356,7 @@
                                 <span class="monitor-card-kicker">Salud</span>
                                 <h2 id="monitor-senal">Señal por minuto</h2>
                             </div>
-                            <span class="monitor-card-note">Cada celda es un minuto real</span>
+                            <span class="monitor-card-note">Cada celda: 1 minuto.</span>
                         </header>
                         <div class="monitor-heatmap" data-monitoreo-franjas role="img"
                              aria-label="Estado de cada minuto de los últimos 30 minutos"></div>

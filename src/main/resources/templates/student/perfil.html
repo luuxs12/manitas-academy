@@ -185,9 +185,7 @@
                 </div>
 
                 <p class="panel-progress-copy">
-                    Tu plan actual es <strong th:text="${usuarioActual.planLabel()}">Gratis</strong>.
-                    Los cursos de paga y los certificados se habilitan cuando se confirma un pago:
-                    el plan nunca se cambia a mano desde el perfil.
+                    Plan <strong th:text="${usuarioActual.planLabel()}">Gratis</strong>. Se activa con el pago.
                 </p>
 
                 <p class="panel-note" th:if="${usuarioActual.premium() and !subscriptionFinLabel.isEmpty()}">

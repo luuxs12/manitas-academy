@@ -10,15 +10,15 @@
     <aside th:replace="~{admin/fragments/admin-nav :: sidebar('inicio')}"></aside>
 
     <div class="panel-shell">
-        <header th:replace="~{admin/fragments/admin-nav :: topbar('Panel Administrativo', 'Gestión integral de Mundo Manitas', '')}"></header>
+        <header th:replace="~{admin/fragments/admin-nav :: topbar('Panel Administrativo', 'Panel Mundo Manitas', '')}"></header>
 
         <main id="panel-main" class="panel-main admin-main"
               th:attr="data-admin-since=${adminDesde}">
 
             <section class="admin-hero" aria-labelledby="admin-hero-title">
                 <div class="admin-hero-copy">
-                    <h1 id="admin-hero-title">Bienvenido, Administrador</h1>
-                    <p>Administrá cuentas, cursos y contenido accesible desde un solo lugar.</p>
+                    <h1 id="admin-hero-title">Tu panel</h1>
+                    <p>Cuentas, cursos y contenido en un lugar.</p>
                     <a class="btn btn-admin" th:href="@{/admin/usuarios}">Gestionar usuarios <span aria-hidden="true">→</span></a>
                 </div>
                 <img class="admin-hero-media" th:src="@{/img/nosotros/clase-lsp.jpg}"
@@ -112,7 +112,7 @@
                             </li>
                         </ul>
                         <p class="admin-empty" th:if="${#lists.isEmpty(popular)}">
-                            Todavía no hay inscripciones. El ranking aparece cuando el alumnado se inscriba.
+                            Sin inscripciones.
                         </p>
                     </section>
 

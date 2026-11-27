@@ -129,7 +129,7 @@
 <header th:fragment="topbar(heading, subtitle, query)" class="panel-topbar admin-topbar">
     <div class="admin-topbar-title">
         <p class="panel-area" th:text="${heading}">Panel Administrativo</p>
-        <p class="admin-subtitle" th:text="${subtitle}">Gestión integral de Mundo Manitas</p>
+        <p class="admin-subtitle" th:text="${subtitle}">Panel Mundo Manitas</p>
     </div>
 
     <form class="panel-search" role="search" th:action="@{/admin/buscar}" method="get">
@@ -164,8 +164,7 @@
                 </ul>
                 <p class="panel-notify-empty" data-admin-empty
                    th:if="${adminEvents == null or #lists.isEmpty(adminEvents)}">
-                    Todavía no hay actividad: aparece cuando se crea o edita contenido,
-                    se emite un certificado o se confirma un pago.
+                    Sin actividad reciente.
                 </p>
                 <a th:href="@{/admin/auditoria}">Ver registro de auditoría <span aria-hidden="true">→</span></a>
             </div>

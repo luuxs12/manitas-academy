@@ -8,10 +8,10 @@
 <div class="panel admin">
     <aside th:replace="~{admin/fragments/admin-nav :: sidebar('reportes')}"></aside>
     <div class="panel-shell">
-        <header th:replace="~{admin/fragments/admin-nav :: topbar('Reportes', 'Finalización, ingresos y retención reales', '')}"></header>
+        <header th:replace="~{admin/fragments/admin-nav :: topbar('Reportes', 'Métricas reales', '')}"></header>
         <main id="panel-main" class="panel-main admin-main">
             <div class="admin-page-head">
-                <div><h1>Reportes</h1><p>Datos calculados sobre PostgreSQL; sin valores de ejemplo.</p></div>
+                <div><h1>Reportes</h1><p>Solo datos reales.</p></div>
                 <div class="admin-actions">
                     <form class="admin-filters" method="get" th:action="@{/admin/reportes}">
                         <label class="sr-only" for="report-days">Período</label>

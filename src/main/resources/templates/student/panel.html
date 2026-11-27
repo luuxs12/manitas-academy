@@ -16,20 +16,20 @@
 
             <div class="panel-welcome-alert" th:if="${welcome}" role="status">
                 <strong>Tu cuenta está lista.</strong>
-                <span>Acá vas a inscribirte a cursos y seguir tu aprendizaje.</span>
+                <span>Inscribite a un curso.</span>
             </div>
 
             <section class="panel-welcome" aria-labelledby="titulo-panel">
                 <div class="panel-welcome-copy">
                     <div class="panel-welcome-line">
                         <h1 id="titulo-panel">
-                            ¡Hola, <span class="panel-name" th:text="${usuarioActual.nombreCompleto()}">Lucía</span>!
+                            Hola, <span class="panel-name" th:text="${usuarioActual.nombreCompleto()}">Lucía</span>
                         </h1>
                         <a class="panel-plan" th:href="@{/panel/perfil} + '#plan'"
                            th:text="${'Plan ' + usuarioActual.planLabel()}"
                            title="Ver mi tipo de cuenta">Plan gratis</a>
                     </div>
-                    <p>Continuá aprendiendo a tu ritmo.</p>
+                    <p>Aprendé a tu ritmo.</p>
                 </div>
             </section>
 
@@ -116,7 +116,7 @@
                             </svg>
                         </span>
                         <div>
-                            <h3>Todavía no estás inscripto</h3>
+                            <h3>Sin cursos inscritos</h3>
                             <p>Elegí un curso gratis y empezá cuando quieras.</p>
                         </div>
                         <a class="btn btn-ghost" th:href="@{/panel/explorar}">Explorar cursos</a>

@@ -21,7 +21,7 @@
             <form class="admin-form" th:action="@{/admin/ejercicios/{id}/preguntas(id=${itemId})}"
                   th:object="${adminCuestionarioFormulario}" method="post" novalidate data-confirm-form
                   data-confirm-message="¿Reemplazar el cuestionario actual con estas diez preguntas?">
-                <p class="admin-hint">Cargá diez preguntas con cuatro alternativas. Marcá la respuesta correcta de cada una. Cada acierto vale 2 puntos.</p>
+                <p class="admin-hint">Diez preguntas, cuatro alternativas. Marcá la correcta. Cada acierto vale 2.</p>
                 <p class="admin-error" role="alert" th:if="${#fields.hasErrors('questions')}" th:errors="*{questions}"></p>
 
                 <section class="panel-card admin-card quiz-admin-question"

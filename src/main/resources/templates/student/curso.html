@@ -65,7 +65,7 @@
                                     allowfullscreen loading="lazy"></iframe>
                         </div>
                         <p class="player-note">
-                            Este video se reproduce desde YouTube sin cookies de terceros.
+                            Video de YouTube sin cookies.
                         </p>
                         <p class="player-hint" data-video-end-hint aria-live="polite"></p>
                         <form class="player-actions" th:if="${esLsp}"
@@ -88,11 +88,8 @@
                     <section class="player-empty" th:if="${player == null and material == null}"
                              aria-labelledby="titulo-elegir">
                         <h2 id="titulo-elegir">Elegí una sesión para empezar</h2>
-                        <p>Hacé clic en una sesión del temario y su video aparece acá, a la izquierda.</p>
-                        <p class="player-empty-hint">
-                            También podés abrir un video o un PDF desde su fila. Los ejercicios
-                            se rinden desde su propia fila.
-                        </p>
+                        <p>Elegí una sesión.</p>
+                        <p class="player-empty-hint">Cada fila abre su video, PDF o ejercicio.</p>
                     </section>
                 </div>
 

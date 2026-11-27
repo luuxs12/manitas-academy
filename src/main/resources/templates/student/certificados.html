@@ -17,7 +17,7 @@
                 <div>
                     <p class="panel-eyebrow">Tus logros</p>
                     <h1>Certificados</h1>
-                    <p>Se emiten al terminar un curso y están incluidos en los planes Premium.</p>
+                    <p>Con Premium, al terminar el curso.</p>
                 </div>
                 <a class="panel-plan panel-plan--link" th:href="@{/panel/facturacion}"
                    th:text="${'Tu plan: ' + usuarioActual.planLabel()}">Tu plan: Gratis</a>
@@ -61,7 +61,7 @@
                     </span>
                     <div>
                         <h3>Todavía no tenés certificados</h3>
-                        <p>Terminá un curso inscripto para descargar el tuyo.</p>
+                        <p>Terminá un curso para descargarlo.</p>
                     </div>
                     <a class="btn btn-ghost" th:href="@{/panel/cursos}">Ver mis cursos</a>
                 </div>

@@ -30,7 +30,7 @@
                         <td><span class="admin-status" th:text="${evento.kind()}">CREATE</span></td>
                         <td th:text="${evento.detail()}">USUARIO: correo</td>
                     </tr>
-                    <tr th:if="${#lists.isEmpty(page.content)}"><td colspan="4" class="admin-empty">Todavía no hay acciones registradas. Se registran altas, ediciones, bajas y emisiones.</td></tr>
+                    <tr th:if="${#lists.isEmpty(page.content)}"><td colspan="4" class="admin-empty">Sin acciones registradas.</td></tr>
                     </tbody>
                 </table>
             </div>

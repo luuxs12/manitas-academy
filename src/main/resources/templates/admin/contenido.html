@@ -24,7 +24,7 @@
             <section class="panel-card admin-card admin-structure" id="temario" aria-labelledby="temario-titulo">
                 <div class="admin-structure-head">
                     <h2 id="temario-titulo">Temario</h2>
-                    <p>Los módulos se cargan desde Módulos. Acá se ordenan las secciones y las clases de cada uno.</p>
+                    <p>Ordená secciones y clases.</p>
                 </div>
 
                 <article class="admin-module" th:each="modulo, i : ${esquema.modules()}"
@@ -133,13 +133,13 @@
                 </article>
 
                 <p class="admin-empty" th:if="${#lists.isEmpty(esquema.modules())}">
-                    Todavía no hay módulos cargados en este curso.
+                    Sin módulos.
                 </p>
             </section>
 
             <section class="panel-card admin-card admin-structure" aria-labelledby="altas-titulo">
                 <h2 id="altas-titulo">Cargar contenido</h2>
-                <p class="admin-muted">Los formularios se abren acá mismo; no se abren ventanas nuevas.</p>
+                <p class="admin-muted">Formularios en esta página.</p>
 
                 <details class="admin-inline-form">
                     <summary>Nueva sección</summary>
@@ -228,9 +228,7 @@
                                 <input id="item-youtube" type="url" th:field="*{youtubeUrl}" maxlength="300"
                                        placeholder="https://www.youtube.com/watch?v=…">
                                 <small class="admin-hint">
-                                    Para VIDEO y VIDEO_LSP; se reproduce sin cookies.
-                                    Cargá el video en lengua de señas con la misma posición
-                                    del video normal: lo verán solo las cuentas con LSP activo.
+                                    Para videos y LSP. La versión LSP usa la misma posición.
                                 </small>
                                 <small class="admin-error" th:if="${#fields.hasErrors('youtubeUrl')}" th:errors="*{youtubeUrl}"></small>
                             </div>

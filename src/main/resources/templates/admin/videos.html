@@ -54,15 +54,18 @@
                         <td class="admin-url" th:text="${item.url()}">youtu.be/…</td>
                         <td th:text="${item.posicion()}">0</td>
                         <td class="admin-row-actions">
-                            <a th:href="@{/admin/videos/{id}/editar(id=${item.id()})}">Editar</a>
+                            <a th:href="@{/admin/videos/{id}/editar(id=${item.id()})}"
+                               th:attr="aria-label='Editar ' + ${item.titulo()}"><th:block th:replace="~{fragments/admin-icons :: pencil}"></th:block><span class="sr-only">Editar</span></a>
                             <form th:action="@{/admin/videos/{id}/mover(id=${item.id()}, up=true)}" method="post">
-                                <button type="submit" th:attr="aria-label='Subir ' + ${item.titulo()}">↑</button>
+                                <button class="admin-move" type="submit"
+                                        th:attr="aria-label='Subir ' + ${item.titulo()}"><th:block th:replace="~{fragments/admin-icons :: arrowUp}"></th:block><span class="sr-only">Subir</span></button>
                             </form>
                             <form th:action="@{/admin/videos/{id}/mover(id=${item.id()}, up=false)}" method="post">
-                                <button type="submit" th:attr="aria-label='Bajar ' + ${item.titulo()}">↓</button>
+                                <button class="admin-move" type="submit"
+                                        th:attr="aria-label='Bajar ' + ${item.titulo()}"><th:block th:replace="~{fragments/admin-icons :: arrowDown}"></th:block><span class="sr-only">Bajar</span></button>
                             </form>
                             <button type="button" class="admin-confirm-link"
-                                    th:attr="data-confirm-url=@{/admin/videos/{id}/eliminar(id=${item.id()})}, aria-label='Eliminar ' + ${item.titulo()}">Eliminar</button>
+                                    th:attr="data-confirm-url=@{/admin/videos/{id}/eliminar(id=${item.id()})}, aria-label='Eliminar ' + ${item.titulo()}"><th:block th:replace="~{fragments/admin-icons :: trash}"></th:block><span class="sr-only">Eliminar</span></button>
                         </td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(page.content)}"><td colspan="5" class="admin-empty">Sin videos.</td></tr>

@@ -209,4 +209,25 @@ class AdminCursoEstructuraFlujoTest {
         verify(adminContenido).deleteRecurso(recursoId, actor);
         assertThat(recurso.getValue().url()).isEqualTo("https://example.org/guia");
     }
+
+    @Test
+    @DisplayName("alterna la visibilidad y vuelve al mismo punto del temario")
+    void togglesVisibility() throws Exception {
+        UUID seccionId = UUID.randomUUID();
+        UUID itemId = UUID.randomUUID();
+
+        mvc.perform(post("/admin/cursos/{id}/contenido/modulos/{moduloId}/visible", cursoId, moduloId))
+                .andExpect(redirectedUrl("/admin/cursos/" + cursoId + "/contenido#modulo-" + moduloId))
+                .andExpect(flash().attribute("panelOk", "La visibilidad del módulo se actualizó."));
+        mvc.perform(post("/admin/cursos/{id}/contenido/secciones/{seccionId}/visible", cursoId, seccionId))
+                .andExpect(redirectedUrl("/admin/cursos/" + cursoId + "/contenido#temario"))
+                .andExpect(flash().attribute("panelOk", "La visibilidad de la sección se actualizó."));
+        mvc.perform(post("/admin/cursos/{id}/contenido/items/{itemId}/visible", cursoId, itemId))
+                .andExpect(redirectedUrl("/admin/cursos/" + cursoId + "/contenido#item-" + itemId))
+                .andExpect(flash().attribute("panelOk", "La visibilidad del ítem se actualizó."));
+
+        verify(adminContenido).toggleModuloVisible(cursoId, moduloId, actor);
+        verify(adminContenido).toggleSeccionVisible(cursoId, seccionId, actor);
+        verify(adminContenido).toggleItemVisible(cursoId, itemId, actor);
+    }
 }

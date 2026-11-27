@@ -79,11 +79,14 @@
                 <h2 id="portada-title">Portada local</h2>
                 <p class="admin-muted" th:text="${adminCursoFormulario.imagen() != null and !#strings.isEmpty(adminCursoFormulario.imagen())
                         ? 'Ruta actual: ' + adminCursoFormulario.imagen() : 'Todavía no hay portada.'}">Sin portada.</p>
-                <form th:action="@{/admin/cursos/{id}/portada(id=${cursoId})}" method="post" enctype="multipart/form-data">
+                <form class="admin-form" th:action="@{/admin/cursos/{id}/portada(id=${cursoId})}" method="post"
+                      enctype="multipart/form-data" data-confirm-form
+                      data-confirm-message="¿Reemplazar la portada actual con este archivo?">
                     <div class="admin-field">
                         <label for="portada-archivo">Archivo JPG, PNG o WebP (hasta 2 MB)</label>
                         <input id="portada-archivo" name="portada" type="file"
                                accept="image/jpeg,image/png,image/webp" required>
+                        <small class="admin-hint">La imagen se guarda en el servidor y reemplaza la anterior.</small>
                     </div>
                     <div class="admin-form-actions">
                         <button class="btn btn-admin" type="submit">Guardar portada</button>

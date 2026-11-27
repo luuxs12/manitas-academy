@@ -63,10 +63,12 @@
                         </td>
                         <td th:text="${item.posicion()}">0</td>
                         <td class="admin-row-actions">
-                            <a th:href="@{/admin/ejercicios/{id}/editar(id=${item.id()})}">Editar</a>
-                            <a th:href="@{/admin/ejercicios/{id}/preguntas(id=${item.id()})}">Configurar preguntas</a>
+                            <a th:href="@{/admin/ejercicios/{id}/editar(id=${item.id()})}"
+                               th:attr="aria-label='Editar ' + ${item.titulo()}"><th:block th:replace="~{fragments/admin-icons :: pencil}"></th:block><span class="sr-only">Editar</span></a>
+                            <a th:href="@{/admin/ejercicios/{id}/preguntas(id=${item.id()})}"
+                               th:attr="aria-label='Configurar preguntas de ' + ${item.titulo()}"><th:block th:replace="~{fragments/admin-icons :: clipboard}"></th:block><span class="sr-only">Configurar preguntas</span></a>
                             <button type="button" class="admin-confirm-link"
-                                    th:attr="data-confirm-url=@{/admin/ejercicios/{id}/eliminar(id=${item.id()})}, aria-label='Eliminar ' + ${item.titulo()}">Eliminar</button>
+                                    th:attr="data-confirm-url=@{/admin/ejercicios/{id}/eliminar(id=${item.id()})}, aria-label='Eliminar ' + ${item.titulo()}"><th:block th:replace="~{fragments/admin-icons :: trash}"></th:block><span class="sr-only">Eliminar</span></button>
                         </td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(page.content)}"><td colspan="7" class="admin-empty">Sin ejercicios.</td></tr>

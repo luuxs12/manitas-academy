@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static org.hamcrest.Matchers.containsString;
+import static org.hamcrest.Matchers.not;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -148,7 +149,9 @@ class AdminContenidoPlantillaTest {
                 .andExpect(content().string(containsString("Ejercicio render")))
                 .andExpect(content().string(containsString("Lecturas render")))
                 .andExpect(content().string(containsString("VIDEO")))
-                .andExpect(content().string(containsString("EJERCICIO")));
+                .andExpect(content().string(containsString("EJERCICIO")))
+                .andExpect(content().string(containsString("M3 3l18 18")))
+                .andExpect(content().string(not(containsString("M2 12s3.5-6"))));
     }
 
     private UUID tempAdmin() {

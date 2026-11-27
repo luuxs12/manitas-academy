@@ -11,7 +11,7 @@ import java.util.UUID;
 public interface ContenidoItemRepository extends JpaRepository<ContenidoItem, UUID> {
 
     @Query("""
-            select x from ContenidoItem x where x.moduloId = ?1 order by x.posicion asc
+            select x from ContenidoItem x where x.moduloId = ?1 order by x.posicion asc, x.id asc
     """)
     List<ContenidoItem> buscarPorModuloIdOrdenarPorPosicionAsc(UUID moduloId);
 

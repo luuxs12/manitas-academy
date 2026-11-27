@@ -179,4 +179,8 @@ public class ContenidoItem {
     public void setPosicion(int posicion) {
         this.posicion = posicion;
     }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
 }

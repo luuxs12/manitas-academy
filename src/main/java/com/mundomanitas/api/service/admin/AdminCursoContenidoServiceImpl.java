@@ -279,6 +279,42 @@ public class AdminCursoContenidoServiceImpl implements AdminCursoContenidoServic
 
     @Override
     @Transactional
+    public void toggleModuloVisible(UUID cursoId, UUID moduloId, UUID actor) {
+        CursoModulo modulo = requireModulo(moduloId);
+        checkArgument(modulo.getCursoId().equals(cursoId), "El módulo no pertenece al curso");
+        modulo.setVisible(!modulo.isVisible());
+        modules.save(modulo);
+        auditoria.record(actor, "UPDATE", "MODULO", moduloId, modulo.isVisible() ? "VISIBLE" : "OCULTO");
+        log.info("Visibilidad del módulo id={} visible={} actor={}", moduloId, modulo.isVisible(), actor);
+    }
+
+    @Override
+    @Transactional
+    public void toggleSeccionVisible(UUID cursoId, UUID seccionId, UUID actor) {
+        CursoSeccion seccion = requireSeccion(seccionId);
+        checkArgument(requireModulo(seccion.getModuloId()).getCursoId().equals(cursoId),
+                "La sección no pertenece al curso");
+        seccion.setVisible(!seccion.isVisible());
+        sections.save(seccion);
+        auditoria.record(actor, "UPDATE", "SECCION", seccionId, seccion.isVisible() ? "VISIBLE" : "OCULTA");
+        log.info("Visibilidad de la sección id={} visible={} actor={}", seccionId, seccion.isVisible(), actor);
+    }
+
+    @Override
+    @Transactional
+    public void toggleItemVisible(UUID cursoId, UUID itemId, UUID actor) {
+        ContenidoItem item = items.findById(itemId)
+                .orElseThrow(() -> new IllegalArgumentException("Ítem no encontrado"));
+        checkArgument(requireModulo(item.getModuloId()).getCursoId().equals(cursoId),
+                "El ítem no pertenece al curso");
+        item.setVisible(!item.isVisible());
+        items.save(item);
+        auditoria.record(actor, "UPDATE", "ITEM", itemId, item.isVisible() ? "VISIBLE" : "OCULTO");
+        log.info("Visibilidad del ítem id={} visible={} actor={}", itemId, item.isVisible(), actor);
+    }
+
+    @Override
+    @Transactional
     public void saveSilabo(UUID cursoId, SilaboFormulario formulario, UUID actor) {
         checkNotNull(formulario, "form");
         Curso curso = courses.findById(cursoId)

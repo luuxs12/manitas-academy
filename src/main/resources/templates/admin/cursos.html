@@ -49,10 +49,12 @@
                         <td th:text="${curso.inscripto()}">0</td>
                         <td th:text="${curso.posicion()}">0</td>
                         <td class="admin-row-actions">
-                            <a th:href="@{/admin/cursos/{id}/editar(id=${curso.id()})}">Editar</a>
-                            <a th:href="@{/admin/cursos/{id}/contenido(id=${curso.id()})}">Contenido</a>
+                            <a th:href="@{/admin/cursos/{id}/editar(id=${curso.id()})}"
+                               th:attr="aria-label='Editar ' + ${curso.titulo()}"><th:block th:replace="~{fragments/admin-icons :: pencil}"></th:block><span class="sr-only">Editar</span></a>
+                            <a th:href="@{/admin/cursos/{id}/contenido(id=${curso.id()})}"
+                               th:attr="aria-label='Contenido de ' + ${curso.titulo()}"><th:block th:replace="~{fragments/admin-icons :: list}"></th:block><span class="sr-only">Contenido</span></a>
                             <button type="button" class="admin-confirm-link"
-                                    th:attr="data-confirm-url=@{/admin/cursos/{id}/eliminar(id=${curso.id()})}, aria-label='Eliminar ' + ${curso.titulo()}">Eliminar</button>
+                                    th:attr="data-confirm-url=@{/admin/cursos/{id}/eliminar(id=${curso.id()})}, aria-label='Eliminar ' + ${curso.titulo()}"><th:block th:replace="~{fragments/admin-icons :: trash}"></th:block><span class="sr-only">Eliminar</span></button>
                         </td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(page.content)}"><td colspan="8" class="admin-empty">Sin cursos.</td></tr>

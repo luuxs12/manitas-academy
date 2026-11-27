@@ -226,6 +226,35 @@ class AdminCursoContenidoServiceTest {
         verify(auditoria).record(eq(actor), eq("DELETE"), eq("ITEM"), eq(itemId), eq("Guía"));
     }
 
+    @Test
+    @DisplayName("alterna la visibilidad de módulos, secciones e ítems")
+    void togglesVisibility() {
+        CursoModulo modulo = modulo();
+        UUID seccionId = UUID.randomUUID();
+        CursoSeccion seccion = new CursoSeccion(moduloId, "Lecturas", 0, true);
+        ReflectionTestUtils.setField(seccion, "id", seccionId);
+        UUID itemId = UUID.randomUUID();
+        ContenidoItem item = material(itemId, moduloId, 0);
+
+        when(modules.findById(moduloId)).thenReturn(Optional.of(modulo));
+        when(sections.findById(seccionId)).thenReturn(Optional.of(seccion));
+        when(items.findById(itemId)).thenReturn(Optional.of(item));
+
+        service.toggleModuloVisible(cursoId, moduloId, actor);
+        service.toggleSeccionVisible(cursoId, seccionId, actor);
+        service.toggleItemVisible(cursoId, itemId, actor);
+
+        assertThat(modulo.isVisible()).isFalse();
+        assertThat(seccion.isVisible()).isFalse();
+        assertThat(item.isVisible()).isFalse();
+        verify(modules).save(modulo);
+        verify(sections).save(seccion);
+        verify(items).save(item);
+        verify(auditoria).record(eq(actor), eq("UPDATE"), eq("MODULO"), eq(moduloId), eq("OCULTO"));
+        verify(auditoria).record(eq(actor), eq("UPDATE"), eq("SECCION"), eq(seccionId), eq("OCULTA"));
+        verify(auditoria).record(eq(actor), eq("UPDATE"), eq("ITEM"), eq(itemId), eq("OCULTO"));
+    }
+
     private CursoModulo modulo() {
         CursoModulo modulo = new CursoModulo(cursoId, "Módulo 1", 0);
         ReflectionTestUtils.setField(modulo, "id", moduloId);

@@ -13,12 +13,12 @@ import java.util.UUID;
 public interface CursoModuloRepository extends JpaRepository<CursoModulo, UUID> {
 
     @Query("""
-            select x from CursoModulo x order by x.posicion asc
+            select x from CursoModulo x order by x.posicion asc, x.id asc
     """)
     List<CursoModulo> buscarAllPorOrdenarPorPosicionAsc();
 
     @Query("""
-            select x from CursoModulo x where x.cursoId = ?1 order by x.posicion asc
+            select x from CursoModulo x where x.cursoId = ?1 order by x.posicion asc, x.id asc
     """)
     List<CursoModulo> buscarPorCursoIdOrdenarPorPosicionAsc(UUID cursoId);
 
@@ -26,7 +26,7 @@ public interface CursoModuloRepository extends JpaRepository<CursoModulo, UUID> 
             select m from CursoModulo m
             where (:cursoId is null or m.cursoId = :cursoId)
               and (:term is null or lower(m.titulo) like lower(concat('%', cast(:term as string), '%')))
-            order by m.posicion, m.titulo
+            order by m.posicion, m.titulo, m.id
             """)
     Page<CursoModulo> search(@Param("cursoId") UUID cursoId, @Param("term") String term, Pageable pageable);
 }

@@ -166,6 +166,45 @@ public class AdminCursoEstructuraController extends AdminBaseController {
         return "redirect:" + estructuraUrl(cursoId);
     }
 
+    @PostMapping("/modulos/{moduloId}/visible")
+    public String toggleModuloVisible(@PathVariable UUID cursoId, @PathVariable UUID moduloId,
+                                      @AuthenticationPrincipal AutenticadoUsuario principal,
+                                      RedirectAttributes redirect) {
+        try {
+            adminContenido.toggleModuloVisible(cursoId, moduloId, actorId(principal));
+            redirect.addFlashAttribute("panelOk", "La visibilidad del módulo se actualizó.");
+        } catch (IllegalArgumentException exception) {
+            redirect.addFlashAttribute("panelError", exception.getMessage());
+        }
+        return "redirect:" + estructuraUrl(cursoId) + "#modulo-" + moduloId;
+    }
+
+    @PostMapping("/secciones/{seccionId}/visible")
+    public String toggleSeccionVisible(@PathVariable UUID cursoId, @PathVariable UUID seccionId,
+                                       @AuthenticationPrincipal AutenticadoUsuario principal,
+                                       RedirectAttributes redirect) {
+        try {
+            adminContenido.toggleSeccionVisible(cursoId, seccionId, actorId(principal));
+            redirect.addFlashAttribute("panelOk", "La visibilidad de la sección se actualizó.");
+        } catch (IllegalArgumentException exception) {
+            redirect.addFlashAttribute("panelError", exception.getMessage());
+        }
+        return "redirect:" + estructuraUrl(cursoId) + "#temario";
+    }
+
+    @PostMapping("/items/{itemId}/visible")
+    public String toggleItemVisible(@PathVariable UUID cursoId, @PathVariable UUID itemId,
+                                    @AuthenticationPrincipal AutenticadoUsuario principal,
+                                    RedirectAttributes redirect) {
+        try {
+            adminContenido.toggleItemVisible(cursoId, itemId, actorId(principal));
+            redirect.addFlashAttribute("panelOk", "La visibilidad del ítem se actualizó.");
+        } catch (IllegalArgumentException exception) {
+            redirect.addFlashAttribute("panelError", exception.getMessage());
+        }
+        return "redirect:" + estructuraUrl(cursoId) + "#item-" + itemId;
+    }
+
     @GetMapping("/items/{itemId}/eliminar")
     public String confirmDeleteItem(@PathVariable UUID cursoId, @PathVariable UUID itemId,
                                     Model model) {

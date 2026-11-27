@@ -20,28 +20,36 @@
             </div>
 
             <form class="panel-card admin-card admin-form" th:action="@{/admin/usuarios/{id}(id=${usuarioId})}"
-                  th:object="${adminUsuarioFormulario}" method="post" novalidate>
+                  th:object="${adminUsuarioFormulario}" method="post" novalidate data-confirm-form
+                  th:attr="data-confirm-message=${usuarioId != null} ? '¿Guardar los cambios de esta cuenta?' : '¿Crear la cuenta con estos datos?'">
                 <div class="admin-form-grid">
-                    <label>Nombre completo
-                        <input type="text" th:field="*{nombreCompleto}" maxlength="120" autocomplete="name" required>
+                    <div class="admin-field">
+                        <label for="usuario-nombre">Nombre completo</label>
+                        <input id="usuario-nombre" type="text" th:field="*{nombreCompleto}" maxlength="120" autocomplete="name" required>
                         <small class="admin-error" th:if="${#fields.hasErrors('nombreCompleto')}" th:errors="*{nombreCompleto}"></small>
-                    </label>
-                    <label>Correo electrónico
-                        <input type="email" th:field="*{email}" maxlength="160" autocomplete="email" required>
+                    </div>
+                    <div class="admin-field">
+                        <label for="usuario-email">Correo electrónico</label>
+                        <input id="usuario-email" type="email" th:field="*{email}" maxlength="160" autocomplete="email" required>
                         <small class="admin-error" th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></small>
-                    </label>
-                    <label>Rol
-                        <select th:field="*{rol}">
+                    </div>
+                    <div class="admin-field">
+                        <label for="usuario-rol">Rol</label>
+                        <select id="usuario-rol" th:field="*{rol}">
                             <option th:each="r : ${roles}" th:value="${r}" th:text="${r == 'ADMIN' ? 'Administrador' : 'Estudiante'}">Rol</option>
                         </select>
-                    </label>
-                    <label>Contraseña <span class="admin-muted">(dejar vacía para mantenerla; escribí una nueva para el reseteo por soporte)</span>
-                        <input type="password" th:field="*{contrasena}" minlength="8" autocomplete="new-password">
+                    </div>
+                    <div class="admin-field">
+                        <label for="usuario-clave">Contraseña</label>
+                        <input id="usuario-clave" type="password" th:field="*{contrasena}" minlength="8" autocomplete="new-password">
+                        <small class="admin-hint">Dejar vacía para mantenerla; escribí una nueva para el reseteo por soporte.</small>
                         <small class="admin-error" th:if="${#fields.hasErrors('contrasena')}" th:errors="*{contrasena}"></small>
+                    </div>
+                    <input type="hidden" name="_activo" value="false">
+                    <label class="admin-check admin-check--inline" for="usuario-activo">
+                        <input id="usuario-activo" type="checkbox" th:field="*{activo}"> Cuenta activa
                     </label>
                 </div>
-                <input type="hidden" name="_activo" value="false">
-                <label class="admin-check"><input type="checkbox" th:field="*{activo}"> Cuenta activa</label>
                 <div class="admin-form-actions">
                     <button class="btn btn-admin" type="submit" th:text="${usuarioId != null} ? 'Guardar cambios' : 'Crear cuenta'">Guardar</button>
                     <a class="admin-back" th:href="@{/admin/usuarios}">Cancelar</a>

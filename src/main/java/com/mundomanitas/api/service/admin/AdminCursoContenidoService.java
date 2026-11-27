@@ -44,6 +44,12 @@ public interface AdminCursoContenidoService {
 
     void moveItem(UUID itemId, boolean up, UUID actor);
 
+    void toggleModuloVisible(UUID cursoId, UUID moduloId, UUID actor);
+
+    void toggleSeccionVisible(UUID cursoId, UUID seccionId, UUID actor);
+
+    void toggleItemVisible(UUID cursoId, UUID itemId, UUID actor);
+
     void saveSilabo(UUID cursoId, SilaboFormulario formulario, UUID actor);
 
     UUID createRecurso(UUID cursoId, RecursoFormulario formulario, UUID actor);

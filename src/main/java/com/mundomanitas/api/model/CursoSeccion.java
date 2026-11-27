@@ -78,4 +78,8 @@ public class CursoSeccion {
     public void setPosicion(int posicion) {
         this.posicion = posicion;
     }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
 }

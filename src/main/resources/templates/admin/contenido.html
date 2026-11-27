@@ -38,12 +38,25 @@
                         <div class="admin-module-actions">
                             <span class="admin-status" th:classappend="${modulo.visible()} ? ' is-ok' : ' is-bad'"
                                   th:text="${modulo.visible()} ? 'Visible' : 'Oculta'">Visible</span>
+                            <form method="post"
+                                  th:action="@{/admin/cursos/{c}/contenido/modulos/{m}/visible(c=${cursoId},m=${modulo.id()})}">
+                                <button class="admin-icon-action" type="submit"
+                                        th:attr="aria-label=(${modulo.visible()} ? 'Ocultar ' : 'Mostrar ') + ${modulo.titulo()},
+                                                 title=(${modulo.visible()} ? 'Ocultar módulo' : 'Mostrar módulo')">
+                                    <th:block th:if="${modulo.visible()}">
+                                        <th:block th:replace="~{fragments/admin-icons :: eyeOff}"></th:block>
+                                    </th:block>
+                                    <th:block th:unless="${modulo.visible()}">
+                                        <th:block th:replace="~{fragments/admin-icons :: eye}"></th:block>
+                                    </th:block>
+                                    <span class="sr-only" th:text="${modulo.visible()} ? 'Ocultar' : 'Mostrar'">Ocultar</span>
+                                </button>
+                            </form>
                             <a class="btn btn-admin admin-session-download"
                                th:href="@{/admin/exportar/sesion/modulos/{m}/pdf(m=${modulo.id()})}"
-                               th:attr="aria-label='Descargar PDF de la sesión ' + ${modulo.titulo()}">Descargar PDF de la sesión</a>
+                               th:attr="aria-label='Descargar PDF de la sesión ' + ${modulo.titulo()}"><th:block th:replace="~{fragments/admin-icons :: download}"></th:block>Descargar PDF de la sesión</a>
                         </div>
                     </div>
-                    <p class="admin-muted" th:text="${!modulo.visible()} ? 'Oculto para el estudiante' : 'Visible para el estudiante'">Visible</p>
 
                     <p class="admin-empty" th:if="${#lists.isEmpty(modulo.sections()) and #lists.isEmpty(modulo.items())}">
                         Este módulo todavía no tiene secciones ni ítems.
@@ -54,6 +67,20 @@
                             <h4 th:text="${seccion.titulo()}">Sección</h4>
                             <span class="admin-status" th:classappend="${seccion.visible()} ? ' is-ok' : ' is-bad'"
                                   th:text="${seccion.visible()} ? 'Visible' : 'Oculta'">Visible</span>
+                            <form method="post"
+                                  th:action="@{/admin/cursos/{c}/contenido/secciones/{s}/visible(c=${cursoId},s=${seccion.id()})}">
+                                <button class="admin-icon-action" type="submit"
+                                        th:attr="aria-label=(${seccion.visible()} ? 'Ocultar ' : 'Mostrar ') + ${seccion.titulo()},
+                                                 title=(${seccion.visible()} ? 'Ocultar sección' : 'Mostrar sección')">
+                                    <th:block th:if="${seccion.visible()}">
+                                        <th:block th:replace="~{fragments/admin-icons :: eyeOff}"></th:block>
+                                    </th:block>
+                                    <th:block th:unless="${seccion.visible()}">
+                                        <th:block th:replace="~{fragments/admin-icons :: eye}"></th:block>
+                                    </th:block>
+                                    <span class="sr-only" th:text="${seccion.visible()} ? 'Ocultar' : 'Mostrar'">Ocultar</span>
+                                </button>
+                            </form>
                         </div>
                         <ul class="admin-content-list">
                             <th:block th:each="item : ${seccion.items()}">
@@ -63,14 +90,14 @@
                         <div class="admin-row-actions admin-section-actions">
                             <form method="post" th:action="@{/admin/cursos/{c}/contenido/secciones/{s}/mover(c=${cursoId},s=${seccion.id()})}">
                                 <input type="hidden" name="up" value="true">
-                                <button class="admin-move" type="submit" th:attr="aria-label='Subir sección ' + ${seccion.titulo()}">↑</button>
+                                <button class="admin-move" type="submit" th:attr="aria-label='Subir sección ' + ${seccion.titulo()}"><th:block th:replace="~{fragments/admin-icons :: arrowUp}"></th:block><span class="sr-only">Subir</span></button>
                             </form>
                             <form method="post" th:action="@{/admin/cursos/{c}/contenido/secciones/{s}/mover(c=${cursoId},s=${seccion.id()})}">
                                 <input type="hidden" name="up" value="false">
-                                <button class="admin-move" type="submit" th:attr="aria-label='Bajar sección ' + ${seccion.titulo()}">↓</button>
+                                <button class="admin-move" type="submit" th:attr="aria-label='Bajar sección ' + ${seccion.titulo()}"><th:block th:replace="~{fragments/admin-icons :: arrowDown}"></th:block><span class="sr-only">Bajar</span></button>
                             </form>
                             <button type="button" class="admin-confirm-link"
-                                    th:attr="data-confirm-url=@{/admin/cursos/{c}/contenido/secciones/{s}/eliminar(c=${cursoId},s=${seccion.id()})}, aria-label='Eliminar sección ' + ${seccion.titulo()}">Eliminar sección</button>
+                                    th:attr="data-confirm-url=@{/admin/cursos/{c}/contenido/secciones/{s}/eliminar(c=${cursoId},s=${seccion.id()})}, aria-label='Eliminar sección ' + ${seccion.titulo()}"><th:block th:replace="~{fragments/admin-icons :: trash}"></th:block><span class="sr-only">Eliminar sección</span></button>
                         </div>
                     </div>
 
@@ -88,7 +115,7 @@
 
             <section class="panel-card admin-card admin-structure" aria-labelledby="altas-titulo">
                 <h2 id="altas-titulo">Cargar contenido</h2>
-                <p class="admin-muted">Los formularios se abren en la página; no hay ventanas emergentes.</p>
+                <p class="admin-muted">Los formularios se abren acá mismo; no se abren ventanas nuevas.</p>
 
                 <details class="admin-inline-form">
                     <summary>Nueva sección</summary>
@@ -302,9 +329,10 @@
                                       th:text="${recurso.url()}">Enlace</a></small>
                         </div>
                         <div class="admin-row-actions">
-                            <form method="post"
+                            <form method="post" data-confirm-form
+                                  data-confirm-message="¿Quitar este recurso del sílabo?"
                                   th:action="@{/admin/cursos/{c}/contenido/recursos/{r}/eliminar(c=${cursoId},r=${recurso.id()})}">
-                                <button type="submit" th:attr="aria-label='Quitar ' + ${recurso.titulo()}">Quitar</button>
+                                <button type="submit" th:attr="aria-label='Quitar ' + ${recurso.titulo()}"><th:block th:replace="~{fragments/admin-icons :: trash}"></th:block><span class="sr-only">Quitar</span></button>
                             </form>
                         </div>
                     </li>

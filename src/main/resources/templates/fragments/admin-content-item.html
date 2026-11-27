@@ -34,16 +34,30 @@
               th:action="@{/admin/cursos/{c}/contenido/items/{i}/mover(c=${cursoId},i=${item.id()})}">
             <input type="hidden" name="up" value="true">
             <button class="admin-move" type="submit"
-                    th:attr="aria-label='Subir ' + ${item.titulo()}">↑</button>
+                    th:attr="aria-label='Subir ' + ${item.titulo()}"><th:block th:replace="~{fragments/admin-icons :: arrowUp}"></th:block><span class="sr-only">Subir</span></button>
         </form>
         <form method="post"
               th:action="@{/admin/cursos/{c}/contenido/items/{i}/mover(c=${cursoId},i=${item.id()})}">
             <input type="hidden" name="up" value="false">
             <button class="admin-move" type="submit"
-                    th:attr="aria-label='Bajar ' + ${item.titulo()}">↓</button>
+                    th:attr="aria-label='Bajar ' + ${item.titulo()}"><th:block th:replace="~{fragments/admin-icons :: arrowDown}"></th:block><span class="sr-only">Bajar</span></button>
+        </form>
+        <form method="post"
+              th:action="@{/admin/cursos/{c}/contenido/items/{i}/visible(c=${cursoId},i=${item.id()})}">
+            <button class="admin-icon-action" type="submit"
+                    th:attr="aria-label=(${item.visible()} ? 'Ocultar ' : 'Mostrar ') + ${item.titulo()},
+                             title=(${item.visible()} ? 'Ocultar ítem' : 'Mostrar ítem')">
+                <th:block th:if="${item.visible()}">
+                    <th:block th:replace="~{fragments/admin-icons :: eyeOff}"></th:block>
+                </th:block>
+                <th:block th:unless="${item.visible()}">
+                    <th:block th:replace="~{fragments/admin-icons :: eye}"></th:block>
+                </th:block>
+                <span class="sr-only" th:text="${item.visible()} ? 'Ocultar' : 'Mostrar'">Ocultar</span>
+            </button>
         </form>
         <button type="button" class="admin-confirm-link"
-                th:attr="data-confirm-url=@{/admin/cursos/{c}/contenido/items/{i}/eliminar(c=${cursoId},i=${item.id()})}, aria-label='Eliminar ' + ${item.titulo()}">Eliminar</button>
+                th:attr="data-confirm-url=@{/admin/cursos/{c}/contenido/items/{i}/eliminar(c=${cursoId},i=${item.id()})}, aria-label='Eliminar ' + ${item.titulo()}"><th:block th:replace="~{fragments/admin-icons :: trash}"></th:block><span class="sr-only">Eliminar</span></button>
     </div>
 </li>
 

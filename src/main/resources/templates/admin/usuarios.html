@@ -54,7 +54,8 @@
                                   th:text="${usuario.activo()} ? 'Activo' : 'Inactivo'">Activo</span></td>
                         <td th:text="${usuario.creado()}">01/01/2026</td>
                         <td class="admin-row-actions">
-                            <a th:href="@{/admin/usuarios/{id}/editar(id=${usuario.id()})}">Editar</a>
+                            <a th:href="@{/admin/usuarios/{id}/editar(id=${usuario.id()})}"
+                               th:attr="aria-label='Editar ' + ${usuario.nombreCompleto()}"><th:block th:replace="~{fragments/admin-icons :: pencil}"></th:block><span class="sr-only">Editar</span></a>
                             <span th:if="${usuario.actual()}" class="admin-muted">Tu cuenta</span>
                         </td>
                     </tr>

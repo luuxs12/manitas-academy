@@ -25,22 +25,24 @@
             <section class="panel-card admin-card admin-issue" aria-labelledby="admin-issue-title">
                 <h2 id="admin-issue-title">Emitir certificado</h2>
                 <p class="admin-muted">Solo cuentas Premium con el curso finalizado. La revocación conserva el historial.</p>
-                <form th:action="@{/admin/certificados/emitir}" th:object="${adminCertificadoFormulario}" method="post"
-                      data-confirm-form
+                <form class="admin-form" th:action="@{/admin/certificados/emitir}" th:object="${adminCertificadoFormulario}"
+                      method="post" novalidate data-confirm-form
                       data-confirm-message="¿Emitir el certificado para la persona y el curso elegidos?">
                     <div class="admin-form-grid">
-                        <label>Persona
-                            <select th:field="*{usuarioId}" required>
+                        <div class="admin-field">
+                            <label for="certificado-persona">Persona</label>
+                            <select id="certificado-persona" th:field="*{usuarioId}" required>
                                 <option value="">Elegí una persona</option>
                                 <option th:each="o : ${usuarioOptions}" th:value="${o.id()}" th:text="${o.label()}"></option>
                             </select>
-                        </label>
-                        <label>Curso
-                            <select th:field="*{cursoId}" required>
+                        </div>
+                        <div class="admin-field">
+                            <label for="certificado-curso">Curso</label>
+                            <select id="certificado-curso" th:field="*{cursoId}" required>
                                 <option value="">Elegí un curso</option>
                                 <option th:each="o : ${cursoOptions}" th:value="${o.id()}" th:text="${o.label()}"></option>
                             </select>
-                        </label>
+                        </div>
                     </div>
                     <button class="btn btn-admin" type="submit">Emitir certificado</button>
                 </form>
@@ -75,9 +77,9 @@
                                   th:text="${item.activo()} ? 'Vigente' : 'Revocado'">Vigente</span></td>
                         <td class="admin-row-actions">
                             <a th:href="@{/admin/certificados/{id}/ver(id=${item.id()})}"
-                               th:attr="aria-label='Ver certificado ' + ${item.code()}">Ver</a>
+                               th:attr="aria-label='Ver certificado ' + ${item.code()}"><th:block th:replace="~{fragments/admin-icons :: clipboard}"></th:block><span class="sr-only">Ver</span></a>
                             <button th:if="${item.activo()}" type="button" class="admin-confirm-link"
-                                    th:attr="data-confirm-url=@{/admin/certificados/{id}/revocar(id=${item.id()}, code=${item.code()})}, aria-label='Revocar ' + ${item.code()}">Revocar</button>
+                                    th:attr="data-confirm-url=@{/admin/certificados/{id}/revocar(id=${item.id()}, code=${item.code()})}, aria-label='Revocar ' + ${item.code()}"><th:block th:replace="~{fragments/admin-icons :: ban}"></th:block><span class="sr-only">Revocar</span></button>
                         </td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(page.content)}"><td colspan="6" class="admin-empty">Todavía no se emitieron certificados.</td></tr>

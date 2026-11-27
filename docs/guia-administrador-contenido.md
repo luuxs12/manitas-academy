@@ -75,9 +75,11 @@ poder marcarlo como visto a mano desde el temario.
 ### 3. Ordenar y borrar
 
 Las flechas de cada sección y de cada ítem los suben o bajan dentro de su grupo.
-Para borrar, primero se abre una **página de confirmación** con el título real;
-el borrado recién se ejecuta con el botón de esa página, mediante un POST con
-token CSRF. No hay diálogos ni ventanas emergentes.
+El ojo alterna la visibilidad de módulos, secciones e ítems; el cambio se guarda
+de inmediato y el alumno deja de ver ese bloque. Para borrar, primero se abre un
+**modal** con el título real; el borrado recién
+se ejecuta con un POST que conserva el token CSRF. Sin JavaScript se usa la
+página de confirmación. No se abren ventanas nuevas.
 
 Al borrar una sección, sus ítems pasan a “Sin sección” y conservan su progreso.
 Al borrar un ítem, se borra también el avance asociado a ese ítem.

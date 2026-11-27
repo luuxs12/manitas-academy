@@ -10,7 +10,7 @@ import java.util.UUID;
 public interface CursoSeccionRepository extends JpaRepository<CursoSeccion, UUID> {
 
     @Query("""
-            select x from CursoSeccion x where x.moduloId = ?1 order by x.posicion asc
+            select x from CursoSeccion x where x.moduloId = ?1 order by x.posicion asc, x.id asc
     """)
     List<CursoSeccion> buscarPorModuloIdOrdenarPorPosicionAsc(UUID moduloId);
 }

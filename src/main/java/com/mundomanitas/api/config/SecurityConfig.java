@@ -73,6 +73,8 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/pagos/stripe/webhook").permitAll()
+                        // Librerías locales del panel: públicas, sin CDN.
+                        .requestMatchers("/vendor/**").permitAll()
                         // Sin usuario de monitoreo, Actuator queda solo para ADMIN.
                         .requestMatchers("/actuator/**").hasRole("ADMIN")
                         .requestMatchers("/admin", "/admin/**").hasRole("ADMIN")

@@ -17,86 +17,55 @@
     <nav class="panel-nav" aria-label="Panel del estudiante">
         <a class="panel-nav-link" th:href="@{/panel}"
            th:attr="aria-current=${activo == 'inicio'} ? 'page' : null">
-            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <path d="M4 10.5 12 4l8 6.5"></path>
-                <path d="M6 9.8V20h12V9.8"></path>
-                <path d="M10 20v-5h4v5"></path>
-            </svg>
+            <i class="ico" data-lucide="house" aria-hidden="true"></i>
             <span>Inicio</span>
         </a>
 
         <a class="panel-nav-link" th:href="@{/panel/cursos}"
            th:attr="aria-current=${activo == 'cursos'} ? 'page' : null">
-            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v15H6.5A2.5 2.5 0 0 0 4 20.5z"></path>
-                <path d="M4 20.5A2.5 2.5 0 0 1 6.5 18H20v3H6.5A2.5 2.5 0 0 1 4 20.5z"></path>
-                <path d="M8 7h8"></path>
-            </svg>
+            <i class="ico" data-lucide="book-open" aria-hidden="true"></i>
             <span>Mis cursos</span>
         </a>
 
         <a class="panel-nav-link" th:href="@{/panel/explorar}"
            th:attr="aria-current=${activo == 'explorar'} ? 'page' : null">
-            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <circle cx="11" cy="11" r="6.5"></circle>
-                <path d="m16 16 4.5 4.5"></path>
-            </svg>
+            <i class="ico" data-lucide="search" aria-hidden="true"></i>
             <span>Inscribirme a cursos</span>
         </a>
 
         <a class="panel-nav-link" th:href="@{/panel/certificados}"
            th:attr="aria-current=${activo == 'certificados'} ? 'page' : null">
-            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <circle cx="12" cy="9" r="5"></circle>
-                <path d="m8.5 13-1 7 4.5-2.5 4.5 2.5-1-7"></path>
-            </svg>
+            <i class="ico" data-lucide="award" aria-hidden="true"></i>
             <span>Certificados</span>
         </a>
 
         <a class="panel-nav-link" th:href="@{/panel/accesibilidad}"
            th:attr="aria-current=${activo == 'accesibilidad'} ? 'page' : null">
-            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <path d="M8 11V6.5a1.5 1.5 0 0 1 3 0V10"></path>
-                <path d="M11 10V4.5a1.5 1.5 0 0 1 3 0V10"></path>
-                <path d="M14 10V6a1.5 1.5 0 0 1 3 0v6a6 6 0 0 1-6 6h-1a5 5 0 0 1-3.6-1.5L4 13.6a1.6 1.6 0 0 1 2.6-1.8L8 13.5"></path>
-            </svg>
+            <i class="ico" data-lucide="accessibility" aria-hidden="true"></i>
             <span>Accesibilidad</span>
         </a>
 
         <a class="panel-nav-link" th:href="@{/panel/facturacion}"
            th:attr="aria-current=${activo == 'facturacion'} ? 'page' : null">
-            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <path d="M5 3h14v18l-3-2-4 2-4-2-3 2z"></path>
-                <path d="M9 8h6M9 12h6"></path>
-            </svg>
+            <i class="ico" data-lucide="receipt-text" aria-hidden="true"></i>
             <span>Facturación</span>
         </a>
 
         <a class="panel-nav-link" th:href="@{/panel/perfil}"
            th:attr="aria-current=${activo == 'perfil'} ? 'page' : null">
-            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <circle cx="12" cy="8" r="3.5"></circle>
-                <path d="M5 20a7 7 0 0 1 14 0"></path>
-            </svg>
+            <i class="ico" data-lucide="user" aria-hidden="true"></i>
             <span>Mi perfil</span>
         </a>
 
         <a class="panel-nav-link" th:href="@{/panel/preferencias}"
            th:attr="aria-current=${activo == 'preferencias'} ? 'page' : null">
-            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <circle cx="12" cy="12" r="3"></circle>
-                <path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1-2.8 2.8-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.6v.2h-4v-.2a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1L4.2 17l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.6-1H3v-4h.2a1.7 1.7 0 0 0 1.6-1 1.7 1.7 0 0 0-.3-1.9L4.2 7 7 4.2l.1.1a1.7 1.7 0 0 0 1.9.3 1.7 1.7 0 0 0 1-1.6V3h4v.2a1.7 1.7 0 0 0 1 1.6 1.7 1.7 0 0 0 1.9-.3l.1-.1L19.8 7l-.1.1a1.7 1.7 0 0 0-.3 1.9 1.7 1.7 0 0 0 1.6 1h.2v4h-.2a1.7 1.7 0 0 0-1.6 1z"></path>
-            </svg>
+            <i class="ico" data-lucide="settings" aria-hidden="true"></i>
             <span>Preferencias</span>
         </a>
 
         <a class="panel-nav-link" th:href="@{/panel/ayuda}"
            th:attr="aria-current=${activo == 'ayuda'} ? 'page' : null">
-            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <circle cx="12" cy="12" r="9"></circle>
-                <path d="M9.2 9.2a3 3 0 1 1 4.2 2.8c-.9.4-1.4 1-1.4 2"></path>
-                <path d="M12 17h.01"></path>
-            </svg>
+            <i class="ico" data-lucide="circle-help" aria-hidden="true"></i>
             <span>Ayuda</span>
         </a>
     </nav>
@@ -104,11 +73,7 @@
     <div class="panel-sidebar-foot">
         <form th:action="@{/logout}" method="post">
             <button class="panel-side-link panel-logout" type="submit">
-                <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                    <path d="M14 4H6v16h8"></path>
-                    <path d="M11 12h9"></path>
-                    <path d="m17 8 4 4-4 4"></path>
-                </svg>
+                <i class="ico" data-lucide="log-out" aria-hidden="true"></i>
                 <span>Cerrar sesión</span>
             </button>
         </form>
@@ -123,10 +88,7 @@
     <p class="panel-area">Área de estudiante</p>
 
     <form class="panel-search" role="search" th:action="@{/panel/explorar}" method="get">
-        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-            <circle cx="11" cy="11" r="6.5"></circle>
-            <path d="m16 16 4.5 4.5"></path>
-        </svg>
+        <i class="ico" data-lucide="search" aria-hidden="true"></i>
         <label class="sr-only" for="panel-buscar">Buscar cursos para inscribirme</label>
         <input id="panel-buscar" name="q" type="search" th:value="${query}"
                placeholder="Buscar cursos para inscribirme…" autocomplete="off">
@@ -135,10 +97,7 @@
     <div class="panel-account">
         <details class="panel-notify" data-panel-menu>
             <summary class="panel-icon-btn" aria-label="Ver notificaciones" title="Notificaciones">
-                <svg class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                    <path d="M18 9a6 6 0 1 0-12 0c0 5-2 6-2 6h16s-2-1-2-6"></path>
-                    <path d="M10.3 20a2 2 0 0 0 3.4 0"></path>
-                </svg>
+                <i class="ico" data-lucide="bell" aria-hidden="true"></i>
                 <span class="panel-notify-count" th:if="${unreadContar > 0}"
                       th:text="${unreadContar > 9 ? '9+' : unreadContar}"
                       aria-label="Avisos sin leer">0</span>
@@ -164,13 +123,8 @@
 
         <button class="theme-toggle panel-theme" type="button" data-theme-toggle
                 aria-pressed="false" aria-label="Cambiar a modo oscuro" title="Modo oscuro">
-            <svg class="ico ico-moon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5z"></path>
-            </svg>
-            <svg class="ico ico-sun" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                <circle cx="12" cy="12" r="4.2"></circle>
-                <path d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6"></path>
-            </svg>
+            <i class="ico ico-moon" data-lucide="moon" aria-hidden="true"></i>
+            <i class="ico ico-sun" data-lucide="sun" aria-hidden="true"></i>
         </button>
 
         <details class="panel-menu" data-panel-menu>
@@ -182,10 +136,7 @@
                     <span th:unless="${usuarioActual.hasAvatar()}"
                           th:text="${usuarioActual.initials()}">LM</span>
                 </span>
-                <svg class="ico panel-menu-chevron" viewBox="0 0 24 24"
-                     aria-hidden="true" focusable="false">
-                    <path d="m6 9 6 6 6-6"></path>
-                </svg>
+                <i class="ico panel-menu-chevron" data-lucide="chevron-down" aria-hidden="true"></i>
             </summary>
 
             <div class="panel-menu-pop">

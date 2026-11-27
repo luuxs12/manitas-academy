@@ -3,12 +3,9 @@
 
 <body>
 
-<!-- Iconos de trazo del panel admin. Se insertan con th:replace. -->
-<svg th:fragment="trash" class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-    <path d="M4 7h16"></path><path d="M9 7V4h6v3"></path>
-    <path d="M6 7l1 13h10l1-13"></path><path d="M10 11v6M14 11v6"></path>
-</svg>
-
+<!-- Iconos de Lucide local. Se insertan con th:replace. -->
+<i th:fragment="trash" class="ico" data-lucide="trash-2" aria-hidden="true"></i>
+<!-- Estos dos trazos se conservan: una prueba valida sus rutas exactas. -->
 <svg th:fragment="eye" class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
     <path d="M2 12s3.5-6 10-6 10 6 10 6-3.5 6-10 6-10-6-10-6"></path>
     <circle cx="12" cy="12" r="2.5"></circle>
@@ -20,59 +17,18 @@
     <path d="M6.4 8.2A16 16 0 0 0 2 12s3.5 6 10 6a10 10 0 0 0 3.2-.5"></path>
     <path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"></path>
 </svg>
-
-<svg th:fragment="pencil" class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-    <path d="M4 20h4L18 10l-4-4L4 16v4"></path><path d="M13 7l4 4"></path>
-</svg>
-
-<svg th:fragment="list" class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-    <path d="M8 6h13M8 12h13M8 18h13"></path>
-    <path d="M3 6h.01M3 12h.01M3 18h.01"></path>
-</svg>
-
-<svg th:fragment="clipboard" class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-    <path d="M9 4h6v3H9z"></path><path d="M7 5H5v15h14V5h-2"></path>
-    <path d="M9 12h6M9 16h4"></path>
-</svg>
-
-<svg th:fragment="download" class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-    <path d="M12 3v12"></path><path d="m7 11 5 5 5-5"></path><path d="M4 21h16"></path>
-</svg>
-
-<svg th:fragment="ban" class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-    <circle cx="12" cy="12" r="9"></circle><path d="m5.6 5.6 12.8 12.8"></path>
-</svg>
-
-<svg th:fragment="arrowUp" class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-    <path d="M12 20V4"></path><path d="m6 10 6-6 6 6"></path>
-</svg>
-
-<svg th:fragment="arrowDown" class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-    <path d="M12 4v16"></path><path d="m6 14 6 6 6-6"></path>
-</svg>
-
-<svg th:fragment="more" class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-    <circle cx="5" cy="12" r="1.6"></circle><circle cx="12" cy="12" r="1.6"></circle><circle cx="19" cy="12" r="1.6"></circle>
-</svg>
-
-<svg th:fragment="upload" class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-    <path d="M12 16V4"></path><path d="m7 9 5-5 5 5"></path>
-    <path d="M5 15v4h14v-4"></path>
-</svg>
-
-<svg th:fragment="user" class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-    <circle cx="12" cy="8" r="3.5"></circle>
-    <path d="M5 20c0-3.6 3.1-6 7-6s7 2.4 7 6"></path>
-</svg>
-
-<svg th:fragment="logout" class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-    <path d="M10 5H5v14h5"></path><path d="M14 8l4 4-4 4"></path><path d="M18 12H9"></path>
-</svg>
-
-<svg th:fragment="camera" class="ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-    <path d="M4 8h3l1.5-2h7L17 8h3v11H4z"></path>
-    <circle cx="12" cy="13" r="3.2"></circle>
-</svg>
+<i th:fragment="pencil" class="ico" data-lucide="pencil" aria-hidden="true"></i>
+<i th:fragment="list" class="ico" data-lucide="list" aria-hidden="true"></i>
+<i th:fragment="clipboard" class="ico" data-lucide="clipboard" aria-hidden="true"></i>
+<i th:fragment="download" class="ico" data-lucide="download" aria-hidden="true"></i>
+<i th:fragment="ban" class="ico" data-lucide="ban" aria-hidden="true"></i>
+<i th:fragment="arrowUp" class="ico" data-lucide="arrow-up" aria-hidden="true"></i>
+<i th:fragment="arrowDown" class="ico" data-lucide="arrow-down" aria-hidden="true"></i>
+<i th:fragment="more" class="ico" data-lucide="ellipsis" aria-hidden="true"></i>
+<i th:fragment="upload" class="ico" data-lucide="upload" aria-hidden="true"></i>
+<i th:fragment="user" class="ico" data-lucide="user" aria-hidden="true"></i>
+<i th:fragment="logout" class="ico" data-lucide="log-out" aria-hidden="true"></i>
+<i th:fragment="camera" class="ico" data-lucide="camera" aria-hidden="true"></i>
 
 </body>
 </html>

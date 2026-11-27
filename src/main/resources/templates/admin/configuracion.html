@@ -17,36 +17,44 @@
             <section class="panel-card admin-card" aria-labelledby="admin-config-title">
                 <div class="panel-section-head"><h2 id="admin-config-title">Configuración</h2><span class="panel-rule" aria-hidden="true"></span></div>
                 <div class="admin-config">
-                    <div>
-                        <h3>Integraciones</h3>
+                    <section class="admin-config-block" aria-labelledby="config-integraciones">
+                        <h3 id="config-integraciones">Integraciones</h3>
                         <p class="admin-muted">Las credenciales se gestionan en el servidor.</p>
-                        <ul class="admin-config-grid">
-                            <li><span th:classappend="${correoEnabled} ? ' is-ok' : ' is-bad'" aria-hidden="true">✓</span>
-                                <strong>Correo</strong>
-                                <small th:text="${correoEnabled} ? 'Disponible' : 'Sin credenciales'">Estado</small></li>
-                            <li><span th:classappend="${stripeEnabled} ? ' is-ok' : ' is-bad'" aria-hidden="true">✓</span>
-                                <strong>Cobros</strong>
-                                <small th:text="${stripeEnabled} ? 'Disponible' : 'Sin credenciales'">Estado</small></li>
-                        </ul>
-                    </div>
-                    <div>
-                        <h3>Plataforma</h3>
-                        <p class="admin-muted">Componentes que sostienen el panel.</p>
-                        <ul class="admin-config-grid">
-                            <li th:each="verificacion : ${sistema}">
-                                <span th:classappend="${verificacion.ok()} ? ' is-ok' : ' is-bad'" aria-hidden="true">✓</span>
-                                <strong th:text="${verificacion.name()}">Componente</strong>
-                                <small th:text="${verificacion.detail()}">Detalle</small>
+                        <ul class="admin-config-list">
+                            <li>
+                                <span class="admin-config-dot" th:classappend="${correoEnabled} ? ' is-ok' : ' is-bad'" aria-hidden="true"></span>
+                                <span class="admin-config-copy"><strong>Correo</strong>
+                                    <small th:text="${correoEnabled} ? 'Disponible' : 'Sin credenciales'">Estado</small></span>
+                            </li>
+                            <li>
+                                <span class="admin-config-dot" th:classappend="${stripeEnabled} ? ' is-ok' : ' is-bad'" aria-hidden="true"></span>
+                                <span class="admin-config-copy"><strong>Cobros</strong>
+                                    <small th:text="${stripeEnabled} ? 'Disponible' : 'Sin credenciales'">Estado</small></span>
                             </li>
                         </ul>
-                    </div>
-                    <div>
-                        <h3>Mi cuenta</h3>
-                        <p class="admin-muted">Tu foto, tus datos y el tema claro u oscuro.</p>
-                        <div class="admin-form-actions">
+                    </section>
+
+                    <section class="admin-config-block" aria-labelledby="config-plataforma">
+                        <h3 id="config-plataforma">Plataforma</h3>
+                        <p class="admin-muted">Componentes que sostienen el panel.</p>
+                        <ul class="admin-config-list">
+                            <li th:each="verificacion : ${sistema}">
+                                <span class="admin-config-dot" th:classappend="${verificacion.ok()} ? ' is-ok' : ' is-bad'" aria-hidden="true"></span>
+                                <span class="admin-config-copy"><strong th:text="${verificacion.name()}">Componente</strong>
+                                    <small th:text="${verificacion.detail()}">Detalle</small></span>
+                            </li>
+                        </ul>
+                    </section>
+
+                    <section class="admin-config-block admin-config-block--wide" aria-labelledby="config-cuenta">
+                        <div class="admin-config-account">
+                            <div>
+                                <h3 id="config-cuenta">Mi cuenta</h3>
+                                <p class="admin-muted">Tu foto, tus datos y el tema claro u oscuro.</p>
+                            </div>
                             <a class="btn btn-admin" th:href="@{/admin/perfil}">Ir a mi perfil</a>
                         </div>
-                    </div>
+                    </section>
                 </div>
             </section>
         </main>

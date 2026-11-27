@@ -5045,7 +5045,7 @@ html[data-theme="dark"] .panel-progress-card {
 .ui-dialog {
     width: calc(100% - 2rem);
     max-width: 26rem;
-    max-height: calc(100vh - 2rem);
+    max-height: calc(100dvh - 2rem);
     margin: auto;
     padding: 0;
     border: 1px solid var(--line);
@@ -5053,19 +5053,30 @@ html[data-theme="dark"] .panel-progress-card {
     background: var(--paper);
     color: var(--ink);
     box-shadow: var(--shadow-md);
-    overflow: auto;
+    /* El diálogo no desplaza: el contenido corto nunca muestra barra interna. */
+    overflow: hidden;
+    animation: ui-dialog-open .14s var(--ease) both;
 }
 
 .ui-dialog::backdrop {
     background: rgba(0, 0, 0, .55);
     backdrop-filter: blur(2px);
+    animation: backdrop-in .14s var(--ease) both;
+}
+
+@keyframes ui-dialog-open {
+    from { opacity: 0; transform: translateY(.4rem) scale(.985); }
+    to { opacity: 1; transform: none; }
 }
 
 .ui-dialog-card {
     display: grid;
     justify-items: center;
-    gap: .6rem;
-    padding: 1.5rem;
+    gap: .55rem;
+    max-height: calc(100dvh - 2.5rem);
+    padding: 1.15rem 1.25rem;
+    overflow-y: auto;
+    overscroll-behavior: contain;
     text-align: center;
 }
 
@@ -5128,18 +5139,20 @@ html[data-theme="dark"] .panel-progress-card {
 .ui-check circle,
 .ui-check path { stroke-dasharray: 145; stroke-dashoffset: 145; }
 .ui-check path { stroke-dasharray: 48; }
-.ui-check circle { animation: ui-dialog-ring .5s var(--ease) forwards; }
-.ui-check path { animation: ui-dialog-check .45s var(--ease) .35s forwards; }
+.ui-check circle { animation: ui-dialog-ring .3s var(--ease) forwards; }
+.ui-check path { animation: ui-dialog-check .26s var(--ease) .12s forwards; }
 
 @keyframes ui-dialog-ring { to { stroke-dashoffset: 0; } }
 @keyframes ui-dialog-check { to { stroke-dashoffset: 0; } }
-.ui-dialog--success[open] .ui-dialog-card { animation: ui-dialog-in .24s var(--ease); }
+.ui-dialog--success[open] .ui-dialog-card { animation: ui-dialog-in .16s var(--ease); }
 @keyframes ui-dialog-in {
     from { opacity: 0; transform: translateY(.5rem) scale(.98); }
     to { opacity: 1; transform: none; }
 }
 
 @media (prefers-reduced-motion: reduce) {
+    .ui-dialog,
+    .ui-dialog::backdrop,
     .ui-check circle,
     .ui-check path,
     .ui-dialog--success[open] .ui-dialog-card { animation: none; }

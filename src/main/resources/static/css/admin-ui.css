@@ -117,27 +117,37 @@
     outline-offset: 1px;
 }
 
-/* Inicio: indicadores compactos, con el verde de marca solo en los iconos. */
-.admin-body .admin-kpis--home { gap: .6rem; margin-bottom: 1rem; }
+/* Inicio: indicadores compactos y parejos, con el verde solo en los iconos. */
+.admin-body .admin-kpis--home {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: .6rem;
+    margin-bottom: 1rem;
+}
 .admin-body .admin-kpis--home .admin-kpi {
-    gap: .15rem;
-    padding: .7rem .8rem;
+    display: grid;
+    grid-template-columns: 34px minmax(0, 1fr);
+    grid-template-areas: "icon label" "icon value" "icon foot";
+    align-items: center;
+    column-gap: .6rem;
+    row-gap: .08rem;
+    padding: .65rem .75rem;
     border: 1px solid var(--line);
     border-radius: var(--radius-sm);
     box-shadow: none;
 }
 .admin-body .admin-kpis--home .admin-kpi-icon {
-    width: 30px;
-    height: 30px;
-    margin-bottom: .2rem;
+    grid-area: icon;
+    width: 34px;
+    height: 34px;
+    margin: 0;
     border-radius: 9px;
     background: var(--accent);
     color: var(--on-accent);
 }
 .admin-body .admin-kpis--home .admin-kpi-icon svg { width: 17px; height: 17px; }
-.admin-body .admin-kpis--home .admin-kpi-label { font-size: .7rem; }
-.admin-body .admin-kpis--home .admin-kpi-value { font-size: 1.45rem; }
-.admin-body .admin-kpis--home .admin-kpi-foot { gap: .3rem; font-size: .66rem; }
+.admin-body .admin-kpis--home .admin-kpi-label { grid-area: label; font-size: .7rem; }
+.admin-body .admin-kpis--home .admin-kpi-value { grid-area: value; font-size: 1.4rem; }
+.admin-body .admin-kpis--home .admin-kpi-foot { grid-area: foot; gap: .3rem; font-size: .66rem; }
 
 /* Formularios: campos y etiquetas con medida, sin bloques excesivos. */
 .admin-body .admin-form { max-width: 760px; }
@@ -193,54 +203,129 @@
 .admin-body .admin-inline-form + .admin-inline-form { margin-top: .9rem; }
 .admin-body .admin-inline-form .admin-form { margin-top: 1.1rem; }
 
-/* Configuración: una sola tarjeta con apartados compactos y ordenados. */
-.admin-body .admin-config { display: grid; gap: .9rem; max-width: 760px; }
-.admin-body .admin-config > div + div {
-    padding-top: .8rem;
-    border-top: 1px solid var(--line);
-}
-.admin-body .admin-config h2 {
-    margin: 0 0 .35rem;
-    font-size: 1rem;
-}
-.admin-body .admin-config p { margin: 0; }
-.admin-body .admin-config-grid {
+/* Configuración: una sola tarjeta con apartados en dos columnas y filas legibles. */
+.admin-body .admin-config {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
-    gap: .45rem;
-    margin: .55rem 0 0;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: .8rem;
+    max-width: 880px;
+}
+.admin-body .admin-config-block {
+    padding: .85rem .95rem;
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: var(--surface-2);
+}
+.admin-body .admin-config-block--wide { grid-column: 1 / -1; }
+.admin-body .admin-config h3 { margin: 0 0 .2rem; font-size: .95rem; }
+.admin-body .admin-config p { margin: 0; font-size: .78rem; }
+.admin-body .admin-config-list {
+    display: grid;
+    gap: .4rem;
+    margin: .6rem 0 0;
     padding: 0;
     list-style: none;
 }
-.admin-body .admin-config-grid li {
+.admin-body .admin-config-list li {
+    display: flex;
+    align-items: center;
+    gap: .55rem;
+    padding: .4rem .55rem;
+    border-radius: 8px;
+    background: var(--field);
+}
+.admin-body .admin-config-dot {
+    flex: 0 0 auto;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--muted);
+}
+.admin-body .admin-config-dot.is-ok { background: var(--accent); }
+.admin-body .admin-config-dot.is-bad { background: var(--danger); }
+.admin-body .admin-config-copy { display: grid; min-width: 0; }
+.admin-body .admin-config-copy strong { font-size: .8rem; }
+.admin-body .admin-config-copy small { color: var(--muted); font-size: .7rem; }
+.admin-body .admin-config-account {
     display: flex;
     flex-wrap: wrap;
-    align-items: baseline;
-    gap: .4rem;
-    padding: .45rem .6rem;
-    border-radius: var(--radius-sm);
-    background: var(--field);
-    font-size: .78rem;
-}
-.admin-body .admin-config-grid small {
-    flex-basis: 100%;
-    color: var(--muted);
-    font-size: .7rem;
+    align-items: center;
+    justify-content: space-between;
+    gap: .7rem;
 }
 
-/* Reportes: KPIs con la identidad de la plataforma. */
+/* Módulos: se elige un curso antes de listar su temario. */
+.admin-body .admin-modules-filter {
+    flex-wrap: wrap;
+    align-items: center;
+    gap: .5rem;
+    margin-bottom: 1rem;
+}
+.admin-body .admin-modules-filter label {
+    color: var(--muted);
+    font-size: .74rem;
+    font-weight: 650;
+}
+.admin-body .admin-modules-filter select { flex: 0 1 260px; max-width: 260px; }
+.admin-body .admin-modules-filter input { flex: 1 1 220px; max-width: 320px; }
+.admin-body .admin-modules-empty { max-width: 860px; }
+.admin-body .admin-modules-empty h2 { margin: 0 0 .3rem; font-size: 1rem; }
+.admin-body .admin-modules-courses {
+    display: flex;
+    flex-wrap: wrap;
+    gap: .4rem;
+    margin: .85rem 0 0;
+    padding: 0;
+    list-style: none;
+}
+.admin-body .admin-modules-courses .btn { min-height: 32px; padding: .3rem .7rem; font-size: .78rem; }
+
+/* Perfil: foto y datos en dos columnas, sin tarjetas desmedidas. */
+.admin-body .admin-profile-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr);
+    gap: 1rem;
+    align-items: start;
+}
+.admin-body .admin-profile-grid .admin-card { padding: 1rem 1.1rem; }
+.admin-body .admin-profile-grid .admin-profile-photo { margin-bottom: .8rem; }
+
+/* Reportes: KPIs con la identidad de la plataforma y gráficos contenidos. */
+.admin-body .admin-kpis--report { gap: .6rem; }
 .admin-body .admin-kpis--report .admin-kpi {
     gap: .2rem;
-    padding: .85rem 1rem;
+    padding: .7rem .85rem;
     border: 1px solid var(--line);
     border-top: 2px solid var(--accent);
     border-radius: var(--radius-sm);
     background: var(--surface-2);
     box-shadow: none;
 }
-.admin-body .admin-kpis--report .admin-kpi-value { font-size: 1.4rem; }
+.admin-body .admin-kpis--report .admin-kpi-value { font-size: 1.35rem; }
 .admin-body .admin-kpis--report .admin-kpi-label { font-size: .72rem; }
 .admin-body .admin-kpis--report .admin-kpi-foot { font-size: .68rem; }
+.admin-body .admin-report-extra { gap: .85rem; margin-top: .85rem; }
+.admin-body .admin-chart {
+    min-height: 0;
+    max-width: 760px;
+    margin: .25rem auto 0;
+}
+.admin-body .admin-chart--income { max-width: 520px; }
+
+/* Inicio: columnas parejas y gráfico centrado en el alto disponible. */
+.admin-body .admin-grid { align-items: stretch; }
+.admin-body .admin-chart-card { display: flex; flex-direction: column; }
+.admin-body .admin-chart-card .admin-chart { margin-top: auto; margin-bottom: auto; }
+
+@media (max-width: 980px) {
+    .admin-body .admin-kpis--home { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 900px) {
+    .admin-body .admin-profile-grid { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 560px) {
+    .admin-body .admin-kpis--home { grid-template-columns: minmax(0, 1fr); }
+}
 
 @media (max-width: 720px) {
     .admin-table { font-size: .78rem; }

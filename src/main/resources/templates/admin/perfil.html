@@ -18,6 +18,7 @@
                 <a class="admin-back" th:href="@{/admin/configuracion}">← Configuración</a>
             </div>
 
+            <div class="admin-profile-grid">
             <section class="panel-card admin-card" id="foto" aria-labelledby="perfil-foto-titulo">
                 <div class="panel-section-head"><h2 id="perfil-foto-titulo">Foto de perfil</h2><span class="panel-rule" aria-hidden="true"></span></div>
                 <div class="admin-profile-photo">
@@ -67,6 +68,7 @@
                     <div><dt>Rol</dt><dd th:text="${perfil.getRol() == 'ADMIN'} ? 'Administrador' : 'Estudiante'">Administrador</dd></div>
                 </dl>
             </section>
+            </div>
         </main>
     </div>
 </div>

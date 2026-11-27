@@ -14,15 +14,15 @@ el identificador del curso. Las rutas del panel administrativo exigen
 Antes de cargar contenido, el curso debe existir y tener al menos un módulo. Los
 módulos se crean desde **Cursos** con su título y posición; en el temario se
 muestran como “Módulo 1”, “Módulo 2” y así sucesivamente, seguidos del título
-real. En los formularios y filtros de **Módulos**, **Videos** y **Ejercicios**,
-elegí primero el curso y después el módulo: la lista de módulos se reduce al
-curso seleccionado.
+real. En **Módulos** elegí primero el curso para ver y ordenar solo sus módulos;
+en **Videos** y **Ejercicios**, elegí primero el curso y después el módulo: la
+lista de módulos se reduce al curso seleccionado.
 
 ## Cómo se organiza el contenido
 
 | Nivel | Qué es | Dónde se carga |
 |---|---|---|
-| Módulo | Agrupador principal del curso | Alta de módulos en **Cursos** |
+| Módulo | Agrupador principal del curso | Alta de módulos en **Módulos** |
 | Sección | Agrupador opcional dentro de un módulo | Formulario “Nueva sección” de esta página |
 | Ítem | Una clase (`VIDEO`), su versión en señas (`VIDEO_LSP`), un enlace (`MATERIAL`) o una consigna (`EJERCICIO`) | Formulario “Nuevo ítem” de esta página |
 | Sílabo | Objetivos, requisitos y recursos complementarios | Bloque “Sílabo” de esta página |

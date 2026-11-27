@@ -7,6 +7,7 @@ import com.mundomanitas.api.security.AutenticadoUsuario;
 import com.mundomanitas.api.service.admin.AdminCatalogService;
 import com.mundomanitas.api.service.admin.AdminNotificacionService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -45,18 +46,27 @@ public class AdminContenidoController extends AdminBaseController {
                           @RequestParam(name = "page", defaultValue = "0") int page,
                           Model model) {
         common(model, "modulos", "Módulos");
-        model.addAttribute("page", catalog.modules(cursoId, query,
-                PageRequest.of(Math.max(page, 0), 10)));
+        var cursos = catalog.cursoOptions();
+        // Sin curso elegido no se listan módulos sueltos de todo el catálogo.
+        model.addAttribute("page", cursoId == null
+                ? Page.empty(PageRequest.of(0, 10))
+                : catalog.modules(cursoId, query, PageRequest.of(Math.max(page, 0), 10)));
         model.addAttribute("query", query);
         model.addAttribute("cursoId", cursoId);
-        model.addAttribute("options", catalog.cursoOptions());
+        model.addAttribute("cursoTitulo", cursoId == null ? null : cursos.stream()
+                .filter(opcion -> opcion.id().equals(cursoId))
+                .map(opcion -> opcion.label())
+                .findFirst()
+                .orElse(null));
+        model.addAttribute("options", cursos);
         return "admin/modulos";
     }
 
     @GetMapping("/modulos/nuevo")
-    public String newModulo(Model model) {
+    public String newModulo(@RequestParam(name = "curso", required = false) UUID cursoId,
+                            Model model) {
         common(model, "modulos", "Nuevo módulo");
-        model.addAttribute("adminModuloFormulario", new AdminModuloFormulario(null, "", 0));
+        model.addAttribute("adminModuloFormulario", new AdminModuloFormulario(cursoId, "", 0));
         model.addAttribute("options", catalog.cursoOptions());
         return "admin/modulo-form";
     }
@@ -112,6 +122,7 @@ public class AdminContenidoController extends AdminBaseController {
     @PostMapping("/modulos/{id}/mover")
     public String moveModulo(@PathVariable UUID id,
                              @RequestParam boolean up,
+                             @RequestParam(name = "curso", required = false) UUID cursoId,
                              @AuthenticationPrincipal AutenticadoUsuario principal,
                              RedirectAttributes redirect) {
         try {
@@ -119,26 +130,31 @@ public class AdminContenidoController extends AdminBaseController {
         } catch (IllegalArgumentException exception) {
             redirect.addFlashAttribute("panelError", exception.getMessage());
         }
-        return "redirect:/admin/modulos";
+        return modulesRedirect(cursoId);
     }
 
     @GetMapping("/modulos/{id}/eliminar")
-    public String confirmDeleteModulo(@PathVariable UUID id, Model model,
+    public String confirmDeleteModulo(@PathVariable UUID id,
+                                      @RequestParam(name = "curso", required = false) UUID cursoId,
+                                      Model model,
                                       RedirectAttributes redirect) {
         try {
             String titulo = catalog.moduloFormulario(id).titulo();
+            String action = "/admin/modulos/" + id + "/eliminar"
+                    + (cursoId == null ? "" : "?curso=" + cursoId);
             return confirmation(model, "modulos", "Eliminar módulo",
                     "Se borrará el módulo y su contenido. Esta acción no se puede deshacer.",
-                    "/admin/modulos/" + id + "/eliminar", "Eliminar módulo",
+                    action, "Eliminar módulo",
                     "/admin/modulos", List.of("Módulo: " + titulo));
         } catch (IllegalArgumentException exception) {
             redirect.addFlashAttribute("panelError", exception.getMessage());
-            return "redirect:/admin/modulos";
+            return modulesRedirect(cursoId);
         }
     }
 
     @PostMapping("/modulos/{id}/eliminar")
     public String deleteModulo(@PathVariable UUID id,
+                               @RequestParam(name = "curso", required = false) UUID cursoId,
                                @AuthenticationPrincipal AutenticadoUsuario principal,
                                RedirectAttributes redirect) {
         try {
@@ -147,7 +163,11 @@ public class AdminContenidoController extends AdminBaseController {
         } catch (IllegalArgumentException exception) {
             redirect.addFlashAttribute("panelError", exception.getMessage());
         }
-        return "redirect:/admin/modulos";
+        return modulesRedirect(cursoId);
+    }
+
+    private String modulesRedirect(UUID cursoId) {
+        return cursoId == null ? "redirect:/admin/modulos" : "redirect:/admin/modulos?curso=" + cursoId;
     }
 
     /* ------------------------------- videos ------------------------------ */

@@ -14,8 +14,14 @@
     const title = confirm.querySelector("[data-confirm-title]");
     const message = confirm.querySelector("[data-confirm-message]");
     const details = confirm.querySelector("[data-confirm-details]");
+    const confirmSubmit = confirm.querySelector("[data-confirm-submit]");
     let pending = null;
     let lastTrigger = null;
+
+    const busy = (state) => {
+        if (confirmSubmit) confirmSubmit.disabled = state;
+        confirm.toggleAttribute("aria-busy", state);
+    };
 
     const show = (dialog, trigger) => {
         if (!dialog || typeof dialog.showModal !== "function" || dialog.open) return;
@@ -46,6 +52,10 @@
     const openDeletion = async (trigger, focusTarget = trigger) => {
         const url = trigger.dataset.confirmUrl;
         if (!url) return;
+        // El modal aparece al instante y se completa cuando llega el impacto real.
+        fill("Eliminar", "Cargando la confirmación…");
+        busy(true);
+        show(confirm, focusTarget);
         try {
             const response = await fetch(url, {
                 headers: { "X-Requested-With": "XMLHttpRequest" }
@@ -71,9 +81,11 @@
                 document.body.append(sender);
                 sender.submit();
             };
-            show(confirm, focusTarget);
+            busy(false);
         } catch (error) {
             pending = null;
+            busy(false);
+            confirm.close();
             window.location.assign(url);
         }
     };
@@ -94,6 +106,7 @@
             confirmedForm = form;
             form.requestSubmit();
         };
+        busy(false);
         show(confirm, form.querySelector("button[type='submit']") || undefined);
     });
 
@@ -197,6 +210,7 @@
     for (const dialog of document.querySelectorAll("dialog.ui-dialog")) {
         dialog.addEventListener("close", () => {
             if (dialog !== confirm && dialog !== actions) return;
+            busy(false);
             // Si el modal de acciones abrió una confirmación, el foco vuelve
             // al botón de esa confirmación, no al disparador que ya se cerró.
             if (document.querySelector("dialog[open]")) return;

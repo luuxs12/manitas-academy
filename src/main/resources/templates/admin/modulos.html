@@ -12,10 +12,16 @@
         <main id="panel-main" class="panel-main admin-main">
 
             <div class="admin-page-head">
-                <div><h1>Módulos</h1><p th:text="${page.totalElements == 1 ? '1 módulo' : page.totalElements + ' módulos'}">0 módulos</p></div>
+                <div>
+                    <h1>Módulos</h1>
+                    <p th:if="${cursoId != null}"
+                       th:text="${(cursoTitulo != null ? cursoTitulo : 'Curso') + ' · ' + (page.totalElements == 1 ? '1 módulo' : page.totalElements + ' módulos')}">Curso · 0 módulos</p>
+                    <p th:if="${cursoId == null}">Elegí un curso para ver y ordenar sus módulos.</p>
+                </div>
                 <div class="admin-actions">
-                    <a class="btn btn-admin" th:href="@{/admin/modulos/nuevo}">Nuevo módulo</a>
-                    <details class="admin-export"><summary>Exportar</summary><div class="panel-menu-pop">
+                    <a class="btn btn-admin"
+                       th:href="${cursoId != null} ? @{/admin/modulos/nuevo(curso=${cursoId})} : @{/admin/modulos/nuevo}">Nuevo módulo</a>
+                    <details class="admin-export" th:if="${cursoId != null}"><summary>Exportar</summary><div class="panel-menu-pop">
                         <a th:href="@{/admin/exportar/modulos(formato='csv')}">CSV</a>
                         <a th:href="@{/admin/exportar/modulos(formato='xlsx')}">Excel (XLSX)</a>
                         <a th:href="@{/admin/exportar/modulos(formato='pdf')}">PDF</a>
@@ -23,53 +29,66 @@
                 </div>
             </div>
 
-            <form class="admin-filters admin-filters--full" method="get" th:action="@{/admin/modulos}">
-                <label class="sr-only" for="filtro-modulos">Buscar módulos</label>
-                <input id="filtro-modulos" name="q" type="search" th:value="${query}" placeholder="Título del módulo…">
-                <label class="sr-only" for="filtro-curso">Filtrar por curso</label>
-                <select id="filtro-curso" name="curso">
-                    <option value="">Todos los cursos</option>
+            <form class="admin-filters admin-filters--full admin-modules-filter" method="get" th:action="@{/admin/modulos}">
+                <label for="filtro-curso">Curso</label>
+                <select id="filtro-curso" name="curso" required>
+                    <option value="" disabled th:selected="${cursoId == null}">Elegí un curso…</option>
                     <option th:each="o : ${options}" th:value="${o.id()}" th:text="${o.label()}"
                             th:selected="${cursoId != null and cursoId.toString() == o.id().toString()}"></option>
                 </select>
-                <button class="btn btn-admin" type="submit">Filtrar</button>
+                <label class="sr-only" for="filtro-modulos">Buscar módulos</label>
+                <input id="filtro-modulos" name="q" type="search" th:value="${query}"
+                       placeholder="Buscar en los módulos del curso…" th:disabled="${cursoId == null}">
+                <button class="btn btn-admin" type="submit">Ver módulos</button>
             </form>
 
-            <div class="panel-card admin-card admin-table-wrap">
-                <table class="admin-table">
-                    <caption>Módulos por curso</caption>
-                    <thead><tr><th scope="col">Curso</th><th scope="col">Módulo</th><th scope="col">Pos.</th><th scope="col">Videos</th><th scope="col">Ejercicios</th><th scope="col">Acciones</th></tr></thead>
-                    <tbody>
-                    <tr th:each="item : ${page.content}">
-                        <td th:text="${item.cursoTitulo()}" th:title="${item.cursoTitulo()}">Curso</td>
-                        <td th:title="${item.titulo()}"><strong th:text="${item.titulo()}">Módulo</strong></td>
-                        <td th:text="${item.posicion()}">0</td>
-                        <td th:text="${item.videos()}">0</td>
-                        <td th:text="${item.exercises()}">0</td>
-                        <td class="admin-row-actions">
-                            <a th:href="@{/admin/modulos/{id}/editar(id=${item.id()})}"
-                               th:attr="aria-label='Editar ' + ${item.titulo()}"><th:block th:replace="~{fragments/admin-icons :: pencil}"></th:block><span class="sr-only">Editar</span></a>
-                            <form th:action="@{/admin/modulos/{id}/mover(id=${item.id()}, up=true)}" method="post">
-                                <button class="admin-move" type="submit"
-                                        th:attr="aria-label='Subir ' + ${item.titulo()}"><th:block th:replace="~{fragments/admin-icons :: arrowUp}"></th:block><span class="sr-only">Subir</span></button>
-                            </form>
-                            <form th:action="@{/admin/modulos/{id}/mover(id=${item.id()}, up=false)}" method="post">
-                                <button class="admin-move" type="submit"
-                                        th:attr="aria-label='Bajar ' + ${item.titulo()}"><th:block th:replace="~{fragments/admin-icons :: arrowDown}"></th:block><span class="sr-only">Bajar</span></button>
-                            </form>
-                            <button type="button" class="admin-confirm-link"
-                                    th:attr="data-confirm-url=@{/admin/modulos/{id}/eliminar(id=${item.id()})}, aria-label='Eliminar ' + ${item.titulo()}"><th:block th:replace="~{fragments/admin-icons :: trash}"></th:block><span class="sr-only">Eliminar</span></button>
-                        </td>
-                    </tr>
-                    <tr th:if="${#lists.isEmpty(page.content)}"><td colspan="6" class="admin-empty">Sin módulos.</td></tr>
-                    </tbody>
-                </table>
-            </div>
-            <nav class="admin-pager" th:if="${page.totalPages > 1}" aria-label="Paginación de módulos">
-                <a th:if="${!page.first}" th:href="@{/admin/modulos(page=${page.number - 1}, q=${query}, curso=${cursoId})}">← Anterior</a>
-                <span th:text="${'Página ' + (page.number + 1) + ' de ' + page.totalPages}">Página 1</span>
-                <a th:if="${!page.last}" th:href="@{/admin/modulos(page=${page.number + 1}, q=${query}, curso=${cursoId})}">Siguiente →</a>
-            </nav>
+            <section class="panel-card admin-card admin-modules-empty" th:if="${cursoId == null}" aria-labelledby="modulos-elegir">
+                <h2 id="modulos-elegir">Elegí un curso</h2>
+                <p class="admin-muted">Los módulos se ordenan dentro de cada curso. Seleccioná uno para ver solo su temario.</p>
+                <ul class="admin-modules-courses">
+                    <li th:each="o : ${options}">
+                        <a class="btn btn-ghost" th:href="@{/admin/modulos(curso=${o.id()})}" th:text="${o.label()}">Curso</a>
+                    </li>
+                </ul>
+                <p class="admin-empty" th:if="${#lists.isEmpty(options)}">Todavía no hay cursos creados.</p>
+            </section>
+
+            <th:block th:if="${cursoId != null}">
+                <div class="panel-card admin-card admin-table-wrap">
+                    <table class="admin-table">
+                        <caption>Módulos por curso</caption>
+                        <thead><tr><th scope="col">Módulo</th><th scope="col">Pos.</th><th scope="col">Videos</th><th scope="col">Ejercicios</th><th scope="col">Acciones</th></tr></thead>
+                        <tbody>
+                        <tr th:each="item : ${page.content}">
+                            <td th:title="${item.titulo()}"><strong th:text="${item.titulo()}">Módulo</strong></td>
+                            <td th:text="${item.posicion()}">0</td>
+                            <td th:text="${item.videos()}">0</td>
+                            <td th:text="${item.exercises()}">0</td>
+                            <td class="admin-row-actions">
+                                <a th:href="@{/admin/modulos/{id}/editar(id=${item.id()})}"
+                                   th:attr="aria-label='Editar ' + ${item.titulo()}"><th:block th:replace="~{fragments/admin-icons :: pencil}"></th:block><span class="sr-only">Editar</span></a>
+                                <form th:action="@{/admin/modulos/{id}/mover(id=${item.id()}, up=true, curso=${cursoId})}" method="post">
+                                    <button class="admin-move" type="submit"
+                                            th:attr="aria-label='Subir ' + ${item.titulo()}"><th:block th:replace="~{fragments/admin-icons :: arrowUp}"></th:block><span class="sr-only">Subir</span></button>
+                                </form>
+                                <form th:action="@{/admin/modulos/{id}/mover(id=${item.id()}, up=false, curso=${cursoId})}" method="post">
+                                    <button class="admin-move" type="submit"
+                                            th:attr="aria-label='Bajar ' + ${item.titulo()}"><th:block th:replace="~{fragments/admin-icons :: arrowDown}"></th:block><span class="sr-only">Bajar</span></button>
+                                </form>
+                                <button type="button" class="admin-confirm-link"
+                                        th:attr="data-confirm-url=@{/admin/modulos/{id}/eliminar(id=${item.id()}, curso=${cursoId})}, aria-label='Eliminar ' + ${item.titulo()}"><th:block th:replace="~{fragments/admin-icons :: trash}"></th:block><span class="sr-only">Eliminar</span></button>
+                            </td>
+                        </tr>
+                        <tr th:if="${#lists.isEmpty(page.content)}"><td colspan="5" class="admin-empty">Este curso todavía no tiene módulos.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <nav class="admin-pager" th:if="${page.totalPages > 1}" aria-label="Paginación de módulos">
+                    <a th:if="${!page.first}" th:href="@{/admin/modulos(page=${page.number - 1}, q=${query}, curso=${cursoId})}">← Anterior</a>
+                    <span th:text="${'Página ' + (page.number + 1) + ' de ' + page.totalPages}">Página 1</span>
+                    <a th:if="${!page.last}" th:href="@{/admin/modulos(page=${page.number + 1}, q=${query}, curso=${cursoId})}">Siguiente →</a>
+                </nav>
+            </th:block>
         </main>
     </div>
 </div>

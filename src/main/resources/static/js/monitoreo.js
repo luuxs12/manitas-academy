@@ -697,6 +697,7 @@
         rutas(datos.rutas);
 
         ultimaCarga = Date.now();
+        document.dispatchEvent(new CustomEvent("monitoreo:actualizado", { detail: datos }));
     };
 
     const reiniciarBarra = () => {

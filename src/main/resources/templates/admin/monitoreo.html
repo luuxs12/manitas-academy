@@ -349,6 +349,44 @@
                     </section>
                 </div>
 
+                <div class="monitor-grid monitor-grid--echarts" aria-label="Comparativas rápidas">
+                    <section class="monitor-card" aria-labelledby="monitor-echart-recursos">
+                        <header class="monitor-card-head">
+                            <div>
+                                <span class="monitor-card-kicker">Proceso</span>
+                                <h2 id="monitor-echart-recursos">CPU y memoria</h2>
+                            </div>
+                            <span class="monitor-card-note">Último minuto</span>
+                        </header>
+                        <div class="monitor-echart" data-echarts="recursos" role="img"
+                             aria-label="Comparación de uso de CPU y memoria en el último minuto"></div>
+                    </section>
+
+                    <section class="monitor-card" aria-labelledby="monitor-echart-respuestas">
+                        <header class="monitor-card-head">
+                            <div>
+                                <span class="monitor-card-kicker">Tráfico</span>
+                                <h2 id="monitor-echart-respuestas">Respuestas por tipo</h2>
+                            </div>
+                            <span class="monitor-card-note">Últimos 30 minutos</span>
+                        </header>
+                        <div class="monitor-echart" data-echarts="respuestas" role="img"
+                             aria-label="Peticiones por minuto agrupadas por tipo de respuesta"></div>
+                    </section>
+
+                    <section class="monitor-card" aria-labelledby="monitor-echart-actividad">
+                        <header class="monitor-card-head">
+                            <div>
+                                <span class="monitor-card-kicker">Negocio</span>
+                                <h2 id="monitor-echart-actividad">Actividad semanal</h2>
+                            </div>
+                            <span class="monitor-card-note">Últimos 7 días</span>
+                        </header>
+                        <div class="monitor-echart" data-echarts="actividad" role="img"
+                             aria-label="Matrículas, pagos y certificados de los últimos siete días"></div>
+                    </section>
+                </div>
+
                 <div class="monitor-grid monitor-grid--signal">
                     <section class="monitor-card" aria-labelledby="monitor-senal">
                         <header class="monitor-card-head">
@@ -618,5 +656,7 @@
 <script defer th:src="@{/js/panel.js}"></script>
 <script defer th:src="@{/js/admin.js}"></script>
 <script defer th:src="@{/js/monitoreo.js}"></script>
+<script defer th:src="@{/vendor/echarts/echarts.min.js}"></script>
+<script defer th:src="@{/js/echarts-monitoreo.js}"></script>
 </body>
 </html>

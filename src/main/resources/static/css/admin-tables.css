@@ -1,0 +1,80 @@
+/* Tablas compartidas del panel.
+   Usa solo las variables de styles.css para que claro y oscuro sigan con la
+   misma paleta de la plataforma. Se carga después de styles.css. */
+
+.admin-table-wrap {
+    border: 1px solid var(--line);
+    border-radius: var(--radius-sm);
+    background: var(--surface);
+}
+
+.admin-table caption {
+    padding-bottom: .9rem;
+    color: var(--ink);
+}
+
+.admin-table thead th {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+    background: var(--surface-2);
+}
+
+.admin-table th,
+.admin-table td,
+.admin-body .admin-table th,
+.admin-body .admin-table td {
+    padding: .7rem .8rem;
+}
+
+.admin-table tbody tr:last-child td { border-bottom: 0; }
+.admin-table tbody tr:hover td { background: var(--soft); }
+
+.admin-table .admin-clip { max-width: 18rem; }
+.admin-table .admin-url { max-width: 16rem; }
+
+.admin-row-actions { gap: .4rem; }
+.admin-row-actions a,
+.admin-row-actions button {
+    min-height: 1.9rem;
+    padding: .3rem .55rem;
+    border-radius: var(--radius-sm);
+    line-height: 1.2;
+}
+.admin-row-actions a:focus-visible,
+.admin-row-actions button:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+.admin-row-actions button { border-color: var(--danger); color: var(--danger); }
+.admin-row-actions button:hover { background: var(--danger-soft); }
+
+.admin-status { border: 1px solid var(--line); }
+.admin-status.is-ok { border-color: var(--accent-line); }
+
+.admin-table .admin-empty,
+.monitor-empty {
+    background: var(--field);
+    color: var(--muted);
+    text-align: center;
+}
+
+.monitor-table { font-variant-numeric: tabular-nums; }
+.monitor-table th,
+.monitor-table td { padding: .65rem .8rem; }
+.monitor-table--compact td:nth-child(2) {
+    max-width: 20rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.panel-payments th,
+.panel-payments td { padding: .65rem .6rem; }
+.panel-payment-status { background: var(--field); }
+
+@media (max-width: 720px) {
+    .admin-table { font-size: .78rem; }
+    .admin-table .admin-clip { max-width: 10rem; }
+    .admin-row-actions { gap: .3rem; }
+}

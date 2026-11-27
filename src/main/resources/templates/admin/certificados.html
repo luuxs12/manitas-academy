@@ -69,9 +69,9 @@
                     <thead><tr><th scope="col">Código</th><th scope="col">Persona</th><th scope="col">Curso</th><th scope="col">Emisión</th><th scope="col">Estado</th><th scope="col">Acciones</th></tr></thead>
                     <tbody>
                     <tr th:each="item : ${page.content}">
-                        <td><strong th:text="${item.code()}">MM-XXX-00000000</strong></td>
-                        <td th:text="${item.usuarioNombre()}">Nombre</td>
-                        <td th:text="${item.cursoTitulo()}">Curso</td>
+                        <td th:title="${item.code()}"><strong th:text="${item.code()}">MM-XXX-00000000</strong></td>
+                        <td th:text="${item.usuarioNombre()}" th:title="${item.usuarioNombre()}">Nombre</td>
+                        <td th:text="${item.cursoTitulo()}" th:title="${item.cursoTitulo()}">Curso</td>
                         <td th:text="${item.emitido()}">01/01/2026</td>
                         <td><span class="admin-status" th:classappend="${item.activo()} ? ' is-ok' : ' is-bad'"
                                   th:text="${item.activo()} ? 'Vigente' : 'Revocado'">Vigente</span></td>

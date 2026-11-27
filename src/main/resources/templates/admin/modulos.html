@@ -41,8 +41,8 @@
                     <thead><tr><th scope="col">Curso</th><th scope="col">Módulo</th><th scope="col">Pos.</th><th scope="col">Videos</th><th scope="col">Ejercicios</th><th scope="col">Acciones</th></tr></thead>
                     <tbody>
                     <tr th:each="item : ${page.content}">
-                        <td th:text="${item.cursoTitulo()}">Curso</td>
-                        <td><strong th:text="${item.titulo()}">Módulo</strong></td>
+                        <td th:text="${item.cursoTitulo()}" th:title="${item.cursoTitulo()}">Curso</td>
+                        <td th:title="${item.titulo()}"><strong th:text="${item.titulo()}">Módulo</strong></td>
                         <td th:text="${item.posicion()}">0</td>
                         <td th:text="${item.videos()}">0</td>
                         <td th:text="${item.exercises()}">0</td>

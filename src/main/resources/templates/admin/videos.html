@@ -49,9 +49,9 @@
                     <thead><tr><th scope="col">Video</th><th scope="col">Curso / Módulo</th><th scope="col">Origen</th><th scope="col">Pos.</th><th scope="col">Acciones</th></tr></thead>
                     <tbody>
                     <tr th:each="item : ${page.content}">
-                        <td><strong th:text="${item.titulo()}">Video</strong></td>
-                        <td><small th:text="${item.cursoTitulo()}">Curso</small><br><small th:text="${item.moduloTitulo()}">Módulo</small></td>
-                        <td class="admin-url" th:text="${item.url()}">youtu.be/…</td>
+                        <td th:title="${item.titulo()}"><strong th:text="${item.titulo()}">Video</strong></td>
+                        <td th:title="${item.cursoTitulo() + ' / ' + item.moduloTitulo()}"><small th:text="${item.cursoTitulo()}">Curso</small><br><small th:text="${item.moduloTitulo()}">Módulo</small></td>
+                        <td class="admin-url" th:text="${item.url()}" th:title="${item.url()}">youtu.be/…</td>
                         <td th:text="${item.posicion()}">0</td>
                         <td class="admin-row-actions">
                             <a th:href="@{/admin/videos/{id}/editar(id=${item.id()})}"

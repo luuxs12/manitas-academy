@@ -35,13 +35,13 @@
                     <thead><tr><th scope="col">Curso</th><th scope="col">Categoría</th><th scope="col">Estado</th><th scope="col">Lecciones</th><th scope="col">Acceso</th><th scope="col">Inscriptos</th><th scope="col">Pos.</th><th scope="col">Acciones</th></tr></thead>
                     <tbody>
                     <tr th:each="curso : ${page.content}">
-                        <td>
+                        <td th:title="${curso.titulo()}">
                             <div class="admin-course-copy">
                                 <strong th:text="${curso.titulo()}">Curso</strong>
                                 <small th:text="${curso.slug()}">slug</small>
                             </div>
                         </td>
-                        <td th:text="${curso.categoria()}">Categoría</td>
+                        <td th:text="${curso.categoria()}" th:title="${curso.categoria()}">Categoría</td>
                         <td><span class="admin-status" th:classappend="${curso.status() == 'PUBLICADO'} ? ' is-ok' : ' is-bad'"
                                   th:text="${curso.status() == 'PUBLICADO'} ? 'Publicado' : 'Borrador'">Borrador</span></td>
                         <td th:text="${curso.lessons()}">0</td>

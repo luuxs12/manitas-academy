@@ -28,7 +28,7 @@
                         <td th:text="${evento.when()}">01/01/2026 10:00</td>
                         <td th:text="${evento.titulo()}">Administrador</td>
                         <td><span class="admin-status" th:text="${evento.kind()}">CREATE</span></td>
-                        <td th:text="${evento.detail()}">USUARIO: correo</td>
+                        <td th:text="${evento.detail()}" th:title="${evento.detail()}">USUARIO: correo</td>
                     </tr>
                     <tr th:if="${#lists.isEmpty(page.content)}"><td colspan="4" class="admin-empty">Sin acciones registradas.</td></tr>
                     </tbody>

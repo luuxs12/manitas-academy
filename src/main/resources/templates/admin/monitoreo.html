@@ -425,12 +425,14 @@
                                 <tbody data-monitoreo-recientes>
                                 <tr th:each="evento : ${monitor.recientes()}">
                                     <td th:text="${evento.cuando()}">—</td>
-                                    <td th:text="${evento.metodo() + ' ' + evento.ruta()}">—</td>
+                                    <td th:text="${evento.metodo() + ' ' + evento.ruta()}"
+                                        th:title="${evento.metodo() + ' ' + evento.ruta()}">—</td>
                                     <td><span class="monitor-status"
                                               th:class="${'monitor-status is-' + (evento.estado() < 300 ? 'ok' : evento.estado() < 400 ? 'redirect' : evento.estado() < 500 ? 'warn' : 'bad')}"
                                               th:text="${evento.estado()}">—</span></td>
                                     <td th:text="${evento.duracionMs() + ' ms'}">—</td>
-                                    <td class="monitor-request" th:text="${evento.requestId()}">—</td>
+                                    <td class="monitor-request" th:text="${evento.requestId()}"
+                                        th:title="${evento.requestId()}">—</td>
                                 </tr>
                                 </tbody>
                             </table>
@@ -472,11 +474,13 @@
                                     <tbody data-monitoreo-tabla-errores>
                                     <tr th:each="evento : ${monitor.eventos()}">
                                         <td th:text="${evento.cuando()}">—</td>
-                                        <td th:text="${evento.metodo() + ' ' + evento.ruta()}">—</td>
+                                        <td th:text="${evento.metodo() + ' ' + evento.ruta()}"
+                                        th:title="${evento.metodo() + ' ' + evento.ruta()}">—</td>
                                         <td><span class="monitor-status is-bad"
                                                   th:text="${evento.estado()}">—</span></td>
                                         <td th:text="${evento.duracionMs() + ' ms'}">—</td>
-                                        <td class="monitor-request" th:text="${evento.requestId()}">—</td>
+                                        <td class="monitor-request" th:text="${evento.requestId()}"
+                                        th:title="${evento.requestId()}">—</td>
                                     </tr>
                                     </tbody>
                                 </table>

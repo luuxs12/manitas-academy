@@ -46,8 +46,8 @@
                     <thead><tr><th>Nombre</th><th>Correo</th><th>Rol</th><th>Plan</th><th>Estado</th><th>Alta</th><th>Acciones</th></tr></thead>
                     <tbody>
                     <tr th:each="usuario : ${page.content}">
-                        <td><strong th:text="${usuario.nombreCompleto()}">Nombre</strong></td>
-                        <td th:text="${usuario.email()}">correo</td>
+                        <td th:title="${usuario.nombreCompleto()}"><strong th:text="${usuario.nombreCompleto()}">Nombre</strong></td>
+                        <td th:text="${usuario.email()}" th:title="${usuario.email()}">correo</td>
                         <td th:text="${usuario.rol() == 'ADMIN' ? 'Admin' : 'Estudiante'}">Rol</td>
                         <td th:text="${usuario.plan()}">Plan</td>
                         <td><span class="admin-status" th:classappend="${usuario.activo()} ? ' is-ok' : ' is-bad'"

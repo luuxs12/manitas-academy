@@ -149,4 +149,4 @@ El formulario de documentos usa el mismo tipo de área: elige o arrastra el
 archivo y el cuadro pasa a mostrar su nombre.
 
 Las migraciones ya ejecutadas **no se editan**: un cambio nuevo va en una
-migración posterior a `V17`.
+migración nueva, sin modificar las anteriores.

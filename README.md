@@ -164,16 +164,24 @@ La base se crea una sola vez; las tablas las crea Flyway al arrancar.
 Variables de entorno disponibles: `DATABASE_URL`, `DB_USER`, `DB_PASSWORD` y
 `REMEMBER_ME_KEY`.
 
-Con `ADMIN_PASSWORD` (y opcionalmente `ADMIN_EMAIL`) la app crea al arrancar la
-cuenta ADMIN si no existe; si ya existe con otro rol la promueve, sin cambiarle
-la clave. Sin esa variable no se crea ni se modifica ninguna cuenta.
+La migración `V18__admin_inicial.sql` deja creada la cuenta
+`admin@damianprint.com` con rol ADMIN desde el primer arranque. La clave se
+guarda como hash BCrypt, nunca en texto plano, y no se sobrescribe si la cuenta
+ya existe. Es una clave inicial para entrar la primera vez: cámbiala desde
+**Mi perfil** después del primer inicio de sesión.
+
+Además, con `ADMIN_PASSWORD` (y opcionalmente `ADMIN_EMAIL`) la app crea al
+arrancar otra cuenta ADMIN si no existe; si ya existe con otro rol la promueve,
+sin cambiarle la clave. Sin esa variable no se crea ni se modifica ninguna
+cuenta adicional.
 
 Las migraciones van de `V1__accounts.sql` a
-`V17__marcado_ejercicios_y_lsp.sql`: cuentas, recuperación, cursos e
+`V18__admin_inicial.sql`: cuentas, recuperación, cursos e
 inscripciones, módulos de cuenta, administración, videos privados, progreso,
 publicación, estructura de contenido (módulos, secciones, ítems y sílabo),
 documentos descargables, cuestionarios de ejercicios, marcado configurable del
-ejercicio e identificador LSP de la cuenta. `V14` no borra las tablas anteriores:
+ejercicio, identificador LSP de la cuenta y cuenta administradora inicial.
+`V14` no borra las tablas anteriores:
 crea `content_items` con `source_type`/`source_id` y los triggers que conservan
 videos, ejercicios y progreso ya cargados. Una migración ya ejecutada **no se
 edita** (Flyway guarda su checksum); el cambio va en una migración posterior.

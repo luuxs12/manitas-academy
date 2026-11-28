@@ -10,6 +10,9 @@
 - **Actuator:** solo `health`, `info`, `metrics` y `prometheus`, y siempre detrás
   del usuario de monitoreo (`MONITOR_USER`/`MONITOR_PASSWORD`). Si no hay
   contraseña de monitoreo, queda protegido con la cuenta `ADMIN` del sitio.
+- **Cuenta inicial:** `V18` crea el ADMIN con la clave guardada como hash BCrypt,
+  nunca en texto plano. Es una clave de arranque: cámbiala desde **Mi perfil**
+  en el primer inicio de sesión y no la reutilices en otros servicios.
 - **Webhook de Stripe:** es público porque Stripe no puede enviar el token CSRF,
   pero exige la firma `Stripe-Signature` calculada sobre el cuerpo crudo. Sin
   firma válida responde `400` y no toca el plan de nadie.

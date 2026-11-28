@@ -72,6 +72,8 @@ Al iniciar sesión se entra directo a `/panel`. Reúne el próximo curso, los cu
 disponibles, el progreso, los certificados y los datos de la cuenta. A los cursos
 se entra por `/panel/cursos` y el temario guarda el avance ítem por ítem.
 
+![Panel del estudiante con el curso siguiente y el progreso](docs/img/panel.jpg)
+
 ### Administrativo
 
 `/admin` es el inicio del panel y muestra KPIs, actividad, cursos populares,
@@ -91,7 +93,13 @@ caídas con su `requestId` y actividad de PostgreSQL. La vista consulta
 `/admin/api/monitoreo`; el JSON sale del buffer de peticiones del servidor, no de
 un `fetch` a Actuator desde el navegador.
 
-![Panel del estudiante con el curso siguiente y el progreso](docs/img/panel.jpg)
+![Inicio del panel administrativo con KPIs y actividad reciente](docs/img/admin-inicio.jpg)
+
+| Módulos por curso | Configuración |
+|---|---|
+| ![Módulos del curso elegido con sus acciones](docs/img/admin-modulos.jpg) | ![Integraciones, plataforma y cuenta en una tarjeta](docs/img/admin-configuracion.jpg) |
+
+![Reportes con indicadores y gráficos de tamaño contenido](docs/img/admin-reportes.jpg)
 
 ## Capturas
 

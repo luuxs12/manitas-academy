@@ -207,6 +207,7 @@
 .admin-body .admin-config {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    align-items: start;
     gap: .8rem;
     max-width: 880px;
 }

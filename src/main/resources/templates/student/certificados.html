@@ -68,7 +68,7 @@
 
                 <div class="panel-upgrade" th:if="${!usuarioActual.premium()}">
                     <strong th:if="${finalizado > 0}"
-                            th:text="'Ya terminaste ' + completed + ' cursos. Los certificados son parte del plan Premium.'">
+                            th:text="${'Ya terminaste ' + finalizado + ' cursos. Los certificados son parte del plan Premium.'}">
                         Ya terminaste cursos. Los certificados son parte del plan Premium.
                     </strong>
                     <strong th:if="${finalizado == 0}">

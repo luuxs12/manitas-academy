@@ -133,9 +133,9 @@
                         Empezá con un curso
                     </p>
                     <p class="panel-progress-copy"
-                       th:text="${inscripto} == 0
+                       th:text="${inscripto == 0
                            ? 'Buscá un curso en el panel e inscribite para verlo acá.'
-                           : completed + ' de ' + enrolled + ' cursos terminados.'">
+                           : finalizado + ' de ' + inscripto + ' cursos terminados.'}">
                         Buscá un curso en el panel e inscribite para verlo acá.
                     </p>
                     <a class="btn btn-ghost panel-progress-action"

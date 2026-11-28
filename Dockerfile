@@ -13,13 +13,13 @@ FROM eclipse-temurin:25-jre
 WORKDIR /app
 
 # Carpetas de trabajo. Con un disco persistente se monta en /app/uploads;
-# en el plan free el filesystem es efímero y se pierde al reiniciar.
+# sin disco persistente esos archivos se pierden al reiniciar el contenedor.
 RUN mkdir -p /app/uploads/avatars /app/uploads/covers /app/uploads/materials /app/logs
 
 COPY --from=build /workspace/target/api-0.0.1-SNAPSHOT.jar /app/api.jar
 
-# Render entrega DATABASE_URL como postgresql://... y Hikari exige jdbc:postgresql://...
-# Este entrypoint normaliza la URL y respeta el puerto que Render inyecta en PORT.
+# Algunas plataformas entregan DATABASE_URL como postgresql://... y Hikari
+# exige jdbc:postgresql://...; este entrypoint normaliza la URL y respeta PORT.
 RUN printf '%s\n' \
     '#!/bin/sh' \
     'set -eu' \

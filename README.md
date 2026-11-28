@@ -194,6 +194,11 @@ Los backups se conservan 14 días; la restauración exige `-ConfirmRestore` y
 verifica el checksum antes de tocar la base. El detalle está en
 [`docs/plan-de-backups.md`](docs/plan-de-backups.md).
 
+### Utilidades
+
+`scripts/java-ratio.ps1` cuenta líneas reales por lenguaje y calcula el
+porcentaje de Java del proyecto; con `-Detailed` muestra el detalle por archivo.
+
 ## Arrancar
 
 ```powershell
@@ -256,6 +261,7 @@ redirigen a `/?login`.
 api/
 ├── pom.xml                          dependencias
 ├── mvnw / mvnw.cmd                  Maven
+├── Dockerfile / .dockerignore       imagen de despliegue opcional
 ├── docs/
 │   ├── design-system.md             contrato visual, tokens y reglas de detalle
 │   ├── git-conventions.md           ramas y mensajes de commit
@@ -263,7 +269,10 @@ api/
 │   ├── plan-de-backups.md           respaldo y restauración de la base
 │   ├── plan-de-monitoreo.md         consola operativa y métricas
 │   ├── seguridad-y-rate-limiting.md límites de intentos y cabeceras
+│   ├── sustentacion.md              guion de sustentación por fases
 │   └── img/                         logo y capturas del README
+├── ops/monitoring/                  Prometheus, alertas y panel de Grafana
+├── scripts/                         backup, restauración y conteo de Java
 └── src/
     ├── main/
     │   ├── java/com/mundomanitas/api/

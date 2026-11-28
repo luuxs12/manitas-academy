@@ -29,9 +29,9 @@ spring:
       max-request-size: 11MB
 
 server:
-  # Render inyecta PORT; en local sigue siendo 8080.
+  # Plataformas de despliegue inyectan PORT; en local sigue siendo 8080.
   port: ${PORT:8080}
-  # Detrás del proxy de Render, respeta X-Forwarded-* para generar enlaces https.
+  # Detrás de un proxy, respeta X-Forwarded-* para generar enlaces https.
   forward-headers-strategy: framework
   servlet:
     session:
